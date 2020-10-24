@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="css,hexo,next,costom," />
+  <meta name="keywords" content="Redis,NOSQL,Jedis," />
 
 
 
@@ -83,20 +83,21 @@
 
 
 
-<meta name="description" content="【博客搭建】_博客预览和部署时背景不同问题：hexo next主题博客预览和部署不一样，背景图片加载不出来的问题思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样经过对比发现，部署时的main.css文件比预览时的main.css文件少了几百行，其中就少了背景图片的加载和设置部分代码。仔细观察可以发现少掉的这部分代码其实就是我们自己创建和添加的博客主题next&#x2F;source">
+<meta name="description" content="RedisNOSQLNOSQL就是非关系型数据库，这种数据库中数据的存储格式主要是key-value形式、文档形式、图片形式等等；而关系型数据库只支持基础数据类型，并且以表的形式存储。  非关系型数据库不支持sql这样的工业标准语言，每一种不同的NOSQL的操作语法不一样。 主流NOSQL产品 键值对存储数据库，比如Redis，数据模型即为一系列键值对。 列存储数据库，以列簇式存储，将同一列数据存">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【博客搭建】_博客预览和部署时背景不同">
-<meta property="og:url" content="http://https//littleforestjia.github.io/2020/09/17/%E3%80%90%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E3%80%91_%E5%8D%9A%E5%AE%A2%E9%A2%84%E8%A7%88%E5%92%8C%E9%83%A8%E7%BD%B2%E6%97%B6%E8%83%8C%E6%99%AF%E4%B8%8D%E5%90%8C/index.html">
+<meta property="og:title" content="【基础知识】_Redis">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/10/24/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Redis/index.html">
 <meta property="og:site_name" content="岩手县小森的博客">
-<meta property="og:description" content="【博客搭建】_博客预览和部署时背景不同问题：hexo next主题博客预览和部署不一样，背景图片加载不出来的问题思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样经过对比发现，部署时的main.css文件比预览时的main.css文件少了几百行，其中就少了背景图片的加载和设置部分代码。仔细观察可以发现少掉的这部分代码其实就是我们自己创建和添加的博客主题next&#x2F;source">
-<meta property="article:published_time" content="2020-09-16T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-09-17T04:16:16.005Z">
+<meta property="og:description" content="RedisNOSQLNOSQL就是非关系型数据库，这种数据库中数据的存储格式主要是key-value形式、文档形式、图片形式等等；而关系型数据库只支持基础数据类型，并且以表的形式存储。  非关系型数据库不支持sql这样的工业标准语言，每一种不同的NOSQL的操作语法不一样。 主流NOSQL产品 键值对存储数据库，比如Redis，数据模型即为一系列键值对。 列存储数据库，以列簇式存储，将同一列数据存">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/24/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Redis/%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93.png">
+<meta property="article:published_time" content="2020-10-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-10-24T14:13:05.949Z">
 <meta property="article:author" content="zju岩手县小森">
-<meta property="article:tag" content="css">
-<meta property="article:tag" content="hexo">
-<meta property="article:tag" content="next">
-<meta property="article:tag" content="costom">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="NOSQL">
+<meta property="article:tag" content="Jedis">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2020/10/24/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Redis/%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93.png">
 
 
 
@@ -126,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/09/17/【博客搭建】_博客预览和部署时背景不同/"/>
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/10/24/【基础知识】_Redis/"/>
 
 
 
 
 
-  <title>【博客搭建】_博客预览和部署时背景不同 | 岩手县小森的博客</title>
+  <title>【基础知识】_Redis | 岩手县小森的博客</title>
   
 
 
@@ -259,7 +260,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/09/17/%E3%80%90%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E3%80%91_%E5%8D%9A%E5%AE%A2%E9%A2%84%E8%A7%88%E5%92%8C%E9%83%A8%E7%BD%B2%E6%97%B6%E8%83%8C%E6%99%AF%E4%B8%8D%E5%90%8C/">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/10/24/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Redis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zju岩手县小森">
@@ -276,7 +277,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">【博客搭建】_博客预览和部署时背景不同</h1>
+          <h1 class="post-title" itemprop="name headline">【基础知识】_Redis</h1>
         
 
         <div class="post-meta">
@@ -288,8 +289,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-17T00:00:00+08:00">
-                2020-09-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-24T00:00:00+08:00">
+                2020-10-24
               </time>
             
 
@@ -311,8 +312,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" itemprop="url" rel="index">
-                    <span itemprop="name">博客搭建</span>
+                  <a href="/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
                   </a>
                 </span>
 
@@ -348,17 +349,113 @@
       
 
       
-        <h2 id="【博客搭建】-博客预览和部署时背景不同"><a href="#【博客搭建】-博客预览和部署时背景不同" class="headerlink" title="【博客搭建】_博客预览和部署时背景不同"></a>【博客搭建】_博客预览和部署时背景不同</h2><h4 id="问题：hexo-next主题博客预览和部署不一样，背景图片加载不出来的问题"><a href="#问题：hexo-next主题博客预览和部署不一样，背景图片加载不出来的问题" class="headerlink" title="问题：hexo next主题博客预览和部署不一样，背景图片加载不出来的问题"></a>问题：hexo next主题博客预览和部署不一样，背景图片加载不出来的问题</h4><h4 id="思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样"><a href="#思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样" class="headerlink" title="思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样"></a>思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样</h4><p>经过对比发现，部署时的<code>main.css</code>文件比预览时的<code>main.css</code>文件少了几百行，其中就少了背景图片的加载和设置部分代码。仔细观察可以发现少掉的这部分代码其实就是我们自己创建和添加的<code>博客主题next/source/css/_costom/costom.styl</code>文件中的代码。</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">  <span class="attribute">background</span>: <span class="built_in">url</span>(<span class="string">"/images/background.jpg"</span>);</span><br><span class="line">  <span class="attribute">background-repeat</span>: no-repeat;</span><br><span class="line">  <span class="attribute">background-attachment</span>: fixed;</span><br><span class="line">  <span class="attribute">background-position</span>: <span class="number">50%</span> <span class="number">50%</span>;</span><br><span class="line">  <span class="attribute">background-size</span>: cover;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>也就是说在预览时，浏览器直接在本地帮我们把_common、_custom、__mixins、_schemes、_variables五个文件夹中的styl格式文件代码合在一起生成main.css文件。</p>
-<p>而在部署时，hexo g生成博客文件时，服务器就要通过<code>博客主题next/source/css/main.styl</code>文件来生成main.css文件。打开<code>博客主题next/source/css/main.styl</code>文件我们发现最后加载<code>costom.styl</code>文件的代码为</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Custom Layer</span><br><span class="line">// --------------------------------------------------</span><br><span class="line"><span class="keyword">@import</span> <span class="string">"_custom/custom"</span>;</span><br></pre></td></tr></table></figure>
-
-<p>表示加载一个名为custom的文件夹中的文件，此处明显有误，多了一层文件夹，所以我们把这一句改成</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@import</span> <span class="string">"_custom/custom.styl"</span>;</span><br></pre></td></tr></table></figure>
-
-<p>再重新部署就可以了，浏览器调试可以看到预览和部署时的main.css文件内容也一样了。</p>
+        <h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><h4 id="NOSQL"><a href="#NOSQL" class="headerlink" title="NOSQL"></a>NOSQL</h4><p>NOSQL就是非关系型数据库，这种数据库中数据的存储格式主要是key-value形式、文档形式、图片形式等等；而关系型数据库只支持基础数据类型，并且以表的形式存储。</p>
+<p><img src="//littleforestjia.github.io/2020/10/24/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Redis/%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93.png" alt></p>
+<p>非关系型数据库不支持sql这样的工业标准语言，每一种不同的NOSQL的操作语法不一样。</p>
+<h4 id="主流NOSQL产品"><a href="#主流NOSQL产品" class="headerlink" title="主流NOSQL产品"></a>主流NOSQL产品</h4><ul>
+<li>键值对存储数据库，比如Redis，数据模型即为一系列键值对。</li>
+<li>列存储数据库，以列簇式存储，将同一列数据存在一起。</li>
+<li>文档型数据库，比如MongoDB，数据模型也是一些连键值对。</li>
+<li>图形(Graph)数据库，数据模型为图结构。</li>
+</ul>
+<h4 id="Redis支持的键值数据类型"><a href="#Redis支持的键值数据类型" class="headerlink" title="Redis支持的键值数据类型"></a>Redis支持的键值数据类型</h4><p>redis中存储的都是键值对，其中key的数据类型只能是字符串，value可以是以下五种类型数据。</p>
+<ul>
+<li><p>string</p>
+</li>
+<li><p>hash(哈希)</p>
+<p><strong><u>其实就是map格式，使用哈希类型作为value就表示，value本身又是一系列键值对。</u></strong></p>
+</li>
+<li><p>list</p>
+<p>linkedlist格式，支持重复元素。</p>
+</li>
+<li><p>set</p>
+<p>linkedlist格式，不允许重复元素。</p>
+</li>
+<li><p>sortset(有序集合)</p>
+<p>linkedlist格式，不允许重复元素，且元素有顺序。每个元素都会关联一个double类型的分数，redis正是通过分数来为集合中的成员进行从小到大的排序。</p>
+</li>
+</ul>
+<h4 id="Redis客户端操作命令"><a href="#Redis客户端操作命令" class="headerlink" title="Redis客户端操作命令"></a>Redis客户端操作命令</h4><ol>
+<li><p><strong>存储string： set key value</strong></p>
+<p>127.0.0.1:6379&gt; set username zhangsan</p>
+</li>
+</ol>
+<ol>
+<li><p><strong>获取string： get key</strong><br>127.0.0.1:6379&gt; get username</p>
+</li>
+<li><p><strong>删除string： del key</strong><br>127.0.0.1:6379&gt; del age</p>
+</li>
+<li><p><strong>存储hash： hset key field value</strong><br>127.0.0.1:6379&gt; hset myhash username lisi<br>127.0.0.1:6379&gt; hset myhash password 123</p>
+</li>
+<li><p><strong>获取hash：</strong></p>
+<ul>
+<li><p><strong>hget key field: 获取指定的field对应的值</strong></p>
+<p>127.0.0.1:6379&gt; hget myhash username</p>
+</li>
+<li><p><strong>hgetall key：获取所有的field和value</strong></p>
+<p>127.0.0.1:6379&gt; hgetall myhash</p>
+</li>
+</ul>
+</li>
+<li><p><strong>删除hash： hdel key field</strong></p>
+<p>127.0.0.1:6379&gt; hdel myhash username</p>
+</li>
+<li><p><strong>添加list：</strong></p>
+<ul>
+<li><p><strong>lpush key value: 将元素加入列表左边</strong></p>
+<p>127.0.0.1:6379&gt; lpush myList a</p>
+</li>
+<li><p><strong>rpush key value：将元素加入列表右边</strong></p>
+<p>127.0.0.1:6379&gt; rpush myList c</p>
+</li>
+</ul>
+</li>
+<li><p><strong>获取list：</strong></p>
+<ul>
+<li><p><strong>lrange key start end ：范围获取</strong></p>
+<p>127.0.0.1:6379&gt; lrange myList 0 -1</p>
+</li>
+</ul>
+</li>
+<li><p><strong>删除list：</strong></p>
+<ul>
+<li><strong>lpop key： 删除列表最左边的元素，并将元素返回</strong></li>
+<li><strong>rpop key： 删除列表最右边的元素，并将元素返回</strong></li>
+</ul>
+</li>
+<li><p><strong>存储set：sadd key value</strong></p>
+<p>127.0.0.1:6379&gt; sadd myset a</p>
+</li>
+<li><p><strong>获取set：smembers key:获取set集合中所有元素</strong></p>
+<p>127.0.0.1:6379&gt; smembers myset</p>
+</li>
+<li><p><strong>删除set：srem key value:删除set集合中的某个元素</strong></p>
+<p>127.0.0.1:6379&gt; srem myset a</p>
+</li>
+<li><p><strong>存储sortedset：zadd key score value</strong></p>
+<p>127.0.0.1:6379&gt; zadd mysort 60 zhangsan</p>
+</li>
+<li><p><strong>获取sortedset：zrange key start end [withscores]</strong></p>
+<p>127.0.0.1:6379&gt; zrange mysort 0 -1</p>
+</li>
+<li><p><strong>删除sortedset：zrem key value</strong></p>
+<p>127.0.0.1:6379&gt; zrem mysort lisi</p>
+</li>
+<li><p><strong>keys * : 查询所有的键</strong></p>
+</li>
+<li><p><strong>type key ： 获取键对应的value的类型</strong></p>
+</li>
+<li><p><strong>del key：删除指定的key value</strong> </p>
+</li>
+</ol>
+<h4 id="Jedis"><a href="#Jedis" class="headerlink" title="Jedis"></a>Jedis</h4><p>Jedis是一款使用java语言操作redis数据库的工具jar包，方便我们通过java语言操作redis数据库中的数据。</p>
+<h5 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h5><ul>
+<li>下载Jedis的jar包</li>
+<li>获取redis数据库连接：Jedis jedis = new Jedis(“localhost”,6379);</li>
+<li>关闭连接：jedis.close();</li>
+</ul>
+<h5 id="操作命令"><a href="#操作命令" class="headerlink" title="操作命令"></a>操作命令</h5><p>具体操作命令见pdf文件。</p>
+<h4 id="JedisPool"><a href="#JedisPool" class="headerlink" title="JedisPool"></a>JedisPool</h4><p>JedisPool是Jedis连接池对象，具体使用方法见pdf文件。</p>
 
       
     </div>
@@ -376,13 +473,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/css/" rel="tag"><i class="fa fa-tag"></i> css</a>
+            <a href="/tags/Redis/" rel="tag"><i class="fa fa-tag"></i> Redis</a>
           
-            <a href="/tags/hexo/" rel="tag"><i class="fa fa-tag"></i> hexo</a>
+            <a href="/tags/NOSQL/" rel="tag"><i class="fa fa-tag"></i> NOSQL</a>
           
-            <a href="/tags/next/" rel="tag"><i class="fa fa-tag"></i> next</a>
-          
-            <a href="/tags/costom/" rel="tag"><i class="fa fa-tag"></i> costom</a>
+            <a href="/tags/Jedis/" rel="tag"><i class="fa fa-tag"></i> Jedis</a>
           
         </div>
       
@@ -395,8 +490,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/09/16/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_%E5%89%8D%E7%AB%AF%E4%B8%89%E5%A4%A7%E4%BB%B6/" rel="next" title="【基础知识】_前端三大件">
-                <i class="fa fa-chevron-left"></i> 【基础知识】_前端三大件
+              <a href="/2020/10/22/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_19.%E5%88%A0%E9%99%A4%E9%93%BE%E8%A1%A8%E7%9A%84%E5%80%92%E6%95%B0%E7%AC%ACN%E4%B8%AA%E8%8A%82%E7%82%B9/" rel="next" title="【力扣刷题】_19.删除链表的倒数第N个节点">
+                <i class="fa fa-chevron-left"></i> 【力扣刷题】_19.删除链表的倒数第N个节点
               </a>
             
           </div>
@@ -405,8 +500,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/09/18/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_20.%E6%9C%89%E6%95%88%E7%9A%84%E6%8B%AC%E5%8F%B7/" rel="prev" title="【力扣刷题】_20.有效的括号">
-                【力扣刷题】_20.有效的括号 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/10/24/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Filter&Listener&JQuery/" rel="prev" title="【基础知识】_Filter&Listener&JQuery">
+                【基础知识】_Filter&Listener&JQuery <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -557,7 +652,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#【博客搭建】-博客预览和部署时背景不同"><span class="nav-number">1.</span> <span class="nav-text">【博客搭建】_博客预览和部署时背景不同</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题：hexo-next主题博客预览和部署不一样，背景图片加载不出来的问题"><span class="nav-number">1.0.1.</span> <span class="nav-text">问题：hexo next主题博客预览和部署不一样，背景图片加载不出来的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样"><span class="nav-number">1.0.2.</span> <span class="nav-text">思路：通过浏览器F12查看预览和部署时，执行的代码、执行的文件有什么不一样</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">1.</span> <span class="nav-text">Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NOSQL"><span class="nav-number">1.0.1.</span> <span class="nav-text">NOSQL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主流NOSQL产品"><span class="nav-number">1.0.2.</span> <span class="nav-text">主流NOSQL产品</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis支持的键值数据类型"><span class="nav-number">1.0.3.</span> <span class="nav-text">Redis支持的键值数据类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis客户端操作命令"><span class="nav-number">1.0.4.</span> <span class="nav-text">Redis客户端操作命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Jedis"><span class="nav-number">1.0.5.</span> <span class="nav-text">Jedis</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#使用步骤"><span class="nav-number">1.0.5.1.</span> <span class="nav-text">使用步骤</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#操作命令"><span class="nav-number">1.0.5.2.</span> <span class="nav-text">操作命令</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JedisPool"><span class="nav-number">1.0.6.</span> <span class="nav-text">JedisPool</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
