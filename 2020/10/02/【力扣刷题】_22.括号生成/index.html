@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="递归," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="22.括号生成tips：代码块中的注解、加粗、下划线部分为重点内容。  数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且有效的括号组合。 示例： 输入：n &#x3D; 3输出：[       “((()))”,       “(()())”,       “(())()”,       “()(())”,       “()()()”     ] 链接：https:&#x2F;&#x2F;leetc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【力扣刷题】_22.括号生成">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/10/02/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_22.%E6%8B%AC%E5%8F%B7%E7%94%9F%E6%88%90/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="22.括号生成tips：代码块中的注解、加粗、下划线部分为重点内容。  数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且有效的括号组合。 示例： 输入：n &#x3D; 3输出：[       “((()))”,       “(()())”,       “(())()”,       “()(())”,       “()()()”     ] 链接：https:&#x2F;&#x2F;leetc">
+<meta property="article:published_time" content="2020-10-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-10-20T11:54:44.216Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="递归">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/10/02/【力扣刷题】_22.括号生成/"/>
+
+
+
+
+
+  <title>【力扣刷题】_22.括号生成 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/10/02/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_22.%E6%8B%AC%E5%8F%B7%E7%94%9F%E6%88%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【力扣刷题】_22.括号生成</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-02T00:00:00+08:00">
+                2020-10-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98/" itemprop="url" rel="index">
+                    <span itemprop="name">力扣刷题</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="22-括号生成"><a href="#22-括号生成" class="headerlink" title="22.括号生成"></a>22.括号生成</h2><p><em>tips：代码块中的注解、加粗、下划线部分为重点内容。</em></p>
+<hr>
+<p>数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且<code>有效的</code>括号组合。</p>
+<p>示例：</p>
+<p>输入：n = 3<br>输出：[<br>       “((()))”,<br>       “(()())”,<br>       “(())()”,<br>       “()(())”,<br>       “()()()”<br>     ]</p>
+<p>链接：<a href="https://leetcode-cn.com/problems/generate-parentheses" target="_blank" rel="noopener">https://leetcode-cn.com/problems/generate-parentheses</a></p>
+<hr>
+<h3 id="方法一：暴力法"><a href="#方法一：暴力法" class="headerlink" title="方法一：暴力法"></a>方法一：暴力法</h3><p><strong>枚举所有种类的字符数组，共2^2n种，检验出其中有效的，放入结果数组中。</strong></p>
+<p><strong><u>这种思路的关键部分是，每个位置只能是<code>(</code>或<code>)</code>这两种，那么我们要枚举所有字符串的方法就是从null开始，在字符串后添加一个<code>(</code>或<code>)</code>，然后又在每一种情况下，在字符串后添加一个<code>(</code>或<code>)</code>，一直递归，直到字符串长度达到预期长度。</u></strong></p>
+<p>时间复杂度：O((2^2n)n)</p>
+<p>空间复杂度：O(n)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generateParenthesis</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; stringList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        generateString(<span class="keyword">new</span> <span class="keyword">char</span>[<span class="number">2</span>*n],<span class="number">0</span>,stringList);</span><br><span class="line">        <span class="keyword">return</span> stringList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//这个递归真是太巧妙了，这谁想的出来啊！！！</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">generateString</span><span class="params">(<span class="keyword">char</span>[] charList,<span class="keyword">int</span> nowLength,List&lt;String&gt; stringList)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(nowLength == charList.length) &#123;</span><br><span class="line">            <span class="keyword">if</span>(valid(charList)) &#123;</span><br><span class="line">                stringList.add(<span class="keyword">new</span> String(charList));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            charList[nowLength] = <span class="string">'('</span>;</span><br><span class="line">            generateString(charList, nowLength + <span class="number">1</span>, stringList);</span><br><span class="line">            charList[nowLength] = <span class="string">')'</span>;</span><br><span class="line">            generateString(charList, nowLength + <span class="number">1</span>, stringList);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   	<span class="comment">//该方法主要用于检验一段括号序列，组合在一起是否是有效括号字符串。</span></span><br><span class="line">    <span class="comment">//主要有两个判断条件：</span></span><br><span class="line">    <span class="comment">//1.每一个包含第一个括号的子序列中左括号个数不能小于右括号个数，</span></span><br><span class="line">    <span class="comment">//因为无论后面再加上多少个左括号，都不能和前面多出来的右括号配对相消。</span></span><br><span class="line">    <span class="comment">//2.总的左右括号个数一定要相等。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">valid</span><span class="params">(<span class="keyword">char</span>[] charList)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> balance = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">char</span> c:charList) &#123;</span><br><span class="line">            <span class="keyword">if</span>(c==<span class="string">'('</span>) &#123;balance++;&#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;balance--;&#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//一旦括号序列中包含第一个括号的子序列中，左括号个数小于右括号个数，那说明该括号序列一定是无效的。</span></span><br><span class="line">            <span class="keyword">if</span>(balance &lt; <span class="number">0</span>) &#123;<span class="keyword">return</span> <span class="keyword">false</span>;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> balance==<span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><ul>
+<li><p><code>public void generateString(char[] charList,int nowLength,List&lt;String&gt; stringList)</code>该方法中：</p>
+<ul>
+<li><u><strong>第一个参数最初为一个空的字符串数组，主要用来提供字符串预期长度，并给不断添加左右括号的字符数组提供一个载体；</strong></u></li>
+<li><u><strong>第二个参数表示现在字符数组中已经添加了几个左右括号字符了；</strong></u></li>
+<li><u><strong>第三个参数主要为枚举结果提供一个载体，一般不会在递归函数中创建新的变量，一般先在递归函数外面定义好变量，将该变量作为参数传入递归函数，由递归函数改变它，递归函数也可以通过这种方式传出运行结果。</strong></u></li>
+</ul>
+</li>
+<li><p><u><strong>一种新的检验括号字符串是否有效的方法：</strong></u></p>
+<ol>
+<li><u><strong>每一个包含第一个括号的子序列中左括号个数不能小于右括号个数，因为无论后面再加上多少个左括号，都不能和前面多出来的右括号配对相消。</strong></u></li>
+<li><u><strong>总的左右括号个数一定要相等。</strong></u></li>
+</ol>
+<p><u><strong>只要满足以上两个条件，就是有效括号字符串。</strong></u></p>
+</li>
+</ul>
+<h3 id="方法二：回溯法"><a href="#方法二：回溯法" class="headerlink" title="方法二：回溯法"></a>方法二：回溯法</h3><p><strong>方法一还有改进的余地：我们可以只在序列仍然保持有效时才添加 <code>(</code> 或 <code>)</code>，而不是像方法一那样每次添加。我们可以通过跟踪到目前为止放置的左括号和右括号的数目来做到这一点：</strong></p>
+<ol>
+<li><strong>如果左括号数量不大于 n，我们可以放一个左括号。</strong></li>
+<li><strong>如果右括号数量小于左括号的数量，我们可以放一个右括号。</strong></li>
+</ol>
+<p><strong><u>以上两个条件优先级相同，一个字符串同时满足就分裂成两种情况。</u></strong></p>
+<p><u><strong>这个思路本质上其实就是设定一种左右括号添加顺序的规则，使得遵守这种括号添加规则的字符串到最后都是有效的。</strong></u></p>
+<p>时间复杂度：O((4^n)/sqrt(n))</p>
+<p>空间复杂度：O(n)</p>
+<p><strong>我自己照这个思路在方法一的基础上写的：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generateParenthesis</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; stringList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        backTrack(<span class="keyword">new</span> <span class="keyword">char</span>[n*<span class="number">2</span>],<span class="number">0</span>,<span class="number">0</span>,stringList);</span><br><span class="line">        <span class="keyword">return</span> stringList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backTrack</span><span class="params">(<span class="keyword">char</span>[] charList,<span class="keyword">int</span> leftNumber,<span class="keyword">int</span> rightNumber,List&lt;String&gt; stringList)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//递归终止条件，就是添加括号达到预期数目。</span></span><br><span class="line">        <span class="keyword">if</span>(leftNumber+rightNumber == charList.length) &#123;</span><br><span class="line">            stringList.add(<span class="keyword">new</span> String(charList));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(leftNumber*<span class="number">2</span> &lt; charList.length) &#123;</span><br><span class="line">            charList[leftNumber+rightNumber] = <span class="string">'('</span>;</span><br><span class="line">            backTrack(charList,leftNumber+<span class="number">1</span>,rightNumber,stringList);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(rightNumber &lt; leftNumber) &#123;</span><br><span class="line">            charList[leftNumber+rightNumber] = <span class="string">')'</span>;</span><br><span class="line">            backTrack(charList,leftNumber,rightNumber+<span class="number">1</span>,stringList);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>力扣官方答案：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generateParenthesis</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; ans = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">        backtrack(ans, <span class="keyword">new</span> StringBuilder(), <span class="number">0</span>, <span class="number">0</span>, n);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(List&lt;String&gt; ans, StringBuilder cur, <span class="keyword">int</span> open, <span class="keyword">int</span> close, <span class="keyword">int</span> max)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cur.length() == max * <span class="number">2</span>) &#123;</span><br><span class="line">            ans.add(cur.toString());</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (open &lt; max) &#123;</span><br><span class="line">            cur.append(<span class="string">'('</span>);</span><br><span class="line">            backtrack(ans, cur, open + <span class="number">1</span>, close, max);</span><br><span class="line">            cur.deleteCharAt(cur.length() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (close &lt; open) &#123;</span><br><span class="line">            cur.append(<span class="string">')'</span>);</span><br><span class="line">            backtrack(ans, cur, open, close + <span class="number">1</span>, max);</span><br><span class="line">            cur.deleteCharAt(cur.length() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="小结："><a href="#小结：" class="headerlink" title="小结："></a>小结：</h4><ul>
+<li><u><strong>注意我自己写的和官方两种递归方法的差别：</strong></u><ol>
+<li><u><strong>我自己写的递归方法中，是没有在递归终止语句后面加上return的，其实这两种写法中，加不加都无所谓，效果是一样的。但是我们要知道区别，如果不加return，则要通过条件语句确保递归终止语句后面的代码不会再执行了。</strong></u></li>
+<li><u><strong>(非常重要)官方方法中，后面两个包含递归方法的if代码块中是通过添加<code>cur.append(&#39;(&#39;);</code>来改变字符串的，执行第一个代码块时，从递归方法中出来后必须先把添加的字符去掉<code>cur.deleteCharAt(cur.length() - 1);</code>，再进入第二个代码块中执行添加操作；而我自己写的方法是直接给该索引位置的字符重新赋值<code>charList[leftNumber+rightNumber] = &#39;)&#39;;</code>，所以不用先删掉之前添加的字符，重新赋值会直接覆盖原来的字符。</strong></u></li>
+</ol>
+</li>
+</ul>
+<h3 id="方法三：动态规划递归（还没自己实现）"><a href="#方法三：动态规划递归（还没自己实现）" class="headerlink" title="方法三：动态规划递归（还没自己实现）"></a>方法三：动态规划递归（还没自己实现）</h3><p><strong>任何一个括号序列都一定是由<code>(</code>开头，并且第一个<code>(</code>一定有一个唯一与之对应的<code>)</code>。这样一来，每一个括号序列可以用<code>(a)b</code>来表示，其中<code>a</code>与<code>b</code>分别是一个合法的括号序列（可以为空）。</strong></p>
+<p><u><strong>那么，要生成所有长度为2*n的括号序列，我们定义一个函数方法generate(n)来返回所有可能的括号序列。那么在函数 generate(n) 的过程中：</strong></u></p>
+<ul>
+<li><u><strong>我们需要枚举与第一个 ( 对应的 ) 的位置 2 * i + 1；</strong></u></li>
+<li><u><strong>递归调用 generate(i) 即可计算 a 的所有可能性；</strong></u></li>
+<li><u><strong>递归调用 generate(n - i - 1) 即可计算 b 的所有可能性；</strong></u></li>
+<li><u><strong>遍历 a 与 b 的所有可能性并拼接，即可得到所有长度为 2 * n 的括号序列。</strong></u></li>
+</ul>
+<p><strong>为了节省计算时间，我们在每次 generate(i) 函数返回之前，把返回值存储起来，下次再调用 generate(i) 时可以直接返回，不需要再递归计算。</strong></p>
+<p>时间复杂度：O((4^n)/sqrt(n))</p>
+<p>空间复杂度：O((4^n)/sqrt(n))</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution3</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generateParenthesis</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> generate(n);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ArrayList[] cache = <span class="keyword">new</span> ArrayList[<span class="number">100</span>];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generate</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cache[n] != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> cache[n];</span><br><span class="line">        &#125;</span><br><span class="line">        ArrayList&lt;String&gt; ans = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">        <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">            ans.add(<span class="string">""</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> c = <span class="number">0</span>; c &lt; n; ++c) &#123;</span><br><span class="line">                <span class="keyword">for</span> (String left: generate(c)) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (String right: generate(n - <span class="number">1</span> - c)) &#123;</span><br><span class="line">                        ans.add(<span class="string">"("</span> + left + <span class="string">")"</span> + right);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        cache[n] = ans;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E9%80%92%E5%BD%92/" rel="tag"><i class="fa fa-tag"></i> 递归</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/28/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_21.%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E9%93%BE%E8%A1%A8/" rel="next" title="【力扣刷题】_21.合并两个有序链表">
+                <i class="fa fa-chevron-left"></i> 【力扣刷题】_21.合并两个有序链表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/15/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_4.%E5%AF%BB%E6%89%BE%E4%B8%A4%E4%B8%AA%E6%AD%A3%E5%BA%8F%E6%95%B0%E7%BB%84%E7%9A%84%E4%B8%AD%E4%BD%8D%E6%95%B0/" rel="prev" title="【力扣刷题】_4.寻找两个正序数组的中位数">
+                【力扣刷题】_4.寻找两个正序数组的中位数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">50</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#22-括号生成"><span class="nav-number">1.</span> <span class="nav-text">22.括号生成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法一：暴力法"><span class="nav-number">1.1.</span> <span class="nav-text">方法一：暴力法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#小结"><span class="nav-number">1.1.1.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法二：回溯法"><span class="nav-number">1.2.</span> <span class="nav-text">方法二：回溯法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#小结："><span class="nav-number">1.2.1.</span> <span class="nav-text">小结：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法三：动态规划递归（还没自己实现）"><span class="nav-number">1.3.</span> <span class="nav-text">方法三：动态规划递归（还没自己实现）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
