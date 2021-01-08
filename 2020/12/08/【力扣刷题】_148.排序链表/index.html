@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="递归,插入排序,并归排序," />
+  <meta name="keywords" content="递归,插入排序,归并排序," />
 
 
 
@@ -91,11 +91,11 @@
 <meta property="og:description" content="148.排序链表tips：代码块中的注解、加粗、下划线部分为重点内容。  给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。 进阶：你可以在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序吗？ 示例 1：  输入：head &#x3D; [4,2,1,3]输出：[1,2,3,4]  示例 2：  输入：head &#x3D; [-1,5,3,4,0]输出：[-1,0,3,">
 <meta property="og:image" content="http://littleforestjia.github.io/2020/12/08/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_148.%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.png">
 <meta property="article:published_time" content="2020-12-07T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-12-09T03:55:21.363Z">
+<meta property="article:modified_time" content="2021-01-08T03:59:27.793Z">
 <meta property="article:author" content="zju岩手县小森">
 <meta property="article:tag" content="递归">
 <meta property="article:tag" content="插入排序">
-<meta property="article:tag" content="并归排序">
+<meta property="article:tag" content="归并排序">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://littleforestjia.github.io/2020/12/08/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_148.%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.png">
 
@@ -374,7 +374,7 @@
 <p><strong>空间复杂度：O(1)</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">sortList</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//新链表的哑节点</span></span><br><span class="line">        ListNode ya = <span class="keyword">new</span> ListNode();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (head != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ListNode curr = ya;</span><br><span class="line">            <span class="keyword">while</span> (curr.next != <span class="keyword">null</span> &amp;&amp; head.val &gt; curr.next.val) &#123;</span><br><span class="line">                curr = curr.next;</span><br><span class="line">            &#125;</span><br><span class="line">            ListNode change = head;</span><br><span class="line">            head = head.next;</span><br><span class="line">            ListNode temp = curr.next;</span><br><span class="line">            curr.next = change;</span><br><span class="line">            change.next = temp;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ya.next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="方法二：递归实现的并归排序"><a href="#方法二：递归实现的并归排序" class="headerlink" title="方法二：递归实现的并归排序"></a>方法二：递归实现的并归排序</h3><p><strong>思路：</strong></p>
+<h3 id="方法二：递归实现的归并排序"><a href="#方法二：递归实现的归并排序" class="headerlink" title="方法二：递归实现的归并排序"></a>方法二：递归实现的归并排序</h3><p><strong>思路：</strong></p>
 <ul>
 <li><strong>找到链表的中点，以中点为分界，将链表拆分成两个子链表。寻找链表的中点可以使用快慢指针的做法，快指针每次移动 22 步，慢指针每次移动 11 步，当快指针到达链表末尾时，慢指针指向的链表节点即为链表的中点。</strong></li>
 <li><strong>使用递归对两个子链表分别排序。</strong></li>
@@ -384,7 +384,7 @@
 <p><strong>空间复杂度：O(logn)<u>（空间复杂度主要是由递归造成的，递归的空间复杂度一般都是O(logn)，将递归转换成迭代即可减小空间复杂度。）</u></strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution1</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//递归法将无序链表排列为有序链表</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">sortList</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//递归终止条件</span></span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) <span class="keyword">return</span> head;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置快慢指针，用来找到链表的中间位置。这一步是并归的关键步骤1。</span></span><br><span class="line">        <span class="comment">//(重要：如果这里直接使fast=head会出大问题，结合关键步骤2中的语句，会使得长度为2的链表分成长度为2的第一段链表和长度为0的第二段链表。)</span></span><br><span class="line">        ListNode slow = head,fast = head.next;</span><br><span class="line">        <span class="keyword">while</span> (fast != <span class="keyword">null</span> &amp;&amp; fast.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">            slow = slow.next;</span><br><span class="line">            fast = fast.next.next;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//以slow节点以前的节点(包括slow节点)为第一段，以后的节点为第二段。这一步是并归的关键步骤2。</span></span><br><span class="line">        ListNode secend = slow.next;</span><br><span class="line">        slow.next = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> merge(sortList(head),sortList(secend));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//递归法合并两个有序链表为一个有序链表</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">merge</span><span class="params">(ListNode n1,ListNode n2)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//递归终止条件</span></span><br><span class="line">        <span class="keyword">if</span> (n1 == <span class="keyword">null</span>) <span class="keyword">return</span> n2;</span><br><span class="line">        <span class="keyword">if</span> (n2 == <span class="keyword">null</span>) <span class="keyword">return</span> n1;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (n1.val &lt; n2.val) &#123;</span><br><span class="line">            n1.next = merge(n1.next,n2);</span><br><span class="line">            <span class="keyword">return</span> n1;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            n2.next = merge(n1,n2.next);</span><br><span class="line">            <span class="keyword">return</span> n2;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="方法三：迭代实现的并归排序"><a href="#方法三：迭代实现的并归排序" class="headerlink" title="方法三：迭代实现的并归排序"></a>方法三：迭代实现的并归排序</h3><p><strong>时间复杂度：O(nlogn)</strong></p>
+<h3 id="方法三：迭代实现的归并排序"><a href="#方法三：迭代实现的归并排序" class="headerlink" title="方法三：迭代实现的归并排序"></a>方法三：迭代实现的归并排序</h3><p><strong>时间复杂度：O(nlogn)</strong></p>
 <p><strong>空间复杂度：O(1)</strong></p>
 <p><strong>具体实现代码不再复写，就上将方法二中的两个递归函数中的递归改成迭代。</strong></p>
 
@@ -408,7 +408,7 @@
           
             <a href="/tags/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/" rel="tag"><i class="fa fa-tag"></i> 插入排序</a>
           
-            <a href="/tags/%E5%B9%B6%E5%BD%92%E6%8E%92%E5%BA%8F/" rel="tag"><i class="fa fa-tag"></i> 并归排序</a>
+            <a href="/tags/%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/" rel="tag"><i class="fa fa-tag"></i> 归并排序</a>
           
         </div>
       
@@ -514,7 +514,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">125</span>
+                  <span class="site-state-item-count">128</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -536,7 +536,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">103</span>
+                  <span class="site-state-item-count">108</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -583,7 +583,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#148-排序链表"><span class="nav-number">1.</span> <span class="nav-text">148.排序链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#十大排序算法"><span class="nav-number">1.1.</span> <span class="nav-text">十大排序算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法一：插入排序"><span class="nav-number">1.2.</span> <span class="nav-text">方法一：插入排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法二：递归实现的并归排序"><span class="nav-number">1.3.</span> <span class="nav-text">方法二：递归实现的并归排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法三：迭代实现的并归排序"><span class="nav-number">1.4.</span> <span class="nav-text">方法三：迭代实现的并归排序</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#148-排序链表"><span class="nav-number">1.</span> <span class="nav-text">148.排序链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#十大排序算法"><span class="nav-number">1.1.</span> <span class="nav-text">十大排序算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法一：插入排序"><span class="nav-number">1.2.</span> <span class="nav-text">方法一：插入排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法二：递归实现的归并排序"><span class="nav-number">1.3.</span> <span class="nav-text">方法二：递归实现的归并排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法三：迭代实现的归并排序"><span class="nav-number">1.4.</span> <span class="nav-text">方法三：迭代实现的归并排序</span></a></li></ol></li></ol></div>
             
 
           </div>
