@@ -90,7 +90,7 @@
 <meta property="og:site_name" content="岩手县小森的博客">
 <meta property="og:description" content="第一轮复习面试题2.实现singleton模式 单例模式  类加载机制  代码： 123456789101112131415161718192021222324252627282930&#x2F;** * 单例模式(饿汉模式) *&#x2F;class Singleton&amp;#123;    private static Singleton singleton &#x3D; new Singleton();    &#x2F;&#x2F;构造方法的">
 <meta property="article:published_time" content="2021-02-28T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-03-01T13:04:36.208Z">
+<meta property="article:modified_time" content="2021-03-06T15:32:03.725Z">
 <meta property="article:author" content="zju岩手县小森">
 <meta name="twitter:card" content="summary">
 
@@ -354,8 +354,191 @@
 
 </li>
 </ul>
-<h3 id="面试题3-数组中重复的数字"><a href="#面试题3-数组中重复的数字" class="headerlink" title="面试题3.数组中重复的数字"></a>面试题3.数组中重复的数字</h3><ul>
-<li>​</li>
+<h3 id="面试题10-1-斐波那契数列"><a href="#面试题10-1-斐波那契数列" class="headerlink" title="面试题10_1.斐波那契数列"></a>面试题10_1.斐波那契数列</h3><ul>
+<li><p>使用动态规划而不用递归</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 优化的动态规划</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution10_1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">fib</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> dp1 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> dp2 = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> temp = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//当n很大的时候可能会出现数字溢出，所以我们需要用结果对1000000007求余。</span></span><br><span class="line">            temp = (dp1 + dp2) % <span class="number">1000000007</span>;</span><br><span class="line">            dp1 = dp2;</span><br><span class="line">            dp2 = temp;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题11-旋转数组的最小数字"><a href="#面试题11-旋转数组的最小数字" class="headerlink" title="面试题11.旋转数组的最小数字"></a>面试题11.旋转数组的最小数字</h3><ul>
+<li>重要：这道题的数组中可以包含相等元素，比不包含相等元素要难得多。</li>
+<li>一定要注意，二分法中将中间点数值与左边界数值还是右边界数值比较是有不同意义的，在做题时可以尝试比较两者区别，选择更加合适比较方式。</li>
+</ul>
+<h3 id="面试题12-矩阵中的路径"><a href="#面试题12-矩阵中的路径" class="headerlink" title="面试题12.矩阵中的路径"></a>面试题12.矩阵中的路径</h3><ul>
+<li>本题中记忆化标记矩阵的回溯代码很容易忘记写，一定不能忘了。深度优先遍历时，一条路走不通了换另一条路时一定要先回溯。</li>
+</ul>
+<h3 id="面试题13-机器人的运动范围"><a href="#面试题13-机器人的运动范围" class="headerlink" title="面试题13.机器人的运动范围"></a>面试题13.机器人的运动范围</h3><ul>
+<li>就是遍历矩阵，判断每个格子是否有符合计算要求，并且左边或者上面的格子能够到达。</li>
+</ul>
+<h3 id="面试题14-1-剪绳子"><a href="#面试题14-1-剪绳子" class="headerlink" title="面试题14_1.剪绳子"></a>面试题14_1.剪绳子</h3><ul>
+<li><p>高数推导得出：所有绳段长度都为3时乘积最大</p>
+</li>
+<li><p>也可以用动态规划的方法，这不过这种动态规划每次求一个状态值都需要用到前面所有的状态值。</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 动态规划</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution14_1</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">result</span><span class="params">(<span class="keyword">int</span> length)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[length + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        dp[<span class="number">2</span>] = <span class="number">1</span>;</span><br><span class="line">        dp[<span class="number">3</span>] = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">4</span>;i &lt; length + <span class="number">1</span>;i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">2</span>;j &lt;= length / <span class="number">2</span>;j++) &#123;</span><br><span class="line">                dp[i] = Math.max(dp[i],Math.max(j,dp[j]) * Math.max(i - j,dp[i - j]));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[length];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题14-2-剪绳子2"><a href="#面试题14-2-剪绳子2" class="headerlink" title="面试题14_2.剪绳子2"></a>面试题14_2.剪绳子2</h3><ul>
+<li>本题中要求每次乘3之后都要取模，所以不能直接用Math.pow方法直接一下求出double类型结果。但是int类型的取值范围为-2147483648~+2147483647，计算结果有可能直接在一次乘3之后直接溢出了，这样就会导致这个计算结果错误。所以此处我们设置结果数据类型为long或者double，一次一次乘3的计算，每次乘3后都取模。</li>
+</ul>
+<h3 id="面试题15-二进制中1的个数"><a href="#面试题15-二进制中1的个数" class="headerlink" title="面试题15.二进制中1的个数"></a>面试题15.二进制中1的个数</h3><ul>
+<li>将树值与1进行与位运算（&amp;），可以得到该数二进制形式的最低位；</li>
+<li>将数值无符号右移（&gt;&gt;&gt;），直到为零。</li>
+</ul>
+<h3 id="面试题16-数值的整数次方"><a href="#面试题16-数值的整数次方" class="headerlink" title="面试题16.数值的整数次方"></a>面试题16.数值的整数次方</h3><ul>
+<li>递归+二分法</li>
+</ul>
+<h3 id="面试题17-打印从1到最大的n位数（未解决）"><a href="#面试题17-打印从1到最大的n位数（未解决）" class="headerlink" title="面试题17.打印从1到最大的n位数（未解决）"></a>面试题17.打印从1到最大的n位数（未解决）</h3><ul>
+<li>递归：个位从0到9，十位从0到9…这样一位一位的确认。</li>
+</ul>
+<h3 id="面试题18-删除链表的节点"><a href="#面试题18-删除链表的节点" class="headerlink" title="面试题18.删除链表的节点"></a>面试题18.删除链表的节点</h3><ul>
+<li>双指针：两个指针分别指向相邻的两个节点。</li>
+</ul>
+<h3 id="面试题19-正则表达式匹配（非常重要）（未解决）"><a href="#面试题19-正则表达式匹配（非常重要）（未解决）" class="headerlink" title="面试题19.正则表达式匹配（非常重要）（未解决）"></a>面试题19.正则表达式匹配（非常重要）（未解决）</h3><h3 id="面试题21-调整数组顺序使奇数位于偶数前面"><a href="#面试题21-调整数组顺序使奇数位于偶数前面" class="headerlink" title="面试题21.调整数组顺序使奇数位于偶数前面"></a>面试题21.调整数组顺序使奇数位于偶数前面</h3><ul>
+<li>双指针：左右指针分别指向头尾，左指针一旦遇到偶数就与右指针交换数值，并将右指针左移一位。</li>
+</ul>
+<h3 id="面试题22-链表中倒数第k个节点"><a href="#面试题22-链表中倒数第k个节点" class="headerlink" title="面试题22.链表中倒数第k个节点"></a>面试题22.链表中倒数第k个节点</h3><ul>
+<li>双指针：前后指针相隔k-1个节点，前指针到达队尾时，后指针即为所求。</li>
+</ul>
+<h3 id="面试题24-反转链表"><a href="#面试题24-反转链表" class="headerlink" title="面试题24.反转链表"></a>面试题24.反转链表</h3><ul>
+<li>三指针：也就是迭代的一个一个反转节点的指向。</li>
+</ul>
+<h3 id="面试题26-树的子结构"><a href="#面试题26-树的子结构" class="headerlink" title="面试题26.树的子结构"></a>面试题26.树的子结构</h3><ul>
+<li><p>递归：两个递归方法的组合，太妙了。一个递归方法用于前序遍历，并一个递归方法用于比较两棵树。</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 递归前序遍历</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution26</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSon</span><span class="params">(TreeNode a,TreeNode b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> isEquel(a,b) || isSon(a.left,b) || isSon(a.right,b);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//注意这个方法并不是真的判断a、b是不是相同，而是判断b是不是与a的顶端几层相同。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEquel</span><span class="params">(TreeNode a,TreeNode b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (b == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (a.val != b.val) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> isEquel(a.left,b.left) &amp;&amp; isEquel(a.right,b.right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题31-栈的压入弹出序列"><a href="#面试题31-栈的压入弹出序列" class="headerlink" title="面试题31.栈的压入弹出序列"></a>面试题31.栈的压入弹出序列</h3><ul>
+<li>辅助栈模拟：就是创建一个辅助栈来真正模拟该栈，将入栈队列依次压入栈中，每压入一个元素，检验出栈队列是否需要将栈顶元素出栈。若执行完上述操作之后，辅助栈正好为空，说明此出栈队列可以对应上入栈队列。</li>
+</ul>
+<h3 id="面试题32-2-从上到下打印二叉树2"><a href="#面试题32-2-从上到下打印二叉树2" class="headerlink" title="面试题32_2.从上到下打印二叉树2"></a>面试题32_2.从上到下打印二叉树2</h3><ul>
+<li>层序遍历二叉树，并将所有节点分好层：要解决这个问题就是在常规层序遍历的基础之上再加一层循环。每次计算队列的长度，以此为循环次数。</li>
+</ul>
+<h3 id="面试题32-3-从上到下打印二叉树3"><a href="#面试题32-3-从上到下打印二叉树3" class="headerlink" title="面试题32_3.从上到下打印二叉树3"></a>面试题32_3.从上到下打印二叉树3</h3><ul>
+<li>与分层层序遍历相比，本题使用链表的双端链表特性来保存每层的数据。比如将结果添加到结果集的第一层时正常使用add()方法，而添加第二层时则使用addLast()方法。</li>
+</ul>
+<h3 id="面试题33-二叉搜索树的后序遍历序列"><a href="#面试题33-二叉搜索树的后序遍历序列" class="headerlink" title="面试题33.二叉搜索树的后序遍历序列"></a>面试题33.二叉搜索树的后序遍历序列</h3><ul>
+<li>递归：一个二叉搜索树的后序遍历结果的格式一定是 [ 小于根节点的节点，大于根节点的节点，根节点 ]  。</li>
+</ul>
+<h3 id="面试题34-二叉树中和为某一值的路径"><a href="#面试题34-二叉树中和为某一值的路径" class="headerlink" title="面试题34.二叉树中和为某一值的路径"></a>面试题34.二叉树中和为某一值的路径</h3><ul>
+<li>递归回溯法一定要己得回溯，我第二次做的时候仍然忘了回溯。</li>
+</ul>
+<h3 id="面试题36-二叉搜索树与双向链表（未解决）"><a href="#面试题36-二叉搜索树与双向链表（未解决）" class="headerlink" title="面试题36.二叉搜索树与双向链表（未解决）"></a>面试题36.二叉搜索树与双向链表（未解决）</h3><ul>
+<li><p>递归中序遍历</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 中序遍历递归</span></span><br><span class="line"><span class="comment"> * 二叉搜索树中序遍历得到的就是递增数组。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution36</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//前驱节点</span></span><br><span class="line">    TreeNode pre;</span><br><span class="line">    <span class="comment">//哑节点</span></span><br><span class="line">    TreeNode god = <span class="keyword">new</span> TreeNode(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">change</span> <span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        dfs(root);</span><br><span class="line">        pre.right = god.right;</span><br><span class="line">        god.right.left = pre;</span><br><span class="line">        <span class="keyword">return</span> god.right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//该递归方法可以将输入的二叉搜索树转变为双向链表，头节点左指针指向null，尾节点右指针指向null</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dfs</span> <span class="params">(TreeNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        dfs(head.left);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pre == <span class="keyword">null</span>) god.right = head;</span><br><span class="line">        <span class="keyword">else</span> pre.right = head;</span><br><span class="line">        head.left = pre;</span><br><span class="line">        pre = head;</span><br><span class="line"></span><br><span class="line">        dfs(head.right);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题37-序列化二叉树"><a href="#面试题37-序列化二叉树" class="headerlink" title="面试题37.序列化二叉树"></a>面试题37.序列化二叉树</h3><ul>
+<li>二叉树层序遍历结果唯一的方法：只要把二叉树中度为0和1的节点都补上值为null的辅助空子节点，得到的层序遍历结果就可以与一棵唯一的二叉树对应。</li>
+</ul>
+<h3 id="面试题38-字符串的排列"><a href="#面试题38-字符串的排列" class="headerlink" title="面试题38.字符串的排列"></a>面试题38.字符串的排列</h3><ul>
+<li>递归回溯；</li>
+<li>通过排序去除重复；</li>
+<li>使用一个标记数组，用来标记哪些字符已经使用过了。</li>
+</ul>
+<h3 id="面试题40-最小的k个数（非常重要）（未解决）"><a href="#面试题40-最小的k个数（非常重要）（未解决）" class="headerlink" title="面试题40.最小的k个数（非常重要）（未解决）"></a>面试题40.最小的k个数（非常重要）（未解决）</h3><ul>
+<li>堆排序</li>
+<li>快速排序</li>
+</ul>
+<h3 id="面试题41-数据流中的中位数"><a href="#面试题41-数据流中的中位数" class="headerlink" title="面试题41.数据流中的中位数"></a>面试题41.数据流中的中位数</h3><ul>
+<li>使用一个最大堆和一个最小堆共同组成数据结构；</li>
+<li>每次添加数据要保证新数据与最大堆和最小堆中数据都比较过。</li>
+</ul>
+<h3 id="面试题43-前n个整数中1出现的次数（巧思）（未解决）"><a href="#面试题43-前n个整数中1出现的次数（巧思）（未解决）" class="headerlink" title="面试题43.前n个整数中1出现的次数（巧思）（未解决）"></a>面试题43.前n个整数中1出现的次数（巧思）（未解决）</h3><ul>
+<li>分别计算个、十、百每一位中1出现的次数；</li>
+<li>分三个部分高位high、当前位curr、低位low，按curr的不同情况计算每一位1出现的次数。</li>
+</ul>
+<h3 id="面试题44-数字序列中某一位的数字（巧思）（未解决）"><a href="#面试题44-数字序列中某一位的数字（巧思）（未解决）" class="headerlink" title="面试题44.数字序列中某一位的数字（巧思）（未解决）"></a>面试题44.数字序列中某一位的数字（巧思）（未解决）</h3><h3 id="面试题45-把数组排成最小的数（巧思）（未解决）"><a href="#面试题45-把数组排成最小的数（巧思）（未解决）" class="headerlink" title="面试题45.把数组排成最小的数（巧思）（未解决）"></a>面试题45.把数组排成最小的数（巧思）（未解决）</h3><ul>
+<li>这道题本质上是一个排序问题，排序规则为：取出任意两个元素a和b，如果ab小于ba则应该将a放在b前面。</li>
+</ul>
+<h3 id="面试题46-把数字翻译成字符串"><a href="#面试题46-把数字翻译成字符串" class="headerlink" title="面试题46.把数字翻译成字符串"></a>面试题46.把数字翻译成字符串</h3><ul>
+<li>动态规划</li>
+</ul>
+<h3 id="面试题47-礼物的最大价值"><a href="#面试题47-礼物的最大价值" class="headerlink" title="面试题47.礼物的最大价值"></a>面试题47.礼物的最大价值</h3><ul>
+<li>这是一个路径问题，是一个很典型的动态规划问题，一般看到路径问题首先就要想到动态规划。</li>
+<li>优化思路：反正原矩阵中的元素只需要在计算该格状态时使用一次，所以直接在原矩阵的格子中记录状态。</li>
+</ul>
+<h3 id="面试题48-最长不含重复字符的子字符串"><a href="#面试题48-最长不含重复字符的子字符串" class="headerlink" title="面试题48.最长不含重复字符的子字符串"></a>面试题48.最长不含重复字符的子字符串</h3><ul>
+<li>使用HashSet辅助的滑动窗口</li>
+</ul>
+<h3 id="面试题49-丑数（巧思）"><a href="#面试题49-丑数（巧思）" class="headerlink" title="面试题49.丑数（巧思）"></a>面试题49.丑数（巧思）</h3><ul>
+<li>数组中每个数都在乘2、3、5，每次都比较相乘结果，最小的那个入队列，然后刚入队列这组的这个数马上变成队列中下一个数，继续与其他变化的组比较。</li>
+</ul>
+<h3 id="面试题50-第一个只出现一次的字符"><a href="#面试题50-第一个只出现一次的字符" class="headerlink" title="面试题50.第一个只出现一次的字符"></a>面试题50.第一个只出现一次的字符</h3><ul>
+<li>用HashMap辅助，只需要遍历字符串两遍即可。</li>
+</ul>
+<h3 id="面试题51-数组中的逆序对（非常重要）（未解决）"><a href="#面试题51-数组中的逆序对（非常重要）（未解决）" class="headerlink" title="面试题51.数组中的逆序对（非常重要）（未解决）"></a>面试题51.数组中的逆序对（非常重要）（未解决）</h3><ul>
+<li>归并排序</li>
+</ul>
+<h3 id="面试题53-2-前n个数中缺失的数字（未解决）"><a href="#面试题53-2-前n个数中缺失的数字（未解决）" class="headerlink" title="面试题53_2.前n个数中缺失的数字（未解决）"></a>面试题53_2.前n个数中缺失的数字（未解决）</h3><ul>
+<li>二分查找</li>
+</ul>
+<h3 id="面试题54-二叉搜索树的第k大节点"><a href="#面试题54-二叉搜索树的第k大节点" class="headerlink" title="面试题54.二叉搜索树的第k大节点"></a>面试题54.二叉搜索树的第k大节点</h3><ul>
+<li>先右后左的中序遍历到第k个值</li>
+</ul>
+<h3 id="面试题55-1-二叉树的深度"><a href="#面试题55-1-二叉树的深度" class="headerlink" title="面试题55_1.二叉树的深度"></a>面试题55_1.二叉树的深度</h3><ul>
+<li>递归回溯法，一定要记得回溯深度值。</li>
+</ul>
+<h3 id="面试题55-2-平衡二叉树"><a href="#面试题55-2-平衡二叉树" class="headerlink" title="面试题55_2.平衡二叉树"></a>面试题55_2.平衡二叉树</h3><ul>
+<li>记忆化递归</li>
+</ul>
+<h3 id="面试题56-1-数组中数字出现的次数（巧思）（未解决）"><a href="#面试题56-1-数组中数字出现的次数（巧思）（未解决）" class="headerlink" title="面试题56_1.数组中数字出现的次数（巧思）（未解决）"></a>面试题56_1.数组中数字出现的次数（巧思）（未解决）</h3><ul>
+<li>位运算</li>
+</ul>
+<h3 id="面试题56-2-数组中数字出现的次数2（巧思）（未解决）"><a href="#面试题56-2-数组中数字出现的次数2（巧思）（未解决）" class="headerlink" title="面试题56_2.数组中数字出现的次数2（巧思）（未解决）"></a>面试题56_2.数组中数字出现的次数2（巧思）（未解决）</h3><ul>
+<li>位运算</li>
+</ul>
+<h3 id="面试题57-2-和为s的连续正数序列"><a href="#面试题57-2-和为s的连续正数序列" class="headerlink" title="面试题57_2.和为s的连续正数序列"></a>面试题57_2.和为s的连续正数序列</h3><ul>
+<li>滑动窗口：两指针都只能往右移</li>
+<li>使用连续整数和的计算公式：首项加末项乘以项数除以二</li>
+</ul>
+<h3 id="面试题58-1-翻转单词顺序"><a href="#面试题58-1-翻转单词顺序" class="headerlink" title="面试题58_1.翻转单词顺序"></a>面试题58_1.翻转单词顺序</h3><ul>
+<li>双指针从后往前一个个找到单词。</li>
+</ul>
+<h3 id="面试题59-1-滑动窗口的最大值（巧思）（未解决）"><a href="#面试题59-1-滑动窗口的最大值（巧思）（未解决）" class="headerlink" title="面试题59_1.滑动窗口的最大值（巧思）（未解决）"></a>面试题59_1.滑动窗口的最大值（巧思）（未解决）</h3><ul>
+<li>辅助双端队列：在该队列中保存滑动窗口中的递减序列</li>
+</ul>
+<h3 id="面试题59-2-队列的最大值（巧思）（未解决）"><a href="#面试题59-2-队列的最大值（巧思）（未解决）" class="headerlink" title="面试题59_2.队列的最大值（巧思）（未解决）"></a>面试题59_2.队列的最大值（巧思）（未解决）</h3><ul>
+<li>想要随时获得栈中的最大、最小值，就需要辅助栈，容量与主栈始终相等；</li>
+<li>想要随实获得队列中的最大、最小值，就需要辅助双端队列，保存主队列中的单调序列，把非单调部分都去掉了。</li>
+</ul>
+<h3 id="面试题60-n个骰子的点数（非常重要）（未解决）"><a href="#面试题60-n个骰子的点数（非常重要）（未解决）" class="headerlink" title="面试题60.n个骰子的点数（非常重要）（未解决）"></a>面试题60.n个骰子的点数（非常重要）（未解决）</h3><ul>
+<li>动态规划：n个筛子和为j的情况数是n-1个筛子和为6中不同情况数的总和。</li>
+</ul>
+<h3 id="面试题61-扑克牌中的顺子（巧思）"><a href="#面试题61-扑克牌中的顺子（巧思）" class="headerlink" title="面试题61.扑克牌中的顺子（巧思）"></a>面试题61.扑克牌中的顺子（巧思）</h3><ul>
+<li>不要从正面找，从反面找不是顺子的情况，那么反面主要有两类：有重复数字、最大值-最小值&gt;=5。</li>
+</ul>
+<h3 id="面试题62-圆圈中最后剩下的数字（巧思）（未解决）"><a href="#面试题62-圆圈中最后剩下的数字（巧思）（未解决）" class="headerlink" title="面试题62.圆圈中最后剩下的数字（巧思）（未解决）"></a>面试题62.圆圈中最后剩下的数字（巧思）（未解决）</h3><ul>
+<li>递归：编写递归方法代码时一定要有这个概念：我们已经知道了从某个位置开始删除数字时，最后留下的是哪个数字。</li>
+</ul>
+<h3 id="面试题65-不用加减乘除做加法（非常重要）（巧思）"><a href="#面试题65-不用加减乘除做加法（非常重要）（巧思）" class="headerlink" title="面试题65.不用加减乘除做加法（非常重要）（巧思）"></a>面试题65.不用加减乘除做加法（非常重要）（巧思）</h3><ul>
+<li>位运算&amp;得到的结果是进位；</li>
+<li>位运算^得到的结果是不考虑进位的加法。</li>
+</ul>
+<h3 id="面试题66-构建乘积数组（巧思）"><a href="#面试题66-构建乘积数组（巧思）" class="headerlink" title="面试题66.构建乘积数组（巧思）"></a>面试题66.构建乘积数组（巧思）</h3><ul>
+<li>动态规划：第一次遍历求出每个元素对应的左边所有元素乘积，第二次遍历再乘上每个元素对应右边所有元素乘积。</li>
+</ul>
+<h3 id="面试题67-把字符串转换成整数（未解决）"><a href="#面试题67-把字符串转换成整数（未解决）" class="headerlink" title="面试题67.把字符串转换成整数（未解决）"></a>面试题67.把字符串转换成整数（未解决）</h3><h3 id="面试题68-1-二叉搜索树的最近公共祖先（未解决）"><a href="#面试题68-1-二叉搜索树的最近公共祖先（未解决）" class="headerlink" title="面试题68_1.二叉搜索树的最近公共祖先（未解决）"></a>面试题68_1.二叉搜索树的最近公共祖先（未解决）</h3><ul>
+<li>要运用到二叉搜索数的特性</li>
+</ul>
+<h3 id="面试题68-2-二叉树的最近公共祖先（非常重要）（未解决）"><a href="#面试题68-2-二叉树的最近公共祖先（非常重要）（未解决）" class="headerlink" title="面试题68_2.二叉树的最近公共祖先（非常重要）（未解决）"></a>面试题68_2.二叉树的最近公共祖先（非常重要）（未解决）</h3><ul>
+<li>有返回值的递归方法是非常强大的</li>
+</ul>
+<h3 id="【力扣刷题】-1-两数之和"><a href="#【力扣刷题】-1-两数之和" class="headerlink" title="【力扣刷题】_1.两数之和"></a>【力扣刷题】_1.两数之和</h3><ul>
+<li>HashMap</li>
+</ul>
+<h3 id="【力扣刷题】-4-寻找两个正序数组的中位数（未解决）"><a href="#【力扣刷题】-4-寻找两个正序数组的中位数（未解决）" class="headerlink" title="【力扣刷题】_4.寻找两个正序数组的中位数（未解决）"></a>【力扣刷题】_4.寻找两个正序数组的中位数（未解决）</h3><h3 id="【力扣刷题】-5-最长回文子串"><a href="#【力扣刷题】-5-最长回文子串" class="headerlink" title="【力扣刷题】_5.最长回文子串"></a>【力扣刷题】_5.最长回文子串</h3><ul>
+<li>中心扩散法：就是指数级的时间复杂度</li>
 </ul>
 
       
@@ -470,7 +653,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">214</span>
+                  <span class="site-state-item-count">140</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -492,7 +675,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">127</span>
+                  <span class="site-state-item-count">113</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -539,7 +722,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一轮复习"><span class="nav-number">1.</span> <span class="nav-text">第一轮复习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题2-实现singleton模式"><span class="nav-number">1.1.</span> <span class="nav-text">面试题2.实现singleton模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题3-数组中重复的数字"><span class="nav-number">1.2.</span> <span class="nav-text">面试题3.数组中重复的数字</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一轮复习"><span class="nav-number">1.</span> <span class="nav-text">第一轮复习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题2-实现singleton模式"><span class="nav-number">1.1.</span> <span class="nav-text">面试题2.实现singleton模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题10-1-斐波那契数列"><span class="nav-number">1.2.</span> <span class="nav-text">面试题10_1.斐波那契数列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题11-旋转数组的最小数字"><span class="nav-number">1.3.</span> <span class="nav-text">面试题11.旋转数组的最小数字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题12-矩阵中的路径"><span class="nav-number">1.4.</span> <span class="nav-text">面试题12.矩阵中的路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题13-机器人的运动范围"><span class="nav-number">1.5.</span> <span class="nav-text">面试题13.机器人的运动范围</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题14-1-剪绳子"><span class="nav-number">1.6.</span> <span class="nav-text">面试题14_1.剪绳子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题14-2-剪绳子2"><span class="nav-number">1.7.</span> <span class="nav-text">面试题14_2.剪绳子2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题15-二进制中1的个数"><span class="nav-number">1.8.</span> <span class="nav-text">面试题15.二进制中1的个数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题16-数值的整数次方"><span class="nav-number">1.9.</span> <span class="nav-text">面试题16.数值的整数次方</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题17-打印从1到最大的n位数（未解决）"><span class="nav-number">1.10.</span> <span class="nav-text">面试题17.打印从1到最大的n位数（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题18-删除链表的节点"><span class="nav-number">1.11.</span> <span class="nav-text">面试题18.删除链表的节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题19-正则表达式匹配（非常重要）（未解决）"><span class="nav-number">1.12.</span> <span class="nav-text">面试题19.正则表达式匹配（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题21-调整数组顺序使奇数位于偶数前面"><span class="nav-number">1.13.</span> <span class="nav-text">面试题21.调整数组顺序使奇数位于偶数前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题22-链表中倒数第k个节点"><span class="nav-number">1.14.</span> <span class="nav-text">面试题22.链表中倒数第k个节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题24-反转链表"><span class="nav-number">1.15.</span> <span class="nav-text">面试题24.反转链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题26-树的子结构"><span class="nav-number">1.16.</span> <span class="nav-text">面试题26.树的子结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题31-栈的压入弹出序列"><span class="nav-number">1.17.</span> <span class="nav-text">面试题31.栈的压入弹出序列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题32-2-从上到下打印二叉树2"><span class="nav-number">1.18.</span> <span class="nav-text">面试题32_2.从上到下打印二叉树2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题32-3-从上到下打印二叉树3"><span class="nav-number">1.19.</span> <span class="nav-text">面试题32_3.从上到下打印二叉树3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题33-二叉搜索树的后序遍历序列"><span class="nav-number">1.20.</span> <span class="nav-text">面试题33.二叉搜索树的后序遍历序列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题34-二叉树中和为某一值的路径"><span class="nav-number">1.21.</span> <span class="nav-text">面试题34.二叉树中和为某一值的路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题36-二叉搜索树与双向链表（未解决）"><span class="nav-number">1.22.</span> <span class="nav-text">面试题36.二叉搜索树与双向链表（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题37-序列化二叉树"><span class="nav-number">1.23.</span> <span class="nav-text">面试题37.序列化二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题38-字符串的排列"><span class="nav-number">1.24.</span> <span class="nav-text">面试题38.字符串的排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题40-最小的k个数（非常重要）（未解决）"><span class="nav-number">1.25.</span> <span class="nav-text">面试题40.最小的k个数（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题41-数据流中的中位数"><span class="nav-number">1.26.</span> <span class="nav-text">面试题41.数据流中的中位数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题43-前n个整数中1出现的次数（巧思）（未解决）"><span class="nav-number">1.27.</span> <span class="nav-text">面试题43.前n个整数中1出现的次数（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题44-数字序列中某一位的数字（巧思）（未解决）"><span class="nav-number">1.28.</span> <span class="nav-text">面试题44.数字序列中某一位的数字（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题45-把数组排成最小的数（巧思）（未解决）"><span class="nav-number">1.29.</span> <span class="nav-text">面试题45.把数组排成最小的数（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题46-把数字翻译成字符串"><span class="nav-number">1.30.</span> <span class="nav-text">面试题46.把数字翻译成字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题47-礼物的最大价值"><span class="nav-number">1.31.</span> <span class="nav-text">面试题47.礼物的最大价值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题48-最长不含重复字符的子字符串"><span class="nav-number">1.32.</span> <span class="nav-text">面试题48.最长不含重复字符的子字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题49-丑数（巧思）"><span class="nav-number">1.33.</span> <span class="nav-text">面试题49.丑数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题50-第一个只出现一次的字符"><span class="nav-number">1.34.</span> <span class="nav-text">面试题50.第一个只出现一次的字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题51-数组中的逆序对（非常重要）（未解决）"><span class="nav-number">1.35.</span> <span class="nav-text">面试题51.数组中的逆序对（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题53-2-前n个数中缺失的数字（未解决）"><span class="nav-number">1.36.</span> <span class="nav-text">面试题53_2.前n个数中缺失的数字（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题54-二叉搜索树的第k大节点"><span class="nav-number">1.37.</span> <span class="nav-text">面试题54.二叉搜索树的第k大节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题55-1-二叉树的深度"><span class="nav-number">1.38.</span> <span class="nav-text">面试题55_1.二叉树的深度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题55-2-平衡二叉树"><span class="nav-number">1.39.</span> <span class="nav-text">面试题55_2.平衡二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题56-1-数组中数字出现的次数（巧思）（未解决）"><span class="nav-number">1.40.</span> <span class="nav-text">面试题56_1.数组中数字出现的次数（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题56-2-数组中数字出现的次数2（巧思）（未解决）"><span class="nav-number">1.41.</span> <span class="nav-text">面试题56_2.数组中数字出现的次数2（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题57-2-和为s的连续正数序列"><span class="nav-number">1.42.</span> <span class="nav-text">面试题57_2.和为s的连续正数序列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题58-1-翻转单词顺序"><span class="nav-number">1.43.</span> <span class="nav-text">面试题58_1.翻转单词顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题59-1-滑动窗口的最大值（巧思）（未解决）"><span class="nav-number">1.44.</span> <span class="nav-text">面试题59_1.滑动窗口的最大值（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题59-2-队列的最大值（巧思）（未解决）"><span class="nav-number">1.45.</span> <span class="nav-text">面试题59_2.队列的最大值（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题60-n个骰子的点数（非常重要）（未解决）"><span class="nav-number">1.46.</span> <span class="nav-text">面试题60.n个骰子的点数（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题61-扑克牌中的顺子（巧思）"><span class="nav-number">1.47.</span> <span class="nav-text">面试题61.扑克牌中的顺子（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题62-圆圈中最后剩下的数字（巧思）（未解决）"><span class="nav-number">1.48.</span> <span class="nav-text">面试题62.圆圈中最后剩下的数字（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题65-不用加减乘除做加法（非常重要）（巧思）"><span class="nav-number">1.49.</span> <span class="nav-text">面试题65.不用加减乘除做加法（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题66-构建乘积数组（巧思）"><span class="nav-number">1.50.</span> <span class="nav-text">面试题66.构建乘积数组（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题67-把字符串转换成整数（未解决）"><span class="nav-number">1.51.</span> <span class="nav-text">面试题67.把字符串转换成整数（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题68-1-二叉搜索树的最近公共祖先（未解决）"><span class="nav-number">1.52.</span> <span class="nav-text">面试题68_1.二叉搜索树的最近公共祖先（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题68-2-二叉树的最近公共祖先（非常重要）（未解决）"><span class="nav-number">1.53.</span> <span class="nav-text">面试题68_2.二叉树的最近公共祖先（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-1-两数之和"><span class="nav-number">1.54.</span> <span class="nav-text">【力扣刷题】_1.两数之和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-4-寻找两个正序数组的中位数（未解决）"><span class="nav-number">1.55.</span> <span class="nav-text">【力扣刷题】_4.寻找两个正序数组的中位数（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-5-最长回文子串"><span class="nav-number">1.56.</span> <span class="nav-text">【力扣刷题】_5.最长回文子串</span></a></li></ol></li></ol></div>
             
 
           </div>
