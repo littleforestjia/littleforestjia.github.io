@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,jdbc," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MYSQL数据库与JDBCJunit Junit使用步骤： 定义一个测试类 定义一个测试方法，这个方法必须可以独立运行。 在该测试方法前加@Test 导入Junit依赖环境   @Before修饰的方法会在测试方法之前被自动执行，@After修饰的方法会在测试方法执行忠厚自动被执行。   反射 获取字节码Class对象的三种方式：  Class.forName(“全类名”)：将字节码文件加载进内存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【基础知识】_MYSQL数据库与JDBC">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/09/13/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MYSQL%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8EJDBC/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="MYSQL数据库与JDBCJunit Junit使用步骤： 定义一个测试类 定义一个测试方法，这个方法必须可以独立运行。 在该测试方法前加@Test 导入Junit依赖环境   @Before修饰的方法会在测试方法之前被自动执行，@After修饰的方法会在测试方法执行忠厚自动被执行。   反射 获取字节码Class对象的三种方式：  Class.forName(“全类名”)：将字节码文件加载进内存">
+<meta property="article:published_time" content="2020-09-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-24T12:27:20.935Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="jdbc">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/09/13/【基础知识】_MYSQL数据库与JDBC/"/>
+
+
+
+
+
+  <title>【基础知识】_MYSQL数据库与JDBC | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/09/13/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MYSQL%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8EJDBC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【基础知识】_MYSQL数据库与JDBC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-13T00:00:00+08:00">
+                2020-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MYSQL数据库与JDBC"><a href="#MYSQL数据库与JDBC" class="headerlink" title="MYSQL数据库与JDBC"></a>MYSQL数据库与JDBC</h2><h3 id="Junit"><a href="#Junit" class="headerlink" title="Junit"></a>Junit</h3><ul>
+<li>Junit使用步骤：<ul>
+<li>定义一个测试类</li>
+<li>定义一个测试方法，<strong><u>这个方法必须可以独立运行</u></strong>。</li>
+<li>在该测试方法前加@Test</li>
+<li><strong><u>导入Junit依赖环境</u></strong></li>
+</ul>
+</li>
+<li>@Before修饰的方法会在测试方法之前被自动执行，@After修饰的方法会在测试方法执行忠厚自动被执行。</li>
+</ul>
+<hr>
+<h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><ul>
+<li><p>获取字节码Class对象的三种方式：</p>
+<ul>
+<li><strong>Class.forName(“全类名”)</strong>：将字节码文件加载进内存，并返回Class对象。全类名：包名.类名。</li>
+<li><strong>类名.class</strong>：通过类名的属性class获取Class对象。</li>
+<li><strong>类的实例化对象.getClass()</strong>：getClass()方法可以用于获取Class对象，Object类中就定义了该方法。</li>
+</ul>
+</li>
+<li><p><strong>获取properties配置文件中键值对信息的一种方法</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Properties pro = <span class="keyword">new</span> Properties();</span><br><span class="line"><span class="comment">//创建Properties配置文件类对象。</span></span><br><span class="line"></span><br><span class="line">ClassLoader classLoader = ReflectTest<span class="class">.<span class="keyword">class</span>.<span class="title">getClassLoader</span>()</span>;</span><br><span class="line"><span class="comment">//获取class目录下的配置文件的方式：</span></span><br><span class="line"><span class="comment">//classLoader是本字节码文件ReflectTest.class的类加载器，它可以找到本项目目录中的类文件和配置文件。</span></span><br><span class="line"></span><br><span class="line">InputStream is = classLoader.getResourceAsStream(<span class="string">"pro.properties"</span>);</span><br><span class="line"><span class="comment">//类加载器的getResourceAsStream()方法可以获取配置文件中对应字节流.</span></span><br><span class="line"></span><br><span class="line">pro.load(is);</span><br><span class="line"><span class="comment">//将该配置文件字节流转换为一个集合。</span></span><br><span class="line"><span class="comment">//该集合的内部结构即为HashTable，就是不同的key与value一一对应。</span></span><br><span class="line"></span><br><span class="line">String className = pro.getProperty(<span class="string">"className"</span>);</span><br><span class="line">String methodName = pro.getProperty(<span class="string">"methodName"</span>);</span><br><span class="line"><span class="comment">//获取配置文件集合中key对应的value，这了的key一定要输入正确。</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<hr>
+<h3 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h3><ul>
+<li>注解本质上就是一个接口，该接口默认继承Annotation接口。</li>
+</ul>
+<hr>
+<h3 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h3><h4 id="sql分类"><a href="#sql分类" class="headerlink" title="sql分类"></a>sql分类</h4><ul>
+<li>DDL(Data Definition Language)数据定义语句：用来对<strong><u>数据库、表、列等数据库对象</u></strong>进行增删改操作。</li>
+<li>DML(Data Manipulation Language)数据操作语句：用来对数据库中<strong><u>表中的数据</u></strong>进行<strong>增删改</strong>操作。</li>
+<li>DQL(Data Query Language)数据查询语句：用来<strong>查询</strong>数据库中<strong><u>表中的数据</u></strong>。</li>
+<li>DCL(Data Control Language)数据控制语句：用来定义数据库访问权限和安全级别等。</li>
+</ul>
+<h4 id="DDL操作"><a href="#DDL操作" class="headerlink" title="DDL操作"></a>DDL操作</h4><p>(tips：以下sql语句实例中的括号表示可有可无)</p>
+<ol>
+<li><p>创建数据库:</p>
+<p><strong>create database (if not exists) 数据库名称 (character set 字符集名);</strong></p>
+</li>
+<li><p>查询所有数据库名称:</p>
+<p><strong>show databases;</strong></p>
+</li>
+<li><p>修改数据库的字符集:</p>
+<p><strong>alter database 数据库名称 character set 字符集名称;</strong></p>
+</li>
+<li><p>删除数据库:</p>
+<p><strong>drop database (if exists) 数据库名称;</strong></p>
+</li>
+<li><p>查询当前正在使用的数据库名称:</p>
+<p><strong>select database();</strong></p>
+</li>
+<li><p>指定使用某个数据库:</p>
+<p><strong>use 数据库名称;</strong></p>
+</li>
+<li><p>查询某个数据库中所有表的名称：</p>
+<p><strong>show tables;</strong></p>
+</li>
+<li><p>查询表结构(列名和数据类型):</p>
+<p><strong>desc 表名;</strong></p>
+</li>
+<li><p>创建表:</p>
+<p><strong>create table 表名(列名1 数据类型1,…,列名n 数据类型n);</strong></p>
+<p>e.g. money double(5,2):数据类型为总位数5位，小数点后两位；<u>name varchar(20):数据类型最大能包含20个字符。</u></p>
+</li>
+<li><p>删除表:</p>
+<p><strong>drop table (if exists) 表名;</strong></p>
+</li>
+<li><p>修改表名:</p>
+<p><strong>alter table 表名 rename to 新的表名;</strong></p>
+</li>
+<li><p>修改表的字符集:</p>
+<p><strong>alter table 表名 character set 字符集名称;</strong>(gbk或者utf8)</p>
+</li>
+<li><p>给表添加一列:</p>
+<p><strong>alter table 表名 add 列名 数据类型;</strong></p>
+</li>
+<li><p>修改表中列的名称和类型:</p>
+<p><strong>alter table 表名 change 列名 新列名 新数据类型;</strong>(同时修改名称和类型)</p>
+<p><strong>alter table 表名 modify 列名 新数据类型;</strong>(只修改类型)</p>
+</li>
+<li><p>删除表中的列:</p>
+<p><strong>alter table 表名 drop 列名;</strong></p>
+</li>
+</ol>
+<h4 id="DML操作"><a href="#DML操作" class="headerlink" title="DML操作"></a>DML操作</h4><ol>
+<li><p>往表中添加数据:</p>
+<p><strong>insert into 表名(列名1,…,列名n) values(值1,…,值n);</strong></p>
+<ul>
+<li>如果表名后不定义列名，则默认给所有列添加值</li>
+<li><u>添加多行可以直接用 values(值1,…,值n),(值1,…,值n),…,(值1,…,值n) 的形式</u></li>
+</ul>
+</li>
+<li><p>删除表中数据:</p>
+<p><strong>delete from 表名 where 条件;</strong></p>
+<ul>
+<li>这个条件主要用于确定是哪一行，比如id = 1</li>
+<li>可以不加where 条件，则删除表中所有记录</li>
+</ul>
+</li>
+<li><p>修改表中数据:</p>
+<p><strong>update 表名 set 列名1=值1,列名2=值2,… where 条件;</strong></p>
+<ul>
+<li>可以不加where 条件，则所有指定列中的值都改变</li>
+</ul>
+</li>
+</ol>
+<h4 id="DQL操作"><a href="#DQL操作" class="headerlink" title="DQL操作"></a>DQL操作</h4><ol>
+<li><p>查询表中数据:</p>
+<p><strong>select 列名列表 from 表名列表 where 条件列表 group by 分组字段 having 分组之后的字段 order by 排序 limit 分页限定;</strong></p>
+<ul>
+<li><p><u>列名可以是一个运算表达式，比如列名1+列名2，得到的就是两列数据相加的结果</u></p>
+</li>
+<li><p>如果要查询所有列的数据值，则可以用*来替代列名列表</p>
+</li>
+<li><p>distinct可以加在select后面用于去除重复的结果集</p>
+</li>
+<li><p><u><strong>ifnull(列名,表达式)</strong>可以加在列名列表中，表示如果该列中某个数据为null时，则用表达式表示该数据</u></p>
+</li>
+<li><p><u>as可以加在列名和表名后面用来给列名和表名起别名，其中as可以省略</u></p>
+</li>
+<li><p>where子句后面跟的条件可以是：</p>
+<ol>
+<li>&lt;、&gt;、&lt;=、&gt;=、=、!=</li>
+<li>BETWEEN…AND</li>
+<li>IN (集合)</li>
+<li><u>LIKE :_表示单个任意字符，%表示任意个任意字符，e.g. LIKE”马%”表示所有姓马的，LIKE”%马%”表示只要包含马字就行</u></li>
+<li>IS NULL</li>
+<li>and 或 &amp;&amp;</li>
+<li>or 或 ||</li>
+<li>not 或 ！</li>
+</ol>
+</li>
+<li><p><strong>order by 排序列名1 排序方式1,排序列名2 排序方式2…</strong></p>
+<p><u>排序方式有ASC表示升序，DESC表示降序；排序列名1的数据相等时，才会再将相等的行按排序列名2排序</u></p>
+</li>
+<li><p><strong>聚合函数：将一列数据作为一个整体，<u>进行纵向的计算</u>，聚合函数通常放在查询语句的列名中，作为一个查询结果列：</strong></p>
+<p>count 、max、min、sum、avg(计算平均值)，<u>e.g. select count(ifnull(math,0)) from student:计算学生中有math的行的个数，其中包括math数据为null的行；select avg(math) from student:计算学生数学成绩平均值。</u></p>
+</li>
+<li><p><strong>group by 关键字可以<u>将查询结果</u>按照某个字段或多个字段进行分组，<u>字段中值相等的为一组</u></strong></p>
+<p><u>group by与聚合函数共同使用时，先进行group by分组，再按组内计算聚合函数结果</u></p>
+</li>
+<li><p><strong>having 条件表达式：与group by搭配使用，主要用来限制分组查询结果的显示，<u>符合条件表达式的行</u>才会被显示</strong></p>
+</li>
+<li><p><strong>limit 每页的第一行在整个表中的行索引,每页显示的行数：用于分页查询，<u>数据库中的表是没有页这个概念的，但是查询结果表格可以有页这个概念</u></strong></p>
+<p><u>每页的第一行在整个表中的行索引 = (当前的页码 - 1) * 每页显示的行数</u></p>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h4><ul>
+<li><p>非空约束：not null，某一列的值不能为null</p>
+<p>e.g. create table stu(id int not null);</p>
+</li>
+</ul>
+<ul>
+<li><p>唯一约束：unique，某一列的值不能重复</p>
+<p>e.g. create table stu(id int unque);</p>
+</li>
+<li><p>主键约束：primary key，非空并且唯一，一张表只能有一个主键，主键是表的唯一标识</p>
+<p>e.g. create table stu(id int primary key);</p>
+</li>
+<li><p><strong>自动增长：auto_increment，在添加某一列数值类型的值时，只需要添加null，表会自动将该位置赋值为<u>上一行同列中的数值+1</u>。也可以自己随意添加一个值，然后下一行的自动增长就在此基础上+1。</strong></p>
+</li>
+<li><p>外键约束：foreign key，让表与表产生关系，从而保证数据的正确性</p>
+<ul>
+<li><p>创建表时，添加外键:</p>
+<p><strong>create table 表名 {…外键列名 外键数据类型 constraint 外键名称 foreign key (外键列名称) references 主表名称(主表列名称)};</strong></p>
+<ul>
+<li>此处的外键名称不对应实际数据，主要用于后面删除外键</li>
+<li><strong><u>有foreign key的表叫从表，被从表中外键references的表叫主表</u></strong></li>
+<li><strong><u>在从表中添加行时，外键列添加的值一定要是主表列中存在的值，否则无法添加成功；同理删除或者修改主表列中的值时，应先将对应外键列中的值设置为空或者其他值，否则会报错</u></strong></li>
+</ul>
+</li>
+<li><p>删除外键:</p>
+<p><strong>alter table 表名 drop foreign key 外键名称;</strong></p>
+</li>
+<li><p>创建表之后，再添加外键:</p>
+<p><strong>alter table 表名 add constraint 外键名称 foreign key (外键列名称) references 主表名称(主表列名称);</strong></p>
+</li>
+</ul>
+</li>
+<li><p><strong>外键约束_级联操作：外键约束中的主表列中的数据做出删除或者修改操作时，对应的从表中的外键列中数据也自动做出改变(作用其实就是为了简化上文中加粗下划线文字部分所提到的情况)</strong></p>
+<ul>
+<li><p>添加级联操作:</p>
+<p><strong>alter table 表名 add constraint 外键名称 foreign key (外键列名称) references 主表名称(主表列名称) on update cascade on delete cascade;</strong></p>
+<ul>
+<li><strong><u>要在已经建立好外键约束的表上添加级联操作，只能先删除外键，再一并添加外键和级联操作</u></strong></li>
+<li>on update cascade和on delete cascade分别为级联更新和级联删除，它们可以一起添加；级联删除主要是指当我们删除主表中某一行，从表中对应外键列所在行也会被自动删除。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="多表关系"><a href="#多表关系" class="headerlink" title="多表关系"></a>多表关系</h4><ul>
+<li>一对一关系实现：在任意一方添加唯一外键指向另一方的主键</li>
+<li><strong>一对多关系实现：将多的一方作为从表，建立外键，指向一的一方的主键</strong></li>
+<li><strong>多对多关系实现：需要借助第三张中间表，中间表至少包含两个列，这两个列都作为第三张表的外键，分别指向前两张表的主键</strong></li>
+</ul>
+<h4 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h4><p>一次查询多张数据库表:</p>
+<p><strong>select 列名1,…,列名n from 表名1,…,表名n where 查询条件;</strong></p>
+<p><strong>当无查询条件，查询结果为笛卡尔积，其行数为所有表的行数的乘积，其中大部分结果都是无用的错误结果。</strong>可以通过设置合适的查询条件来消除无用的错误结果，主要得到三种较好的查询方式：内连接查询、外连接查询、子查询。</p>
+<ul>
+<li><p>内连接查询：从结果表中删除没有通过外键连接相匹配的所有行</p>
+<p>隐式语法：</p>
+<p><strong>select 列名1,…,列名n from 表名1,…,表名n where 查询条件;</strong></p>
+<p>e.g. <strong>select t1.’id’,t1.’name’,t2.’age’ from employee t1,department t2 where <u>t1.’id’=t2.’id’</u>;</strong></p>
+<ul>
+<li><strong>上例中t1和t2分别为两表的别名</strong></li>
+<li><strong>列名要加上表名前缀和引号</strong></li>
+<li>上例中的查询条件为两表中的id相等</li>
+</ul>
+<p>显式语法：</p>
+<p><strong>select 列名1,…,列名n from 表名1 (inner) join 表名2 on 查询条件;</strong></p>
+<ul>
+<li>隐式和显式写法查询出来的结果一样，只是写法的不同</li>
+<li>inner可加可不加</li>
+</ul>
+</li>
+<li><p>外连接查询：分为左外连接和右外连接。<strong>以一张表为基表，该基表的内容会全部显示，然后加上左、右连接表中满足查询条件的内容。</strong>如果基表中的数据在另一张表中没有记录，则结果集同一行中连接表部分的数据显示为null。</p>
+<ul>
+<li><p><strong>左外连接:</strong></p>
+<p><strong>select 列名列表 from 表1 left (outer) join 表2 on 查询条件;</strong></p>
+<p><strong><u>查询的是表1的所有数据以及两表的交集部分</u></strong></p>
+</li>
+<li><p><strong>右外连接:</strong></p>
+<p><strong>select 列名列表 from 表1 right (outer) join 表2 on 查询条件;</strong></p>
+<p><strong><u>查询的是表2的所有数据以及两表的交际部分</u></strong></p>
+</li>
+</ul>
+</li>
+<li><p>子查询：子查询就是查询中嵌套查询，子查询结果可以是单行单列、多行单列、多行多列的</p>
+<p>e.g. select * from emp where emp.salary &lt; (select avg(salary) from emp);</p>
+</li>
+</ul>
+<h4 id="DCL操作"><a href="#DCL操作" class="headerlink" title="DCL操作"></a>DCL操作</h4><ul>
+<li><p>添加用户:</p>
+<p><strong>create user ‘用户名‘@’主机名’ identified by ‘密码’;</strong></p>
+<ul>
+<li><strong><u>这里的主机名指的是电脑的ip地址，如果直接写成%，则代表任何电脑都可以用该用户名访问该服务器。</u></strong></li>
+</ul>
+</li>
+<li><p>删除用户:</p>
+<p><strong>drop user ‘用户名‘@’主机名’;</strong></p>
+</li>
+<li><p>修改用户密码:</p>
+<p><strong>update user set password = password(‘新密码’) where user = ‘用户名’;</strong></p>
+</li>
+<li><p>查询用户:</p>
+<p><strong>use mysql;</strong></p>
+<p><strong>select * from user;</strong></p>
+</li>
+<li><p>查询某个用户的权限:</p>
+<p><strong>show grants for ‘用户名‘@’主机名’;</strong></p>
+</li>
+<li><p>授予某个用户权限:</p>
+<p><strong>grant 权限列表 on 数据库名.表名 to ‘用户名‘@’主机名’;</strong></p>
+<ul>
+<li><strong><u>可以通过查询root用户的权限，看看具体有哪些权限可以授予</u></strong></li>
+</ul>
+</li>
+<li><p>撤销权限:</p>
+<p><strong>remove 权限列表 on 数据库名.表名 from ‘用户名‘@’主机名’;</strong></p>
+</li>
+</ul>
+<hr>
+<h3 id="JDBC"><a href="#JDBC" class="headerlink" title="JDBC"></a>JDBC</h3><h4 id="JDBC基本使用步骤"><a href="#JDBC基本使用步骤" class="headerlink" title="JDBC基本使用步骤"></a>JDBC基本使用步骤</h4><ol>
+<li><p><strong>导入驱动jar包:创建一个文件夹命名为libs，将jar包放到该文件夹中，右键该文件夹–&gt;add as library。这样才是真正把jar包加入到项目中了，使项目程序能使用jar包中的api。</strong></p>
+</li>
+<li><p>注册驱动。(其实就是通过反射获取libs中的Driver类的Class类对象，将其放入jvm内存中)</p>
+</li>
+<li><p>获取数据库连接对象。</p>
+</li>
+<li><p>定义sql语句。(最后不用加分号。)</p>
+</li>
+<li><p>获取sql对象Statement。</p>
+</li>
+<li><p>执行sql。</p>
+</li>
+<li><p>释放资源。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Class.forName(<span class="string">"com.mysql.jdbc.Driver"</span>);</span><br><span class="line"><span class="comment">//注册驱动。(其实就是通过反射获取libs中的Driver类的Class类对象，将其放入jvm内存中)</span></span><br><span class="line"></span><br><span class="line">Connection conn = DriverManager.getConnection(<span class="string">"jdbc:mysql://localhost:3306/db1"</span>,<span class="string">"root"</span>,<span class="string">"root"</span>);</span><br><span class="line"><span class="comment">//获取数据库连接对象。</span></span><br><span class="line"></span><br><span class="line">String sql = <span class="string">"update stu set name = '金子涵' where id = 3"</span>;</span><br><span class="line"><span class="comment">//定义sql语句。(最后不用加分号。)</span></span><br><span class="line"></span><br><span class="line">Statement stmt = conn.createStatement();</span><br><span class="line"><span class="comment">//获取sql对象Statement。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> count = stmt.executeUpdate(sql);</span><br><span class="line"><span class="comment">//执行sql。</span></span><br><span class="line"></span><br><span class="line">System.out.println(count);</span><br><span class="line"><span class="comment">//处理结果。</span></span><br><span class="line"></span><br><span class="line">stmt.close();</span><br><span class="line">conn.close();</span><br><span class="line"><span class="comment">//释放资源。</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ul>
+<li><strong>在for、while循环语句中，在每次循环内部创建的局部变量的寿命就只有该次循环，不会存活到下一次循环，所以在下一次循环中可以创建一个新的同名局部变量。</strong></li>
+</ul>
+<h4 id="加载配置文件"><a href="#加载配置文件" class="headerlink" title="加载配置文件"></a>加载配置文件</h4><ul>
+<li><p><strong><u>使用类加载器动态加载配置文件</u></strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Properties pro = <span class="keyword">new</span> Properties();</span><br><span class="line">InputStream is = DruidDemo1.class.getClassLoader().getResourceAsStream("druid.properties");</span><br><span class="line">pro.load(is);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><u>可以是放在项目中任意目录下</u></strong></li>
+</ul>
+</li>
+<li><p>使用字符文件读取类+绝对路径加载配置文件**</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Properties pro = <span class="keyword">new</span> Properties();</span><br><span class="line">pro.load(<span class="keyword">new</span> FileReader(<span class="string">"E:\\files\\IntelliJ IDEA\\037.1JDBCTemplate\\dataSource\\src\\druid.properties"</span>));</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li><strong><u>字符串中\\表示\，或者把\\换成/也可以。</u></strong></li>
+<li>此处第二个文件夹名为IntelliJ IDEA，可以带空格。</li>
+</ul>
+<h4 id="JDBC连接池-amp-JDBCTemplate"><a href="#JDBC连接池-amp-JDBCTemplate" class="headerlink" title="JDBC连接池&amp;JDBCTemplate"></a>JDBC连接池&amp;JDBCTemplate</h4><ul>
+<li><p>获取Druid数据库连接池对象的基本步骤</p>
+<ol>
+<li><p>导入jar包</p>
+</li>
+<li><p>定义properties配置文件</p>
+</li>
+<li><p>加载配置文件</p>
+</li>
+<li><p>获取连接池对象</p>
+</li>
+<li><p>获取连接对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Properties pro = <span class="keyword">new</span> Properties();</span><br><span class="line">InputStream is = DruidDemo1.class.getClassLoader().getResourceAsStream("druid.properties");</span><br><span class="line">pro.load(is);</span><br><span class="line"><span class="comment">//加载配置文件</span></span><br><span class="line"></span><br><span class="line">DataSource ds = DruidDataSourceFactory.createDataSource(pro);</span><br><span class="line"><span class="comment">//获取连接池对象</span></span><br><span class="line"></span><br><span class="line">Connection conn = ds.getConnection();</span><br><span class="line"><span class="comment">//获取连接对象</span></span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><p>使用Template的基本步骤</p>
+<ol>
+<li><p>导入jar包</p>
+</li>
+<li><p>创建JdbcTemplate对象</p>
+</li>
+<li><p>调用JdbcTemplate对象的方法来完成CRUD操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JdbcTemplate template = <span class="keyword">new</span> JdbcTemplate(ds);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>JdbcTemplate类的构造函数的输入参数类型为数据库连接池</strong></li>
+<li><strong><u>与不使用Template对比可以发现，代码简单了很多，连接的获取、结果集的操作、资源的释放、连接的归还等操作都已经被JdbcTemplate类封装好了，不用我们再去写。</u></strong></li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><p>JdbcTemplate的方法</p>
+<ul>
+<li><p><strong>update():用于执行DML语句，对表中数据进行增、删、改操作。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String sql = <span class="string">"update bank set money = 5000 where id = ?"</span>;</span><br><span class="line"><span class="keyword">int</span> count = template.update(sql,<span class="number">2</span>);</span><br><span class="line"><span class="comment">//template.update()方法的输入为sql语句和sql语句中的?实参列表。</span></span><br><span class="line"><span class="comment">//返回值为sql增删改语句对数据库中表的影响行数。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>queryForMap():用于对表中数据进行查询操作，将查询结果封装为map集合，将列名作为key，将数据值作为value。使用这个方法进行查询的sql语句的查询结果行数只能是1。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String sql = <span class="string">"select * from student where id = ?"</span>;</span><br><span class="line">Map&lt;String,Object&gt; map = template.queryForMap(sql,<span class="number">1</span>);</span><br><span class="line"><span class="comment">//1.Map是一个接口，这里用于声明一个Map引用变量，在声明时一定要确定泛型，</span></span><br><span class="line"><span class="comment">//该Map中表名作为key，各种不同数据类型作为value，所以key声明为String，value声明为Object。</span></span><br><span class="line"><span class="comment">//2.这个Map引用变量指向的肯定是Map的一个实现类对象，具体是怎样的实现类我们不知道，</span></span><br><span class="line"><span class="comment">//也不需要知道，JdbcTemplate已经帮我们把该实现类的基本方法接口编写封装好了。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>queryForList():用于对表中数据进行查询操作，将查询结果封装为List集合。使用这个方法进行查询的sql语句的查询结果行数应大于1，实际上就是把查询结果的每一行封装成一个Map集合。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String sql = <span class="string">"select * from student"</span>;</span><br><span class="line">List&lt;Map&lt;String,Object&gt;&gt; list = template.queryForList(sql);</span><br><span class="line"><span class="comment">//这里的list的节点就是JdbcTemplate封装好的Map实现类对象，很多方法接口都可以套用。</span></span><br><span class="line"><span class="comment">//这里的List也是官方接口，list引用变量具体指向的实现类对象结构也是由JdbcTemplate定义封装好的。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>queryForObject():用于查询，并将查询结果封装为定义好的对象。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String sql = <span class="string">"select count(id) from student"</span>;</span><br><span class="line">Integer total = template.queryForObject(sql,Integer<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"><span class="comment">//template.queryForObject()方法的输入除了sql语句，还有一个要返回的结果类型的Class对象。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>query():用于查询，并将结果封装为JavaBean对象。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">String sql = <span class="string">"select * from student"</span>;</span><br><span class="line">List&lt;Student&gt; list = template.query(sql, <span class="keyword">new</span> BeanPropertyRowMapper&lt;Student&gt;(Student<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line"><span class="comment">//这里的query方法同样是直接得到一个List实现类对象，只不过其中节点是JavaBean对象。</span></span><br><span class="line"><span class="comment">//使用BeanPropertyRowMapper实现类，可以完成数据到JavaBean的自动封装。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//(注意这里的被查询表student中如果有值为null的数据，则Student类中的数据类型</span></span><br><span class="line"><span class="comment">//必须是引用数据类型的封装类，不能是基本数据类型，比如不能是int，要写成Integer，</span></span><br><span class="line"><span class="comment">//因为int不能等于null，而Integer对象可以等于null。)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><u>一般我们使用BeanPropertyRowMapper类来作为query()方法的输入参数，这个类可以将查询结果的每一行数据自动封装成JavaBean实例对象。</u></strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+          
+            <a href="/tags/jdbc/" rel="tag"><i class="fa fa-tag"></i> jdbc</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/" rel="next" title="【科研项目】_众包设计活动分解工具开发">
+                <i class="fa fa-chevron-left"></i> 【科研项目】_众包设计活动分解工具开发
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/16/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_%E5%89%8D%E7%AB%AF%E4%B8%89%E5%A4%A7%E4%BB%B6/" rel="prev" title="【基础知识】_前端三大件">
+                【基础知识】_前端三大件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MYSQL数据库与JDBC"><span class="nav-number">1.</span> <span class="nav-text">MYSQL数据库与JDBC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Junit"><span class="nav-number">1.1.</span> <span class="nav-text">Junit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反射"><span class="nav-number">1.2.</span> <span class="nav-text">反射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注解"><span class="nav-number">1.3.</span> <span class="nav-text">注解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL"><span class="nav-number">1.4.</span> <span class="nav-text">MySQL</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sql分类"><span class="nav-number">1.4.1.</span> <span class="nav-text">sql分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DDL操作"><span class="nav-number">1.4.2.</span> <span class="nav-text">DDL操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DML操作"><span class="nav-number">1.4.3.</span> <span class="nav-text">DML操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DQL操作"><span class="nav-number">1.4.4.</span> <span class="nav-text">DQL操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#约束"><span class="nav-number">1.4.5.</span> <span class="nav-text">约束</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多表关系"><span class="nav-number">1.4.6.</span> <span class="nav-text">多表关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多表查询"><span class="nav-number">1.4.7.</span> <span class="nav-text">多表查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DCL操作"><span class="nav-number">1.4.8.</span> <span class="nav-text">DCL操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JDBC"><span class="nav-number">1.5.</span> <span class="nav-text">JDBC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JDBC基本使用步骤"><span class="nav-number">1.5.1.</span> <span class="nav-text">JDBC基本使用步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加载配置文件"><span class="nav-number">1.5.2.</span> <span class="nav-text">加载配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JDBC连接池-amp-JDBCTemplate"><span class="nav-number">1.5.3.</span> <span class="nav-text">JDBC连接池&amp;JDBCTemplate</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

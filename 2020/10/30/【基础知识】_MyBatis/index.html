@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MyBatis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MyBatisMyBatis入门MyBatis简介mybatis与jdbc template相比最大的优点：使用配置文件动态配置sql语句，实现sql语句与java代码解耦，将sql开发人员和java开发人员的任务分开。 MyBatis开发步骤 在pom.xml文件中导入MyBatis坐标和其他相关坐标   ​  在MySQL数据库中创建数据表  在项目domain包中创建数据表对应的javabe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【基础知识】_MyBatis">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="MyBatisMyBatis入门MyBatis简介mybatis与jdbc template相比最大的优点：使用配置文件动态配置sql语句，实现sql语句与java代码解耦，将sql开发人员和java开发人员的任务分开。 MyBatis开发步骤 在pom.xml文件中导入MyBatis坐标和其他相关坐标   ​  在MySQL数据库中创建数据表  在项目domain包中创建数据表对应的javabe">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%AF%BC%E5%85%A5%E5%9D%90%E6%A0%871.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%AF%BC%E5%85%A5%E5%9D%90%E6%A0%872.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%BC%96%E5%86%99mapper%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%88%9B%E5%BB%BA%E6%A0%B8%E5%BF%83%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%BC%96%E5%86%99%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E6%A6%82%E8%BF%B0.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E9%85%8D%E7%BD%AE%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%A0%B8%E5%BF%83%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E9%85%8D%E7%BD%AE%E9%A1%BA%E5%BA%8F.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/mapper%E6%A0%87%E7%AD%BE.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/properties%E6%A0%87%E7%AD%BE.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%88%AB%E5%90%8D%E6%A0%87%E7%AD%BE.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%8E%A5%E5%8F%A3%E4%B8%8E%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E5%AF%B9%E5%BA%94.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E8%8E%B7%E5%BE%97%E5%AE%9E%E4%BE%8B%E5%AF%B9%E8%B1%A1.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/if.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/foreach.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%89%87%E6%AE%B5%E6%8A%BD%E5%8F%96.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%88%86%E9%A1%B5%E5%8A%A9%E6%89%8B.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E9%85%8D%E7%BD%AE%E5%88%86%E9%A1%B5%E6%8F%92%E4%BB%B6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%BD%BF%E7%94%A8%E5%88%86%E9%A1%B5%E5%B7%A5%E5%85%B7.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E8%8E%B7%E5%BE%97%E5%88%86%E9%A1%B5%E5%8F%82%E6%95%B0.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%B8%80%E5%AF%B9%E4%B8%80%E6%9F%A5%E8%AF%A2%E6%B3%A8%E8%A7%A3.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%B8%80%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2%E6%B3%A8%E8%A7%A3.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%A4%9A%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2%E6%B3%A8%E8%A7%A3.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%95%B4%E5%90%88%E6%80%9D%E8%B7%AF.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%BC%9A%E8%AF%9D%E5%B7%A5%E5%8E%82%E6%94%BE%E5%85%A5spring%E6%A1%86%E6%9E%B6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%89%AB%E6%8F%8Fmapper%E6%94%BE%E5%85%A5spring%E6%A1%86%E6%9E%B6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E9%85%8D%E7%BD%AE%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%BF%AE%E6%94%B9service.png">
+<meta property="article:published_time" content="2020-10-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-10-30T12:34:43.631Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="MyBatis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%AF%BC%E5%85%A5%E5%9D%90%E6%A0%871.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/10/30/【基础知识】_MyBatis/"/>
+
+
+
+
+
+  <title>【基础知识】_MyBatis | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【基础知识】_MyBatis</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-30T00:00:00+08:00">
+                2020-10-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MyBatis"><a href="#MyBatis" class="headerlink" title="MyBatis"></a>MyBatis</h2><h3 id="MyBatis入门"><a href="#MyBatis入门" class="headerlink" title="MyBatis入门"></a>MyBatis入门</h3><h4 id="MyBatis简介"><a href="#MyBatis简介" class="headerlink" title="MyBatis简介"></a>MyBatis简介</h4><p><strong><u>mybatis与jdbc template相比最大的优点：使用配置文件动态配置sql语句，实现sql语句与java代码解耦，将sql开发人员和java开发人员的任务分开。</u></strong></p>
+<h4 id="MyBatis开发步骤"><a href="#MyBatis开发步骤" class="headerlink" title="MyBatis开发步骤"></a>MyBatis开发步骤</h4><ol>
+<li><p><strong>在pom.xml文件中导入MyBatis坐标和其他相关坐标</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%AF%BC%E5%85%A5%E5%9D%90%E6%A0%871.png" alt></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%AF%BC%E5%85%A5%E5%9D%90%E6%A0%872.png" alt></p>
+<p>​</p>
+</li>
+<li><p>在MySQL数据库中创建数据表</p>
+</li>
+<li><p>在项目domain包中创建数据表对应的javabean实体类</p>
+</li>
+<li><p><strong><u>在resources文件夹下创建一个和dao层包同名的文件夹，比如：jia/zheng/mapper，在该文件夹中创建数据表对应的xml映射文件，将操作该数据表的所有sql语句都放到该映射文件中。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%BC%96%E5%86%99mapper%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6.png" alt></p>
+</li>
+<li><p><strong><u>在resources文件夹下创建MyBatis的核心配置文件sqlMapConfig.xml</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%88%9B%E5%BB%BA%E6%A0%B8%E5%BF%83%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6.png" alt></p>
+</li>
+<li><p><strong><u>编写使用代码并使用</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%BC%96%E5%86%99%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81.png" alt></p>
+</li>
+</ol>
+<h4 id="MyBatis映射文件概述"><a href="#MyBatis映射文件概述" class="headerlink" title="MyBatis映射文件概述"></a>MyBatis映射文件概述</h4><p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E6%A6%82%E8%BF%B0.png" alt></p>
+<p><strong><u>映射文件中主要可以配置增、删、改、查四种操作：</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E9%85%8D%E7%BD%AE%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5.png" alt></p>
+<h4 id="MyBatis核心配置文件概述"><a href="#MyBatis核心配置文件概述" class="headerlink" title="MyBatis核心配置文件概述"></a>MyBatis核心配置文件概述</h4><p><strong><u>核心配置文件中的配置标签具有固定的顺序要求，必须按照如下图中的顺序来配置，否则会报错。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%A0%B8%E5%BF%83%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E9%85%8D%E7%BD%AE%E9%A1%BA%E5%BA%8F.png" alt></p>
+<ul>
+<li><p><strong><u>environments标签：数据库环境的配置，支持多环境配置，可以指定所要使用的环境配置。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE.png" alt></p>
+</li>
+<li><p><strong><u>mapper标签：</u></strong></p>
+<p><u><strong>resource表示相对class路径，而我们项目中resources文件夹下的文件就是直接放在class路径下的。</strong></u></p>
+<p>****<img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/mapper%E6%A0%87%E7%AD%BE.png" alt></p>
+</li>
+<li><p><strong><u>properties标签：实际开发中，习惯将数据源的配置信息单独抽取成一个properties文件，该标签可以加载额外配置的properties文件。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/properties%E6%A0%87%E7%AD%BE.png" alt></p>
+</li>
+<li><p><strong><u>typeAliases标签：类型别名标签用来给项目中的JavaBean实体类设置一个短的别名。(注意吃此处是在核心配置文件中设置别名，然后再映射文件中使用别名。)</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%88%AB%E5%90%8D%E6%A0%87%E7%AD%BE.png" alt></p>
+</li>
+</ul>
+<h4 id="MyBatis使用时需要的API"><a href="#MyBatis使用时需要的API" class="headerlink" title="MyBatis使用时需要的API"></a>MyBatis使用时需要的API</h4><ul>
+<li>SqlSession工厂构建器SqlSessionFactoryBuilder </li>
+<li>SqlSession工厂对象SqlSessionFactory </li>
+<li>SqlSession会话对象SqlSession</li>
+</ul>
+<h3 id="MyBatis的Dao层实现"><a href="#MyBatis的Dao层实现" class="headerlink" title="MyBatis的Dao层实现"></a>MyBatis的Dao层实现</h3><p><strong>采用 Mybatis 的代理开发方式实现 DAO 层的开发，这种方式是我们后面进入企业的主流。</strong><br><strong><u>Mapper 接口开发方法只需要程序员编写Mapper 接口（相当于Dao 接口），由Mybatis 框架根据接口定义创建接口的动态代理对象，代理对象的方法体与之前使用template时每次都要编写的接口的实现类是一样的。</u></strong></p>
+<p><strong><u>一般就是先创建好接口，定义好所需要使用的抽象方法，然后根据该接口在相应映射文件中配置mapper标签。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%8E%A5%E5%8F%A3%E4%B8%8E%E6%98%A0%E5%B0%84%E6%96%87%E4%BB%B6%E5%AF%B9%E5%BA%94.png" alt></p>
+<p><strong><u>使用代理开发方式时要先通过MyBatis框架获得相应接口的实现类的实例对象。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E8%8E%B7%E5%BE%97%E5%AE%9E%E4%BE%8B%E5%AF%B9%E8%B1%A1.png" alt></p>
+<h3 id="MyBatis映射文件深入"><a href="#MyBatis映射文件深入" class="headerlink" title="MyBatis映射文件深入"></a>MyBatis映射文件深入</h3><h4 id="动态sql语句"><a href="#动态sql语句" class="headerlink" title="动态sql语句"></a>动态sql语句</h4><p>在MyBatis的映射文件中，前面我们的SQL都是比较简单的，有时候业务逻辑复杂时，我们的<strong>SQL应该是动态变化的。</strong></p>
+<h4 id="lt-if-gt"><a href="#lt-if-gt" class="headerlink" title="&lt;if&gt;"></a>&lt;if&gt;</h4><p><strong>我们根据实体类的不同取值，使用不同的 SQL语句来进行查询。</strong>比如在 id如果不为空时可以根据id查询， 如果username 不同空时还要加入用户名作为条件。这种情况在我们的多条件组合查询中经常会碰到。 </p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/if.png" alt></p>
+<h4 id="lt-foreach-gt"><a href="#lt-foreach-gt" class="headerlink" title="&lt;foreach&gt;"></a>&lt;foreach&gt;</h4><p><strong>&lt;foreach&gt;标签用于遍历集合</strong>，它的属性：</p>
+<ul>
+<li>collection：代表要遍历的集合元素，注意编写时不要写#{}</li>
+<li>open：代表语句的开始部分</li>
+<li>close：代表结束部分</li>
+<li>item：代表遍历集合的每个元素，生成的变量名</li>
+<li>sperator：代表分隔符 </li>
+</ul>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/foreach.png" alt></p>
+<h4 id="SQL片段抽取"><a href="#SQL片段抽取" class="headerlink" title="SQL片段抽取"></a>SQL片段抽取</h4><p><strong><u>Sql 中可将重复的 sql 提取出来，使用时用 include 引用即可，最终达到 sql 重用的目的 。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E7%89%87%E6%AE%B5%E6%8A%BD%E5%8F%96.png" alt></p>
+<h3 id="MyBatis核心配置文件深入"><a href="#MyBatis核心配置文件深入" class="headerlink" title="MyBatis核心配置文件深入"></a>MyBatis核心配置文件深入</h3><h4 id="typeHandlers标签"><a href="#typeHandlers标签" class="headerlink" title="typeHandlers标签"></a>typeHandlers标签</h4><p><strong>创建并配置使用自定义的数据库数据与java数据类型转换器，最常用的例子就是将数据库中的1970年至今毫秒值取出时，自动转换成java中的Date类型数据。</strong></p>
+<h4 id="plugins标签"><a href="#plugins标签" class="headerlink" title="plugins标签"></a>plugins标签</h4><p><strong><u>MyBatis可以使用第三方的插件来对功能进行扩展，分页助手PageHelper将分页的复杂操作进行封装，使得使用简单的方式即可获得分页的相关数据。</u></strong></p>
+<ol>
+<li><p>在pom.xml文件中导入通用PageHelper坐标</p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%88%86%E9%A1%B5%E5%8A%A9%E6%89%8B.png" alt></p>
+</li>
+<li><p>在sqlMapConfig.xml文件中配置PageHelper插件</p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E9%85%8D%E7%BD%AE%E5%88%86%E9%A1%B5%E6%8F%92%E4%BB%B6.png" alt></p>
+</li>
+<li><p>使用分页工具</p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%BD%BF%E7%94%A8%E5%88%86%E9%A1%B5%E5%B7%A5%E5%85%B7.png" alt></p>
+</li>
+<li><p>还可以使用分页工具的其他方法获得分页相关的其他参数</p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E8%8E%B7%E5%BE%97%E5%88%86%E9%A1%B5%E5%8F%82%E6%95%B0.png" alt></p>
+</li>
+</ol>
+<h3 id="MyBatis的多表操作"><a href="#MyBatis的多表操作" class="headerlink" title="MyBatis的多表操作"></a>MyBatis的多表操作</h3><p><u><strong>创建JavaBean实体时，在类中添加另一个JavaBean实体的对象作为私有属性。</strong></u></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 员工从表数据对象对应的封装实体。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Employee</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> Department department;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 部门主表数据对象对应的封装对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Department</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> String dep_name;</span><br><span class="line">    <span class="keyword">private</span> String dep_location;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//因为部门和员工是一对多的关系，所以部门中包含的应该是员工集合属性。</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;Employee&gt; employeeList;</span><br></pre></td></tr></table></figure>
+
+<p><strong><u>在映射文件中配置，通过使用&lt;resultMap&gt;标签和&lt;collection&gt;标签使sql语句的查询结果中预期的列元素放入我们预设的JavaBean类的实例对象中。</u></strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"jia.zheng.mapper.EmployeeMapper"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--重要：用resultMap标签来手动指定sql查询结果字段与java封装实体对象属性之间的映射关系--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"employeeMap"</span> <span class="attr">type</span>=<span class="string">"employee"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--column:查询结果表中字段的名称  property:封装实体的属性名称--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"name"</span> <span class="attr">property</span>=<span class="string">"name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"age"</span> <span class="attr">property</span>=<span class="string">"age"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"dep_id"</span> <span class="attr">property</span>=<span class="string">"department.id"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"dep_name"</span> <span class="attr">property</span>=<span class="string">"department.dep_name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"dep_location"</span> <span class="attr">property</span>=<span class="string">"department.dep_location"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"findAllEmployee"</span> <span class="attr">resultMap</span>=<span class="string">"employeeMap"</span>&gt;</span></span><br><span class="line">        SELECT *,d.id did FROM employee e,department d WHERE e.dep_id=d.id;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"jia.zheng.mapper.DepartmentMapper"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"departmentMap"</span> <span class="attr">type</span>=<span class="string">"department"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"did"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span><span class="comment">&lt;!--为了区分查询结果表中员工和部门的id字段，我们在查询表中添加了一个did字段来表示部门的id字段，eid字段表示员工的id字段。--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"dep_name"</span> <span class="attr">property</span>=<span class="string">"dep_name"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"dep_location"</span> <span class="attr">property</span>=<span class="string">"dep_location"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!--配置java封装对象中的集合信息</span></span><br><span class="line"><span class="comment">            property:java封装对象中的集合名称</span></span><br><span class="line"><span class="comment">            ofType：当前集合中数据的类型</span></span><br><span class="line"><span class="comment">        --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"employeeList"</span> <span class="attr">ofType</span>=<span class="string">"employee"</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--将查询结果表中数据与employee中属性进行映射--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"eid"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"name"</span> <span class="attr">property</span>=<span class="string">"name"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"age"</span> <span class="attr">property</span>=<span class="string">"age"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"findAllDepartment"</span> <span class="attr">resultMap</span>=<span class="string">"departmentMap"</span>&gt;</span></span><br><span class="line">        SELECT *,d.id did,e.id eid FROM department d,employee e WHERE d.id=e.dep_id;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MyBatis注解开发"><a href="#MyBatis注解开发" class="headerlink" title="MyBatis注解开发"></a>MyBatis注解开发</h3><p><strong><u>将sqlMapConfig.xml文件中的加载映射文件改成扫描使用注解的类所在的包，因为映射关系还是在的。</u></strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--加载映射关系，虽然用注解代替了mapper映射文件，但是还是有映射关系的。--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mappers</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--指定使用了mybatis注解的接口所在的包--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">package</span> <span class="attr">name</span>=<span class="string">"jia.zheng.mapper"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mappers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><u><strong>简单增删改查只需要在接口相关抽象方法上添加一个相应注解即可，主要关注多表查询注解配置。</strong></u></p>
+<ul>
+<li><p><u><strong>一对一查询：</strong></u></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%B8%80%E5%AF%B9%E4%B8%80%E6%9F%A5%E8%AF%A2%E6%B3%A8%E8%A7%A3.png" alt></p>
+</li>
+<li><p><strong><u>一对多查询：</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%B8%80%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2%E6%B3%A8%E8%A7%A3.png" alt></p>
+</li>
+<li><p><strong><u>多对多查询：</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E5%A4%9A%E5%AF%B9%E5%A4%9A%E6%9F%A5%E8%AF%A2%E6%B3%A8%E8%A7%A3.png" alt></p>
+</li>
+</ul>
+<h4 id="Spring整合MyBatis"><a href="#Spring整合MyBatis" class="headerlink" title="Spring整合MyBatis"></a>Spring整合MyBatis</h4><h5 id="整合思路"><a href="#整合思路" class="headerlink" title="整合思路"></a>整合思路</h5><p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%95%B4%E5%90%88%E6%80%9D%E8%B7%AF.png" alt></p>
+<h5 id="整合步骤"><a href="#整合步骤" class="headerlink" title="整合步骤"></a>整合步骤</h5><ol>
+<li><p><strong><u>将SqlSessionFactory配置到Spring容器中</u></strong> </p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%BC%9A%E8%AF%9D%E5%B7%A5%E5%8E%82%E6%94%BE%E5%85%A5spring%E6%A1%86%E6%9E%B6.png" alt></p>
+</li>
+<li><p><strong><u>扫描Mapper，让Spring容器产生Mapper实现类</u></strong> </p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E6%89%AB%E6%8F%8Fmapper%E6%94%BE%E5%85%A5spring%E6%A1%86%E6%9E%B6.png" alt></p>
+</li>
+<li><p><strong><u>在applicationContext.xml文件中配置声明式事务控制</u></strong> </p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E9%85%8D%E7%BD%AE%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6.png" alt></p>
+</li>
+<li><p><strong><u>修改Service实现类代码</u></strong> </p>
+<p><img src="//littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/%E4%BF%AE%E6%94%B9service.png" alt></p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MyBatis/" rel="tag"><i class="fa fa-tag"></i> MyBatis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JSON/" rel="next" title="【基础知识】_JSON">
+                <i class="fa fa-chevron-left"></i> 【基础知识】_JSON
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/05/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_AJAX/" rel="prev" title="【基础知识】_AJAX">
+                【基础知识】_AJAX <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MyBatis"><span class="nav-number">1.</span> <span class="nav-text">MyBatis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MyBatis入门"><span class="nav-number">1.1.</span> <span class="nav-text">MyBatis入门</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MyBatis简介"><span class="nav-number">1.1.1.</span> <span class="nav-text">MyBatis简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MyBatis开发步骤"><span class="nav-number">1.1.2.</span> <span class="nav-text">MyBatis开发步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MyBatis映射文件概述"><span class="nav-number">1.1.3.</span> <span class="nav-text">MyBatis映射文件概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MyBatis核心配置文件概述"><span class="nav-number">1.1.4.</span> <span class="nav-text">MyBatis核心配置文件概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MyBatis使用时需要的API"><span class="nav-number">1.1.5.</span> <span class="nav-text">MyBatis使用时需要的API</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyBatis的Dao层实现"><span class="nav-number">1.2.</span> <span class="nav-text">MyBatis的Dao层实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyBatis映射文件深入"><span class="nav-number">1.3.</span> <span class="nav-text">MyBatis映射文件深入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#动态sql语句"><span class="nav-number">1.3.1.</span> <span class="nav-text">动态sql语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-if-gt"><span class="nav-number">1.3.2.</span> <span class="nav-text">&lt;if&gt;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-foreach-gt"><span class="nav-number">1.3.3.</span> <span class="nav-text">&lt;foreach&gt;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SQL片段抽取"><span class="nav-number">1.3.4.</span> <span class="nav-text">SQL片段抽取</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyBatis核心配置文件深入"><span class="nav-number">1.4.</span> <span class="nav-text">MyBatis核心配置文件深入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#typeHandlers标签"><span class="nav-number">1.4.1.</span> <span class="nav-text">typeHandlers标签</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#plugins标签"><span class="nav-number">1.4.2.</span> <span class="nav-text">plugins标签</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyBatis的多表操作"><span class="nav-number">1.5.</span> <span class="nav-text">MyBatis的多表操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MyBatis注解开发"><span class="nav-number">1.6.</span> <span class="nav-text">MyBatis注解开发</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Spring整合MyBatis"><span class="nav-number">1.6.1.</span> <span class="nav-text">Spring整合MyBatis</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#整合思路"><span class="nav-number">1.6.1.1.</span> <span class="nav-text">整合思路</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#整合步骤"><span class="nav-number">1.6.1.2.</span> <span class="nav-text">整合步骤</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

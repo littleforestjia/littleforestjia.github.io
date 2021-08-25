@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Controller,ModelAndView," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SpringMVCSpring集成web环境应用上下文对象ApplicationContext是通过new ClasspathXmlApplicationContext(spring配置文件) 方式获取的，但是每次从容器中获得Bean时都要编写new ClasspathXmlApplicationContext(spring配置文件) ，这样的弊端是配置文件加载多次，应用上下文对象创建多次。  在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【基础知识】_SpringMVC">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="SpringMVCSpring集成web环境应用上下文对象ApplicationContext是通过new ClasspathXmlApplicationContext(spring配置文件) 方式获取的，但是每次从容器中获得Bean时都要编写new ClasspathXmlApplicationContext(spring配置文件) ，这样的弊端是配置文件加载多次，应用上下文对象创建多次。  在">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E6%B3%A8%E8%A7%A3%E8%A7%A3%E6%9E%90.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E8%A7%86%E5%9B%BE%E8%A7%A3%E6%9E%90%E5%99%A8.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E7%9B%B4%E6%8E%A5%E8%BF%94%E5%9B%9E%E5%AD%97%E7%AC%A6%E4%B8%B2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%BF%94%E5%9B%9E%E6%A8%A1%E5%9E%8B%E8%A7%86%E5%9B%BE%E5%AF%B9%E8%B1%A1.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%80%9A%E8%BF%87%E6%A1%86%E6%9E%B6%E5%AD%98%E5%82%A8%E6%95%B0%E6%8D%AE.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%80%9A%E8%BF%87%E8%A7%86%E5%9B%BE%E5%AF%B9%E8%B1%A1%E6%96%B9%E6%B3%95%E5%AD%98%E5%82%A8%E6%95%B0%E6%8D%AE.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E7%9B%B4%E6%8E%A5%E5%9B%9E%E5%86%99%E5%AD%97%E7%AC%A6%E4%B8%B2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%AF%BC%E5%85%A5jackson%E5%9D%90%E6%A0%871.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%AF%BC%E5%85%A5jackson%E5%9D%90%E6%A0%872.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/java%E5%AF%B9%E8%B1%A1%E8%BD%AC%E4%B8%BAjson%E5%AD%97%E7%AC%A6%E4%B8%B2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%9B%9E%E5%86%99%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%88%96%E9%9B%86%E5%90%88.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97POJO%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97%E6%95%B0%E7%BB%84%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%9B%86%E5%90%88POJO.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97%E9%9B%86%E5%90%88%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%AE%BE%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%8F%82%E6%95%B0%E7%BB%91%E5%AE%9A.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%8F%96%E5%8E%9F%E5%A7%8Bapi.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%88%9B%E5%BB%BA%E6%8B%A6%E6%88%AA%E5%99%A8%E7%B1%BB.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%AF%B7%E6%B1%82%E5%8F%82%E6%95%B0%E9%AA%8C%E8%AF%81%E6%A1%88%E4%BE%8B.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E6%8B%A6%E6%88%AA%E5%99%A8.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%A4%9A%E6%8B%A6%E6%88%AA%E5%99%A8.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E7%AE%80%E5%8D%95%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%99%A8.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%88%9B%E5%BB%BA%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%99%A8%E7%B1%BB.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%99%A8.png">
+<meta property="article:published_time" content="2020-10-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-10-30T12:27:15.771Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Controller">
+<meta property="article:tag" content="ModelAndView">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E6%B3%A8%E8%A7%A3%E8%A7%A3%E6%9E%90.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/10/29/【基础知识】_SpringMVC/"/>
+
+
+
+
+
+  <title>【基础知识】_SpringMVC | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【基础知识】_SpringMVC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-29T00:00:00+08:00">
+                2020-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring框架</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><h3 id="Spring集成web环境"><a href="#Spring集成web环境" class="headerlink" title="Spring集成web环境"></a>Spring集成web环境</h3><p><strong>应用上下文对象ApplicationContext是通过new ClasspathXmlApplicationContext(spring配置文件) 方式获取的，但是每次从容器中获得Bean时都要编写new ClasspathXmlApplicationContext(spring配置文件) ，这样的弊端是配置文件加载多次，应用上下文对象创建多次。</strong> </p>
+<p><strong>在Web项目中，<u>可以使用ServletContextListener监听Web应用的启动</u>，我们可以在Web应用启动时，就加载Spring的配置文件，创建应用上下文对象ApplicationContext，在将其存储到最大的域servletContext域中，这样就可以在任意位置从域中获得应用上下文ApplicationContext对象了。</strong> </p>
+<p><strong>上面的分析不用手动实现， Spring提供了一个监听器ContextLoaderListener就是对上述功能的封装，该监听器内部加载Spring配置文件，创建应用上下文对象，并存储到ServletContext域中，提供了一个客户端工具WebApplicationContextUtils供使用者获得应用上下文对象。</strong> </p>
+<h4 id="获取Spring框架创建的应用上下文对象的基本步骤"><a href="#获取Spring框架创建的应用上下文对象的基本步骤" class="headerlink" title="获取Spring框架创建的应用上下文对象的基本步骤"></a>获取Spring框架创建的应用上下文对象的基本步骤</h4><ol>
+<li><p><strong>在pom.xml文件中导入Spring集成web的坐标</strong></p>
+</li>
+<li><p><strong><u>在web.xml文件中配置ComtextLoaderListener监听器</u></strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--全局初始化参数，用于参数化配置监听器中所要加载的Spring配置文件，这样以后如果要改变要读取的Spring配置文件，在此处改动就可以--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">context-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:applicationContext.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">context-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--配置web项目的监听器，此处选用Spring-web包中的--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><u>在java组件中通过工具获取应用上下文对象</u></strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取ServletContext域对象。</span></span><br><span class="line">ServletContext servletContext = request.getServletContext();</span><br><span class="line"></span><br><span class="line"><span class="comment">//使用Spring-web框架中的工具类获取ServletContext域中的应用上下文对象。</span></span><br><span class="line">ApplicationContext app = WebApplicationContextUtils.getWebApplicationContext(servletContext);</span><br><span class="line"></span><br><span class="line">UserService userService = (UserService) app.getBean(<span class="string">"userService"</span>);</span><br><span class="line">userService.save();</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h3 id="SpringMVC简介"><a href="#SpringMVC简介" class="headerlink" title="SpringMVC简介"></a>SpringMVC简介</h3><p><strong>SpringMVC 是一种基于 Java 的实现 MVC 设计模型的请求驱动类型的轻量级 Web 框架 。</strong></p>
+<p><strong>MVC分别是指：</strong></p>
+<ul>
+<li><strong>modul(模型)：用于数据封装和业务逻辑处理</strong></li>
+<li><strong>view(视图)：用于数据的展示</strong></li>
+<li><strong>controller(控制器)：用于分发指派工作</strong></li>
+</ul>
+<p><strong><u>传统的web层Servlet类要继承和实现特定接口，才可以接收客户端发出的请求消息并回复响应消息。而SpringMVC可以通过一套注解，让一个简单的 Java 类成为处理请求的控制器，而无须实现任何接口，这套注解正是mvc框架崛起的主要因素。</u></strong></p>
+<h4 id="SpringMVC使用步骤"><a href="#SpringMVC使用步骤" class="headerlink" title="SpringMVC使用步骤"></a>SpringMVC使用步骤</h4><ol>
+<li><p>在pom.xml文件中导入Spring和SpringMVC的坐标</p>
+</li>
+<li><p>在pom.xml文件中导入Servlet和Jsp的坐标</p>
+</li>
+<li><p><strong><u>在web.xml文件中配置SpringMVC的核心控制器</u></strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--配置SpringMVC的前端控制器--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--servlet初始化参数：通过给前端控制器加载初始配置文件来告诉前端控制器它所要控制的Controller在哪--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:spring-mvc.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--表示服务器启动时就加载该前端控制器（如果不添加该语句，则默认第一次使用时才加载该前端控制器）--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--配置前端控制器的映射地址--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--只用一个/表示任何客户端请求都要经过该前端控制器（如果此处舔*.xxx则意味着只有文件扩展名类型为xxx的请求消息才经过前端控制器）--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建Controller类和其中的业务方法</p>
+</li>
+<li><p>创建视图页面jsp文件</p>
+</li>
+<li><p><strong><u>在Controller类和其中业务方法上添加注解，通过注解使该类中的业务方法成为一个可以接收请求消息的动态资源。</u></strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)<span class="comment">//资源路径为/user/quick</span></span><br><span class="line">    <span class="comment">//请求映射注解。(请求消息访问/user/quick动态资源时，服务器映射到save()方法，执行其中代码，并返回一个jsp视图页面名字符串，使客户端直接跳转到该视图。)</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">save</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Controller save running....."</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"/success.jsp"</span>;</span><br><span class="line">        <span class="comment">//"success.jsp"为相对资源路径，到时候会访问的视图动态资源路径为/user/success.jsp，然而这并不存在，所以会404；</span></span><br><span class="line">        <span class="comment">//重要："/success.jsp"为绝对资源路径，表示直接放在web项目根目录下的资源路径/success.jsp。</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><u>创建spring-mvc.xml文件，主要用来开启mvc的注解扫描和注解驱动。</u></strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd</span></span></span><br><span class="line"><span class="tag"><span class="string">            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--Controller的组件注解扫描(扫描的包范围最好小一点，这样能确保分工更明确，controller包以外的注解扫描交给核心配置文件来做。)--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"jia.zheng.controller"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--配置mvc的注解驱动，使得Controller中的映射方法返回值可以为对象或者集合，且由该驱动默认继承的jackson转换为json格式字符串展示在页面上--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mvc:annotation-driven</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>部署项目到tomcat上并使用</p>
+</li>
+</ol>
+<h4 id="SpringMVC注解解析"><a href="#SpringMVC注解解析" class="headerlink" title="SpringMVC注解解析"></a>SpringMVC注解解析</h4><p><strong>@RequestMapping：用于建立请求 URL 和处理请求方法之间的对应关系</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E6%B3%A8%E8%A7%A3%E8%A7%A3%E6%9E%90.png" alt></p>
+<h4 id="SpringMVC配置视图解析器"><a href="#SpringMVC配置视图解析器" class="headerlink" title="SpringMVC配置视图解析器"></a>SpringMVC配置视图解析器</h4><p><strong>在spring-mvc.xml文件中可以配置视图资源解析器，并通过属性注入，来修改视图的前后缀。</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E8%A7%86%E5%9B%BE%E8%A7%A3%E6%9E%90%E5%99%A8.png" alt></p>
+<h3 id="SpringMVC的数据响应"><a href="#SpringMVC的数据响应" class="headerlink" title="SpringMVC的数据响应"></a>SpringMVC的数据响应</h3><p>SpringMVC的数据响应主要有四种方式</p>
+<ul>
+<li>页面跳转<ul>
+<li>直接返回字符串</li>
+<li>返回ModelAndView对象</li>
+</ul>
+</li>
+<li>回写数据<ul>
+<li>直接返回字符串</li>
+<li>返回对象或集合</li>
+</ul>
+</li>
+</ul>
+<h4 id="数据响应为页面跳转-字符串"><a href="#数据响应为页面跳转-字符串" class="headerlink" title="数据响应为页面跳转_字符串"></a>数据响应为页面跳转_字符串</h4><p><strong><u>注意此时作为动态资源的方法的返回值类型必须是String。</u></strong></p>
+<ul>
+<li><p><strong>直接返回单个页面跳转字符串，Spring会将返回的字符串与视图解析器中配置好的前后缀拼接好，作为转发资源的绝对地址。</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E7%9B%B4%E6%8E%A5%E8%BF%94%E5%9B%9E%E5%AD%97%E7%AC%A6%E4%B8%B2.png" alt></p>
+</li>
+<li><p><strong><u>也可以返回带有前后缀的完整资源绝对地址，则不用拼接。</u></strong></p>
+<ul>
+<li><strong><u>转发： forward:/WEB-INF/views/index.jsp</u></strong></li>
+<li><strong><u>重定向： redirect:/index.jsp</u></strong> </li>
+</ul>
+</li>
+</ul>
+<h4 id="数据响应为页面跳转-ModelAndView对象"><a href="#数据响应为页面跳转-ModelAndView对象" class="headerlink" title="数据响应为页面跳转_ModelAndView对象"></a>数据响应为页面跳转_ModelAndView对象</h4><p><strong><u>注意此时作为动态资源的方法的返回值类型必须是ModelAndView。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%BF%94%E5%9B%9E%E6%A8%A1%E5%9E%8B%E8%A7%86%E5%9B%BE%E5%AF%B9%E8%B1%A1.png" alt></p>
+<h4 id="数据响应为页面跳转-向request域中存储数据"><a href="#数据响应为页面跳转-向request域中存储数据" class="headerlink" title="数据响应为页面跳转_向request域中存储数据"></a>数据响应为页面跳转_向request域中存储数据</h4><p><strong>在进行转发时，往往要向request域中存储数据，使得jsp页面可以使用这些数据。</strong></p>
+<p>存储数据的方式主要有两种：</p>
+<ul>
+<li><p><strong>通过SpringMVC框架注入的request对象setAttribute()方法设置</strong> </p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%80%9A%E8%BF%87%E6%A1%86%E6%9E%B6%E5%AD%98%E5%82%A8%E6%95%B0%E6%8D%AE.png" alt></p>
+</li>
+<li><p><strong>通过ModelAndView的addObject()方法设置</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%80%9A%E8%BF%87%E8%A7%86%E5%9B%BE%E5%AF%B9%E8%B1%A1%E6%96%B9%E6%B3%95%E5%AD%98%E5%82%A8%E6%95%B0%E6%8D%AE.png" alt></p>
+</li>
+</ul>
+<h4 id="数据响应为回写数据-字符串"><a href="#数据响应为回写数据-字符串" class="headerlink" title="数据响应为回写数据_字符串"></a>数据响应为回写数据_字符串</h4><p><strong><u>数据响应为回写数据时，要在成为动态资源的业务方法上再加一个注解@ResponseBody，这个注解会告知SpringMVC框架，业务方法返回的数据不是跳转数据，而是直接放在在http响应体中返回。 业务方法的返回值类型即为要回写数据的类型。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E7%9B%B4%E6%8E%A5%E5%9B%9E%E5%86%99%E5%AD%97%E7%AC%A6%E4%B8%B2.png" alt></p>
+<h4 id="数据响应为回写数据-json格式字符串"><a href="#数据响应为回写数据-json格式字符串" class="headerlink" title="数据响应为回写数据_json格式字符串"></a>数据响应为回写数据_json格式字符串</h4><p>使用Jackson将java对象转换为json字符串并返回的基本步骤：</p>
+<ol>
+<li><p><strong><u>在pom.xml文件中导入jackson坐标（注意：每次更改完pom.xml、spring-mvc等配置文件后都要重新创建一次web项目的artifacts导入Tomcat服务器中。）</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%AF%BC%E5%85%A5jackson%E5%9D%90%E6%A0%871.png" alt></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%AF%BC%E5%85%A5jackson%E5%9D%90%E6%A0%872.png" alt></p>
+</li>
+<li><p><strong><u>创建ObjectMapper对象，并使用其方法将java对象转换成json字符串并返回。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/java%E5%AF%B9%E8%B1%A1%E8%BD%AC%E4%B8%BAjson%E5%AD%97%E7%AC%A6%E4%B8%B2.png" alt></p>
+</li>
+</ol>
+<h4 id="数据响应为回写数据-对象或集合"><a href="#数据响应为回写数据-对象或集合" class="headerlink" title="数据响应为回写数据_对象或集合"></a>数据响应为回写数据_对象或集合</h4><p>返回对象或集合的基本步骤：</p>
+<ol>
+<li><p><strong><u>在spring-mvc.xml文件中打开mvc的注解驱动</u></strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--配置mvc的注解驱动，使得Controller中的映射方法返回值可以为对象或者集合，且由该驱动默认继承的jackson转换为json格式字符串展示在页面上--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mvc:annotation-driven</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>业务方法返回值类型写成对象类型或者集合类型，mvc会自动帮我们把返回的该对象或集合转换成json字符串放入响应体中。</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%9B%9E%E5%86%99%E8%BF%94%E5%9B%9E%E5%AF%B9%E8%B1%A1%E6%88%96%E9%9B%86%E5%90%88.png" alt></p>
+</li>
+</ol>
+<h3 id="SpringMVC获得请求数据"><a href="#SpringMVC获得请求数据" class="headerlink" title="SpringMVC获得请求数据"></a>SpringMVC获得请求数据</h3><h4 id="获得请求参数"><a href="#获得请求参数" class="headerlink" title="获得请求参数"></a>获得请求参数</h4><p>客户端请求参数的格式是： name=value&amp;name=value… … </p>
+<p>服务器端要获得请求的参数，有时还需要进行数据的封装，再给到service层和dao层使用。</p>
+<p>SpringMVC可以接收如下类型的请求参数：</p>
+<ul>
+<li>基本类型参数</li>
+<li>POJO类型参数</li>
+<li>数组类型参数</li>
+<li>集合类型参数</li>
+</ul>
+<h4 id="获得基本类型参数"><a href="#获得基本类型参数" class="headerlink" title="获得基本类型参数"></a>获得基本类型参数</h4><p><strong><u>使Controller中作为动态资源的业务方法的输入参数与请求参数的name一致，则参数值会自动映射匹配。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png" alt></p>
+<h4 id="获得POJO类型参数"><a href="#获得POJO类型参数" class="headerlink" title="获得POJO类型参数"></a>获得POJO类型参数</h4><p><strong><u>使Controller中的业务方法的POJO参数的属性名与请求参数的name一致，则参数值会自动映射匹配。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97POJO%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png" alt></p>
+<h4 id="获得数组类型参数"><a href="#获得数组类型参数" class="headerlink" title="获得数组类型参数"></a>获得数组类型参数</h4><p><strong><u>使Controller中的业务方法数组名称与请求参数的name一致，则参数值会自动映射匹配。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97%E6%95%B0%E7%BB%84%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png" alt></p>
+<h4 id="获得集合类型参数"><a href="#获得集合类型参数" class="headerlink" title="获得集合类型参数"></a>获得集合类型参数</h4><p><strong><u>获得集合参数时，也要将几何参数包装到一个POJO中才可以。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%9B%86%E5%90%88POJO.png" alt></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%BE%97%E9%9B%86%E5%90%88%E7%B1%BB%E5%9E%8B%E5%8F%82%E6%95%B0.png" alt></p>
+<h4 id="请求数据乱码问题"><a href="#请求数据乱码问题" class="headerlink" title="请求数据乱码问题"></a>请求数据乱码问题</h4><p><strong><u>当post请求时，数据会出现乱码，我们可以在web.xml文件中配置一个过滤器来进行编码的过滤。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%AE%BE%E7%BD%AE%E8%BF%87%E6%BB%A4%E5%99%A8.png" alt></p>
+<h4 id="参数绑定注解-RequestParam"><a href="#参数绑定注解-RequestParam" class="headerlink" title="参数绑定注解@RequestParam"></a>参数绑定注解@RequestParam</h4><p><strong><u>当请求消息中的请求参数的名称与Controller中的业务方法的输入参数名称不一致时，就需要通过@RequestParam注解来将请求参数与输入参数进行绑定。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%8F%82%E6%95%B0%E7%BB%91%E5%AE%9A.png" alt></p>
+<h4 id="自定义类型转换器"><a href="#自定义类型转换器" class="headerlink" title="自定义类型转换器"></a>自定义类型转换器</h4><p>SpringMVC默认已经提供了一些常用的类型转换器，例如客户端提供的字符串转换成int型进行参数设置，但是有一些数据类型并没有提供转换器，比如日期类型的数据就需要自定义转换器。</p>
+<p>自定义类型转换器的开发步骤：</p>
+<ol>
+<li>定义转换器类，该类实现Converter接口</li>
+<li>在Spring-mvc文件中配置转换器</li>
+<li>在Spring-mvc文件中的&lt;annotation-driven&gt;中引入该转换器</li>
+</ol>
+<h4 id="获得Servlet相关API"><a href="#获得Servlet相关API" class="headerlink" title="获得Servlet相关API"></a>获得Servlet相关API</h4><p><strong>SpringMVC支持使用原始ServletAPI对象作为Controller中业务方法的输入参数，常用的对象如下：</strong></p>
+<ul>
+<li><strong>HttpServletRequest</strong></li>
+<li><strong>HttpServletResponse</strong></li>
+<li><strong>HttpSession</strong> </li>
+</ul>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%8E%B7%E5%8F%96%E5%8E%9F%E5%A7%8Bapi.png" alt></p>
+<h4 id="获得请求头"><a href="#获得请求头" class="headerlink" title="获得请求头"></a>获得请求头</h4><p>使用@RequestHeader可以获得请求头信息，相当于web阶段学习的request.getHeader(name)。</p>
+<p>使用@CookieValue可以获得指定Cookie的值。</p>
+<h4 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h4><ul>
+<li>文件上传客户端三要素</li>
+<li>文件上传原理</li>
+<li>单文件上传实现步骤</li>
+<li>多文件上传实现步骤</li>
+</ul>
+<h3 id="SpringMVC拦截器"><a href="#SpringMVC拦截器" class="headerlink" title="SpringMVC拦截器"></a>SpringMVC拦截器</h3><h4 id="拦截器的作用"><a href="#拦截器的作用" class="headerlink" title="拦截器的作用"></a>拦截器的作用</h4><p><strong>Spring MVC 的拦截器类似于 Servlet 开发中的过滤器 Filter，用于对Controller进行预处理和后处理。 拦截器也是AOP思想的具体实现。</strong></p>
+<h4 id="自定义拦截器步骤"><a href="#自定义拦截器步骤" class="headerlink" title="自定义拦截器步骤"></a>自定义拦截器步骤</h4><ol>
+<li><p><strong><u>创建拦截器类，该类要实现HandlerInterceptor接口</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%88%9B%E5%BB%BA%E6%8B%A6%E6%88%AA%E5%99%A8%E7%B1%BB.png" alt></p>
+<p><strong>其中preHandle()方法最常使用的案例就是：登录验证。客户端页面提交的请求参数中的键值对要符合要求才可以执行目标方法，不符合要求则转发到其他错误提示页面。</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E8%AF%B7%E6%B1%82%E5%8F%82%E6%95%B0%E9%AA%8C%E8%AF%81%E6%A1%88%E4%BE%8B.png" alt></p>
+</li>
+<li><p><strong><u>在Spring-mvc.xml文件中配置拦截器</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E6%8B%A6%E6%88%AA%E5%99%A8.png" alt></p>
+</li>
+</ol>
+<h4 id="多拦截器操作"><a href="#多拦截器操作" class="headerlink" title="多拦截器操作"></a>多拦截器操作</h4><p><strong><u>拦截器在Spring-mvc.xml配置文件中的配置顺序决定了它们的拦截顺序。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%A4%9A%E6%8B%A6%E6%88%AA%E5%99%A8.png" alt></p>
+<h3 id="SpringMVC异常处理"><a href="#SpringMVC异常处理" class="headerlink" title="SpringMVC异常处理"></a>SpringMVC异常处理</h3><h4 id="异常处理思路"><a href="#异常处理思路" class="headerlink" title="异常处理思路"></a>异常处理思路</h4><p><strong><u>在一个运用了Spring框架的web项目中，dao、service、controller层中出现的异常全都向上抛出，最后由SpringMVC前端控制器交由异常处理器来进行异常处理。</u></strong></p>
+<h4 id="使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver"><a href="#使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver" class="headerlink" title="使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver"></a>使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver</h4><p><strong><u>SpringMVC已经定义好了该类型转换器，要使用时在Spring-mvc.xml文件中如下配置即可，可以根据项目情况进行相应异常与视图的映射配置。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E7%AE%80%E5%8D%95%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%99%A8.png" alt></p>
+<h4 id="使用自定义异常处理器"><a href="#使用自定义异常处理器" class="headerlink" title="使用自定义异常处理器"></a>使用自定义异常处理器</h4><p><strong>相比于使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver，使用自定义异常处理器则只需要多出一个步骤：<u>创建异常处理器类，该类实现HandlerExceptionResolver。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E5%88%9B%E5%BB%BA%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%99%A8%E7%B1%BB.png" alt></p>
+<p><strong>创建好之后，在Spring-mvc.xml文件中如下配置该异常处理器即可，注意简单异常处理器和自定义异常处理器一般不在同时配置。</strong></p>
+<p><img src="//littleforestjia.github.io/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_SpringMVC/%E9%85%8D%E7%BD%AE%E8%87%AA%E5%AE%9A%E4%B9%89%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E5%99%A8.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Controller/" rel="tag"><i class="fa fa-tag"></i> Controller</a>
+          
+            <a href="/tags/ModelAndView/" rel="tag"><i class="fa fa-tag"></i> ModelAndView</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/28/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_Spring/" rel="next" title="【基础知识】_Spring">
+                <i class="fa fa-chevron-left"></i> 【基础知识】_Spring
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/10/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JSON/" rel="prev" title="【基础知识】_JSON">
+                【基础知识】_JSON <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringMVC"><span class="nav-number">1.</span> <span class="nav-text">SpringMVC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring集成web环境"><span class="nav-number">1.1.</span> <span class="nav-text">Spring集成web环境</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取Spring框架创建的应用上下文对象的基本步骤"><span class="nav-number">1.1.1.</span> <span class="nav-text">获取Spring框架创建的应用上下文对象的基本步骤</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC简介"><span class="nav-number">1.2.</span> <span class="nav-text">SpringMVC简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SpringMVC使用步骤"><span class="nav-number">1.2.1.</span> <span class="nav-text">SpringMVC使用步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpringMVC注解解析"><span class="nav-number">1.2.2.</span> <span class="nav-text">SpringMVC注解解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpringMVC配置视图解析器"><span class="nav-number">1.2.3.</span> <span class="nav-text">SpringMVC配置视图解析器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC的数据响应"><span class="nav-number">1.3.</span> <span class="nav-text">SpringMVC的数据响应</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数据响应为页面跳转-字符串"><span class="nav-number">1.3.1.</span> <span class="nav-text">数据响应为页面跳转_字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据响应为页面跳转-ModelAndView对象"><span class="nav-number">1.3.2.</span> <span class="nav-text">数据响应为页面跳转_ModelAndView对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据响应为页面跳转-向request域中存储数据"><span class="nav-number">1.3.3.</span> <span class="nav-text">数据响应为页面跳转_向request域中存储数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据响应为回写数据-字符串"><span class="nav-number">1.3.4.</span> <span class="nav-text">数据响应为回写数据_字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据响应为回写数据-json格式字符串"><span class="nav-number">1.3.5.</span> <span class="nav-text">数据响应为回写数据_json格式字符串</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据响应为回写数据-对象或集合"><span class="nav-number">1.3.6.</span> <span class="nav-text">数据响应为回写数据_对象或集合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC获得请求数据"><span class="nav-number">1.4.</span> <span class="nav-text">SpringMVC获得请求数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获得请求参数"><span class="nav-number">1.4.1.</span> <span class="nav-text">获得请求参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得基本类型参数"><span class="nav-number">1.4.2.</span> <span class="nav-text">获得基本类型参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得POJO类型参数"><span class="nav-number">1.4.3.</span> <span class="nav-text">获得POJO类型参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得数组类型参数"><span class="nav-number">1.4.4.</span> <span class="nav-text">获得数组类型参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得集合类型参数"><span class="nav-number">1.4.5.</span> <span class="nav-text">获得集合类型参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#请求数据乱码问题"><span class="nav-number">1.4.6.</span> <span class="nav-text">请求数据乱码问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参数绑定注解-RequestParam"><span class="nav-number">1.4.7.</span> <span class="nav-text">参数绑定注解@RequestParam</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义类型转换器"><span class="nav-number">1.4.8.</span> <span class="nav-text">自定义类型转换器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得Servlet相关API"><span class="nav-number">1.4.9.</span> <span class="nav-text">获得Servlet相关API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获得请求头"><span class="nav-number">1.4.10.</span> <span class="nav-text">获得请求头</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文件上传"><span class="nav-number">1.4.11.</span> <span class="nav-text">文件上传</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC拦截器"><span class="nav-number">1.5.</span> <span class="nav-text">SpringMVC拦截器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#拦截器的作用"><span class="nav-number">1.5.1.</span> <span class="nav-text">拦截器的作用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义拦截器步骤"><span class="nav-number">1.5.2.</span> <span class="nav-text">自定义拦截器步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多拦截器操作"><span class="nav-number">1.5.3.</span> <span class="nav-text">多拦截器操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringMVC异常处理"><span class="nav-number">1.6.</span> <span class="nav-text">SpringMVC异常处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#异常处理思路"><span class="nav-number">1.6.1.</span> <span class="nav-text">异常处理思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver"><span class="nav-number">1.6.2.</span> <span class="nav-text">使用SpringMVC内置的简单异常处理器SimpleMappingExceptionResolver</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用自定义异常处理器"><span class="nav-number">1.6.3.</span> <span class="nav-text">使用自定义异常处理器</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,众包,公理化设计," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="众包项目过程中的困难：算法开发过程中的困难 公理化设计在大多数论文或者应用中，是一种设计指导的中心思想，研究人员通常式根据公理化设计的思想一步一步的展开、完善自己的设计，需求分析-&gt;功能分解-&gt;结构分解-&gt;功构映射验证独立性公理和信息公理。 在这些步骤主要是依据设计者的设计经验或者资料查阅来设置和完善：  从模糊需求到规范化需求列表 从需求列表到功能分解 从功能模块到结构模块 功">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【科研项目】_众包设计活动分解工具开发">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="众包项目过程中的困难：算法开发过程中的困难 公理化设计在大多数论文或者应用中，是一种设计指导的中心思想，研究人员通常式根据公理化设计的思想一步一步的展开、完善自己的设计，需求分析-&gt;功能分解-&gt;结构分解-&gt;功构映射验证独立性公理和信息公理。 在这些步骤主要是依据设计者的设计经验或者资料查阅来设置和完善：  从模糊需求到规范化需求列表 从需求列表到功能分解 从功能模块到结构模块 功">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/maven%E9%A1%B9%E7%9B%AE%E6%9B%B4%E6%96%B0war%E5%8C%85%E6%AD%A5%E9%AA%A4.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/%E6%A0%91%E5%BD%A2%E7%BB%93%E6%9E%84%E9%A1%B5%E9%9D%A2%E6%98%BE%E7%A4%BA%E6%95%88%E6%9E%9C.png">
+<meta property="article:published_time" content="2020-09-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-10-15T14:45:07.622Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="众包">
+<meta property="article:tag" content="公理化设计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/maven%E9%A1%B9%E7%9B%AE%E6%9B%B4%E6%96%B0war%E5%8C%85%E6%AD%A5%E9%AA%A4.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/09/09/【科研项目】_众包设计活动分解工具开发/"/>
+
+
+
+
+
+  <title>【科研项目】_众包设计活动分解工具开发 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【科研项目】_众包设计活动分解工具开发</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-09T00:00:00+08:00">
+                2020-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index">
+                    <span itemprop="name">科研项目</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="众包项目过程中的困难："><a href="#众包项目过程中的困难：" class="headerlink" title="众包项目过程中的困难："></a>众包项目过程中的困难：</h1><h2 id="算法开发过程中的困难"><a href="#算法开发过程中的困难" class="headerlink" title="算法开发过程中的困难"></a>算法开发过程中的困难</h2><ol>
+<li><p>公理化设计在大多数论文或者应用中，是一种设计指导的中心思想，研究人员通常式根据公理化设计的思想一步一步的展开、完善自己的设计，需求分析-&gt;功能分解-&gt;结构分解-&gt;功构映射验证独立性公理和信息公理。</p>
+<p><strong>在这些步骤主要是依据设计者的设计经验或者资料查阅来设置和完善：</strong></p>
+<ul>
+<li>从模糊需求到规范化需求列表</li>
+<li>从需求列表到功能分解</li>
+<li>从功能模块到结构模块</li>
+<li>功构映射中的功能、结构耦合关系参数设定</li>
+</ul>
+<p><strong>如何在没有产品知识数据的基础之上完成上述步骤，使软件完成主动任务分解？</strong></p>
+</li>
+<li><p>公理化设计在大多数论文或者应用中，是预先设定好产品模块库，这些模块化设计的产品是一个设计任务产品的基本构成单元。大多数的定制产品的设计过程都是运用公理化设计思想将产品分解成与模块库中相同或者功能类似的模块，如果分解得到的模块与模块库中的模块相似或相同，则再次基础上进行创新设计；如果在模块库中没有与分解得到模块相同的模块则需要全部自主创新设计。</p>
+<p><strong>那么众包项目在我的理解中实际上就是上述步骤中所有分解得到的模块都需要自主创新设计，只不过最后这个模块自主创新设计是作为子任务的模式发送给线上接包者。</strong></p>
+<p><strong>如何在没有产品模板库的基础上设置任务分解终点？</strong></p>
+</li>
+</ol>
+<h2 id="代码编写过程中的困难"><a href="#代码编写过程中的困难" class="headerlink" title="代码编写过程中的困难"></a>代码编写过程中的困难</h2><h3 id="1-树形图等数据在数据库中的保存形式"><a href="#1-树形图等数据在数据库中的保存形式" class="headerlink" title="1. 树形图等数据在数据库中的保存形式"></a>1. 树形图等数据在数据库中的保存形式</h3><p><strong>问题</strong>：如何将分解好的任务包信息存储的mysql数据库中，任务、要求、功能分解树、结构分解树、多维度性能评估信息等数据组成的任务包以何种形式的表格存储在mysql数据库中？</p>
+<p><strong>解决</strong>：<strong><u>邻接表(adjacency list)模型</u></strong></p>
+<p>+————-+———————-+——–+<br>| category_id | name         | parent |<br>+————-+———————-+——–+<br>|           1 | ELECTRONICS   |   NULL |<br>|           2 | TELEVISIONS     |      1 |<br>|           3 | TUBE                  |      2 |<br>|           4 | LCD                     |      2 |<br>|           5 | PLASMA             |      2 |<br>|           6 | PORTABLE ELECTRONICS |      1 |<br>|           7 | MP3 PLAYERS   |      6 |<br>|           8 | FLASH                |      7 |<br>|           9 | CD PLAYERS      |      6 |<br>|          10 | 2 WAY RADIOS |      6 |<br>+————-+———————-+——–+</p>
+<p>在邻接表(adjacency list)模型中, 表中的每一项都包含指向父亲节点中的指针。本例中最顶级的元素，有一个 NULL 值做父元素节点。邻接表(adjacency list)模型有一个好处就是非常简单，很容易可以看到 FLASH 是 mp3 的一个子节点，mp3是 portable electronics的子节点， portable electronics是electronics的一个子节点。邻接表(adjacency list)模型相对于客户端代码(client-side code)比较容易，但是使用纯SQL有些问题。</p>
+<p>###2.  Bootstrap竖版标签页</p>
+<p><strong>问题</strong>：Bootstrap中只有横版标签页模板，没有竖版标签页。</p>
+<p><strong>解决</strong>：<strong><u>在导航区的类属性中添加nav-stacked属性值</u></strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ul</span> <span class="attr">class</span>=<span class="string">"nav nav-pills nav-stacked"</span> <span class="attr">role</span>=<span class="string">"tablist"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">role</span>=<span class="string">"presentation"</span> <span class="attr">class</span>=<span class="string">"active"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#new_task"</span> <span class="attr">role</span>=<span class="string">"tab"</span> <span class="attr">data-toggle</span>=<span class="string">"tab"</span>&gt;</span>新任务<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">role</span>=<span class="string">"presentation"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#process_task"</span> <span class="attr">role</span>=<span class="string">"tab"</span> <span class="attr">data-toggle</span>=<span class="string">"tab"</span>&gt;</span>处理中任务<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">role</span>=<span class="string">"presentation"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#finish_task"</span> <span class="attr">role</span>=<span class="string">"tab"</span> <span class="attr">data-toggle</span>=<span class="string">"tab"</span>&gt;</span>已处理任务<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后通过表格标签或者css调整标签位置，使整体达到竖版标签页的效果。</p>
+<h3 id="3-html页面图片无法加载"><a href="#3-html页面图片无法加载" class="headerlink" title="3. html页面图片无法加载"></a>3. html页面图片无法加载</h3><p><strong>问题</strong>：html代码中图片路径没有错误，但是将项目部署后，浏览器页面上无法加载该图片。</p>
+<p><strong>解决</strong>：<strong><u>通过浏览器F12调试功能来查找问题所在，这是在编写web项目过程中一定要常用且熟练掌握的技能。</u></strong>查找发现浏览器报错：在执行语句<code>&lt;img src=&quot;img/welcome4.png&quot; style=&quot;margin-top: 0px;width: 100%;&quot;&gt;</code>时出现错误<code>Failed to load resource: the server responded with a status of 404 ()</code></p>
+<p>鼠标移动到该错误上，出现目标图片的目标路径，可以看出路径是没有错误的，那么就顺着这个路径来找到这个文件夹。</p>
+<p>maven项目部署之后的，包含项目名的文件根目录对应的应该是项目文件夹out中的项目文件夹，来到out文件夹中发现并没有这张图片，也就是说idea在编译时并没有把这张图片编译输出到out文件夹中，那么我们自己复制粘贴这张图片到out文件夹中就行了。</p>
+<p><strong>经过观察也可以发现，maven项目中的文件夹之间的关系，src文件夹中的webapp文件夹中的文件编译后保存在out文件夹中，src文件夹中的java文件夹和resources文件夹中的文件编译后保存在target文件夹中。</strong></p>
+<h3 id="4-html文本高度居中"><a href="#4-html文本高度居中" class="headerlink" title="4. html文本高度居中"></a>4. html文本高度居中</h3><p><strong><u>height:表示标签高度，line-heignt表示文字行高，两者设置相同即可使文本高度居中。</u></strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--height:表示标签高度，line-heignt表示文字行高，两者设置相同即可使文本高度居中。--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"border: 1px solid black;height: 60px;line-height: 60px;"</span>&gt;</span></span><br><span class="line">    序号+任务名称+任务编号+部分任务信息</span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-html表格单元格内容置顶"><a href="#5-html表格单元格内容置顶" class="headerlink" title="5. html表格单元格内容置顶"></a>5. html表格单元格内容置顶</h3><p><strong><u>使表格单元格内容置顶的属性和属性值：valign=”top”。</u></strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">td</span> <span class="attr">style</span>=<span class="string">"width: 10%;"</span> <span class="attr">valign</span>=<span class="string">"top"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="6-html设置边框为圆角"><a href="#6-html设置边框为圆角" class="headerlink" title="6. html设置边框为圆角"></a>6. html设置边框为圆角</h3><p><strong><u>设置标签的边框border为圆角，使用style属性，设定属性值为<code>border-radius: 圆角像素值</code>。</u></strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"border: 2px solid rgb(217,217,217);height: 60px;border-radius: 10px"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7-查询mysql数据库表中id值最大的任务行信息"><a href="#7-查询mysql数据库表中id值最大的任务行信息" class="headerlink" title="7.查询mysql数据库表中id值最大的任务行信息"></a>7.查询mysql数据库表中id值最大的任务行信息</h3><p><strong><code>select * from 表 order by 要最大值的字段 desc limit 0,1;</code></strong>，其中的<code>order by 要最大值的字段 desc</code>表示将查询结果按降序排序，<code>limit 0,1</code>起到分页查询的作用，<strong>本质就是从索引为0的行开始，取共1行的数据作为本次查询的查询结果。</strong></p>
+<p><strong>这个查询语句更常用于：查询表中id前十大的任务行信息。</strong></p>
+<h3 id="8-javascript修改Element对象的class属性"><a href="#8-javascript修改Element对象的class属性" class="headerlink" title="8.javascript修改Element对象的class属性"></a>8.javascript修改Element对象的class属性</h3><p><strong>修改class属性时要用classname，而不是直接使用class。</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.getElementById(<span class="string">"process_task_head"</span>).className=<span class="string">"active"</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="9-标签页上添加页面跳转按钮"><a href="#9-标签页上添加页面跳转按钮" class="headerlink" title="9.标签页上添加页面跳转按钮"></a>9.标签页上添加页面跳转按钮</h3><p><strong>boostrap标签页js插件提供了一个可以点击标签，实现页面跳转的功能，现在我们在此基础之上添加另外的页面跳转按钮。主要通过同时修改导航区中标签的class属性和面板区页面标签的class属性来实现，去掉当前显示页面中的active属性值，在要显示的页面中加上active属性。</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;button type="button" id="taskmanage1" style="float: right;margin-right: 20px;line-height: 30px;font-size: 15px;margin-top: 10px"&gt;完善任务需求&lt;/button&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    <span class="keyword">var</span> quitButton = document.getElementById(<span class="string">"taskmanage1"</span>);</span><br><span class="line">    quitButton.onclick = function () &#123;</span><br><span class="line">        document.getElementById(<span class="string">"new_task_head"</span>).className=<span class="string">""</span>;</span><br><span class="line">        document.getElementById(<span class="string">"process_task_head"</span>).className=<span class="string">"active"</span>;</span><br><span class="line">        document.getElementById(<span class="string">"new_task"</span>).className=<span class="string">"tab-pane"</span>;</span><br><span class="line">        document.getElementById(<span class="string">"process_task"</span>).className=<span class="string">"tab-pane active"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="10-idea更新MAVEN项目中的target文件夹中的class文件"><a href="#10-idea更新MAVEN项目中的target文件夹中的class文件" class="headerlink" title="10.idea更新MAVEN项目中的target文件夹中的class文件"></a>10.idea更新MAVEN项目中的target文件夹中的class文件</h3><p><strong>当我们在工作空间中更改我们java文件夹中的java文件后，直接重新部署项目到tomcat上时，idea并不会帮我们把更改后的java文件重新编译。比如我们在Java文件夹中新建一个Servlet类后，重新部署项目，在target文件夹中和out文件夹中并不会有该Servlet类对应的calss文件，浏览器中请求该动态资源也会404。</strong></p>
+<p><strong>这时候我们需要自己手动跟新maven项目的war包，具体操作步骤：<u>右边maven项目弹窗中选定项目–&gt;clean然后再install。</u></strong></p>
+<p><img src="//littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/maven%E9%A1%B9%E7%9B%AE%E6%9B%B4%E6%96%B0war%E5%8C%85%E6%AD%A5%E9%AA%A4.png" alt></p>
+<p><strong>如果重建项目war包时，出现<code>不再支持源选项 5。请使用 7 或更高版本。</code>的错误，则说明编译时使用的jdk版本错误，需要我们在pom.xml文件中添加以下语句确保使用我们设定的jdk编译java文件。</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">maven.compiler.source</span>&gt;</span>13<span class="tag">&lt;/<span class="name">maven.compiler.source</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">maven.compiler.target</span>&gt;</span>13<span class="tag">&lt;/<span class="name">maven.compiler.target</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="11-静态资源分开放到不同文档中"><a href="#11-静态资源分开放到不同文档中" class="headerlink" title="11.静态资源分开放到不同文档中"></a>11.静态资源分开放到不同文档中</h3><p>使用boostrap标签页插件使所有标签页中的静态资源都放在同一个jsp文件中很难协调每个页面对应的动态资源操作。</p>
+<p><strong>还是尽量多分几个静态资源文档，不要把太多静态资源放在同一个文档当中。</strong></p>
+<h3 id="12-herf实现资源跳转"><a href="#12-herf实现资源跳转" class="headerlink" title="12.herf实现资源跳转"></a>12.herf实现资源跳转</h3><ul>
+<li><p><strong><u>herf既可以指定jsp、html等可以跳转到的页面地址，也可以指定Servlet类动态资源。</u></strong></p>
+</li>
+<li><p><strong><u>这个网址可以是完整的其他服务器资源的url，也可以是本服务器资源的uri。</u></strong></p>
+</li>
+<li><p><strong><u>herf指定跳转地址时可以在地址后添加请求参数列表。</u></strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">quitButton.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    location.href = <span class="string">"manageFinishTask.jsp?catalog_id=7"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">quitButton.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    location.href = <span class="string">"/crowdsourcing_break_down_war_exploded/manageNewTask?task_id=0"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+</li>
+</ul>
+<h3 id="13-JavaScript获取请求参数数据"><a href="#13-JavaScript获取请求参数数据" class="headerlink" title="13.JavaScript获取请求参数数据"></a>13.JavaScript获取请求参数数据</h3><p><strong><u>jsp文档中的&lt;%java表达式%&gt;和&lt;%=java表达式%&gt;脚本或者${EL表达式}是可以放在&lt;script&gt;标签内的javascript代码中的。所以可以直接通过jsp脚本代码获得请求参数，然后放到javascript代码中。从而达到通过请求参数或域共享数据，控制浏览器页面显示效果的目的。</u></strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> processtaskmessage = <span class="built_in">document</span>.getElementById(<span class="string">"processtaskmessage"</span>);</span><br><span class="line"><span class="keyword">var</span> tag=&lt;%= request.getParameter(<span class="string">"task_id"</span>)%&gt;</span><br><span class="line"><span class="keyword">if</span> (tag==<span class="number">0</span>) &#123;</span><br><span class="line">    processtaskmessage.innerText =<span class="string">"任务$&#123;applicationScope.name.id&#125;:$&#123;applicationScope.name.name&#125;    任务描述:$&#123;applicationScope.name.information&#125;"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (tag==<span class="number">1</span>) &#123;</span><br><span class="line">    processtaskmessage.innerText =<span class="string">"任务$&#123;applicationScope.name1.id&#125;:$&#123;applicationScope.name1.name&#125;    任务描述:$&#123;applicationScope.name1.information&#125;"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    processtaskmessage.innerText =<span class="string">"任务$&#123;applicationScope.name2.id&#125;:$&#123;applicationScope.name2.name&#125;    任务描述:$&#123;applicationScope.name2.information&#125;"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong><u>甚至可以用于跳转的URL字符串中，如下：</u></strong></p>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=<span class="string">"/crowdsourcing_break_down_war_exploded/ServletCompleteRequest?task_id=&lt;%= request.getParameter("</span>task_id<span class="string">")%&gt;"</span> method=<span class="string">"post"</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="14-JavaScript获取请求参数中不存在的键"><a href="#14-JavaScript获取请求参数中不存在的键" class="headerlink" title="14.JavaScript获取请求参数中不存在的键"></a>14.JavaScript获取请求参数中不存在的键</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> task_id =&lt;%= request.getParameter(<span class="string">"task_id"</span>)%&gt;;</span><br></pre></td></tr></table></figure>
+
+<p><strong><u>如上例中，当请求参数中没有以task_id为键名的键值对时，该语句并不会报错，浏览器会帮我们将该语句解析为<code>task_id=null;</code>。</u></strong></p>
+<h3 id="15-JavaScript与-lt-gt-脚本中的java代码不能配合使用"><a href="#15-JavaScript与-lt-gt-脚本中的java代码不能配合使用" class="headerlink" title="15.JavaScript与&lt;% %&gt;脚本中的java代码不能配合使用"></a>15.JavaScript与&lt;% %&gt;脚本中的java代码不能配合使用</h3><p><strong>前面问题13中虽然提到JavaScript可以和java表达式配合使用，用于获取动态资源中的数据。<u>但是JavaScript并不能和java逻辑代码使用，比如想达到点击按钮执行java代码的效果，这是无法实现的。</u></strong></p>
+<p><strong><u>因为java代码是再服务器端运行的，JavaScript和html语句是在浏览器中运行的，加载一个jsp文档时，一定是先编译和执行java代码，再在浏览器页面上显示页面信息。</u></strong></p>
+<p><strong>想要实现逻辑性调用动态资源数据的常用方式之一就是：JSTL标签+EL表达式</strong></p>
+<h3 id="16-JDBC查询语句参数BeanPropertyRowMapper的使用规则"><a href="#16-JDBC查询语句参数BeanPropertyRowMapper的使用规则" class="headerlink" title="16.JDBC查询语句参数BeanPropertyRowMapper的使用规则"></a>16.JDBC查询语句参数BeanPropertyRowMapper的使用规则</h3><p><strong>JDBC查询数据库表时，如果想把查询结果直接通过BeanPropertyRowMapper封装到定义好的javabean对象中，则一定要保证javabean对象中的属性名和属性数据类型与sql查询结果的列名和列数据类型相同。</strong></p>
+<h3 id="17-如何在浏览器页面上展示树形结构数据"><a href="#17-如何在浏览器页面上展示树形结构数据" class="headerlink" title="17.如何在浏览器页面上展示树形结构数据"></a>17.如何在浏览器页面上展示树形结构数据</h3><p>主要方法：</p>
+<ul>
+<li><strong>数据获取和显示主要运用JSTL标签+EL表达式来实现</strong></li>
+<li><strong>树形结构的体现主要通过&lt;ul&gt;标签和&lt;li&gt;标签来实现</strong></li>
+</ul>
+<p>主要不足：</p>
+<ul>
+<li>只能勉强实现基本效果，没有很美观的树形页面显示</li>
+<li>没有用递归方法，而是自己预设了一个最大深度，超出该深度的节点就不会显示</li>
+</ul>
+<p>下例是最大深度为6的树形结构显示代码的编写：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:forEach items=<span class="string">"&lt;%= structureNodes%&gt;"</span> <span class="keyword">var</span>=<span class="string">"node0"</span> varStatus=<span class="string">"s0"</span>&gt;</span><br><span class="line">    &lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;node0.parentId==null&#125;"</span>&gt;</span><br><span class="line">        &lt;li&gt;</span><br><span class="line">                $&#123;node0.name&#125;</span><br><span class="line">            &lt;ul&gt;</span><br><span class="line">                &lt;c:forEach items=<span class="string">"&lt;%= structureNodes%&gt;"</span> <span class="keyword">var</span>=<span class="string">"node1"</span> varStatus=<span class="string">"s1"</span>&gt;</span><br><span class="line">                    &lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;node0.nodeId==node1.parentId&#125;"</span>&gt;</span><br><span class="line">                        &lt;li&gt;</span><br><span class="line">                                $&#123;node1.name&#125;</span><br><span class="line">                            &lt;ul&gt;</span><br><span class="line">                                &lt;c:forEach items=<span class="string">"&lt;%= structureNodes%&gt;"</span> <span class="keyword">var</span>=<span class="string">"node2"</span> varStatus=<span class="string">"s2"</span>&gt;</span><br><span class="line">                                    &lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;node1.nodeId==node2.parentId&#125;"</span>&gt;</span><br><span class="line">                                        &lt;li&gt;</span><br><span class="line">                                                $&#123;node2.name&#125;</span><br><span class="line">                                            &lt;ul&gt;</span><br><span class="line">                                                &lt;c:forEach items=<span class="string">"&lt;%= structureNodes%&gt;"</span> <span class="keyword">var</span>=<span class="string">"node3"</span> varStatus=<span class="string">"s3"</span>&gt;</span><br><span class="line">                                                    &lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;node2.nodeId==node3.parentId&#125;"</span>&gt;</span><br><span class="line">                                                        &lt;li&gt;</span><br><span class="line">                                                                $&#123;node3.name&#125;</span><br><span class="line">                                                            &lt;ul&gt;</span><br><span class="line">                                                                &lt;c:forEach items=<span class="string">"&lt;%= structureNodes%&gt;"</span> <span class="keyword">var</span>=<span class="string">"node4"</span> varStatus=<span class="string">"s4"</span>&gt;</span><br><span class="line">                                                                    &lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;node3.nodeId==node4.parentId&#125;"</span>&gt;</span><br><span class="line">                                                                        &lt;li&gt;</span><br><span class="line">                                                                                $&#123;node4.name&#125;</span><br><span class="line">                                                                            &lt;ul&gt;</span><br><span class="line">                                                                                &lt;c:forEach items=<span class="string">"&lt;%= structureNodes%&gt;"</span> <span class="keyword">var</span>=<span class="string">"node5"</span> varStatus=<span class="string">"s4"</span>&gt;</span><br><span class="line">                                                                                    &lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;node4.nodeId==node5.parentId&#125;"</span>&gt;</span><br><span class="line">                                                                                        &lt;li&gt;</span><br><span class="line">                                                                                                $&#123;node5.name&#125;</span><br><span class="line">                                                                                        &lt;/li&gt;</span><br><span class="line">                                                                                    &lt;/c:if&gt;</span><br><span class="line">                                                                                &lt;/c:forEach&gt;</span><br><span class="line">                                                                            &lt;/ul&gt;</span><br><span class="line">                                                                        &lt;/li&gt;</span><br><span class="line">                                                                    &lt;/c:if&gt;</span><br><span class="line">                                                                &lt;/c:forEach&gt;</span><br><span class="line">                                                            &lt;/ul&gt;</span><br><span class="line">                                                        &lt;/li&gt;</span><br><span class="line">                                                    &lt;/c:if&gt;</span><br><span class="line">                                                &lt;/c:forEach&gt;</span><br><span class="line">                                            &lt;/ul&gt;</span><br><span class="line">                                        &lt;/li&gt;</span><br><span class="line">                                    &lt;/c:if&gt;</span><br><span class="line">                                &lt;/c:forEach&gt;</span><br><span class="line">                            &lt;/ul&gt;</span><br><span class="line">                        &lt;/li&gt;</span><br><span class="line">                    &lt;/c:if&gt;</span><br><span class="line">                &lt;/c:forEach&gt;</span><br><span class="line">            &lt;/ul&gt;</span><br><span class="line">        &lt;/li&gt;</span><br><span class="line">    &lt;/c:if&gt;</span><br><span class="line">&lt;/c:forEach&gt;</span><br></pre></td></tr></table></figure>
+
+<p>实现效果如下：</p>
+<p><img src="//littleforestjia.github.io/2020/09/09/%E3%80%90%E7%A7%91%E7%A0%94%E9%A1%B9%E7%9B%AE%E3%80%91_%E4%BC%97%E5%8C%85%E8%AE%BE%E8%AE%A1%E6%B4%BB%E5%8A%A8%E5%88%86%E8%A7%A3%E5%B7%A5%E5%85%B7%E5%BC%80%E5%8F%91/%E6%A0%91%E5%BD%A2%E7%BB%93%E6%9E%84%E9%A1%B5%E9%9D%A2%E6%98%BE%E7%A4%BA%E6%95%88%E6%9E%9C.png" alt></p>
+<h3 id="18-设置标签默认隐藏并点击按钮显示"><a href="#18-设置标签默认隐藏并点击按钮显示" class="headerlink" title="18.设置标签默认隐藏并点击按钮显示"></a>18.设置标签默认隐藏并点击按钮显示</h3><p>主要使用Jquery实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> min_break = <span class="built_in">document</span>.getElementById(<span class="string">"min_break"</span>);</span><br><span class="line">$(<span class="string">"#functionBreakTree"</span>).hide();</span><br><span class="line">$(<span class="string">"#structureBreakTree"</span>).hide();</span><br><span class="line">min_break.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    $(<span class="string">"#functionBreakTree"</span>).show();</span><br><span class="line">    $(<span class="string">"#structureBreakTree"</span>).show();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="19-JDBCTemplate查询单行数据库表结果"><a href="#19-JDBCTemplate查询单行数据库表结果" class="headerlink" title="19.JDBCTemplate查询单行数据库表结果"></a>19.JDBCTemplate查询单行数据库表结果</h3><p><strong><code>jdbcTemplate.queryForObject(sql, requiredType)</code>中的requiredType应该为基础数据类型，和String类型，不能用于查询单行数据库结果并封装为javabean类的实例对象。还是要用<code>jdbcTemplate.query()</code>方法，然后获取方法返回列表中的第一个对象。</strong></p>
+<h3 id="20-通过jdbc插入中文到mysql数据库中显示乱码问题"><a href="#20-通过jdbc插入中文到mysql数据库中显示乱码问题" class="headerlink" title="20.通过jdbc插入中文到mysql数据库中显示乱码问题"></a>20.通过jdbc插入中文到mysql数据库中显示乱码问题</h3><p><strong>在idea默认字符集和mysql数据库默认字符集都为utf-8的情况下，通过jdbc插入中文到mysql数据库中，还是会出现显示乱码的问题。</strong></p>
+<p><strong><u>一定要注意注意再注意，尤其是在请求消息或响应消息中包含中文时，要在Servlet类的service方法代码的最前方，指明request和response的编码类型为utf-8。</u></strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">response.setContentType(<span class="string">"text/html;charset=utf-8"</span>); </span><br><span class="line">request.setCharacterEncoding(<span class="string">"utf-8"</span>);</span><br><span class="line">response.setCharacterEncoding(<span class="string">"utf-8"</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="21-页面请求Servlet动态资源后直接关闭页面"><a href="#21-页面请求Servlet动态资源后直接关闭页面" class="headerlink" title="21.页面请求Servlet动态资源后直接关闭页面"></a>21.页面请求Servlet动态资源后直接关闭页面</h3><p><strong>一个页面资源发送请求消息给Servlet类动态资源，Servlet动态资源在执行完代码之后直接关闭该页面。要达到这个效果，直接在Servlet类的service方法的最后加上这句：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.getWriter().write(<span class="string">"&lt;script&gt;windows.close();&lt;/script&gt;"</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="22-js实现window-open-方法弹出窗口居中"><a href="#22-js实现window-open-方法弹出窗口居中" class="headerlink" title="22.js实现window.open()方法弹出窗口居中"></a>22.js实现window.open()方法弹出窗口居中</h3><p><strong>其实就是通过dom中的screen属性计算出屏幕的中间位置：</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> s = <span class="string">"top="</span>+(screen.height<span class="number">-100</span>)/<span class="number">2</span>+<span class="string">",left="</span>+(screen.width<span class="number">-400</span>)/<span class="number">2</span>+<span class="string">",height=100,width=400,toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no,status=no"</span>;</span><br><span class="line"><span class="built_in">window</span>.open(<span class="string">"changeFunctionNode/changeFunctionNodes.jsp"</span>,<span class="string">""</span>,s);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="23-request获取请求参数中同名键的所有值"><a href="#23-request获取请求参数中同名键的所有值" class="headerlink" title="23.request获取请求参数中同名键的所有值"></a>23.request获取请求参数中同名键的所有值</h3><p><strong>使用request对象中的方法<code>String[] getParameterValues(String var1);</code></strong></p>
+<h3 id="24-MYSQL数据库表与excel表数据传输"><a href="#24-MYSQL数据库表与excel表数据传输" class="headerlink" title="24.MYSQL数据库表与excel表数据传输"></a>24.MYSQL数据库表与excel表数据传输</h3><p><strong>MySQL数据库图形化管理工具sqlyog可以实现MySQL数据库表与excel表中数据的转换，具体操作流程步骤可以直接百度，十分简单。</strong></p>
+<h3 id="25-点击按钮出现弹窗"><a href="#25-点击按钮出现弹窗" class="headerlink" title="25.点击按钮出现弹窗"></a>25.点击按钮出现弹窗</h3><p><strong>注意在JavaScript中，使用点击事件和弹窗方法绑定时，不能直接写成：</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> case_rebreak = <span class="built_in">document</span>.getElementById(<span class="string">"case_rebreak"</span>);</span><br><span class="line">case_rebreak.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"请先选择所要修改的任务案例！"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>如果写成这样，并不会实现点击按钮出现弹窗，而会打开该页面就直接出现弹窗。</strong></p>
+<p><strong>要实现预期效果，要写成：</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> case_rebreak = <span class="built_in">document</span>.getElementById(<span class="string">"case_rebreak"</span>);</span><br><span class="line">case_rebreak.onclick = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"请先选择所要修改的任务案例！"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>与事件绑定的方法一定要放在一个新建的function方法中。</strong></p>
+<h3 id="26-jstl标签库中的foreach标签与按钮的结合"><a href="#26-jstl标签库中的foreach标签与按钮的结合" class="headerlink" title="26.jstl标签库中的foreach标签与按钮的结合"></a>26.jstl标签库中的foreach标签与按钮的结合</h3><p><strong>foreach标签可以与按钮相结合，只不过要注意使每次循环中的按钮标签的id属性值不一样。<u>要达到这个目的，只能将el表达式直接写进id属性值和JavaScript语句中。</u></strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:forEach items=<span class="string">"&lt;%= newTasklist%&gt;"</span> <span class="keyword">var</span>=<span class="string">"newTask"</span> varStatus=<span class="string">"s"</span>&gt;</span><br><span class="line">    &lt;div style=<span class="string">"border: 2px solid rgb(217,217,217);height: 60px;line-height: 60px;font-size: 20px;margin-left: 50px;margin-right: 50px;border-radius: 10px;margin-bottom: 20px;"</span>&gt;</span><br><span class="line">        任务$&#123;newTask.id&#125;:$&#123;newTask.name&#125;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;任务描述:$&#123;newTask.information&#125;</span><br><span class="line">        &lt;button type="button" id="taskmanage$&#123;newTask.id&#125;" style="float: right;margin-right: 20px;line-height: 30px;font-size: 15px;margin-top: 10px;"&gt;完善任务需求&lt;/button&gt;</span><br><span class="line">        &lt;script&gt;</span><br><span class="line">            <span class="keyword">var</span> taskmanage$&#123;newTask.id&#125; = document.getElementById(<span class="string">"taskmanage$&#123;newTask.id&#125;"</span>);</span><br><span class="line">            taskmanage$&#123;newTask.id&#125;.onclick = function () &#123;</span><br><span class="line">                location.href = <span class="string">"manageProcessTask.jsp?task_id=$&#123;newTask.id&#125;&amp;category=$&#123;newTask.category&#125;"</span></span><br><span class="line">            &#125;</span><br><span class="line">        &lt;/script&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/c:forEach&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="27"><a href="#27" class="headerlink" title="27."></a>27.</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+          
+            <a href="/tags/%E4%BC%97%E5%8C%85/" rel="tag"><i class="fa fa-tag"></i> 众包</a>
+          
+            <a href="/tags/%E5%85%AC%E7%90%86%E5%8C%96%E8%AE%BE%E8%AE%A1/" rel="tag"><i class="fa fa-tag"></i> 公理化设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/01/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_%E7%83%AD%E9%97%A8100%E9%A2%98/" rel="next" title="【力扣刷题】_热门100题">
+                <i class="fa fa-chevron-left"></i> 【力扣刷题】_热门100题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/13/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MYSQL%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%8EJDBC/" rel="prev" title="【基础知识】_MYSQL数据库与JDBC">
+                【基础知识】_MYSQL数据库与JDBC <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#众包项目过程中的困难："><span class="nav-number">1.</span> <span class="nav-text">众包项目过程中的困难：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#算法开发过程中的困难"><span class="nav-number">1.1.</span> <span class="nav-text">算法开发过程中的困难</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码编写过程中的困难"><span class="nav-number">1.2.</span> <span class="nav-text">代码编写过程中的困难</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-树形图等数据在数据库中的保存形式"><span class="nav-number">1.2.1.</span> <span class="nav-text">1. 树形图等数据在数据库中的保存形式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-html页面图片无法加载"><span class="nav-number">1.2.2.</span> <span class="nav-text">3. html页面图片无法加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-html文本高度居中"><span class="nav-number">1.2.3.</span> <span class="nav-text">4. html文本高度居中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-html表格单元格内容置顶"><span class="nav-number">1.2.4.</span> <span class="nav-text">5. html表格单元格内容置顶</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-html设置边框为圆角"><span class="nav-number">1.2.5.</span> <span class="nav-text">6. html设置边框为圆角</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-查询mysql数据库表中id值最大的任务行信息"><span class="nav-number">1.2.6.</span> <span class="nav-text">7.查询mysql数据库表中id值最大的任务行信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-javascript修改Element对象的class属性"><span class="nav-number">1.2.7.</span> <span class="nav-text">8.javascript修改Element对象的class属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-标签页上添加页面跳转按钮"><span class="nav-number">1.2.8.</span> <span class="nav-text">9.标签页上添加页面跳转按钮</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-idea更新MAVEN项目中的target文件夹中的class文件"><span class="nav-number">1.2.9.</span> <span class="nav-text">10.idea更新MAVEN项目中的target文件夹中的class文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-静态资源分开放到不同文档中"><span class="nav-number">1.2.10.</span> <span class="nav-text">11.静态资源分开放到不同文档中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-herf实现资源跳转"><span class="nav-number">1.2.11.</span> <span class="nav-text">12.herf实现资源跳转</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#13-JavaScript获取请求参数数据"><span class="nav-number">1.2.12.</span> <span class="nav-text">13.JavaScript获取请求参数数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#14-JavaScript获取请求参数中不存在的键"><span class="nav-number">1.2.13.</span> <span class="nav-text">14.JavaScript获取请求参数中不存在的键</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#15-JavaScript与-lt-gt-脚本中的java代码不能配合使用"><span class="nav-number">1.2.14.</span> <span class="nav-text">15.JavaScript与&lt;% %&gt;脚本中的java代码不能配合使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#16-JDBC查询语句参数BeanPropertyRowMapper的使用规则"><span class="nav-number">1.2.15.</span> <span class="nav-text">16.JDBC查询语句参数BeanPropertyRowMapper的使用规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#17-如何在浏览器页面上展示树形结构数据"><span class="nav-number">1.2.16.</span> <span class="nav-text">17.如何在浏览器页面上展示树形结构数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#18-设置标签默认隐藏并点击按钮显示"><span class="nav-number">1.2.17.</span> <span class="nav-text">18.设置标签默认隐藏并点击按钮显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#19-JDBCTemplate查询单行数据库表结果"><span class="nav-number">1.2.18.</span> <span class="nav-text">19.JDBCTemplate查询单行数据库表结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20-通过jdbc插入中文到mysql数据库中显示乱码问题"><span class="nav-number">1.2.19.</span> <span class="nav-text">20.通过jdbc插入中文到mysql数据库中显示乱码问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#21-页面请求Servlet动态资源后直接关闭页面"><span class="nav-number">1.2.20.</span> <span class="nav-text">21.页面请求Servlet动态资源后直接关闭页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#22-js实现window-open-方法弹出窗口居中"><span class="nav-number">1.2.21.</span> <span class="nav-text">22.js实现window.open()方法弹出窗口居中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#23-request获取请求参数中同名键的所有值"><span class="nav-number">1.2.22.</span> <span class="nav-text">23.request获取请求参数中同名键的所有值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#24-MYSQL数据库表与excel表数据传输"><span class="nav-number">1.2.23.</span> <span class="nav-text">24.MYSQL数据库表与excel表数据传输</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#25-点击按钮出现弹窗"><span class="nav-number">1.2.24.</span> <span class="nav-text">25.点击按钮出现弹窗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#26-jstl标签库中的foreach标签与按钮的结合"><span class="nav-number">1.2.25.</span> <span class="nav-text">26.jstl标签库中的foreach标签与按钮的结合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#27"><span class="nav-number">1.2.26.</span> <span class="nav-text">27.</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="线程池," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="基于线程池的直充接口异步响应基于线程池的直充接口异步响应由于拼多多要求虚拟产品直充接口在500ms内返回响应，所以采用异步响应的模式：创建任务，用于调用后续权益下发等接口，并将该任务提交到线程池中。 1.创建实现Runnable接口的任务类重写run()方法，完成后续权益下发等逻辑，并回调拼多多的接口告诉拼多多充值成功与否。多线程Runable任务的参数一般是以对象实例对象的形式配置的，通过构造方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【二三方】_基于线程池的直充接口异步响应">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/08/18/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E5%9F%BA%E4%BA%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E7%9B%B4%E5%85%85%E6%8E%A5%E5%8F%A3%E5%BC%82%E6%AD%A5%E5%93%8D%E5%BA%94/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="基于线程池的直充接口异步响应基于线程池的直充接口异步响应由于拼多多要求虚拟产品直充接口在500ms内返回响应，所以采用异步响应的模式：创建任务，用于调用后续权益下发等接口，并将该任务提交到线程池中。 1.创建实现Runnable接口的任务类重写run()方法，完成后续权益下发等逻辑，并回调拼多多的接口告诉拼多多充值成功与否。多线程Runable任务的参数一般是以对象实例对象的形式配置的，通过构造方">
+<meta property="article:published_time" content="2021-08-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-24T14:48:43.915Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="线程池">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/08/18/【二三方】_基于线程池的直充接口异步响应/"/>
+
+
+
+
+
+  <title>【二三方】_基于线程池的直充接口异步响应 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/08/18/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E5%9F%BA%E4%BA%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E7%9B%B4%E5%85%85%E6%8E%A5%E5%8F%A3%E5%BC%82%E6%AD%A5%E5%93%8D%E5%BA%94/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【二三方】_基于线程池的直充接口异步响应</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-18T00:00:00+08:00">
+                2021-08-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%8C%E4%B8%89%E6%96%B9/" itemprop="url" rel="index">
+                    <span itemprop="name">二三方</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="基于线程池的直充接口异步响应"><a href="#基于线程池的直充接口异步响应" class="headerlink" title="基于线程池的直充接口异步响应"></a>基于线程池的直充接口异步响应</h2><h3 id="基于线程池的直充接口异步响应-1"><a href="#基于线程池的直充接口异步响应-1" class="headerlink" title="基于线程池的直充接口异步响应"></a>基于线程池的直充接口异步响应</h3><p>由于拼多多要求虚拟产品直充接口在500ms内返回响应，所以采用异步响应的模式：创建任务，用于调用后续权益下发等接口，并将该任务提交到线程池中。</p>
+<h4 id="1-创建实现Runnable接口的任务类"><a href="#1-创建实现Runnable接口的任务类" class="headerlink" title="1.创建实现Runnable接口的任务类"></a>1.创建实现Runnable接口的任务类</h4><p>重写run()方法，完成后续权益下发等逻辑，并回调拼多多的接口告诉拼多多充值成功与否。<strong>多线程Runable任务的参数一般是以对象实例对象的形式配置的，通过构造方法来输入。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 异步处理线程</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@link</span> com.youku.crmtoali.service.activity.impl.PddActivityServiceImpl&#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YkPddOrderVideoTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Object ctx;</span><br><span class="line">    <span class="keyword">private</span> PddOrderVideoDTO pddOrderVideoDTO;</span><br><span class="line">    <span class="keyword">private</span> ActivityConfigDO activityConfig;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">YkPddOrderVideoTask</span><span class="params">(Object ctx, PddOrderVideoDTO pddOrderVideoDTO, ActivityConfigDO activityConfig)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.ctx = ctx;</span><br><span class="line">        <span class="keyword">this</span>.pddOrderVideoDTO = pddOrderVideoDTO;</span><br><span class="line">        <span class="keyword">this</span>.activityConfig = activityConfig;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 鹰眼链路</span></span><br><span class="line">        EagleEye.setRpcContext(ctx);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 1.开始做异步直充逻辑</span></span><br><span class="line">            IActivityBizService iActivityBizService = map.get(activityConfig.getActivityType());</span><br><span class="line">            ResponseDTO responseDTO = iActivityBizService.participateActivityBiz(activityConfig.getActivityCode(),</span><br><span class="line">                    UserTypeEnum.PHONE.name(), pddOrderVideoDTO.getChargeNo(), pddOrderVideoDTO.getOutOrderNo(), <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 2.直充日志打印</span></span><br><span class="line">            Boolean success = responseDTO.isSuccess();</span><br><span class="line">            LogPrintUtil.printStoreInfo(log, StoreConst.STORE_RECHARGE_LOG, <span class="string">"YkPddOrderVideoHsfServiceImpl"</span>, <span class="string">"YkPddOrderVideoTask"</span>,</span><br><span class="line">                    StoreConst.PDD_LOG_CHANNEL, pddOrderVideoDTO.getOutOrderNo(), success ? <span class="string">"直充成功"</span> : <span class="string">"直充失败"</span>,</span><br><span class="line">                    JSONObject.toJSONString(pddOrderVideoDTO), <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 3.Pdd回调通知</span></span><br><span class="line">            callbackPdd(pddOrderVideoDTO, success);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            LogPrintUtil.printStoreError(log, StoreConst.STORE_INFO_LOG, <span class="string">"YkPddOrderVideoHsfServiceImpl"</span>, <span class="string">"YkPddOrderVideoTask"</span>,</span><br><span class="line">                    StoreConst.PDD_LOG_CHANNEL, pddOrderVideoDTO.getOutOrderNo(), <span class="string">"异步线程异常"</span>,</span><br><span class="line">                    PddMsgEnum.PDD_SERVICE_ERROR.getCode(), JSONObject.toJSONString(pddOrderVideoDTO), <span class="keyword">null</span>, e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            EagleEye.clearRpcContext();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-创建线程池管理类"><a href="#2-创建线程池管理类" class="headerlink" title="2.创建线程池管理类"></a>2.创建线程池管理类</h4><p>创建线程池管理类，在静态代码块中创建几个线程池，用于进行响应的异步工作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadPoolManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;PoolTypeEnum, ThreadPoolExecutor&gt; poolManagerMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 线程工厂</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadFactory THREAD_FACTORY =</span><br><span class="line">            <span class="keyword">new</span> ThreadFactoryBuilder().setNameFormat(<span class="string">"STORE-YK-PROCESSOR-%d"</span>).build();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> PoolTypeEnum &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * io 密集型任务</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        IO_TASK,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 订单任务使用线程</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        STORE,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 失败订单重试定时任务线程池</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        FAILED_TASK;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        poolManagerMap.put(PoolTypeEnum.IO_TASK,</span><br><span class="line">                <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">50</span>, <span class="number">100</span>, <span class="number">30</span>, TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">16</span>),</span><br><span class="line">                        Executors.defaultThreadFactory(), <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()));</span><br><span class="line">        poolManagerMap.put(PoolTypeEnum.STORE,</span><br><span class="line">                <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">20</span>, <span class="number">50</span>, <span class="number">30</span>, TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">16</span>),</span><br><span class="line">                        THREAD_FACTORY, <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()));</span><br><span class="line">        poolManagerMap.put(PoolTypeEnum.FAILED_TASK,</span><br><span class="line">                <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">20</span>, <span class="number">50</span>, <span class="number">30</span>, TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">16</span>),</span><br><span class="line">                        THREAD_FACTORY, <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 默认线程池</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadPoolExecutor DEFAULT_THREAD_POOL = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">50</span>, <span class="number">100</span>, <span class="number">30</span>, TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">16</span>),</span><br><span class="line">            Executors.defaultThreadFactory(), <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取线程池方法</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> poolTypeEnum</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ThreadPoolExecutor <span class="title">getExecutor</span><span class="params">(PoolTypeEnum poolTypeEnum)</span> </span>&#123;</span><br><span class="line">        ThreadPoolExecutor threadPoolExecutor = poolManagerMap.get(poolTypeEnum);</span><br><span class="line">        <span class="keyword">if</span> (Objects.isNull(threadPoolExecutor)) &#123;</span><br><span class="line">            <span class="keyword">return</span> DEFAULT_THREAD_POOL;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> threadPoolExecutor;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-在直充接口中将新任务放入线程池中"><a href="#3-在直充接口中将新任务放入线程池中" class="headerlink" title="3.在直充接口中将新任务放入线程池中"></a>3.在直充接口中将新任务放入线程池中</h4><p>在提供给拼多多的直充接口中，添加将新任务放入线程池中的逻辑，然后直接返回响应成功，后续权益发放、回调通知的逻辑交给线程池中的线程去做。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 3.异步线程处理</span></span><br><span class="line">    ThreadPoolExecutor executor = ThreadPoolManager.getExecutor(ThreadPoolManager.PoolTypeEnum.STORE);</span><br><span class="line">    <span class="keyword">if</span> (Objects.isNull(executor)) &#123;</span><br><span class="line">        LogPrintUtil.printStoreError(log, StoreConst.STORE_INFO_LOG, <span class="string">"YkPddOrderVideoHsfServiceImpl"</span>, <span class="string">"createOrder"</span>,</span><br><span class="line">                StoreConst.PDD_LOG_CHANNEL, pddOrderVideoDTO.getOutOrderNo(), <span class="string">"异步任务未获取到对应的线程池"</span>,</span><br><span class="line">                PddMsgEnum.PDD_SERVICE_ERROR.getCode(), JSONObject.toJSONString(pddOrderVideoDTO), <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">return</span> PddResponseDTO.error(PddMsgEnum.PDD_SERVICE_SUCCESS, result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        executor.execute(<span class="keyword">new</span> YkPddOrderVideoTask(EagleEye.getRpcContext(), pddOrderVideoDTO, activityConfig));</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="comment">// 线程拒绝了策略，需要通知拼多多，让他们执行重试策略。</span></span><br><span class="line">        LogPrintUtil.printStoreError(log, StoreConst.STORE_INFO_LOG, <span class="string">"YkPddOrderVideoHsfServiceImpl"</span>, <span class="string">"createOrder"</span>,</span><br><span class="line">                StoreConst.PDD_LOG_CHANNEL, pddOrderVideoDTO.getOutOrderNo(), <span class="string">"线程池拒绝策略"</span>,</span><br><span class="line">                PddMsgEnum.PDD_SERVICE_ERROR.getCode(), JSONObject.toJSONString(pddOrderVideoDTO), <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">return</span> PddResponseDTO.error(PddMsgEnum.PDD_SERVICE_SUCCESS, result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4.操作结果回传Pdd</span></span><br><span class="line">    result.setStatus(PDD_ACCEPT);</span><br><span class="line">    <span class="keyword">return</span> PddResponseDTO.error(PddMsgEnum.PDD_SERVICE_SUCCESS, result);</span><br></pre></td></tr></table></figure>
+
+<h3 id="基于策略模式的数据库失败订单轮询处理"><a href="#基于策略模式的数据库失败订单轮询处理" class="headerlink" title="基于策略模式的数据库失败订单轮询处理"></a>基于策略模式的数据库失败订单轮询处理</h3><p>使用定时任务查询数据库，查询失败订单；使用设计工厂模式和策略模式，针对订单状态字段的不同值，调用不同的工厂实例执行抽象方法的不同实现逻辑。之前介绍过借助Spring依赖注入来创建工厂的形式，这里则是采用applicationContext.getBean(Class&lt;T&gt; var1)方法通过Class类来获取实例bean的工厂。</p>
+<h4 id="1-创建实例bean接口"><a href="#1-创建实例bean接口" class="headerlink" title="1.创建实例bean接口"></a>1.创建实例bean接口</h4><p>先创建一个接口，后续的工厂对象类都是该接口的实现类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FailedOrderStrategy</span> </span>&#123;</span><br><span class="line">  	</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 失败订单处理策略</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> activityRecordList</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">doDealFailedOrder</span><span class="params">(List&lt;ActivityRecordDO&gt; activityRecordList)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-创建工厂对象类"><a href="#2-创建工厂对象类" class="headerlink" title="2.创建工厂对象类"></a>2.创建工厂对象类</h4><p>创建工厂对象类，并将它们放入Spring容器中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PddUnYkRechargeOrder</span> <span class="keyword">implements</span> <span class="title">FailedOrderStrategy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  	<span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> YkPddOrderVideoHsfService ykPddOrderVideoHsfService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> StoreRetryRecordMapper storeRetryRecordMapper;</span><br><span class="line">  </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doDealFailedOrder</span><span class="params">(List&lt;ActivityRecordDO&gt; activityRecordList)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (ActivityRecordDO activityRecordDO : activityRecordList) &#123;</span><br><span class="line">            <span class="comment">// 日志打印</span></span><br><span class="line">            LogPrintUtil.printStoreInfo(log, StoreConst.STORE_TASK_LOG, <span class="string">"PddUnYkRechargeOrder"</span>, <span class="string">"doDealFailedOrder"</span>,</span><br><span class="line">                    StoreConst.PDD_LOG_CHANNEL, activityRecordDO.getOutOrderId(), <span class="string">"PDD处理未直充订单"</span>,</span><br><span class="line">                    JSONObject.toJSONString(activityRecordDO), <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 事务补偿防止情况：订单已重试成功，然后error记录删除失败</span></span><br><span class="line">            <span class="keyword">if</span> (PDD_RECHARGE_ERROR_NOTICE_SUCCESS.getStatus().equals(activityRecordDO.getResult())</span><br><span class="line">                    || PDD_RECHARGE_SUCCESS_NOTICE_SUCCESS.getStatus().equals(activityRecordDO.getResult())) &#123;</span><br><span class="line">                storeRetryRecordMapper.deleteByOutOrderId(activityRecordDO.getOutOrderId());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ThreadPoolExecutor executor = ThreadPoolManager.getExecutor(ThreadPoolManager.PoolTypeEnum.FAILED_TASK);</span><br><span class="line">            <span class="keyword">if</span> (Objects.isNull(executor)) &#123;</span><br><span class="line">                log.error(<span class="string">"YkPddOrderVideoHsfServiceImpl task error:executor is null"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            PddOrderVideoDTO pddOrderVideoDTO = PddOrderVideoDTO.builder()</span><br><span class="line">                    .chargeNo(activityRecordDO.getUserId())</span><br><span class="line">                    .outOrderNo(activityRecordDO.getOutOrderId())</span><br><span class="line">                    .build();</span><br><span class="line">            <span class="keyword">if</span> (JsonUtil.isJson(activityRecordDO.getBenefitLog())) &#123;</span><br><span class="line">                pddOrderVideoDTO = JSONObject.parseObject(activityRecordDO.getBenefitLog(), PddOrderVideoDTO<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ykPddOrderVideoHsfService.rechargeYkBenefit(pddOrderVideoDTO, activityRecordDO.getActivityCode());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PddUnCallBackOrder</span> <span class="keyword">implements</span> <span class="title">FailedOrderStrategy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">  	<span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> YkPddOrderVideoHsfService ykPddOrderVideoHsfService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> StoreRetryRecordMapper storeRetryRecordMapper;</span><br><span class="line">  	</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doDealFailedOrder</span><span class="params">(List&lt;ActivityRecordDO&gt; activityRecordList)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (ActivityRecordDO activityRecordDO : activityRecordList) &#123;</span><br><span class="line">            <span class="comment">// 日志打印</span></span><br><span class="line">            LogPrintUtil.printStoreInfo(log, StoreConst.STORE_TASK_LOG, <span class="string">"PddUnCallBackOrder"</span>, <span class="string">"doDealFailedOrder"</span>,</span><br><span class="line">                    StoreConst.PDD_LOG_CHANNEL, activityRecordDO.getOutOrderId(), <span class="string">"PDD处理未回调订单"</span>,</span><br><span class="line">                    JSONObject.toJSONString(activityRecordDO), <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 事务补偿防止情况：订单已重试成功，然后error记录删除失败</span></span><br><span class="line">            <span class="keyword">if</span> (PDD_RECHARGE_ERROR_NOTICE_SUCCESS.getStatus().equals(activityRecordDO.getResult())</span><br><span class="line">                    || PDD_RECHARGE_SUCCESS_NOTICE_SUCCESS.getStatus().equals(activityRecordDO.getResult())) &#123;</span><br><span class="line">                storeRetryRecordMapper.deleteByOutOrderId(activityRecordDO.getOutOrderId());</span><br><span class="line">            &#125;</span><br><span class="line">            PddOrderVideoDTO pddOrderVideo = PddOrderVideoDTO.builder()</span><br><span class="line">                    .outOrderNo(activityRecordDO.getOutOrderId())</span><br><span class="line">                    .chargeNo(activityRecordDO.getUserId())</span><br><span class="line">                    .build();</span><br><span class="line">            <span class="keyword">if</span> (JsonUtil.isJson(activityRecordDO.getBenefitLog())) &#123;</span><br><span class="line">                pddOrderVideo = JSONObject.parseObject(activityRecordDO.getBenefitLog(), PddOrderVideoDTO<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 直充失败未通知的处理方式</span></span><br><span class="line">            <span class="keyword">if</span> (PDD_RECHARGE_ERROR_UN_NOTICE.getStatus().equals(activityRecordDO.getResult())) &#123;</span><br><span class="line">                ykPddOrderVideoHsfService.callbackPdd(pddOrderVideo, <span class="keyword">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 直充成功未通知的处理方式</span></span><br><span class="line">            <span class="keyword">if</span> (PDD_RECHARGE_SUCCESS_UN_NOTICE.getStatus().equals(activityRecordDO.getResult())) &#123;</span><br><span class="line">                ykPddOrderVideoHsfService.callbackPdd(pddOrderVideo, <span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-创建枚举类"><a href="#3-创建枚举类" class="headerlink" title="3.创建枚举类"></a>3.创建枚举类</h4><p>创建枚举类，以工厂对象类的Class对象作为枚举的一个属性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> StoreOrderStatusEnum &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * PDD:落库未处理</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    PDD_IN_DB_UN_RECHARGE(<span class="string">"PDD1"</span>, <span class="string">"落库未处理"</span>,PddUnYkRechargeOrder<span class="class">.<span class="keyword">class</span>),</span></span><br><span class="line"><span class="class">    /**</span></span><br><span class="line">     * PDD:充值失败未通知</span><br><span class="line">     */</span><br><span class="line">    PDD_RECHARGE_ERROR_UN_NOTICE(<span class="string">"PDD2"</span>, <span class="string">"充值失败未通知"</span>, PddUnCallBackOrder<span class="class">.<span class="keyword">class</span>),</span></span><br><span class="line"><span class="class">    /**</span></span><br><span class="line">     * PDD:充值成功未通知</span><br><span class="line">     */</span><br><span class="line">    PDD_RECHARGE_SUCCESS_UN_NOTICE(<span class="string">"PDD3"</span>, <span class="string">"充值成功未通知"</span>, PddUnCallBackOrder<span class="class">.<span class="keyword">class</span>),</span></span><br><span class="line"><span class="class">    /**</span></span><br><span class="line">     * PDD:通知失败</span><br><span class="line">     */</span><br><span class="line">    PDD_RECHARGE_NOTICE_ERROR(<span class="string">"PDD4"</span>, <span class="string">"通知失败"</span>,PddUnCallBackOrder<span class="class">.<span class="keyword">class</span>),</span></span><br><span class="line"><span class="class">    /**</span></span><br><span class="line">     * PDD:直充失败已通知</span><br><span class="line">     */</span><br><span class="line">    PDD_RECHARGE_ERROR_NOTICE_SUCCESS(<span class="string">"PDD5"</span>, <span class="string">"直充失败已通知"</span>,<span class="keyword">null</span>),</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * ODD:直充成功已通知</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    PDD_RECHARGE_SUCCESS_NOTICE_SUCCESS(<span class="string">"PDD6"</span>, <span class="string">"直充成功已通知"</span>,<span class="keyword">null</span>),</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * JD：订单状态</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    JD_ORDER_SUCCESS(<span class="string">"0"</span>,<span class="string">"充值成功"</span>,<span class="keyword">null</span>),</span><br><span class="line">    JD_ORDER_PROCESS(<span class="string">"1"</span>,<span class="string">"充值中"</span>,JdUnYkRechargeOrder<span class="class">.<span class="keyword">class</span>),</span></span><br><span class="line">    JD_ORDER_FAILED("2","充值失败",null)</span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String status;</span><br><span class="line">    <span class="keyword">private</span> String desc;</span><br><span class="line">    <span class="keyword">private</span> Class&lt;? extends FailedOrderStrategy&gt; beanClass;</span><br><span class="line"></span><br><span class="line">    StoreOrderStatusEnum(String status, String desc, Class&lt;? extends FailedOrderStrategy&gt; beanClass) &#123;</span><br><span class="line">        <span class="keyword">this</span>.status = status;</span><br><span class="line">        <span class="keyword">this</span>.desc = desc;</span><br><span class="line">        <span class="keyword">this</span>.beanClass = beanClass;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getStatus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setStatus</span><span class="params">(String status)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.status = status;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getDesc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> desc;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDesc</span><span class="params">(String desc)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.desc = desc;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Class&lt;? extends FailedOrderStrategy&gt; getBeanClass() &#123;</span><br><span class="line">        <span class="keyword">return</span> beanClass;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBeanClass</span><span class="params">(Class&lt;? extends FailedOrderStrategy&gt; beanClass)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.beanClass = beanClass;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-创建工厂类"><a href="#4-创建工厂类" class="headerlink" title="4.创建工厂类"></a>4.创建工厂类</h4><p>创建工厂类，该工厂可以根据输入参数找到对于的枚举类，然后取出枚举类中的工厂对象bean，使用其方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FailedOrderFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, StoreOrderStatusEnum&gt; YK_STORE_ORDER_STATUS_ENUM_MAP = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        EnumUtils.getEnumList(StoreOrderStatusEnum<span class="class">.<span class="keyword">class</span>).<span class="title">forEach</span>(<span class="title">item</span> -&gt; <span class="title">YK_STORE_ORDER_STATUS_ENUM_MAP</span>.<span class="title">put</span>(<span class="title">item</span>.<span class="title">getStatus</span>(), <span class="title">item</span>))</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> ApplicationContext applicationContext;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> ActivityRecordMapper activityRecordMapper;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> PddResponseDTO&lt;StoreRetryRecordDO&gt; <span class="title">doDealFailedOrder</span><span class="params">(StoreRetryRecordDO storeRetryRecord)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 日志打印</span></span><br><span class="line">        LogPrintUtil.printStoreInfo(log, StoreConst.STORE_TASK_LOG, <span class="string">"FailedOrderFactory"</span>, <span class="string">"doDealFailedOrder"</span>,</span><br><span class="line">                storeRetryRecord.getType(), storeRetryRecord.getOutOrderId(), <span class="string">"定时任务处理订单入口"</span>,</span><br><span class="line">                JSONObject.toJSONString(storeRetryRecord), <span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取对应的处理策略</span></span><br><span class="line">        StoreOrderStatusEnum storeOrderStatusEnum = YK_STORE_ORDER_STATUS_ENUM_MAP.get(storeRetryRecord.getUpdateStatus());</span><br><span class="line">        <span class="keyword">if</span> (Objects.isNull(storeOrderStatusEnum) || Objects.isNull(storeOrderStatusEnum.getBeanClass())) &#123;</span><br><span class="line">            <span class="keyword">return</span> PddResponseDTO.error(<span class="string">"请检查result参数是否正确"</span>, storeRetryRecord);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 查询失败订单</span></span><br><span class="line">        List&lt;ActivityRecordDO&gt; activityRecordList = activityRecordMapper.query(ActivityRecordQuery</span><br><span class="line">                .builder()</span><br><span class="line">                .userId(storeRetryRecord.getOpenId())</span><br><span class="line">                .outOrderId(storeRetryRecord.getOutOrderId())</span><br><span class="line">                .result(storeRetryRecord.getUpdateStatus())</span><br><span class="line">                .build());</span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(activityRecordList)) &#123;</span><br><span class="line">            LogPrintUtil.printStoreError(log, StoreConst.STORE_TASK_LOG, <span class="string">"StoreFailedOrderRetryJob"</span>, <span class="string">"process"</span>,</span><br><span class="line">                    <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="string">"查询不到指定失败订单"</span>,</span><br><span class="line">                    <span class="keyword">null</span>, JSONObject.toJSONString(storeRetryRecord), <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">return</span> PddResponseDTO.error(<span class="string">"暂无失败订单"</span>, storeRetryRecord);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 业务处理，找到状态对应的业务策略</span></span><br><span class="line">        FailedOrderStrategy failedOrderStrategy = applicationContext.getBean(storeOrderStatusEnum.getBeanClass());</span><br><span class="line">        failedOrderStrategy.doDealFailedOrder(activityRecordList);</span><br><span class="line">        <span class="keyword">return</span> PddResponseDTO.success(storeRetryRecord);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-在定时任务中使用工厂对象"><a href="#5-在定时任务中使用工厂对象" class="headerlink" title="5.在定时任务中使用工厂对象"></a>5.在定时任务中使用工厂对象</h4><p>在定时任务中查询数据库，根据失败订单的状态字段，选择不同的工厂对象，执行对于的业务策略。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf</span>4j(topic = <span class="string">"third"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StoreFailedOrderRetryJob</span> <span class="keyword">extends</span> <span class="title">JavaProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> StoreRetryRecordMapper storeRetryRecordMapper;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> FailedOrderFactory pddFailedOrderFactory;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ProcessResult <span class="title">process</span><span class="params">(JobContext context)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String params = context.getJobParameters();</span><br><span class="line">            StoreRetryRecordQuery storeRetryRecordQuery;</span><br><span class="line">            <span class="keyword">if</span> (StringUtils.isNotBlank(params)) &#123;</span><br><span class="line">                storeRetryRecordQuery = JSONObject.parseObject(params, StoreRetryRecordQuery<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                storeRetryRecordQuery = StoreRetryRecordQuery</span><br><span class="line">                        .builder()</span><br><span class="line">                        .retryTimesLimit(PddBaseConst.PDD_RETRY_TIME)</span><br><span class="line">                        .startTime(<span class="keyword">new</span> Date(System.currentTimeMillis() - <span class="number">5</span> * <span class="number">60</span> * <span class="number">1000</span>))</span><br><span class="line">                        .pageSize(<span class="number">100</span>)</span><br><span class="line">                        .build();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 查询失败订单</span></span><br><span class="line">            List&lt;StoreRetryRecordDO&gt; storeRetryRecordList = storeRetryRecordMapper.select(storeRetryRecordQuery);</span><br><span class="line">            <span class="keyword">if</span> (CollectionUtils.isEmpty(storeRetryRecordList)) &#123;</span><br><span class="line">                <span class="comment">// 日志打印</span></span><br><span class="line">                LogPrintUtil.printStoreInfo(log, StoreConst.STORE_TASK_LOG, <span class="string">"StoreFailedOrderRetryJob"</span>, <span class="string">"process"</span>,</span><br><span class="line">                        <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="string">"定时任务查询无失败订单"</span>,</span><br><span class="line">                        JSONObject.toJSONString(storeRetryRecordQuery), <span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(<span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (StoreRetryRecordDO storeRetryRecord : storeRetryRecordList) &#123;</span><br><span class="line">                <span class="comment">// 调用失败处理逻辑</span></span><br><span class="line">                pddFailedOrderFactory.doDealFailedOrder(storeRetryRecord);</span><br><span class="line">                storeRetryRecordMapper.addRetryTimes(storeRetryRecord.getId(), <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(<span class="keyword">true</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            LogPrintUtil.printStoreError(log, StoreConst.STORE_TASK_LOG, <span class="string">"StoreFailedOrderRetryJob"</span>, <span class="string">"process"</span>,</span><br><span class="line">                    <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="string">"定时任务异常"</span>,</span><br><span class="line">                    <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" rel="tag"><i class="fa fa-tag"></i> 线程池</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/08/14/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E5%8C%96%E7%89%88/" rel="next" title="【二三方】_工厂模式的应用进化版">
+                <i class="fa fa-chevron-left"></i> 【二三方】_工厂模式的应用进化版
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于线程池的直充接口异步响应"><span class="nav-number">1.</span> <span class="nav-text">基于线程池的直充接口异步响应</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于线程池的直充接口异步响应-1"><span class="nav-number">1.1.</span> <span class="nav-text">基于线程池的直充接口异步响应</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-创建实现Runnable接口的任务类"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.创建实现Runnable接口的任务类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-创建线程池管理类"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.创建线程池管理类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-在直充接口中将新任务放入线程池中"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.在直充接口中将新任务放入线程池中</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于策略模式的数据库失败订单轮询处理"><span class="nav-number">1.2.</span> <span class="nav-text">基于策略模式的数据库失败订单轮询处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-创建实例bean接口"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.创建实例bean接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-创建工厂对象类"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.创建工厂对象类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-创建枚举类"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.创建枚举类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-创建工厂类"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.创建工厂类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-在定时任务中使用工厂对象"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.在定时任务中使用工厂对象</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

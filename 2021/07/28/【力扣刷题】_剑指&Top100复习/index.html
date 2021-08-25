@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="剑指&amp;Top100复习面试题2.实现singleton模式 单例模式  类加载机制  代码： 1234567891011121314151617181920212223242526272829&#x2F;** * 单例模式(饿汉模式) *&#x2F;class Singleton&amp;#123;    &#x2F;&#x2F;构造方法的首字母需要大写。    private Singleton()&amp;#123;&amp;#125;    pr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【力扣刷题】_剑指&amp;Top100复习">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/07/28/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_%E5%89%91%E6%8C%87&Top100%E5%A4%8D%E4%B9%A0/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="剑指&amp;Top100复习面试题2.实现singleton模式 单例模式  类加载机制  代码： 1234567891011121314151617181920212223242526272829&#x2F;** * 单例模式(饿汉模式) *&#x2F;class Singleton&amp;#123;    &#x2F;&#x2F;构造方法的首字母需要大写。    private Singleton()&amp;#123;&amp;#125;    pr">
+<meta property="article:published_time" content="2021-07-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-07-27T16:20:36.396Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/07/28/【力扣刷题】_剑指&Top100复习/"/>
+
+
+
+
+
+  <title>【力扣刷题】_剑指&Top100复习 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/07/28/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_%E5%89%91%E6%8C%87&Top100%E5%A4%8D%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【力扣刷题】_剑指&Top100复习</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-28T00:00:00+08:00">
+                2021-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98/" itemprop="url" rel="index">
+                    <span itemprop="name">力扣刷题</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="剑指-amp-Top100复习"><a href="#剑指-amp-Top100复习" class="headerlink" title="剑指&amp;Top100复习"></a>剑指&amp;Top100复习</h2><h3 id="面试题2-实现singleton模式"><a href="#面试题2-实现singleton模式" class="headerlink" title="面试题2.实现singleton模式"></a>面试题2.实现singleton模式</h3><ul>
+<li><p>单例模式</p>
+</li>
+<li><p>类加载机制</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 单例模式(饿汉模式)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line">    <span class="comment">//构造方法的首字母需要大写。</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton singleton = <span class="keyword">new</span> Singleton();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getSingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> singleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 静态内部类(懒汉模式)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Case2</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Case2</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">InternClass</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> Case2 singleton = <span class="keyword">new</span> Case2();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//只有在需要使用时，调用了getSingleton()方法，静态内部类才会被JVM加载，才会创建该Case2类的单例。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Case2 <span class="title">getSingleton</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> InternClass.singleton;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一个类加载时，其内部的静态内部类与静态代码块和静态变量不同，静态代码块并不会被加载，静态内部类的方法或属性被调用时它才会被加载。</p>
+</li>
+</ul>
+<h3 id="面试题10-1-斐波那契数列"><a href="#面试题10-1-斐波那契数列" class="headerlink" title="面试题10_1.斐波那契数列"></a>面试题10_1.斐波那契数列</h3><ul>
+<li><p>使用动态规划而不用递归</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 优化的动态规划</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution10_1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">fib</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> dp1 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> dp2 = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> temp = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//当n很大的时候可能会出现数字溢出，所以我们需要用结果对1000000007求余。</span></span><br><span class="line">            temp = (dp1 + dp2) % <span class="number">1000000007</span>;</span><br><span class="line">            dp1 = dp2;</span><br><span class="line">            dp2 = temp;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题11-旋转数组的最小数字"><a href="#面试题11-旋转数组的最小数字" class="headerlink" title="面试题11.旋转数组的最小数字"></a>面试题11.旋转数组的最小数字</h3><ul>
+<li>重要：这道题的数组中可以包含相等元素，比不包含相等元素要难得多。</li>
+<li>一定要注意，二分法中将中间点数值与左边界数值还是右边界数值比较是有不同意义的，在做题时可以尝试比较两者区别，选择更加合适比较方式。</li>
+</ul>
+<h3 id="面试题12-矩阵中的路径"><a href="#面试题12-矩阵中的路径" class="headerlink" title="面试题12.矩阵中的路径"></a>面试题12.矩阵中的路径</h3><ul>
+<li>本题中记忆化标记矩阵的回溯代码很容易忘记写，一定不能忘了。深度优先遍历时，一条路走不通了换另一条路时一定要先回溯。</li>
+</ul>
+<h3 id="面试题13-机器人的运动范围"><a href="#面试题13-机器人的运动范围" class="headerlink" title="面试题13.机器人的运动范围"></a>面试题13.机器人的运动范围</h3><ul>
+<li>就是遍历矩阵，判断每个格子是否有符合计算要求，并且左边或者上面的格子能够到达。</li>
+</ul>
+<h3 id="面试题14-1-剪绳子"><a href="#面试题14-1-剪绳子" class="headerlink" title="面试题14_1.剪绳子"></a>面试题14_1.剪绳子</h3><ul>
+<li><p>高数推导得出：所有绳段长度都为3时乘积最大</p>
+</li>
+<li><p>也可以用动态规划的方法，这不过这种动态规划每次求一个状态值都需要用到前面所有的状态值。</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 动态规划</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution14_1</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">result</span><span class="params">(<span class="keyword">int</span> length)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[length + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        dp[<span class="number">2</span>] = <span class="number">1</span>;</span><br><span class="line">        dp[<span class="number">3</span>] = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">4</span>;i &lt; length + <span class="number">1</span>;i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">2</span>;j &lt;= length / <span class="number">2</span>;j++) &#123;</span><br><span class="line">                dp[i] = Math.max(dp[i],Math.max(j,dp[j]) * Math.max(i - j,dp[i - j]));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[length];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题14-2-剪绳子2"><a href="#面试题14-2-剪绳子2" class="headerlink" title="面试题14_2.剪绳子2"></a>面试题14_2.剪绳子2</h3><ul>
+<li>本题中要求每次乘3之后都要取模，所以不能直接用Math.pow方法直接一下求出double类型结果。但是int类型的取值范围为-2147483648~+2147483647，计算结果有可能直接在一次乘3之后直接溢出了，这样就会导致这个计算结果错误。所以此处我们设置结果数据类型为long或者double，一次一次乘3的计算，每次乘3后都取模。</li>
+</ul>
+<h3 id="面试题15-二进制中1的个数"><a href="#面试题15-二进制中1的个数" class="headerlink" title="面试题15.二进制中1的个数"></a>面试题15.二进制中1的个数</h3><ul>
+<li>将树值与1进行与位运算（&amp;），可以得到该数二进制形式的最低位；</li>
+<li>将数值无符号右移（&gt;&gt;&gt;），直到为零。</li>
+</ul>
+<h3 id="面试题16-数值的整数次方"><a href="#面试题16-数值的整数次方" class="headerlink" title="面试题16.数值的整数次方"></a>面试题16.数值的整数次方</h3><ul>
+<li>递归+二分法</li>
+</ul>
+<h3 id="面试题17-打印从1到最大的n位数（未解决）"><a href="#面试题17-打印从1到最大的n位数（未解决）" class="headerlink" title="面试题17.打印从1到最大的n位数（未解决）"></a>面试题17.打印从1到最大的n位数（未解决）</h3><ul>
+<li>递归：个位从0到9，十位从0到9…这样一位一位的确认。</li>
+</ul>
+<h3 id="面试题18-删除链表的节点"><a href="#面试题18-删除链表的节点" class="headerlink" title="面试题18.删除链表的节点"></a>面试题18.删除链表的节点</h3><ul>
+<li>双指针：两个指针分别指向相邻的两个节点。</li>
+</ul>
+<h3 id="面试题19-正则表达式匹配（非常重要）（未解决）"><a href="#面试题19-正则表达式匹配（非常重要）（未解决）" class="headerlink" title="面试题19.正则表达式匹配（非常重要）（未解决）"></a>面试题19.正则表达式匹配（非常重要）（未解决）</h3><h3 id="面试题21-调整数组顺序使奇数位于偶数前面"><a href="#面试题21-调整数组顺序使奇数位于偶数前面" class="headerlink" title="面试题21.调整数组顺序使奇数位于偶数前面"></a>面试题21.调整数组顺序使奇数位于偶数前面</h3><ul>
+<li>双指针：左右指针分别指向头尾，左指针一旦遇到偶数就与右指针交换数值，并将右指针左移一位。</li>
+</ul>
+<h3 id="面试题22-链表中倒数第k个节点"><a href="#面试题22-链表中倒数第k个节点" class="headerlink" title="面试题22.链表中倒数第k个节点"></a>面试题22.链表中倒数第k个节点</h3><ul>
+<li>双指针：前后指针相隔k-1个节点，前指针到达队尾时，后指针即为所求。</li>
+</ul>
+<h3 id="面试题24-反转链表"><a href="#面试题24-反转链表" class="headerlink" title="面试题24.反转链表"></a>面试题24.反转链表</h3><ul>
+<li>三指针：也就是迭代的一个一个反转节点的指向。</li>
+</ul>
+<h3 id="面试题26-树的子结构"><a href="#面试题26-树的子结构" class="headerlink" title="面试题26.树的子结构"></a>面试题26.树的子结构</h3><ul>
+<li><p>递归：两个递归方法的组合，太妙了。一个递归方法用于前序遍历，并一个递归方法用于比较两棵树。</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 递归前序遍历</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution26</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSon</span><span class="params">(TreeNode a,TreeNode b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> isEquel(a,b) || isSon(a.left,b) || isSon(a.right,b);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//注意这个方法并不是真的判断a、b是不是相同，而是判断b是不是与a的顶端几层相同。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEquel</span><span class="params">(TreeNode a,TreeNode b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (b == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (a == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (a.val != b.val) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> isEquel(a.left,b.left) &amp;&amp; isEquel(a.right,b.right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题31-栈的压入弹出序列（巧思）"><a href="#面试题31-栈的压入弹出序列（巧思）" class="headerlink" title="面试题31.栈的压入弹出序列（巧思）"></a>面试题31.栈的压入弹出序列（巧思）</h3><ul>
+<li>辅助栈模拟：就是创建一个辅助栈来真正模拟该栈，将入栈队列依次压入栈中，每压入一个元素，检验出栈队列是否需要将栈顶元素出栈。若执行完上述操作之后，辅助栈正好为空，说明此出栈队列可以对应上入栈队列。</li>
+</ul>
+<h3 id="面试题32-2-从上到下打印二叉树2"><a href="#面试题32-2-从上到下打印二叉树2" class="headerlink" title="面试题32_2.从上到下打印二叉树2"></a>面试题32_2.从上到下打印二叉树2</h3><ul>
+<li>层序遍历二叉树，并将所有节点分好层：要解决这个问题就是在常规层序遍历的基础之上再加一层循环。每次计算队列的长度，以此为循环次数。</li>
+</ul>
+<h3 id="面试题32-3-从上到下打印二叉树3"><a href="#面试题32-3-从上到下打印二叉树3" class="headerlink" title="面试题32_3.从上到下打印二叉树3"></a>面试题32_3.从上到下打印二叉树3</h3><ul>
+<li>与分层层序遍历相比，本题使用链表的双端链表特性来保存每层的数据。比如将结果添加到结果集的第一层时正常使用add()方法，而添加第二层时则使用addLast()方法。</li>
+</ul>
+<h3 id="面试题33-二叉搜索树的后序遍历序列（巧思）"><a href="#面试题33-二叉搜索树的后序遍历序列（巧思）" class="headerlink" title="面试题33.二叉搜索树的后序遍历序列（巧思）"></a>面试题33.二叉搜索树的后序遍历序列（巧思）</h3><ul>
+<li>递归：一个二叉搜索树的后序遍历结果的格式一定是 [ 小于根节点的节点，大于根节点的节点，根节点 ]  。</li>
+</ul>
+<h3 id="面试题34-二叉树中和为某一值的路径"><a href="#面试题34-二叉树中和为某一值的路径" class="headerlink" title="面试题34.二叉树中和为某一值的路径"></a>面试题34.二叉树中和为某一值的路径</h3><ul>
+<li>递归回溯法一定要己得回溯，我第二次做的时候仍然忘了回溯。</li>
+</ul>
+<h3 id="面试题36-二叉搜索树与双向链表（未解决）"><a href="#面试题36-二叉搜索树与双向链表（未解决）" class="headerlink" title="面试题36.二叉搜索树与双向链表（未解决）"></a>面试题36.二叉搜索树与双向链表（未解决）</h3><ul>
+<li><p>递归中序遍历</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 中序遍历递归</span></span><br><span class="line"><span class="comment"> * 二叉搜索树中序遍历得到的就是递增数组。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution36</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//前驱节点</span></span><br><span class="line">    TreeNode pre;</span><br><span class="line">    <span class="comment">//哑节点</span></span><br><span class="line">    TreeNode god = <span class="keyword">new</span> TreeNode(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">change</span> <span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        dfs(root);</span><br><span class="line">        pre.right = god.right;</span><br><span class="line">        god.right.left = pre;</span><br><span class="line">        <span class="keyword">return</span> god.right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//该递归方法可以将输入的二叉搜索树转变为双向链表，头节点左指针指向null，尾节点右指针指向null</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dfs</span> <span class="params">(TreeNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        dfs(head.left);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pre == <span class="keyword">null</span>) god.right = head;</span><br><span class="line">        <span class="keyword">else</span> pre.right = head;</span><br><span class="line">        head.left = pre;</span><br><span class="line">        pre = head;</span><br><span class="line"></span><br><span class="line">        dfs(head.right);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="面试题37-序列化二叉树"><a href="#面试题37-序列化二叉树" class="headerlink" title="面试题37.序列化二叉树"></a>面试题37.序列化二叉树</h3><ul>
+<li>二叉树层序遍历结果唯一的方法：只要把二叉树中度为0和1的节点都补上值为null的辅助空子节点，得到的层序遍历结果就可以与一棵唯一的二叉树对应。</li>
+<li>反序列化需要借助辅助队列来实现，每次为一个节点创建左右子节点之后就放入队列中，然后循环弹出队列中的元素为其添加左右子节点。</li>
+</ul>
+<h3 id="面试题38-字符串的排列"><a href="#面试题38-字符串的排列" class="headerlink" title="面试题38.字符串的排列"></a>面试题38.字符串的排列</h3><ul>
+<li>递归回溯；</li>
+<li>通过排序去除重复；</li>
+<li>使用一个标记数组，用来标记哪些字符已经使用过了。</li>
+</ul>
+<h3 id="面试题40-最小的k个数（非常重要）"><a href="#面试题40-最小的k个数（非常重要）" class="headerlink" title="面试题40.最小的k个数（非常重要）"></a>面试题40.最小的k个数（非常重要）</h3><ul>
+<li>堆排序：使用大根堆而不是小根堆。</li>
+<li>快速排序</li>
+</ul>
+<h3 id="面试题41-数据流中的中位数（巧思）"><a href="#面试题41-数据流中的中位数（巧思）" class="headerlink" title="面试题41.数据流中的中位数（巧思）"></a>面试题41.数据流中的中位数（巧思）</h3><ul>
+<li>使用一个最大堆和一个最小堆共同组成数据结构；</li>
+<li>每次添加数据要保证新数据与最大堆和最小堆中数据都比较过。</li>
+</ul>
+<h3 id="面试题43-前n个整数中1出现的次数（巧思）"><a href="#面试题43-前n个整数中1出现的次数（巧思）" class="headerlink" title="面试题43.前n个整数中1出现的次数（巧思）"></a>面试题43.前n个整数中1出现的次数（巧思）</h3><ul>
+<li>分别计算个、十、百每一位中1出现的次数；</li>
+<li>分三个部分高位high、当前位curr、低位low，按curr的不同情况计算每一位1出现的次数。</li>
+</ul>
+<h3 id="面试题44-数字序列中某一位的数字（巧思）（未解决）"><a href="#面试题44-数字序列中某一位的数字（巧思）（未解决）" class="headerlink" title="面试题44.数字序列中某一位的数字（巧思）（未解决）"></a>面试题44.数字序列中某一位的数字（巧思）（未解决）</h3><h3 id="面试题45-把数组排成最小的数（巧思）"><a href="#面试题45-把数组排成最小的数（巧思）" class="headerlink" title="面试题45.把数组排成最小的数（巧思）"></a>面试题45.把数组排成最小的数（巧思）</h3><ul>
+<li>这道题本质上是一个排序问题，需要借助JDK的Arrays工具类的sort()方法，排序规则为：取出任意两个元素a和b，如果ab小于ba则应该将a放在b前面。</li>
+</ul>
+<h3 id="面试题46-把数字翻译成字符串"><a href="#面试题46-把数字翻译成字符串" class="headerlink" title="面试题46.把数字翻译成字符串"></a>面试题46.把数字翻译成字符串</h3><ul>
+<li>动态规划</li>
+</ul>
+<h3 id="面试题47-礼物的最大价值"><a href="#面试题47-礼物的最大价值" class="headerlink" title="面试题47.礼物的最大价值"></a>面试题47.礼物的最大价值</h3><ul>
+<li>这是一个路径问题，是一个很典型的动态规划问题，一般看到路径问题首先就要想到动态规划。</li>
+<li>优化思路：反正原矩阵中的元素只需要在计算该格状态时使用一次，所以直接在原矩阵的格子中记录状态。</li>
+</ul>
+<h3 id="面试题48-最长不含重复字符的子字符串"><a href="#面试题48-最长不含重复字符的子字符串" class="headerlink" title="面试题48.最长不含重复字符的子字符串"></a>面试题48.最长不含重复字符的子字符串</h3><ul>
+<li>使用HashSet辅助的滑动窗口。</li>
+</ul>
+<h3 id="面试题49-丑数（巧思）"><a href="#面试题49-丑数（巧思）" class="headerlink" title="面试题49.丑数（巧思）"></a>面试题49.丑数（巧思）</h3><ul>
+<li>特殊的动态规划，特别巧妙的思路。</li>
+</ul>
+<h3 id="面试题50-第一个只出现一次的字符"><a href="#面试题50-第一个只出现一次的字符" class="headerlink" title="面试题50.第一个只出现一次的字符"></a>面试题50.第一个只出现一次的字符</h3><ul>
+<li>不要想得太复杂，用HashMap辅助，key为字符值，value为字符出现次数；遍历字符串两遍，第一遍将字符存入哈希表，第二遍找到第一个只出现一次的字符。</li>
+</ul>
+<h3 id="面试题51-数组中的逆序对（非常重要）（未解决）"><a href="#面试题51-数组中的逆序对（非常重要）（未解决）" class="headerlink" title="面试题51.数组中的逆序对（非常重要）（未解决）"></a>面试题51.数组中的逆序对（非常重要）（未解决）</h3><ul>
+<li>归并排序</li>
+</ul>
+<h3 id="面试题53-2-前n个数中缺失的数字（巧思）"><a href="#面试题53-2-前n个数中缺失的数字（巧思）" class="headerlink" title="面试题53_2.前n个数中缺失的数字（巧思）"></a>面试题53_2.前n个数中缺失的数字（巧思）</h3><ul>
+<li>二分查找：注意不要把此题和原地置换的题目搞混了，题目看起来很像。</li>
+</ul>
+<h3 id="面试题54-二叉搜索树的第k大节点"><a href="#面试题54-二叉搜索树的第k大节点" class="headerlink" title="面试题54.二叉搜索树的第k大节点"></a>面试题54.二叉搜索树的第k大节点</h3><ul>
+<li>先右后左的中序遍历到第k个值</li>
+</ul>
+<h3 id="面试题55-1-二叉树的深度"><a href="#面试题55-1-二叉树的深度" class="headerlink" title="面试题55_1.二叉树的深度"></a>面试题55_1.二叉树的深度</h3><ul>
+<li>递归回溯法，一定要记得回溯深度值。</li>
+</ul>
+<h3 id="面试题55-2-平衡二叉树（巧思）"><a href="#面试题55-2-平衡二叉树（巧思）" class="headerlink" title="面试题55_2.平衡二叉树（巧思）"></a>面试题55_2.平衡二叉树（巧思）</h3><ul>
+<li>记忆化递归</li>
+</ul>
+<h3 id="面试题56-1-数组中数字出现的次数（巧思）"><a href="#面试题56-1-数组中数字出现的次数（巧思）" class="headerlink" title="面试题56_1.数组中数字出现的次数（巧思）"></a>面试题56_1.数组中数字出现的次数（巧思）</h3><ul>
+<li>异或 位运算：这个思路太强了，就是根据数字的二进制格式的某一位为0或1，将数组分成两组，两组分别全员异或得到的即为两个只出现一次的数字。</li>
+</ul>
+<h3 id="面试题56-2-数组中数字出现的次数2（巧思）"><a href="#面试题56-2-数组中数字出现的次数2（巧思）" class="headerlink" title="面试题56_2.数组中数字出现的次数2（巧思）"></a>面试题56_2.数组中数字出现的次数2（巧思）</h3><ul>
+<li>位运算：对于出现三次的数字，各二进制位出现的次数都是 3 的倍数。因此，统计所有数字的各二进制位中 1 的出现次数，并对 3 求余，结果则为只出现一次的数字。</li>
+<li>用无符号右移&gt;&gt;&gt;和左移&lt;&lt;&lt;。</li>
+</ul>
+<h3 id="面试题57-2-和为s的连续正数序列（巧思）"><a href="#面试题57-2-和为s的连续正数序列（巧思）" class="headerlink" title="面试题57_2.和为s的连续正数序列（巧思）"></a>面试题57_2.和为s的连续正数序列（巧思）</h3><ul>
+<li>滑动窗口：两指针都只能往右移，当窗口总值小于目标值时右指针右移，窗口总值小于或等于目标值时左指针右移。</li>
+<li>使用连续整数和的计算公式：首项加末项乘以项数除以二。</li>
+</ul>
+<h3 id="面试题58-1-翻转单词顺序"><a href="#面试题58-1-翻转单词顺序" class="headerlink" title="面试题58_1.翻转单词顺序"></a>面试题58_1.翻转单词顺序</h3><ul>
+<li>双指针从后往前一个个找到单词。</li>
+</ul>
+<h3 id="面试题59-1-滑动窗口的最大值（巧思）"><a href="#面试题59-1-滑动窗口的最大值（巧思）" class="headerlink" title="面试题59_1.滑动窗口的最大值（巧思）"></a>面试题59_1.滑动窗口的最大值（巧思）</h3><ul>
+<li>辅助双端队列：在该队列中保存滑动窗口中的递减序列。</li>
+</ul>
+<h3 id="面试题59-2-队列的最大值（巧思）"><a href="#面试题59-2-队列的最大值（巧思）" class="headerlink" title="面试题59_2.队列的最大值（巧思）"></a>面试题59_2.队列的最大值（巧思）</h3><ul>
+<li>想要随时获得栈中的最大、最小值，就需要辅助栈，容量与主栈始终相等；</li>
+<li>想要随实获得队列中的最大、最小值，就需要辅助双端队列，保存主队列中的单调序列，把非单调部分都去掉了。</li>
+</ul>
+<h3 id="面试题60-n个骰子的点数（非常重要）"><a href="#面试题60-n个骰子的点数（非常重要）" class="headerlink" title="面试题60.n个骰子的点数（非常重要）"></a>面试题60.n个骰子的点数（非常重要）</h3><ul>
+<li>背包问题：使用动态规划，n个筛子和为j的情况数是n-1个筛子和为6中不同情况数的总和。</li>
+</ul>
+<h3 id="面试题61-扑克牌中的顺子（巧思）"><a href="#面试题61-扑克牌中的顺子（巧思）" class="headerlink" title="面试题61.扑克牌中的顺子（巧思）"></a>面试题61.扑克牌中的顺子（巧思）</h3><ul>
+<li>不要从正面找，从反面找不是顺子的情况，那么反面主要有两类：有重复数字、最大值-最小值&gt;=5。</li>
+</ul>
+<h3 id="面试题62-圆圈中最后剩下的数字（非常重要）（巧思）"><a href="#面试题62-圆圈中最后剩下的数字（非常重要）（巧思）" class="headerlink" title="面试题62.圆圈中最后剩下的数字（非常重要）（巧思）"></a>面试题62.圆圈中最后剩下的数字（非常重要）（巧思）</h3><ul>
+<li>递归：这道题非常好得运用到了递归的本质：我们已经知道了上一步递归的结果，我们只需要使用上一步递归的结果来辅助实现本层的逻辑即可，不需要考虑上一步递归内部到底是怎样实现的。</li>
+</ul>
+<h3 id="面试题64-求前n个正整数之和（巧思）"><a href="#面试题64-求前n个正整数之和（巧思）" class="headerlink" title="面试题64.求前n个正整数之和（巧思）"></a>面试题64.求前n个正整数之和（巧思）</h3><ul>
+<li>递归</li>
+</ul>
+<h3 id="面试题65-不用加减乘除做加法（非常重要）（巧思）"><a href="#面试题65-不用加减乘除做加法（非常重要）（巧思）" class="headerlink" title="面试题65.不用加减乘除做加法（非常重要）（巧思）"></a>面试题65.不用加减乘除做加法（非常重要）（巧思）</h3><ul>
+<li>位运算&amp;得到的结果再左移一位，得到的就是两数相加时每个二进制位上的进位；位运算^得到的结果就是排除进位后，两个二进制数在每一位上的和。那么上述得到的进位结果和不进位和相加就是两数真正的相加和，而要求到进位结果与不进位和的相加和又要重复上述步骤，所以要不断迭代这个过程直到进位结果为0为止。</li>
+</ul>
+<h3 id="面试题66-构建乘积数组（巧思）"><a href="#面试题66-构建乘积数组（巧思）" class="headerlink" title="面试题66.构建乘积数组（巧思）"></a>面试题66.构建乘积数组（巧思）</h3><ul>
+<li>动态规划：第一次遍历求出每个元素对应的左边所有元素乘积，第二次遍历再乘上每个元素对应右边所有元素乘积。</li>
+</ul>
+<h3 id="面试题68-1-二叉搜索树的最近公共祖先"><a href="#面试题68-1-二叉搜索树的最近公共祖先" class="headerlink" title="面试题68_1.二叉搜索树的最近公共祖先"></a>面试题68_1.二叉搜索树的最近公共祖先</h3><ul>
+<li>递归：运用二叉搜索数的特性简单很多</li>
+</ul>
+<h3 id="面试题68-2-二叉树的最近公共祖先"><a href="#面试题68-2-二叉树的最近公共祖先" class="headerlink" title="面试题68_2.二叉树的最近公共祖先"></a>面试题68_2.二叉树的最近公共祖先</h3><ul>
+<li>有返回值的递归方法是非常强大的</li>
+</ul>
+<h3 id="【力扣刷题】-1-两数之和"><a href="#【力扣刷题】-1-两数之和" class="headerlink" title="【力扣刷题】_1.两数之和"></a>【力扣刷题】_1.两数之和</h3><ul>
+<li>HashMap的key保存元素值，value保存元素在数组中的索引。</li>
+</ul>
+<h3 id="【力扣刷题】-3-无重复字符的最长子串"><a href="#【力扣刷题】-3-无重复字符的最长子串" class="headerlink" title="【力扣刷题】_3.无重复字符的最长子串"></a>【力扣刷题】_3.无重复字符的最长子串</h3><ul>
+<li>滑动窗口+HashSet</li>
+</ul>
+<h3 id="【力扣刷题】-4-寻找两个正序数组的中位数"><a href="#【力扣刷题】-4-寻找两个正序数组的中位数" class="headerlink" title="【力扣刷题】_4.寻找两个正序数组的中位数"></a>【力扣刷题】_4.寻找两个正序数组的中位数</h3><ul>
+<li>迭代合并数组，再找中位数。</li>
+</ul>
+<h3 id="【力扣刷题】-5-最长回文子串"><a href="#【力扣刷题】-5-最长回文子串" class="headerlink" title="【力扣刷题】_5.最长回文子串"></a>【力扣刷题】_5.最长回文子串</h3><ul>
+<li>中心扩散法：涉及到回文串，都用中心扩散法好一点。</li>
+</ul>
+<h3 id="【力扣刷题】-10-正则表达式匹配-非常重要-（未解决）"><a href="#【力扣刷题】-10-正则表达式匹配-非常重要-（未解决）" class="headerlink" title="【力扣刷题】_10.正则表达式匹配(非常重要)（未解决）"></a>【力扣刷题】_10.正则表达式匹配(非常重要)（未解决）</h3><ul>
+<li>动态规划：dp[i][j]表示两个字符串的前i个字符和前j个字符是否正则匹配。</li>
+</ul>
+<h3 id="【力扣刷题】-11-盛最多水的容器（巧思）"><a href="#【力扣刷题】-11-盛最多水的容器（巧思）" class="headerlink" title="【力扣刷题】_11.盛最多水的容器（巧思）"></a>【力扣刷题】_11.盛最多水的容器（巧思）</h3><ul>
+<li>双指针：初始时，双指针分别指向数组左右两端，计算盛水面积，每次向内移动两指中较小的那一个，直到两指针重合。这样移动指针可以保证我们不会错过每一个更大的盛水面积。</li>
+</ul>
+<h3 id="【力扣刷题】-15-三数之和"><a href="#【力扣刷题】-15-三数之和" class="headerlink" title="【力扣刷题】_15.三数之和"></a>【力扣刷题】_15.三数之和</h3><ul>
+<li>排序+双指针</li>
+</ul>
+<h3 id="【力扣刷题】-20-有效的括号（非常重要）（巧思）"><a href="#【力扣刷题】-20-有效的括号（非常重要）（巧思）" class="headerlink" title="【力扣刷题】_20.有效的括号（非常重要）（巧思）"></a>【力扣刷题】_20.有效的括号（非常重要）（巧思）</h3><ul>
+<li>方法一栈：当遇到匹配的括号则一起出栈，最后栈为空则说明正好配对成功。</li>
+<li>方法二：见【力扣刷题】_22.括号生成。</li>
+</ul>
+<h3 id="【力扣刷题】-22-括号生成"><a href="#【力扣刷题】-22-括号生成" class="headerlink" title="【力扣刷题】_22.括号生成"></a>【力扣刷题】_22.括号生成</h3><ul>
+<li>递归回溯+枝剪</li>
+<li>一种新的判断字符串是否有效的方法：<ul>
+<li>每一个包含第一个括号的子序列中左括号个数不能小于右括号个数，因为无论后面再加上多少个左括号，都不能和前面多出来的右括号配对相消；</li>
+<li>总的左右括号个数一定要相等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="【力扣刷题】-23-合并K个升序链表（巧思）"><a href="#【力扣刷题】-23-合并K个升序链表（巧思）" class="headerlink" title="【力扣刷题】_23.合并K个升序链表（巧思）"></a>【力扣刷题】_23.合并K个升序链表（巧思）</h3><ul>
+<li>分治合并：其实原理就和归并排序一样，只不过这个相当于已经分割好了，只需要进行后面的合并。</li>
+</ul>
+<h3 id="【力扣刷题】-31-下一个排列（巧思）"><a href="#【力扣刷题】-31-下一个排列（巧思）" class="headerlink" title="【力扣刷题】_31.下一个排列（巧思）"></a>【力扣刷题】_31.下一个排列（巧思）</h3><ul>
+<li>字典序的概念</li>
+<li>思路很巧妙：第一步先从后往前找到第一个递减元素，然后找到后面比它大的元素中最小的一个元素，交换这两个元素位置；第二部将后面的递减数组反转成递增数组。</li>
+</ul>
+<h3 id="【力扣刷题】-32-最长有效括号"><a href="#【力扣刷题】-32-最长有效括号" class="headerlink" title="【力扣刷题】_32.最长有效括号"></a>【力扣刷题】_32.最长有效括号</h3><ul>
+<li>动态规划</li>
+</ul>
+<h3 id="【力扣刷题】-33-搜索旋转排序数组"><a href="#【力扣刷题】-33-搜索旋转排序数组" class="headerlink" title="【力扣刷题】_33.搜索旋转排序数组"></a>【力扣刷题】_33.搜索旋转排序数组</h3><ul>
+<li>二分搜索：与正常二分搜索差不多，一直判断在中点左边还是右边，只不过判断条件不同。</li>
+</ul>
+<h3 id="【力扣刷题】-39-组合总和"><a href="#【力扣刷题】-39-组合总和" class="headerlink" title="【力扣刷题】_39.组合总和"></a>【力扣刷题】_39.组合总和</h3><ul>
+<li>递归回溯：本题关键在于去除重复，所以最开始把数组排序，并在递归中设置好循环条件使得只能升序添加元素。</li>
+</ul>
+<h3 id="【力扣刷题】-42-接雨水（巧思）"><a href="#【力扣刷题】-42-接雨水（巧思）" class="headerlink" title="【力扣刷题】_42.接雨水（巧思）"></a>【力扣刷题】_42.接雨水（巧思）</h3><ul>
+<li>遍历数组找出数组中每个数左边（包括该数自己）的最大值，在遍历找出每个数右边的最大值，这样就能计算每一列所能储存的雨水，然后加起来。每一列所能储存的雨水取决于它左右两边最高的列中更低的那一列。</li>
+</ul>
+<h3 id="【力扣刷题】-46-全排列"><a href="#【力扣刷题】-46-全排列" class="headerlink" title="【力扣刷题】_46.全排列"></a>【力扣刷题】_46.全排列</h3><ul>
+<li>递归回溯：使用一个mark数组标记使用过的元素，这个mark数组也要记得回溯。</li>
+</ul>
+<h3 id="【力扣刷题】-49-字母异位词分组（巧思）"><a href="#【力扣刷题】-49-字母异位词分组（巧思）" class="headerlink" title="【力扣刷题】_49.字母异位词分组（巧思）"></a>【力扣刷题】_49.字母异位词分组（巧思）</h3><ul>
+<li>将字符串的字符重新排序后进行比较，看是不是字母异位词。</li>
+<li>用HashMap的一个List类型的value来保存同一组字母异位词。</li>
+</ul>
+<h3 id="【力扣刷题】-55-跳跃游戏（巧思）"><a href="#【力扣刷题】-55-跳跃游戏（巧思）" class="headerlink" title="【力扣刷题】_55.跳跃游戏（巧思）"></a>【力扣刷题】_55.跳跃游戏（巧思）</h3><ul>
+<li>方法一动态规划：状态dp[i]表示能否到达索引为i的元素，每次计算dp[i]需要遍历一次前面所有的状态值，所以时间复杂度为O(n^2)。</li>
+<li>方法二动态规划：状态dp[i]表示从索引为i的元素所能跳到的最远距离，dp[i] = nums[i]+i。</li>
+</ul>
+<h3 id="【力扣刷题】-56-合并区间（巧思）"><a href="#【力扣刷题】-56-合并区间（巧思）" class="headerlink" title="【力扣刷题】_56.合并区间（巧思）"></a>【力扣刷题】_56.合并区间（巧思）</h3><ul>
+<li>先将各个区间按左边界正序排列，然后依次判断每两个相邻区间需不需要合并，需要合并则将第二个区间改为合并后区间，不需要合并则将第一个区间放入结果列表。</li>
+</ul>
+<h3 id="【力扣刷题】-72-编辑距离（非常重要）（巧思）"><a href="#【力扣刷题】-72-编辑距离（非常重要）（巧思）" class="headerlink" title="【力扣刷题】_72.编辑距离（非常重要）（巧思）"></a>【力扣刷题】_72.编辑距离（非常重要）（巧思）</h3><ul>
+<li>动态规划：其实使两个字符串相同的操作总结下来就是三个：在A中插入一个字符、在B中插入一个字符、修改A中的一个字符。</li>
+</ul>
+<h3 id="【力扣刷题】-75-颜色分类（巧思）"><a href="#【力扣刷题】-75-颜色分类（巧思）" class="headerlink" title="【力扣刷题】_75.颜色分类（巧思）"></a>【力扣刷题】_75.颜色分类（巧思）</h3><ul>
+<li>双指针：也可以说是三指针。</li>
+</ul>
+<h3 id="【力扣刷题】-76-最小覆盖子串（巧思）"><a href="#【力扣刷题】-76-最小覆盖子串（巧思）" class="headerlink" title="【力扣刷题】_76.最小覆盖子串（巧思）"></a>【力扣刷题】_76.最小覆盖子串（巧思）</h3><ul>
+<li>滑动窗口：右指针先向后移动直到覆盖子串，左指针再向后移动直到即将不再覆盖子串，记录长度；然后将左指针后移一步，再循环上述步骤，比较得到最小覆盖子串。</li>
+</ul>
+<h3 id="【力扣刷题】-78-子集（非常重要）"><a href="#【力扣刷题】-78-子集（非常重要）" class="headerlink" title="【力扣刷题】_78.子集（非常重要）"></a>【力扣刷题】_78.子集（非常重要）</h3><ul>
+<li><p>递归回溯：本题的关键在于不考虑子集的顺序，所以需要通过设置好循环条件排除元素相同、顺序不同的情况。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; subsets(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        ans.add(<span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">        List&lt;Integer&gt; answer = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        dfs(ans,answer,nums,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dfs</span><span class="params">(List&lt;List&lt;Integer&gt;&gt; ans,List&lt;Integer&gt; answer,<span class="keyword">int</span>[] nums,<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = index; i &lt; nums.length; i++) &#123;</span><br><span class="line">            answer.add(nums[i]);</span><br><span class="line"></span><br><span class="line">            ans.add(<span class="keyword">new</span> ArrayList&lt;&gt;(answer));</span><br><span class="line"></span><br><span class="line">            dfs(ans,answer,nums,i + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">            answer.remove(answer.size() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-84-柱状图中最大的矩形（非常重要）（巧思）"><a href="#【力扣刷题】-84-柱状图中最大的矩形（非常重要）（巧思）" class="headerlink" title="【力扣刷题】_84.柱状图中最大的矩形（非常重要）（巧思）"></a>【力扣刷题】_84.柱状图中最大的矩形（非常重要）（巧思）</h3><ul>
+<li><p>单调栈：本题和42.接雨水思路很像，从左往右和从右往左的两次遍历分别记录两个数组，只不过本题记录的是每个柱形两边首个比它矮的柱形的位置，所以需要单调栈来辅助记录。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution0084</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">largestRectangleArea</span><span class="params">(<span class="keyword">int</span>[] heights)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = heights.length;</span><br><span class="line">        <span class="keyword">int</span>[] left = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="keyword">int</span>[] right = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line"></span><br><span class="line">        Stack&lt;Integer&gt; stack = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//比较得出每个柱形左边第一个比它矮的柱形的位置；</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!stack.isEmpty() &amp;&amp; heights[stack.peek()] &gt;= heights[i]) &#123;</span><br><span class="line">                stack.pop();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (stack.isEmpty()) &#123;</span><br><span class="line">                left[i] = -<span class="number">1</span>;</span><br><span class="line">                stack.push(i);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                left[i] = stack.peek();</span><br><span class="line">                stack.push(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stack.clear();</span><br><span class="line">        <span class="comment">//比较得出每个柱形左边第一个比它矮的柱形的位置；</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!stack.isEmpty() &amp;&amp; heights[stack.peek()] &gt;= heights[i]) &#123;</span><br><span class="line">                stack.pop();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (stack.isEmpty()) &#123;</span><br><span class="line">                right[i] = n;</span><br><span class="line">                stack.push(i);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                right[i] = stack.peek();</span><br><span class="line">                stack.push(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            ans = Math.max(ans,heights[i] * (right[i] - left[i] - <span class="number">1</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-85-最大矩形（巧思）"><a href="#【力扣刷题】-85-最大矩形（巧思）" class="headerlink" title="【力扣刷题】_85.最大矩形（巧思）"></a>【力扣刷题】_85.最大矩形（巧思）</h3><ul>
+<li><p>单调栈+动态规划：就是84.柱状图中最大的矩形的二维升级，注意一定要把一行中所有柱形的高度都先计算出来，再进行单调排序。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution0085</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maximalRectangle</span><span class="params">(<span class="keyword">char</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = matrix.length;</span><br><span class="line">        <span class="keyword">int</span> m = matrix[<span class="number">0</span>].length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[] heights = <span class="keyword">new</span> <span class="keyword">int</span>[m];</span><br><span class="line">        <span class="keyword">int</span>[] left = <span class="keyword">new</span> <span class="keyword">int</span>[m];</span><br><span class="line">        <span class="keyword">int</span>[] right = <span class="keyword">new</span> <span class="keyword">int</span>[m];</span><br><span class="line"></span><br><span class="line">        Stack&lt;Integer&gt; stack = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="comment">//注意一定要把一行中所有柱形的高度都先计算出来，再进行单调排序</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; m; j++) &#123;</span><br><span class="line">                heights[j] = matrix[i][j] == <span class="string">'0'</span> ? <span class="number">0</span> : (<span class="number">1</span> + heights[j]);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            stack.clear();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; m; j++) &#123;</span><br><span class="line">                <span class="keyword">while</span> (!stack.isEmpty() &amp;&amp; heights[stack.peek()] &gt;= heights[j]) &#123;</span><br><span class="line">                    stack.pop();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (stack.isEmpty()) &#123;</span><br><span class="line">                    left[j] = -<span class="number">1</span>;</span><br><span class="line">                    stack.push(j);</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    left[j] = stack.peek();</span><br><span class="line">                    stack.push(j);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            stack.clear();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = m - <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--) &#123;</span><br><span class="line">                <span class="keyword">while</span> (!stack.isEmpty() &amp;&amp; heights[stack.peek()] &gt;= heights[j]) &#123;</span><br><span class="line">                    stack.pop();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (stack.isEmpty()) &#123;</span><br><span class="line">                    right[j] = m;</span><br><span class="line">                    stack.push(j);</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    right[j] = stack.peek();</span><br><span class="line">                    stack.push(j);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; m; j++) &#123;</span><br><span class="line">                ans = Math.max(ans,(right[j] - left[j] - <span class="number">1</span>) * heights[j]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-96-不同的二叉搜索树（巧思）"><a href="#【力扣刷题】-96-不同的二叉搜索树（巧思）" class="headerlink" title="【力扣刷题】_96.不同的二叉搜索树（巧思）"></a>【力扣刷题】_96.不同的二叉搜索树（巧思）</h3><ul>
+<li><p>动态规划：二叉搜索数的特点是左子孙节点一定都小于根节点，右子孙节点一定都大于根节点，所以只要是单调固定个数的数值，其所能组成的不同二叉搜索树的种数也是固定的。所以将每个数作为根节点的情况累加起来即为结果。其实这种思路一定程度上用到了递归的思想。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution0096</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numTrees</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        dp[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= i; j++) &#123;</span><br><span class="line">                dp[i] = dp[i] + dp[j - <span class="number">1</span>] * dp[i - j];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp[n];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-101-对称二叉树"><a href="#【力扣刷题】-101-对称二叉树" class="headerlink" title="【力扣刷题】_101.对称二叉树"></a>【力扣刷题】_101.对称二叉树</h3><ul>
+<li>递归：给定两个指针始终沿着相反方向前进。</li>
+<li>注意：两颗二叉树的中序遍历结果相同并不能保证两个树相同，因为不同二叉树可能有相同中序遍历结果。</li>
+</ul>
+<h3 id="【力扣刷题】-102-二叉树的层序遍历"><a href="#【力扣刷题】-102-二叉树的层序遍历" class="headerlink" title="【力扣刷题】_102.二叉树的层序遍历"></a>【力扣刷题】_102.二叉树的层序遍历</h3><ul>
+<li><p>广度优先遍历：使用一个辅助队列，每次遍历完一层的节点时，队列的长度正好是下一层节点的个数。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution0102</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; levelOrder(TreeNode root) &#123;</span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Queue&lt;TreeNode&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        queue.add(root);</span><br><span class="line">        <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> length = queue.size();</span><br><span class="line">            List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">                TreeNode node = queue.remove();</span><br><span class="line">                list.add(node.val);</span><br><span class="line">                <span class="keyword">if</span> (node.left != <span class="keyword">null</span>) &#123;queue.add(node.left);&#125;</span><br><span class="line">                <span class="keyword">if</span> (node.right != <span class="keyword">null</span>) &#123;queue.add(node.right);&#125;</span><br><span class="line">            &#125;</span><br><span class="line">            ans.add(list);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-114-二叉树展开为链表（非常重要）（巧思）"><a href="#【力扣刷题】-114-二叉树展开为链表（非常重要）（巧思）" class="headerlink" title="【力扣刷题】_114.二叉树展开为链表（非常重要）（巧思）"></a>【力扣刷题】_114.二叉树展开为链表（非常重要）（巧思）</h3><ul>
+<li><p>递归：从上到下，将每个节点的右子树砍下放到其前驱结点的右子树位置，然后将左子树砍下放到其右子树位置。</p>
+</li>
+<li><p>寻找前驱节点：其实前驱节点很好找，也是用递归，先进入左子树，然后一直往右走到最后一个节点即为前驱节点。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flatten</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) &#123;<span class="keyword">return</span>;&#125;</span><br><span class="line">        <span class="keyword">if</span> (root.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">            TreeNode preNode = findPreNode(root.left);</span><br><span class="line">            preNode.right = root.right;</span><br><span class="line">            root.right = root.left;</span><br><span class="line">            root.left = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        flatten(root.right);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">findPreNode</span><span class="params">(TreeNode node)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (node.right == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> node;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> findPreNode(node.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-122-买卖股票的最佳时机2（巧思）"><a href="#【力扣刷题】-122-买卖股票的最佳时机2（巧思）" class="headerlink" title="【力扣刷题】_122.买卖股票的最佳时机2（巧思）"></a>【力扣刷题】_122.买卖股票的最佳时机2（巧思）</h3><ul>
+<li><p>动态规划：创建两个动态规划数组，一个表示当天结束时持有股票的最大收益，另一个表示当天结束时不持有股票的最大收益。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution0122</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxProfit</span><span class="params">(<span class="keyword">int</span>[] prices)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = prices.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> dp0 = -prices[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> dp1 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp0 = Math.max(dp0,dp1 - prices[i]);</span><br><span class="line">            dp1 = Math.max(dp1,dp0 + prices[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dp1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-123-买卖股票的最佳时机3（巧思）"><a href="#【力扣刷题】-123-买卖股票的最佳时机3（巧思）" class="headerlink" title="【力扣刷题】_123.买卖股票的最佳时机3（巧思）"></a>【力扣刷题】_123.买卖股票的最佳时机3（巧思）</h3><ul>
+<li><p>动态规划：这个动态规划要是没有前面一题真是打死也想不到，创建四个动态规划数组，第一个表示当天结束时是第一次持有股票的最大收益，第二个表示当天结束时是第一次卖出股票的最大收益，第三个表示当天是第二次持有股票的最大收益，第四个表示当天结束时是第二次卖出股票的最大收益。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution0123</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxProfit</span><span class="params">(<span class="keyword">int</span>[] prices)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = prices.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> buy0 = -prices[<span class="number">0</span>],sell0 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> buy1 = -prices[<span class="number">0</span>],sell1 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            buy0 = Math.max(buy0,-prices[i]);</span><br><span class="line">            sell0 = Math.max(sell0,buy0 + prices[i]);</span><br><span class="line">            buy1 = Math.max(buy1,sell0 - prices[i]);</span><br><span class="line">            sell1 = Math.max(sell1,buy1 + prices[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> sell1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-128-最长连续序列（巧思）"><a href="#【力扣刷题】-128-最长连续序列（巧思）" class="headerlink" title="【力扣刷题】_128.最长连续序列（巧思）"></a>【力扣刷题】_128.最长连续序列（巧思）</h3><ul>
+<li><p>不能用排序，排一下序时间复杂度就O(nlogn)了，这里要灵活运用HashSet的增删查复杂度都为O(1)的性质。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution1</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestConsecutive</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//Set为不含重复元素的集合，java中常用HashSet来实现。</span></span><br><span class="line">        Set&lt;Integer&gt; numbers = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> num : nums) &#123;</span><br><span class="line">            numbers.add(num);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> num : numbers) &#123;</span><br><span class="line">            <span class="comment">//HashSet.contains()方法的时间复杂度为O(1)。</span></span><br><span class="line">            <span class="keyword">if</span> (!numbers.contains(num - <span class="number">1</span>)) &#123;<span class="comment">//表示该元素为一个连续序列的起点，而不是中间一个点。</span></span><br><span class="line">                <span class="keyword">int</span> length = <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">while</span> (numbers.contains(num + length)) &#123;</span><br><span class="line">                    length++;</span><br><span class="line">                &#125;</span><br><span class="line">                ans = Math.max(ans,length);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-139-单词拆分（巧思）"><a href="#【力扣刷题】-139-单词拆分（巧思）" class="headerlink" title="【力扣刷题】_139.单词拆分（巧思）"></a>【力扣刷题】_139.单词拆分（巧思）</h3><ul>
+<li><p>动态规划：状态dp[i]表示前i个字符所组成的字符串是否可拆分，计算该状态值时需要用到前面每一个状态值。</p>
+</li>
+<li><p>HashSet：使用set来判断数组是否包含某元素，往往能将复杂度降低一个n级别。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0139</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">wordBreak</span><span class="params">(String s, List&lt;String&gt; wordDict)</span> </span>&#123;</span><br><span class="line">        Set&lt;String&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;(wordDict);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//dp[i]表示前i个字符是否可以拆分为字典中单词</span></span><br><span class="line">        <span class="keyword">boolean</span>[] dp = <span class="keyword">new</span> <span class="keyword">boolean</span>[s.length() + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        dp[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= s.length(); i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="comment">//s.substring(j,i)每次都是一个从未出现过的字符串，时间复杂度没法再降低了。</span></span><br><span class="line">                <span class="keyword">if</span> (dp[j] &amp;&amp; set.contains(s.substring(j,i)))&#123;</span><br><span class="line">                    dp[i] = <span class="keyword">true</span>;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[s.length()];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-141-环形链表（巧思）"><a href="#【力扣刷题】-141-环形链表（巧思）" class="headerlink" title="【力扣刷题】_141.环形链表（巧思）"></a>【力扣刷题】_141.环形链表（巧思）</h3><ul>
+<li>双指针：设置快慢指正一直往后走直到为空，如果两指针相遇则为环形链表。</li>
+</ul>
+<h3 id="【力扣刷题】-142-环形链表加强（巧思）"><a href="#【力扣刷题】-142-环形链表加强（巧思）" class="headerlink" title="【力扣刷题】_142.环形链表加强（巧思）"></a>【力扣刷题】_142.环形链表加强（巧思）</h3><ul>
+<li>双指针：这里其实是三指针法，当快慢指针相遇时，此时第三个指针从头部出发，同时慢指针继续前进，当两者相遇时，根据数学计算可得，它们相遇的点即为入环节点。计算过程详见官网答案，很精妙，由a+n(b+c)+b=2(a+b)得到a=(n-1)(b+c)+c。</li>
+<li>快指针的速度是慢指针的两倍，所以慢指针不可能走完一圈还没被快指针追上。</li>
+</ul>
+<h3 id="【力扣刷题】-146-LRU缓存机制"><a href="#【力扣刷题】-146-LRU缓存机制" class="headerlink" title="【力扣刷题】_146.LRU缓存机制"></a>【力扣刷题】_146.LRU缓存机制</h3><ul>
+<li>HashMap+双向链表</li>
+<li>双向链表节点必须自己定义</li>
+<li>LRU底层结构为一个HashMap、size、capacity、伪头结点、伪尾结点，初始化时必须定义这两个伪节点，用来定位双向链表的头尾。</li>
+</ul>
+<h3 id="【力扣刷题】-152-乘积最大子数组（巧思）"><a href="#【力扣刷题】-152-乘积最大子数组（巧思）" class="headerlink" title="【力扣刷题】_152.乘积最大子数组（巧思）"></a>【力扣刷题】_152.乘积最大子数组（巧思）</h3><ul>
+<li><p>动态规划：因为存在负负得正的情况，所以本题应创建两个状态队列，一个保存以第i个字符结束的最大乘积，一个保存以第i个字符结束的最小乘积。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0152</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxProduct</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> large = nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> small = nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> ans = large;</span><br><span class="line">        <span class="keyword">int</span> temp = large;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            temp = large;</span><br><span class="line">            large = Math.max(Math.max(nums[i],large * nums[i]),small * nums[i]);</span><br><span class="line">            small = Math.min(Math.min(nums[i],temp * nums[i]),small * nums[i]);</span><br><span class="line">            ans = Math.max(ans,large);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-160-相交链表（巧思）"><a href="#【力扣刷题】-160-相交链表（巧思）" class="headerlink" title="【力扣刷题】_160.相交链表（巧思）"></a>【力扣刷题】_160.相交链表（巧思）</h3><ul>
+<li>双指针：一个遍历A+B，一个遍历B+A，当两指针同时为null则说明两链表并不相交。</li>
+</ul>
+<h3 id="【力扣刷题】-169-多数元素（巧思）"><a href="#【力扣刷题】-169-多数元素（巧思）" class="headerlink" title="【力扣刷题】_169.多数元素（巧思）"></a>【力扣刷题】_169.多数元素（巧思）</h3><ul>
+<li><p>摩尔投票法</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0169</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">majorityElement</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> flag = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> king = nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (flag == <span class="number">0</span>) &#123;</span><br><span class="line">                king = nums[i];</span><br><span class="line">                flag = <span class="number">1</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (king == nums[i]) &#123;flag++;&#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;flag--;&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> king;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-188-买卖股票的最佳时机4（巧思）"><a href="#【力扣刷题】-188-买卖股票的最佳时机4（巧思）" class="headerlink" title="【力扣刷题】_188.买卖股票的最佳时机4（巧思）"></a>【力扣刷题】_188.买卖股票的最佳时机4（巧思）</h3><ul>
+<li>动态规划：在123.买卖股票的最佳时机3的基础上改写即可。</li>
+</ul>
+<h3 id="【力扣刷题】-200-岛屿数量（巧思）"><a href="#【力扣刷题】-200-岛屿数量（巧思）" class="headerlink" title="【力扣刷题】_200.岛屿数量（巧思）"></a>【力扣刷题】_200.岛屿数量（巧思）</h3><ul>
+<li>递归：岛屿问题最关键的难点就是某节点是否已经遍历过了的判断，此题将所有已经遍历过了的陆地格子的值通过递归改写成’0’。</li>
+</ul>
+<h3 id="【力扣刷题】-206-反转链表（非常重要）（巧思）"><a href="#【力扣刷题】-206-反转链表（非常重要）（巧思）" class="headerlink" title="【力扣刷题】_206.反转链表（非常重要）（巧思）"></a>【力扣刷题】_206.反转链表（非常重要）（巧思）</h3><ul>
+<li><p>方法一三指针迭代</p>
+</li>
+<li><p>方法二递归（非常体现递归的本质，如果一下就能想出该递归思路，则说明此刻的你对递归理解得很到位。）：本题的关键，将head.next作为递归方法的输入参数之后，head的next属性还是指向原来那个节点的，只不过那个节点现在变成了一个链表的尾端。</p>
+</li>
+</ul>
+<h3 id="【力扣刷题】-207-课程表（非常重要）（巧思）"><a href="#【力扣刷题】-207-课程表（非常重要）（巧思）" class="headerlink" title="【力扣刷题】_207.课程表（非常重要）（巧思）"></a>【力扣刷题】_207.课程表（非常重要）（巧思）</h3><ul>
+<li><p>注意此题和399.除法求职都是有向图相关的题目，只不过要解决的问题不同。本题要检查图中是否存在环，所以使用邻接表的方法来解决；399要实现获取有向图中任意两节点之间的权值，所以使用带权并查集的方法来实现。</p>
+</li>
+<li><p>邻接表：维护两个map，分别记录每个节点的入度和所指向的其他节点。然后借助辅助队列，一个一个删除入度为0的节点，并删除指向节点，如果被指向节点入度降为0则将其加入辅助队列，循环上述操作。最后辅助队列为空却还有节点入度不为0，则说明有向图中存在环。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0207</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">canFinish</span><span class="params">(<span class="keyword">int</span> numCourses, <span class="keyword">int</span>[][] prerequisites)</span> </span>&#123;</span><br><span class="line">        Map&lt;Integer, Set&lt;Integer&gt;&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        Map&lt;Integer,Integer&gt; input = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        Queue&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//保存好每个节点的指向节点和入度</span></span><br><span class="line">        <span class="keyword">int</span> n = prerequisites.length;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (map.containsKey(prerequisites[i][<span class="number">0</span>])) &#123;</span><br><span class="line">                map.get(prerequisites[i][<span class="number">0</span>]).add(prerequisites[i][<span class="number">1</span>]);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                Set&lt;Integer&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">                set.add(prerequisites[i][<span class="number">1</span>]);</span><br><span class="line">                map.put(prerequisites[i][<span class="number">0</span>],set);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (input.containsKey(prerequisites[i][<span class="number">1</span>])) &#123;</span><br><span class="line">                <span class="keyword">int</span> num = input.get(prerequisites[i][<span class="number">1</span>]);</span><br><span class="line">                input.put(prerequisites[i][<span class="number">1</span>],num + <span class="number">1</span>);</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                input.put(prerequisites[i][<span class="number">1</span>],<span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//找出所有有向图的头节点</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> num: map.keySet()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!input.containsKey(num)) &#123;</span><br><span class="line">                queue.add(num);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//从头节点开始一个一个减</span></span><br><span class="line">        <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> temp = queue.remove();</span><br><span class="line">            <span class="keyword">if</span> (map.containsKey(temp)) &#123;</span><br><span class="line">                Set&lt;Integer&gt; set = map.get(temp);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> num : set) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (input.get(num) == <span class="number">1</span>) &#123;</span><br><span class="line">                        input.remove(num);</span><br><span class="line">                        queue.add(num);</span><br><span class="line">                    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">int</span> x = input.get(num);</span><br><span class="line">                        input.put(num,x - <span class="number">1</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> input.isEmpty();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-208-实现Trie前缀树（未解决）"><a href="#【力扣刷题】-208-实现Trie前缀树（未解决）" class="headerlink" title="【力扣刷题】_208.实现Trie前缀树（未解决）"></a>【力扣刷题】_208.实现Trie前缀树（未解决）</h3><ul>
+<li>创建前缀树节点类，类中主要属性是大小为26的节点数组。</li>
+</ul>
+<h3 id="【力扣刷题】-215-数组中的第K个最大元素"><a href="#【力扣刷题】-215-数组中的第K个最大元素" class="headerlink" title="【力扣刷题】_215.数组中的第K个最大元素"></a>【力扣刷题】_215.数组中的第K个最大元素</h3><ul>
+<li><p>堆排序</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0215</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">findKthLargest</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line"></span><br><span class="line">        PriorityQueue&lt;Integer&gt; queue = <span class="keyword">new</span> PriorityQueue&lt;&gt;(<span class="keyword">new</span> Comparator&lt;Integer&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Integer o1, Integer o2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> o2 - o1;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            queue.add(nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            queue.poll();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> queue.poll();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-221-最大正方形（巧思）"><a href="#【力扣刷题】-221-最大正方形（巧思）" class="headerlink" title="【力扣刷题】_221.最大正方形（巧思）"></a>【力扣刷题】_221.最大正方形（巧思）</h3><ul>
+<li><p>动态规划：状态dp[i][j]为以该索引位置点为右下角的最大正方形的边长，该状态值取决于上、左、左上三个点的值中的最小值。</p>
+</li>
+<li><p>测试可以发现，封装类Integer、Boolean等初始化时不会赋初值，而是直接为null。基本数据类型int、boolean等初始化时会赋初值，比如0、false等。</p>
+</li>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0221</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maximalSquare</span><span class="params">(<span class="keyword">char</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = matrix.length;</span><br><span class="line">        <span class="keyword">int</span> m = matrix[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[][] edge = <span class="keyword">new</span> <span class="keyword">int</span>[n][m];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (matrix[<span class="number">0</span>][i] == <span class="string">'1'</span>) &#123;</span><br><span class="line">                edge[<span class="number">0</span>][i] = <span class="number">1</span>;</span><br><span class="line">                ans = Math.max(ans,edge[<span class="number">0</span>][i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (matrix[i][<span class="number">0</span>] == <span class="string">'1'</span>) &#123;</span><br><span class="line">                edge[i][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">                ans = Math.max(ans,edge[i][<span class="number">0</span>]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; m; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (matrix[i][j] == <span class="string">'1'</span>) &#123;</span><br><span class="line">                    edge[i][j] = Math.min(Math.min(edge[i - <span class="number">1</span>][j - <span class="number">1</span>],edge[i - <span class="number">1</span>][j]),edge[i][j - <span class="number">1</span>]) + <span class="number">1</span>;</span><br><span class="line">                    ans = Math.max(ans,edge[i][j]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans * ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//测试可以发现，封装类Integer、Boolean等初始化时不会赋初值，而是直接为null。</span></span><br><span class="line">    <span class="comment">//基本数据类型int、boolean等初始化时会赋初值，比如0、false等。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[][] ans1 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>][<span class="number">2</span>];</span><br><span class="line">        Integer[][] ans2 = <span class="keyword">new</span> Integer[<span class="number">2</span>][<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span>[][] ans3 = <span class="keyword">new</span> <span class="keyword">boolean</span>[<span class="number">2</span>][<span class="number">2</span>];</span><br><span class="line">        Boolean[][] ans4 = <span class="keyword">new</span> Boolean[<span class="number">2</span>][<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-234-回文链表（巧思）"><a href="#【力扣刷题】-234-回文链表（巧思）" class="headerlink" title="【力扣刷题】_234.回文链表（巧思）"></a>【力扣刷题】_234.回文链表（巧思）</h3><ul>
+<li><p>方法一辅助栈：先使用快慢指针找到链表中点，在寻找中点过程中将链表节点存入栈中，直到到达中点。</p>
+</li>
+<li><p>方法二反转链表：先使用快慢指针找到链表中点，在寻找中点过程中反转前半段链表，然后双指针从中点分别往左右出发，判断是否回文。</p>
+</li>
+</ul>
+<h3 id="【力扣刷题】-236-二叉树的最近公共祖先（巧思）"><a href="#【力扣刷题】-236-二叉树的最近公共祖先（巧思）" class="headerlink" title="【力扣刷题】_236.二叉树的最近公共祖先（巧思）"></a>【力扣刷题】_236.二叉树的最近公共祖先（巧思）</h3><ul>
+<li><p>递归：本题需要我们依靠自己的智慧去定义当该方法返回值为null时代表什么，此处我们定义当该方法返回null时表示p、q全都不在该二叉树root中。（这个还是太难想了，真正拿到可能还是会用自己想得递归方法）</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0236</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == p || root == q) <span class="keyword">return</span> root;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (lowestCommonAncestor(root.left,p,q) == <span class="keyword">null</span>) <span class="keyword">return</span> lowestCommonAncestor(root.right,p,q);</span><br><span class="line">        <span class="keyword">if</span> (lowestCommonAncestor(root.right,p,q) == <span class="keyword">null</span>) <span class="keyword">return</span> lowestCommonAncestor(root.left,p,q);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//以上两种情况都不符合，则说明两个目标节点分别分布在左右子树中，最近公共祖先即为该根节点。</span></span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-239-滑动窗口最大值（巧思）"><a href="#【力扣刷题】-239-滑动窗口最大值（巧思）" class="headerlink" title="【力扣刷题】_239.滑动窗口最大值（巧思）"></a>【力扣刷题】_239.滑动窗口最大值（巧思）</h3><ul>
+<li><p>辅助双端队列：使用双端队列记录窗口中数值从大到小的序列，滑动窗口每次滑动，按固定规则处理双端队列的头尾，使得窗口每次滑动后双端队列尾部都是窗口中的最大值。</p>
+</li>
+<li><p>代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">leetcode0239</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] maxSlidingWindow(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        Deque&lt;Integer&gt; deque = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span>[] ans = <span class="keyword">new</span> <span class="keyword">int</span>[n - k + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k; i++) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; deque.peekFirst() &lt; nums[i]) &#123;</span><br><span class="line">                deque.pollFirst();</span><br><span class="line">            &#125;</span><br><span class="line">            deque.addFirst(nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ans[<span class="number">0</span>] = deque.peekLast();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = k; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (deque.peekLast() == nums[i - k]) &#123;</span><br><span class="line">                deque.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!deque.isEmpty() &amp;&amp; deque.peekFirst() &lt; nums[i]) &#123;</span><br><span class="line">                deque.pollFirst();</span><br><span class="line">            &#125;</span><br><span class="line">            deque.addFirst(nums[i]);</span><br><span class="line">            ans[i - k + <span class="number">1</span>] = deque.peekLast();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="【力扣刷题】-279-完全平方数（巧思）"><a href="#【力扣刷题】-279-完全平方数（巧思）" class="headerlink" title="【力扣刷题】_279.完全平方数（巧思）"></a>【力扣刷题】_279.完全平方数（巧思）</h3><ul>
+<li>动态规划：典型的背包问题，具体见背包问题专题。</li>
+</ul>
+<h3 id="【力扣刷题】-297-二叉树的序列化与反序列化（巧思）"><a href="#【力扣刷题】-297-二叉树的序列化与反序列化（巧思）" class="headerlink" title="【力扣刷题】_297.二叉树的序列化与反序列化（巧思）"></a>【力扣刷题】_297.二叉树的序列化与反序列化（巧思）</h3><ul>
+<li>层序遍历+辅助队列：序列化时将每个实际存在的节点的null子节点全部加入序列中；</li>
+<li>层序遍历+辅助队列：反序列化时也要用到辅助队列，不过在反序列化时null节点不得放入队列中。每次从队列头部中取出一个节点时，数组指针接下来所指的两个元素就刚好是该节点的子节点，这时如果这两个子节点不为空则将它们加入队列，并放到刚取出节点的左右子节点位置。然后接着循环进行以上操作，直到队列为空。</li>
+</ul>
+<h3 id="【力扣刷题】-300-最长递增子序列（巧思）"><a href="#【力扣刷题】-300-最长递增子序列（巧思）" class="headerlink" title="【力扣刷题】_300.最长递增子序列（巧思）"></a>【力扣刷题】_300.最长递增子序列（巧思）</h3><ul>
+<li>动态规划：计算每个状态值时，需要用到前面每一个状态值。其实就是计算每个状态值时，需要将该数与前面的每一个数比较一次大小。</li>
+</ul>
+<h3 id="【力扣刷题】-301-删除无效的括号（巧思）"><a href="#【力扣刷题】-301-删除无效的括号（巧思）" class="headerlink" title="【力扣刷题】_301.删除无效的括号（巧思）"></a>【力扣刷题】_301.删除无效的括号（巧思）</h3><ul>
+<li>递归回溯+枝剪：使用【力扣刷题】_20.有效的括号中的方法二中的两个条件来进行枝剪。</li>
+</ul>
+<h3 id="【力扣刷题】-309-最佳买卖股票时机含冷冻期（巧思）"><a href="#【力扣刷题】-309-最佳买卖股票时机含冷冻期（巧思）" class="headerlink" title="【力扣刷题】_309.最佳买卖股票时机含冷冻期（巧思）"></a>【力扣刷题】_309.最佳买卖股票时机含冷冻期（巧思）</h3><ul>
+<li>动态规划：把买入股票看作亏钱，卖出股票看作赚钱，主要考虑三种状态，持有股票、冷冻期、卖出了股票且非冷冻期。</li>
+</ul>
+<h3 id="【力扣刷题】-312-戳气球（未解决）"><a href="#【力扣刷题】-312-戳气球（未解决）" class="headerlink" title="【力扣刷题】_312.戳气球（未解决）"></a>【力扣刷题】_312.戳气球（未解决）</h3><h3 id="【力扣刷题】-322-零钱兑换"><a href="#【力扣刷题】-322-零钱兑换" class="headerlink" title="【力扣刷题】_322.零钱兑换"></a>【力扣刷题】_322.零钱兑换</h3><ul>
+<li>背包问题</li>
+</ul>
+<h3 id="【力扣刷题】-337-打家劫舍3（巧思）"><a href="#【力扣刷题】-337-打家劫舍3（巧思）" class="headerlink" title="【力扣刷题】_337.打家劫舍3（巧思）"></a>【力扣刷题】_337.打家劫舍3（巧思）</h3><ul>
+<li>动态规划思路+递归：沿用了198.打家劫舍的解题思路，其实就相当于将状态看成偷窃每一层的金额。</li>
+</ul>
+<h3 id="【力扣刷题】-338-比特位计数（巧思）"><a href="#【力扣刷题】-338-比特位计数（巧思）" class="headerlink" title="【力扣刷题】_338.比特位计数（巧思）"></a>【力扣刷题】_338.比特位计数（巧思）</h3><ul>
+<li>方法一暴力法：直接用无符号右移计算每个数的二进制格式中的1的个数。</li>
+<li>方法二动态规划：状态dp[i]表示数字i的二进制格式中1的数量。位运算i&amp;(i-1)得到的就是将i的二进制表达式从右往左第一个1变成0所表示的数，所以dp[i] = dp[i &amp; (i - 1)] + 1。</li>
+</ul>
+<h3 id="【力扣刷题】-394-字符串解码"><a href="#【力扣刷题】-394-字符串解码" class="headerlink" title="【力扣刷题】_394.字符串解码"></a>【力扣刷题】_394.字符串解码</h3><ul>
+<li>递归：存粹就是体力活，没有太多巧思。</li>
+</ul>
+<h3 id="【力扣刷题】-399-除法求值（非常重要）"><a href="#【力扣刷题】-399-除法求值（非常重要）" class="headerlink" title="【力扣刷题】_399.除法求值（非常重要）"></a>【力扣刷题】_399.除法求值（非常重要）</h3><ul>
+<li><p>注意本题与【力扣刷题】_207.课程表的区别，虽然都是有向图的数据结构，但是一道是判断有无环形，另一道是计算任意两个节点直接的权值。</p>
+</li>
+<li><p>带权并查集：带权并查集的属性和方法：int[] parent表示每个节点的父节点；double[] weight表示每个节点到父节点的权值；UnionFind()方法为构造方法，设置每个节点的父节点为自己，权值为1.0；find()方法为寻找根节点方法，寻找过程中将该节点进行路径压缩使其直接指向根节点；isConnect()方法用于判断两个节点是否处于同一个集合中，是则可以返回这两个节点之间的权值；union()方法用于将两个节点所在的两个集合合并为同一个集合。</p>
+</li>
+</ul>
+<h3 id="【力扣刷题】-406-根据身高重建队列（巧思）"><a href="#【力扣刷题】-406-根据身高重建队列（巧思）" class="headerlink" title="【力扣刷题】_406.根据身高重建队列（巧思）"></a>【力扣刷题】_406.根据身高重建队列（巧思）</h3><ul>
+<li>先将原队列按身高排好序，然后按这个顺序一个一个将人插入结果队列中，这样就能保证后插入的人一定高于先插入的人。</li>
+<li>如果我们在初始时建立一个包含n个位置的空队列，而我们每次将一个人放入队列中时，会将一个「空」位置变成「满」位置，那么当我们放入第i个人时，我们需要给他安排一个「空」位置，并且这个「空」位置前面恰好还有ki个「空」位置，用来安排给后面身高更高的人。也就是说，第i个人的位置，就是队列中从左往右数第ki+1 个「空」位置。</li>
+</ul>
+<h3 id="【力扣刷题】-448-找到所有数组中消失的数字（巧思）"><a href="#【力扣刷题】-448-找到所有数组中消失的数字（巧思）" class="headerlink" title="【力扣刷题】_448.找到所有数组中消失的数字（巧思）"></a>【力扣刷题】_448.找到所有数组中消失的数字（巧思）</h3><ul>
+<li>原地置换升级版：要找到多个不在原位置的数，则需要先把数组中原本存在的数按顺序置换好，再遍历找出小时的数。</li>
+</ul>
+<h3 id="【力扣刷题】-494-目标和"><a href="#【力扣刷题】-494-目标和" class="headerlink" title="【力扣刷题】_494.目标和"></a>【力扣刷题】_494.目标和</h3><ul>
+<li>这是一道背包问题，但是因为目标和可能为负值，所以不好设置状态范围，所以我觉得本题用递归反而更不容易写错。</li>
+</ul>
+<h3 id="【力扣刷题】-538-把二叉搜索树转换为累加树（巧思）"><a href="#【力扣刷题】-538-把二叉搜索树转换为累加树（巧思）" class="headerlink" title="【力扣刷题】_538.把二叉搜索树转换为累加树（巧思）"></a>【力扣刷题】_538.把二叉搜索树转换为累加树（巧思）</h3><ul>
+<li>递归：从右往左中序遍历二叉树，把每个节点之前已遍历的节点之值的和加到该节点上。</li>
+</ul>
+<h3 id="【力扣刷题】-560-和为K的子数组（巧思）"><a href="#【力扣刷题】-560-和为K的子数组（巧思）" class="headerlink" title="【力扣刷题】_560.和为K的子数组（巧思）"></a>【力扣刷题】_560.和为K的子数组（巧思）</h3><ul>
+<li>本题的难点在于数组元素可以为负数，无法使用滑动窗口。</li>
+<li>枚举：本题推荐直接使用暴力枚举法，枚举左右边界。（虽然也可以使用前缀和的方法来优化，但是优化方法太难想了）</li>
+</ul>
+<h3 id="【力扣刷题】-581-最短无序连续子数组（巧思）"><a href="#【力扣刷题】-581-最短无序连续子数组（巧思）" class="headerlink" title="【力扣刷题】_581.最短无序连续子数组（巧思）"></a>【力扣刷题】_581.最短无序连续子数组（巧思）</h3><ul>
+<li>方法一：可以先排序，然后将排序后的数组与原数组进行比较。</li>
+<li>方法二：从前往后遍历找到出现降序之后最小的数min，反向遍历找到出现升序之后最大的数max，这两个数就是无序子序列重排之后的起点和终点；那么分别前序找到第一个比min大的数，反向找到第一个比max小的数，这两个数即为无序子序列的起点和终点。</li>
+</ul>
+<h3 id="【力扣刷题】-647-回文子串（巧思）"><a href="#【力扣刷题】-647-回文子串（巧思）" class="headerlink" title="【力扣刷题】_647.回文子串（巧思）"></a>【力扣刷题】_647.回文子串（巧思）</h3><ul>
+<li>中心扩散法：回文子串的题目还是要最先考虑中心扩散法。</li>
+</ul>
+<h3 id="【力扣刷题】-714-买卖股票的最佳时机含手续费（巧思）"><a href="#【力扣刷题】-714-买卖股票的最佳时机含手续费（巧思）" class="headerlink" title="【力扣刷题】_714.买卖股票的最佳时机含手续费（巧思）"></a>【力扣刷题】_714.买卖股票的最佳时机含手续费（巧思）</h3><ul>
+<li>动态规划：不要想得太复杂，还是原来的思路，就是在卖出的同时要减去手续费即可。</li>
+</ul>
+<h3 id="【力扣刷题】-739-每日温度（巧思）"><a href="#【力扣刷题】-739-每日温度（巧思）" class="headerlink" title="【力扣刷题】_739.每日温度（巧思）"></a>【力扣刷题】_739.每日温度（巧思）</h3><ul>
+<li>两个辅助栈：创建两个栈，主栈保存从下到上单调递减的温度数据，辅栈保存主栈中每一个温度在数组中对应的位置索引。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/07/22/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB/" rel="next" title="【力扣刷题】_背包问题汇总">
+                <i class="fa fa-chevron-left"></i> 【力扣刷题】_背包问题汇总
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/08/01/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E5%B0%8F%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" rel="prev" title="【二三方】_小知识积累">
+                【二三方】_小知识积累 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#剑指-amp-Top100复习"><span class="nav-number">1.</span> <span class="nav-text">剑指&amp;Top100复习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题2-实现singleton模式"><span class="nav-number">1.1.</span> <span class="nav-text">面试题2.实现singleton模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题10-1-斐波那契数列"><span class="nav-number">1.2.</span> <span class="nav-text">面试题10_1.斐波那契数列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题11-旋转数组的最小数字"><span class="nav-number">1.3.</span> <span class="nav-text">面试题11.旋转数组的最小数字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题12-矩阵中的路径"><span class="nav-number">1.4.</span> <span class="nav-text">面试题12.矩阵中的路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题13-机器人的运动范围"><span class="nav-number">1.5.</span> <span class="nav-text">面试题13.机器人的运动范围</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题14-1-剪绳子"><span class="nav-number">1.6.</span> <span class="nav-text">面试题14_1.剪绳子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题14-2-剪绳子2"><span class="nav-number">1.7.</span> <span class="nav-text">面试题14_2.剪绳子2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题15-二进制中1的个数"><span class="nav-number">1.8.</span> <span class="nav-text">面试题15.二进制中1的个数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题16-数值的整数次方"><span class="nav-number">1.9.</span> <span class="nav-text">面试题16.数值的整数次方</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题17-打印从1到最大的n位数（未解决）"><span class="nav-number">1.10.</span> <span class="nav-text">面试题17.打印从1到最大的n位数（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题18-删除链表的节点"><span class="nav-number">1.11.</span> <span class="nav-text">面试题18.删除链表的节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题19-正则表达式匹配（非常重要）（未解决）"><span class="nav-number">1.12.</span> <span class="nav-text">面试题19.正则表达式匹配（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题21-调整数组顺序使奇数位于偶数前面"><span class="nav-number">1.13.</span> <span class="nav-text">面试题21.调整数组顺序使奇数位于偶数前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题22-链表中倒数第k个节点"><span class="nav-number">1.14.</span> <span class="nav-text">面试题22.链表中倒数第k个节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题24-反转链表"><span class="nav-number">1.15.</span> <span class="nav-text">面试题24.反转链表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题26-树的子结构"><span class="nav-number">1.16.</span> <span class="nav-text">面试题26.树的子结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题31-栈的压入弹出序列（巧思）"><span class="nav-number">1.17.</span> <span class="nav-text">面试题31.栈的压入弹出序列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题32-2-从上到下打印二叉树2"><span class="nav-number">1.18.</span> <span class="nav-text">面试题32_2.从上到下打印二叉树2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题32-3-从上到下打印二叉树3"><span class="nav-number">1.19.</span> <span class="nav-text">面试题32_3.从上到下打印二叉树3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题33-二叉搜索树的后序遍历序列（巧思）"><span class="nav-number">1.20.</span> <span class="nav-text">面试题33.二叉搜索树的后序遍历序列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题34-二叉树中和为某一值的路径"><span class="nav-number">1.21.</span> <span class="nav-text">面试题34.二叉树中和为某一值的路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题36-二叉搜索树与双向链表（未解决）"><span class="nav-number">1.22.</span> <span class="nav-text">面试题36.二叉搜索树与双向链表（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题37-序列化二叉树"><span class="nav-number">1.23.</span> <span class="nav-text">面试题37.序列化二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题38-字符串的排列"><span class="nav-number">1.24.</span> <span class="nav-text">面试题38.字符串的排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题40-最小的k个数（非常重要）"><span class="nav-number">1.25.</span> <span class="nav-text">面试题40.最小的k个数（非常重要）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题41-数据流中的中位数（巧思）"><span class="nav-number">1.26.</span> <span class="nav-text">面试题41.数据流中的中位数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题43-前n个整数中1出现的次数（巧思）"><span class="nav-number">1.27.</span> <span class="nav-text">面试题43.前n个整数中1出现的次数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题44-数字序列中某一位的数字（巧思）（未解决）"><span class="nav-number">1.28.</span> <span class="nav-text">面试题44.数字序列中某一位的数字（巧思）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题45-把数组排成最小的数（巧思）"><span class="nav-number">1.29.</span> <span class="nav-text">面试题45.把数组排成最小的数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题46-把数字翻译成字符串"><span class="nav-number">1.30.</span> <span class="nav-text">面试题46.把数字翻译成字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题47-礼物的最大价值"><span class="nav-number">1.31.</span> <span class="nav-text">面试题47.礼物的最大价值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题48-最长不含重复字符的子字符串"><span class="nav-number">1.32.</span> <span class="nav-text">面试题48.最长不含重复字符的子字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题49-丑数（巧思）"><span class="nav-number">1.33.</span> <span class="nav-text">面试题49.丑数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题50-第一个只出现一次的字符"><span class="nav-number">1.34.</span> <span class="nav-text">面试题50.第一个只出现一次的字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题51-数组中的逆序对（非常重要）（未解决）"><span class="nav-number">1.35.</span> <span class="nav-text">面试题51.数组中的逆序对（非常重要）（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题53-2-前n个数中缺失的数字（巧思）"><span class="nav-number">1.36.</span> <span class="nav-text">面试题53_2.前n个数中缺失的数字（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题54-二叉搜索树的第k大节点"><span class="nav-number">1.37.</span> <span class="nav-text">面试题54.二叉搜索树的第k大节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题55-1-二叉树的深度"><span class="nav-number">1.38.</span> <span class="nav-text">面试题55_1.二叉树的深度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题55-2-平衡二叉树（巧思）"><span class="nav-number">1.39.</span> <span class="nav-text">面试题55_2.平衡二叉树（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题56-1-数组中数字出现的次数（巧思）"><span class="nav-number">1.40.</span> <span class="nav-text">面试题56_1.数组中数字出现的次数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题56-2-数组中数字出现的次数2（巧思）"><span class="nav-number">1.41.</span> <span class="nav-text">面试题56_2.数组中数字出现的次数2（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题57-2-和为s的连续正数序列（巧思）"><span class="nav-number">1.42.</span> <span class="nav-text">面试题57_2.和为s的连续正数序列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题58-1-翻转单词顺序"><span class="nav-number">1.43.</span> <span class="nav-text">面试题58_1.翻转单词顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题59-1-滑动窗口的最大值（巧思）"><span class="nav-number">1.44.</span> <span class="nav-text">面试题59_1.滑动窗口的最大值（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题59-2-队列的最大值（巧思）"><span class="nav-number">1.45.</span> <span class="nav-text">面试题59_2.队列的最大值（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题60-n个骰子的点数（非常重要）"><span class="nav-number">1.46.</span> <span class="nav-text">面试题60.n个骰子的点数（非常重要）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题61-扑克牌中的顺子（巧思）"><span class="nav-number">1.47.</span> <span class="nav-text">面试题61.扑克牌中的顺子（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题62-圆圈中最后剩下的数字（非常重要）（巧思）"><span class="nav-number">1.48.</span> <span class="nav-text">面试题62.圆圈中最后剩下的数字（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题64-求前n个正整数之和（巧思）"><span class="nav-number">1.49.</span> <span class="nav-text">面试题64.求前n个正整数之和（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题65-不用加减乘除做加法（非常重要）（巧思）"><span class="nav-number">1.50.</span> <span class="nav-text">面试题65.不用加减乘除做加法（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题66-构建乘积数组（巧思）"><span class="nav-number">1.51.</span> <span class="nav-text">面试题66.构建乘积数组（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题68-1-二叉搜索树的最近公共祖先"><span class="nav-number">1.52.</span> <span class="nav-text">面试题68_1.二叉搜索树的最近公共祖先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#面试题68-2-二叉树的最近公共祖先"><span class="nav-number">1.53.</span> <span class="nav-text">面试题68_2.二叉树的最近公共祖先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-1-两数之和"><span class="nav-number">1.54.</span> <span class="nav-text">【力扣刷题】_1.两数之和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-3-无重复字符的最长子串"><span class="nav-number">1.55.</span> <span class="nav-text">【力扣刷题】_3.无重复字符的最长子串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-4-寻找两个正序数组的中位数"><span class="nav-number">1.56.</span> <span class="nav-text">【力扣刷题】_4.寻找两个正序数组的中位数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-5-最长回文子串"><span class="nav-number">1.57.</span> <span class="nav-text">【力扣刷题】_5.最长回文子串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-10-正则表达式匹配-非常重要-（未解决）"><span class="nav-number">1.58.</span> <span class="nav-text">【力扣刷题】_10.正则表达式匹配(非常重要)（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-11-盛最多水的容器（巧思）"><span class="nav-number">1.59.</span> <span class="nav-text">【力扣刷题】_11.盛最多水的容器（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-15-三数之和"><span class="nav-number">1.60.</span> <span class="nav-text">【力扣刷题】_15.三数之和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-20-有效的括号（非常重要）（巧思）"><span class="nav-number">1.61.</span> <span class="nav-text">【力扣刷题】_20.有效的括号（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-22-括号生成"><span class="nav-number">1.62.</span> <span class="nav-text">【力扣刷题】_22.括号生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-23-合并K个升序链表（巧思）"><span class="nav-number">1.63.</span> <span class="nav-text">【力扣刷题】_23.合并K个升序链表（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-31-下一个排列（巧思）"><span class="nav-number">1.64.</span> <span class="nav-text">【力扣刷题】_31.下一个排列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-32-最长有效括号"><span class="nav-number">1.65.</span> <span class="nav-text">【力扣刷题】_32.最长有效括号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-33-搜索旋转排序数组"><span class="nav-number">1.66.</span> <span class="nav-text">【力扣刷题】_33.搜索旋转排序数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-39-组合总和"><span class="nav-number">1.67.</span> <span class="nav-text">【力扣刷题】_39.组合总和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-42-接雨水（巧思）"><span class="nav-number">1.68.</span> <span class="nav-text">【力扣刷题】_42.接雨水（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-46-全排列"><span class="nav-number">1.69.</span> <span class="nav-text">【力扣刷题】_46.全排列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-49-字母异位词分组（巧思）"><span class="nav-number">1.70.</span> <span class="nav-text">【力扣刷题】_49.字母异位词分组（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-55-跳跃游戏（巧思）"><span class="nav-number">1.71.</span> <span class="nav-text">【力扣刷题】_55.跳跃游戏（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-56-合并区间（巧思）"><span class="nav-number">1.72.</span> <span class="nav-text">【力扣刷题】_56.合并区间（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-72-编辑距离（非常重要）（巧思）"><span class="nav-number">1.73.</span> <span class="nav-text">【力扣刷题】_72.编辑距离（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-75-颜色分类（巧思）"><span class="nav-number">1.74.</span> <span class="nav-text">【力扣刷题】_75.颜色分类（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-76-最小覆盖子串（巧思）"><span class="nav-number">1.75.</span> <span class="nav-text">【力扣刷题】_76.最小覆盖子串（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-78-子集（非常重要）"><span class="nav-number">1.76.</span> <span class="nav-text">【力扣刷题】_78.子集（非常重要）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-84-柱状图中最大的矩形（非常重要）（巧思）"><span class="nav-number">1.77.</span> <span class="nav-text">【力扣刷题】_84.柱状图中最大的矩形（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-85-最大矩形（巧思）"><span class="nav-number">1.78.</span> <span class="nav-text">【力扣刷题】_85.最大矩形（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-96-不同的二叉搜索树（巧思）"><span class="nav-number">1.79.</span> <span class="nav-text">【力扣刷题】_96.不同的二叉搜索树（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-101-对称二叉树"><span class="nav-number">1.80.</span> <span class="nav-text">【力扣刷题】_101.对称二叉树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-102-二叉树的层序遍历"><span class="nav-number">1.81.</span> <span class="nav-text">【力扣刷题】_102.二叉树的层序遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-114-二叉树展开为链表（非常重要）（巧思）"><span class="nav-number">1.82.</span> <span class="nav-text">【力扣刷题】_114.二叉树展开为链表（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-122-买卖股票的最佳时机2（巧思）"><span class="nav-number">1.83.</span> <span class="nav-text">【力扣刷题】_122.买卖股票的最佳时机2（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-123-买卖股票的最佳时机3（巧思）"><span class="nav-number">1.84.</span> <span class="nav-text">【力扣刷题】_123.买卖股票的最佳时机3（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-128-最长连续序列（巧思）"><span class="nav-number">1.85.</span> <span class="nav-text">【力扣刷题】_128.最长连续序列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-139-单词拆分（巧思）"><span class="nav-number">1.86.</span> <span class="nav-text">【力扣刷题】_139.单词拆分（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-141-环形链表（巧思）"><span class="nav-number">1.87.</span> <span class="nav-text">【力扣刷题】_141.环形链表（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-142-环形链表加强（巧思）"><span class="nav-number">1.88.</span> <span class="nav-text">【力扣刷题】_142.环形链表加强（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-146-LRU缓存机制"><span class="nav-number">1.89.</span> <span class="nav-text">【力扣刷题】_146.LRU缓存机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-152-乘积最大子数组（巧思）"><span class="nav-number">1.90.</span> <span class="nav-text">【力扣刷题】_152.乘积最大子数组（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-160-相交链表（巧思）"><span class="nav-number">1.91.</span> <span class="nav-text">【力扣刷题】_160.相交链表（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-169-多数元素（巧思）"><span class="nav-number">1.92.</span> <span class="nav-text">【力扣刷题】_169.多数元素（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-188-买卖股票的最佳时机4（巧思）"><span class="nav-number">1.93.</span> <span class="nav-text">【力扣刷题】_188.买卖股票的最佳时机4（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-200-岛屿数量（巧思）"><span class="nav-number">1.94.</span> <span class="nav-text">【力扣刷题】_200.岛屿数量（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-206-反转链表（非常重要）（巧思）"><span class="nav-number">1.95.</span> <span class="nav-text">【力扣刷题】_206.反转链表（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-207-课程表（非常重要）（巧思）"><span class="nav-number">1.96.</span> <span class="nav-text">【力扣刷题】_207.课程表（非常重要）（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-208-实现Trie前缀树（未解决）"><span class="nav-number">1.97.</span> <span class="nav-text">【力扣刷题】_208.实现Trie前缀树（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-215-数组中的第K个最大元素"><span class="nav-number">1.98.</span> <span class="nav-text">【力扣刷题】_215.数组中的第K个最大元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-221-最大正方形（巧思）"><span class="nav-number">1.99.</span> <span class="nav-text">【力扣刷题】_221.最大正方形（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-234-回文链表（巧思）"><span class="nav-number">1.100.</span> <span class="nav-text">【力扣刷题】_234.回文链表（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-236-二叉树的最近公共祖先（巧思）"><span class="nav-number">1.101.</span> <span class="nav-text">【力扣刷题】_236.二叉树的最近公共祖先（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-239-滑动窗口最大值（巧思）"><span class="nav-number">1.102.</span> <span class="nav-text">【力扣刷题】_239.滑动窗口最大值（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-279-完全平方数（巧思）"><span class="nav-number">1.103.</span> <span class="nav-text">【力扣刷题】_279.完全平方数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-297-二叉树的序列化与反序列化（巧思）"><span class="nav-number">1.104.</span> <span class="nav-text">【力扣刷题】_297.二叉树的序列化与反序列化（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-300-最长递增子序列（巧思）"><span class="nav-number">1.105.</span> <span class="nav-text">【力扣刷题】_300.最长递增子序列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-301-删除无效的括号（巧思）"><span class="nav-number">1.106.</span> <span class="nav-text">【力扣刷题】_301.删除无效的括号（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-309-最佳买卖股票时机含冷冻期（巧思）"><span class="nav-number">1.107.</span> <span class="nav-text">【力扣刷题】_309.最佳买卖股票时机含冷冻期（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-312-戳气球（未解决）"><span class="nav-number">1.108.</span> <span class="nav-text">【力扣刷题】_312.戳气球（未解决）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-322-零钱兑换"><span class="nav-number">1.109.</span> <span class="nav-text">【力扣刷题】_322.零钱兑换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-337-打家劫舍3（巧思）"><span class="nav-number">1.110.</span> <span class="nav-text">【力扣刷题】_337.打家劫舍3（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-338-比特位计数（巧思）"><span class="nav-number">1.111.</span> <span class="nav-text">【力扣刷题】_338.比特位计数（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-394-字符串解码"><span class="nav-number">1.112.</span> <span class="nav-text">【力扣刷题】_394.字符串解码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-399-除法求值（非常重要）"><span class="nav-number">1.113.</span> <span class="nav-text">【力扣刷题】_399.除法求值（非常重要）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-406-根据身高重建队列（巧思）"><span class="nav-number">1.114.</span> <span class="nav-text">【力扣刷题】_406.根据身高重建队列（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-448-找到所有数组中消失的数字（巧思）"><span class="nav-number">1.115.</span> <span class="nav-text">【力扣刷题】_448.找到所有数组中消失的数字（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-494-目标和"><span class="nav-number">1.116.</span> <span class="nav-text">【力扣刷题】_494.目标和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-538-把二叉搜索树转换为累加树（巧思）"><span class="nav-number">1.117.</span> <span class="nav-text">【力扣刷题】_538.把二叉搜索树转换为累加树（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-560-和为K的子数组（巧思）"><span class="nav-number">1.118.</span> <span class="nav-text">【力扣刷题】_560.和为K的子数组（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-581-最短无序连续子数组（巧思）"><span class="nav-number">1.119.</span> <span class="nav-text">【力扣刷题】_581.最短无序连续子数组（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-647-回文子串（巧思）"><span class="nav-number">1.120.</span> <span class="nav-text">【力扣刷题】_647.回文子串（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-714-买卖股票的最佳时机含手续费（巧思）"><span class="nav-number">1.121.</span> <span class="nav-text">【力扣刷题】_714.买卖股票的最佳时机含手续费（巧思）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【力扣刷题】-739-每日温度（巧思）"><span class="nav-number">1.122.</span> <span class="nav-text">【力扣刷题】_739.每日温度（巧思）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

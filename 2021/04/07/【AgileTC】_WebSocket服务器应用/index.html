@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="WebSocket," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="【AgileTC】_WebSocket服务器应用1.AgileTC开源版本 访问映射路径：”&#x2F;api&#x2F;case&#x2F;{caseId}&#x2F;{recordId}&#x2F;{isCore}&#x2F;{user}” 本质是使用一个ConcurrentHashMap&lt;String, WebSocket&gt;来保存所有websocket连接。 save方法 找到当前所有连接到了该对象（用例集或者测试任务）上的websock">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【AgileTC】_WebSocket服务器应用">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/04/07/%E3%80%90AgileTC%E3%80%91_WebSocket%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="【AgileTC】_WebSocket服务器应用1.AgileTC开源版本 访问映射路径：”&#x2F;api&#x2F;case&#x2F;{caseId}&#x2F;{recordId}&#x2F;{isCore}&#x2F;{user}” 本质是使用一个ConcurrentHashMap&lt;String, WebSocket&gt;来保存所有websocket连接。 save方法 找到当前所有连接到了该对象（用例集或者测试任务）上的websock">
+<meta property="article:published_time" content="2021-04-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-05-14T15:02:37.881Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="WebSocket">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/04/07/【AgileTC】_WebSocket服务器应用/"/>
+
+
+
+
+
+  <title>【AgileTC】_WebSocket服务器应用 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/04/07/%E3%80%90AgileTC%E3%80%91_WebSocket%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BA%94%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【AgileTC】_WebSocket服务器应用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-04-07T00:00:00+08:00">
+                2021-04-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AgileTC/" itemprop="url" rel="index">
+                    <span itemprop="name">AgileTC</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="【AgileTC】-WebSocket服务器应用"><a href="#【AgileTC】-WebSocket服务器应用" class="headerlink" title="【AgileTC】_WebSocket服务器应用"></a>【AgileTC】_WebSocket服务器应用</h2><h4 id="1-AgileTC开源版本"><a href="#1-AgileTC开源版本" class="headerlink" title="1.AgileTC开源版本"></a>1.AgileTC开源版本</h4><ul>
+<li>访问映射路径：”/api/case/{caseId}/{recordId}/{isCore}/{user}”</li>
+<li>本质是使用一个ConcurrentHashMap&lt;String, WebSocket&gt;来保存所有websocket连接。</li>
+<li>save方法<ul>
+<li>找到当前所有连接到了该对象（用例集或者测试任务）上的websocket连接，并找到其中更新时间最大的那一个对象；</li>
+<li>将更新时间最大的对象与数据库中该对象的更新时间进行比较，如果数据库中对象更新时间更大，则将数据中对象的树型结构内容赋值给所有连接对象，并将所有连接的数据对象更新时间设置为0，然后返回；</li>
+<li>反之，则将跟新时间最大的对象中的树型结构内容复制给所有连接对象，并将所有连接的数据对象更新时间设置为0，并将其保存到数据库中该对象上去，并更新数据库中的跟新时间为当前时间。</li>
+</ul>
+</li>
+<li>@OnOpen注解方法<ul>
+<li>当有用户浏览器访问映射路径时，会创建一个WebSocket类的实例对象并触发该方法；</li>
+<li>如果当前服务器中有访问同一对象的其他websocket连接则save方法一下该对象，确保数据库中和其他所有连接中的内容已经是最新的；</li>
+<li>将新连接加入到记录连接的hashmap中去，并将数据库中该对象的数据通过websocket连接中的session发送到客户端浏览器中。</li>
+</ul>
+</li>
+<li>@OnClose注解方法<ul>
+<li>当客户端浏览器关闭映射路径对应页面时就会执行该方法；</li>
+<li>会先执行save方法，此时的所有连接包括正要关闭的这个连接；</li>
+<li>然后将该连接移除记录所有连接的hashmap。</li>
+</ul>
+</li>
+<li>@OnMessage注解方法<ul>
+<li>当websocket连接中的服务器端收到用户端发来的信息时会执行该方法；</li>
+<li>如果该消息是pong消息则无事发生；</li>
+<li>将该消息发送给所有访问该对象的客户端浏览器，包括其他用户和自己，并根据该消息修改本连接中的树型结构内容，把本连接的更新时间设置为当前时间戳；（注意此处并没有将访问该对象的其他连接中的树型结构内容更新，也就是说此时其他用户的websocket连接中后端对象中的树型结构与前端浏览器显示的树型结构并不是一样的，前端浏览器中显示的全是最新的。）</li>
+</ul>
+</li>
+<li>@OnError注解方法<ul>
+<li>当websocket连接出现异常时会执行该方法；</li>
+<li>会先执行save方法，此时的所有连接包括正要关闭的这个连接；</li>
+<li>然后将该连接移出记录所有连接的hashmap。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-AgileTC滴滴内部版"><a href="#2-AgileTC滴滴内部版" class="headerlink" title="2.AgileTC滴滴内部版"></a>2.AgileTC滴滴内部版</h4><ul>
+<li><p>WebSocket对象主要属性</p>
+<ul>
+<li>caseContent：用例树形结构对象序列化字符串；</li>
+<li>updateTime：更新时间，分为用例更新时间和任务更新时间。</li>
+</ul>
+</li>
+<li><p>三个比较重要的集合：</p>
+<ul>
+<li>ConcurrentHashMap&lt;String, Integer&gt;类型的userInfo用于保存当前连接的用户，其中key为用户名字符串，值为同一用户创建的连接个数；</li>
+<li>ConcurrentHashMap&lt;String, WebSocket&gt;类型的webSocket用于保存当前建立连接的WebSocket对象，其中key为用例id+任务id+sessionid，值为WebSocket对象；</li>
+<li>List&lt;String&gt;类型的keys用于保存所有的session信息，其中元素数据为用例id+任务id+sessionid。</li>
+</ul>
+</li>
+<li><p>WebSocket同步</p>
+<ul>
+<li>容器会为每一个WebSocket连接创建一个EndPoint的实例，用实例变量来保存一些状态信息，也就是说WebSocket对象是多例的；</li>
+<li>为@OnOpen、@OnClose、@OnMessage、@OnError四个方法加上synchronized锁，因为这四个方法都是非静态方法，所以为这四个方法加上的<a href="https://www.cnblogs.com/codebj/p/10994748.html" target="_blank" rel="noopener">synchronized锁的锁对象</a>就是其所在的WebSocket实例对象，也就是说同一个连接中并发执行的这四个方法会被同步，而不同连接中并发执行的这四个方法并不会被同步。</li>
+</ul>
+</li>
+<li><p>静态代码块用于创建一个线程池，执行任务：定时向所有WebSocket连接的客户端发送ping消息，坚持连接是否正常；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    log.info(<span class="string">"[线程池执行ping-pong] time = &#123;&#125;"</span>, System.currentTimeMillis());</span><br><span class="line">    ThreadPoolExecutor executor = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>,</span><br><span class="line">            TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;Runnable&gt;(<span class="number">3</span>),</span><br><span class="line">            <span class="keyword">new</span> ThreadPoolExecutor.DiscardOldestPolicy());</span><br><span class="line">    executor.execute(() -&gt; &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 看看是不是链接关闭了，如果没有收到就关闭</span></span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (Map.Entry&lt;String, WebSocket&gt; entry : webSocket.entrySet()) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!UNDEFINED.equals(entry.getValue().caseId)) &#123;</span><br><span class="line">                        entry.getValue().sendMessage(PING_MESSAGE);</span><br><span class="line">                        <span class="comment">// 看看是不是过时的内容</span></span><br><span class="line">                        <span class="keyword">if</span> (System.currentTimeMillis() - entry.getValue().pongTimeStamp &gt; <span class="number">6000</span>) &#123;</span><br><span class="line">                            log.error(<span class="string">"[线程池执行ping-pong出错]准备关闭当前websocket=&#123;&#125;"</span>, entry.getValue().toString());</span><br><span class="line">                            entry.getValue().onClose();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            log.error(<span class="string">"[线程池执行ping-pong出错]错误原因e=&#123;&#125;"</span>, e.getMessage());</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>updateCaseMessage()方法</p>
+<ul>
+<li>将当前所有同用例id或任务id的WebSocket对象中的caseContent更新为最新的，更新时间设置为0；数据库中对应的用例或任务也更新为最新的。</li>
+</ul>
+</li>
+<li><p>@OnOpen注解方法</p>
+<ul>
+<li>1.利用ddmq消息队列使所有服务器都执行updateCaseMessage()方法。这里之所以使用消息队列，是因为在内部版该项目是集群部署，必须使用消息队列使集群中每一台服务器都收到该更新信息，以使得集群中而开源版是单机部署则不需要使用消息队列；</li>
+<li>2.从缓存或者数据库中拉取获取caseContent信息，发送给前端渲染成树型图，并保存到缓存中；</li>
+<li>3.将相应数据保存到上述三个集合中，其中userInfo的更新也需要使用ddmq消息队列，并更新该webSocket对象中的caseContent字符串和更新时间；</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@OnOpen</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">onOpen</span><span class="params">(@PathParam(value = <span class="string">"caseId"</span>)</span> String caseId,</span></span><br><span class="line"><span class="function">                                @<span class="title">PathParam</span><span class="params">(value = <span class="string">"recordId"</span>)</span> String recordId,</span></span><br><span class="line"><span class="function">                                @<span class="title">PathParam</span><span class="params">(value = <span class="string">"isCore"</span>)</span> String isCore,</span></span><br><span class="line"><span class="function">                                @<span class="title">PathParam</span><span class="params">(value = <span class="string">"user"</span>)</span> String user,</span></span><br><span class="line"><span class="function">                                Session session) </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        log.info(<span class="string">"[websocket-onOpen 尝试开启新的session][&#123;&#125;] caseId=&#123;&#125;, recordId=&#123;&#125;, isCore=&#123;&#125;"</span>,</span><br><span class="line">                recordId == <span class="keyword">null</span> || UNDEFINED.equals(recordId) ? <span class="string">"测试用例"</span> : <span class="string">"执行任务"</span>, caseId, recordId, isCore);</span><br><span class="line">        <span class="keyword">this</span>.session = session;</span><br><span class="line">        <span class="keyword">this</span>.caseId = stringFill(caseId, <span class="number">8</span>, <span class="string">'0'</span>, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">this</span>.recordId = stringFill(recordId, <span class="number">8</span>, <span class="string">'0'</span>, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">this</span>.isCore = isCore;</span><br><span class="line">        <span class="keyword">this</span>.user = user;</span><br><span class="line">        <span class="keyword">this</span>.updateCaseTime = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">this</span>.updateRecordTime = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">this</span>.pongTimeStamp = System.currentTimeMillis();</span><br><span class="line">        log.info(<span class="string">"[websocket-onOpen 开启新的session成功]当前session=&#123;&#125;"</span>, toString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 其实这里只是将需要跟新的用例id或者任务id发送到ddmq消息队列，</span></span><br><span class="line">        <span class="comment">// 消费者收到消息后会使用从消息队列获得的信息执行本类中的updateLatestCase方法。</span></span><br><span class="line">        wsMsgAnycProducerService.updateCaseMessage(<span class="keyword">this</span>.caseId,<span class="keyword">this</span>.recordId,isCore,user);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//打开用例</span></span><br><span class="line">        String key = stringFill(<span class="keyword">this</span>.caseId, <span class="number">8</span>, <span class="string">'0'</span>, <span class="keyword">true</span>)  + stringFill(<span class="keyword">this</span>.recordId, <span class="number">8</span>, <span class="string">'0'</span>, <span class="keyword">true</span>)+isCore;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (codis.exists(key)) &#123;</span><br><span class="line">            log.info(<span class="string">"[websocket-onOpen 从redis获取内容] key=&#123;&#125;"</span>, key);</span><br><span class="line">            <span class="comment">// 这里是将本用例或任务的content树信息从redis缓存中发送给前端</span></span><br><span class="line">            sendMessage(codis.get(key));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            log.info(<span class="string">"[websocket-onOpen 从db获取内容] caseId=&#123;&#125;, recordId=&#123;&#125;"</span>, caseId, recordId);</span><br><span class="line">            <span class="comment">// 缓存中没有，就从数据库中去取content树信息，发送给前端并保存到redis缓存中</span></span><br><span class="line">            open(<span class="keyword">this</span>.caseId, <span class="keyword">this</span>.recordId, isCore);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// "2".equals(isCore)表示该用例为冒烟用例，无需执行更新操作</span></span><br><span class="line">        <span class="keyword">if</span> (!<span class="string">"2"</span>.equals(isCore) &amp;&amp; !UNDEFINED.equals(<span class="keyword">this</span>.caseId)) &#123;</span><br><span class="line">            String session_key = <span class="keyword">this</span>.caseId + <span class="keyword">this</span>.recordId + stringFill(session.getId(), <span class="number">8</span>, <span class="string">'0'</span>, <span class="keyword">true</span>);</span><br><span class="line">            keys.add(session_key);</span><br><span class="line">            webSocket.put(session_key, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 将用户信息发送到ddmq消息队列，消费者收到消息后会将用户信息更新到userinfo中。</span></span><br><span class="line">            wsMsgAnycProducerService.addUser(user);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 刚创建的这个WebSocket对象中的caseContent更新为最新content，更新时间设为0</span></span><br><span class="line">            webSocket.get(session_key).caseContent = codis.get(key);</span><br><span class="line">            webSocket.get(session_key).updateCaseTime = <span class="number">0L</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        log.info(<span class="string">"[websocket-onOpen 打开用例成功]打开的用例id=&#123;&#125;, 当前用户数量=&#123;&#125;"</span>, <span class="keyword">this</span>.caseId, webSocket.size());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        log.error(<span class="string">"[websocket-onOpen 打开用例失败]session=&#123;&#125;, 当前用户数量=&#123;&#125;"</span>, toString(), e.getMessage());</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>@OnClose注解方法</p>
+<ul>
+<li>1.在当前服务器中updateCaseMessage()；</li>
+<li>2.用ddmq通知集群中其他服务器，对该用例或任务也进行updateCaseMessage()；</li>
+<li>3.更新缓存中的用例或任务；</li>
+<li>4.三个集合删除相应数据。</li>
+</ul>
+</li>
+<li><p>@OnMessage注解方法</p>
+<ul>
+<li>1.将客户端修改后发回来的caseContent版本号+1重新发回客户端；</li>
+<li>2.使用消息队列使当前所有服务器中同用例id或任务id的所有WebSocket对象中的caseContent可靠更新；</li>
+<li>3.更新缓存。</li>
+</ul>
+</li>
+<li><p>@OnError注解方法</p>
+<ul>
+<li>返回错误信息给客户端。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WebSocket/" rel="tag"><i class="fa fa-tag"></i> WebSocket</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/31/%E3%80%90AgileTC%E3%80%91_Mybatis%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" rel="next" title="【AgileTC】_Mybatis配置文件">
+                <i class="fa fa-chevron-left"></i> 【AgileTC】_Mybatis配置文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/04/14/%E3%80%90AgileTC%E3%80%91_Shiro%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/" rel="prev" title="【AgileTC】_Shiro权限管理">
+                【AgileTC】_Shiro权限管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#【AgileTC】-WebSocket服务器应用"><span class="nav-number">1.</span> <span class="nav-text">【AgileTC】_WebSocket服务器应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-AgileTC开源版本"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.AgileTC开源版本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-AgileTC滴滴内部版"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.AgileTC滴滴内部版</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

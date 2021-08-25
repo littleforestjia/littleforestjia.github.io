@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MySQL,SpringBoot,log4j2,maven,Git,SQL,shell," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="【AgileTC】_知识点积累一、MySQL树形结构存储 项目中的树形结构都是以一个字段的形式存储在数据库中的，也就是一行数据中的一个字段来存储一整棵从根节点开始的树。数据类型就是json对象序列化成的字符串； 这种存储方式一般配合java中的fastjson框架或者jackson框架使用，这些框架封装了很多对json对象的操作方法。  二、springboot中不同application.yml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【AgileTC】_知识点积累">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/03/10/%E3%80%90AgileTC%E3%80%91_%E7%9F%A5%E8%AF%86%E7%82%B9%E7%A7%AF%E7%B4%AF/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="【AgileTC】_知识点积累一、MySQL树形结构存储 项目中的树形结构都是以一个字段的形式存储在数据库中的，也就是一行数据中的一个字段来存储一整棵从根节点开始的树。数据类型就是json对象序列化成的字符串； 这种存储方式一般配合java中的fastjson框架或者jackson框架使用，这些框架封装了很多对json对象的操作方法。  二、springboot中不同application.yml">
+<meta property="article:published_time" content="2021-03-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-05-14T14:52:28.882Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="SpringBoot">
+<meta property="article:tag" content="log4j2">
+<meta property="article:tag" content="maven">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/03/10/【AgileTC】_知识点积累/"/>
+
+
+
+
+
+  <title>【AgileTC】_知识点积累 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/03/10/%E3%80%90AgileTC%E3%80%91_%E7%9F%A5%E8%AF%86%E7%82%B9%E7%A7%AF%E7%B4%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【AgileTC】_知识点积累</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-10T00:00:00+08:00">
+                2021-03-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AgileTC/" itemprop="url" rel="index">
+                    <span itemprop="name">AgileTC</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="【AgileTC】-知识点积累"><a href="#【AgileTC】-知识点积累" class="headerlink" title="【AgileTC】_知识点积累"></a>【AgileTC】_知识点积累</h2><h3 id="一、MySQL树形结构存储"><a href="#一、MySQL树形结构存储" class="headerlink" title="一、MySQL树形结构存储"></a>一、MySQL树形结构存储</h3><ul>
+<li>项目中的树形结构都是以一个字段的形式存储在数据库中的，也就是一行数据中的一个字段来存储一整棵从根节点开始的树。数据类型就是json对象序列化成的字符串；</li>
+<li>这种存储方式一般配合java中的fastjson框架或者jackson框架使用，这些框架封装了很多对json对象的操作方法。</li>
+</ul>
+<h3 id="二、springboot中不同application-yml配置文件之间的关系"><a href="#二、springboot中不同application-yml配置文件之间的关系" class="headerlink" title="二、springboot中不同application.yml配置文件之间的关系"></a>二、springboot中不同application.yml配置文件之间的关系</h3><ul>
+<li><p>原始application.yml文件中可以配置spring.profiles.active属性，用于指定还要用到的yml配置文件，如果原始配置文件中与指定配置文件配置了同一属性，则优先使用指定文件中的属性值。</p>
+<p>比如此处application.yml配置如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">  profiles:</span><br><span class="line">    active: test</span><br></pre></td></tr></table></figure>
+
+<p>则表示优先使用application-test.yml配置文件，再使用application.yml完成剩余配置；</p>
+</li>
+<li><p>在测试机上部署项目时使用命令<code>nohup java -jar case-server-1.0-SNAPSHOT.jar --spring.profiles.active=dev &amp; tail -f nohup.out</code>，则会使用application-dev.yml作为指定配置文件。</p>
+</li>
+</ul>
+<h3 id="三、log配置文件的使用与日志查看"><a href="#三、log配置文件的使用与日志查看" class="headerlink" title="三、log配置文件的使用与日志查看"></a>三、log配置文件的使用与日志查看</h3><ul>
+<li>当log4j2.xml文件和log4j2-test.xml文件同时存在时，优先使用log4j2-test.xml文件作为日志的配置文件。</li>
+<li>使用方法见浏览器收藏夹</li>
+</ul>
+<h3 id="四、Maven远程仓库"><a href="#四、Maven远程仓库" class="headerlink" title="四、Maven远程仓库"></a>四、Maven远程仓库</h3><ul>
+<li><code>mvn dependency:tree</code>命令可用于在maven项目中查看所有从远程仓库中注入的jar包之间的依赖关系；</li>
+<li>可以在maven文件夹的setting文件中查看maven项目引用的远程仓库地址，并在浏览器中进入该地址查看其中所能提供的jar包的版本；</li>
+<li>将maven远程仓库设置为滴滴内部远程仓库：<ul>
+<li>解决方法：使用命令bash &lt;(curl -s -S -L <a href="https://git.xiaojukeji.com/elevate/environment/raw/master/setup-scripts/maven_setup.sh)重新配置本机的maven的配置文件，输入滴滴员工的账号密码就可以将本机maven的远程仓库地址设置为滴滴内部远程仓库的地址；" target="_blank" rel="noopener">https://git.xiaojukeji.com/elevate/environment/raw/master/setup-scripts/maven_setup.sh)重新配置本机的maven的配置文件，输入滴滴员工的账号密码就可以将本机maven的远程仓库地址设置为滴滴内部远程仓库的地址；</a></li>
+<li>Bash是一个命令处理器，通常运行于文本窗口中，并能执行用户直接输入的命令。Bash还能从文件中读取命令，这样的文件称为脚本。能运行于大多数类Unix系统的操作系统之上，包括Linux与Mac OS X v10.4都将它作为默认shell；</li>
+<li>curl是一个利用URL语法在命令行下工作的文件传输工具，比如使用命令：curl <a href="http://curl.haxx.se，用这个命令可以获得http://curl.haxx.se指向的页面，同样，如果这里的URL指向的是一个文件或者一幅图都可以直接下载到本地。" target="_blank" rel="noopener">http://curl.haxx.se，用这个命令可以获得http://curl.haxx.se指向的页面，同样，如果这里的URL指向的是一个文件或者一幅图都可以直接下载到本地。</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="五、Git代码管理"><a href="#五、Git代码管理" class="headerlink" title="五、Git代码管理"></a>五、Git代码管理</h3><ul>
+<li><code>Merge remote-tracking branch &#39;origin/dev-jzy&#39; into dev-jzy</code>命令表示将远程仓库origin/dev-jzy上的改动拉取并合并到本地仓库dev-jzy中来。（一般适用场景：拉取了一个项目到本地仓库，在上面进行了一些修改，但是这个时候有其他人对远程仓库提交了修改，这时先将自己的修改提交到本地仓库，然后执行该命令可以将其他人提交的修改从远程仓库拉取到自己的本地仓库中，这样此时本地仓库中既有其他人的修改又有自己的修改。）</li>
+<li><a href="https://blog.csdn.net/elsostal/article/details/108573807" target="_blank" rel="noopener">修改Git的提交账户</a>；</li>
+<li><a href="https://blog.csdn.net/dietime1943/article/details/85682688" target="_blank" rel="noopener">git pull –rebase</a>命令用于解决上传远程仓库时版本冲突的问题；</li>
+<li><a href="https://www.cnblogs.com/sugar-tomato/p/9029205.html" target="_blank" rel="noopener">修改关联的远程仓库</a>。</li>
+</ul>
+<h3 id="六、SQL语句"><a href="#六、SQL语句" class="headerlink" title="六、SQL语句"></a>六、SQL语句</h3><h4 id="1-sql中的concat-函数"><a href="#1-sql中的concat-函数" class="headerlink" title="1.sql中的concat()函数"></a>1.sql中的concat()函数</h4><ul>
+<li>concat函数用于拼接字符串，concat(“a”,”b”)返回”ab”；</li>
+<li>concat_ws()函数英语拼接带分隔符的字符串，第一个参数表示分隔符，concat_ws(“s”,”a”,”b”,”c”)返回”asbscs”。</li>
+</ul>
+<h4 id="2-sql中的distinct用于添加在字段前，排除字段重复值"><a href="#2-sql中的distinct用于添加在字段前，排除字段重复值" class="headerlink" title="2.sql中的distinct用于添加在字段前，排除字段重复值"></a>2.sql中的distinct用于添加在字段前，排除字段重复值</h4><ul>
+<li>直接用法<code>select distinct name from a</code>表示从a表中找出所有name，重复的不多次显示；</li>
+<li>也可以表示并集使用<code>select distinct name,id from a</code>表示从a表中找出所有name和id，多次重复的name+id不显示；</li>
+<li>distinct最常用的用法是与count()函数结合使用，<code>select count(distinct name) from a</code>表示计算去重后的name的数量。</li>
+</ul>
+<h3 id="七、Postman-Debug在调试代码和查看源码时非常有用"><a href="#七、Postman-Debug在调试代码和查看源码时非常有用" class="headerlink" title="七、Postman+Debug在调试代码和查看源码时非常有用"></a>七、Postman+Debug在调试代码和查看源码时非常有用</h3><h3 id="八、shell脚本的执行与编写语法"><a href="#八、shell脚本的执行与编写语法" class="headerlink" title="八、shell脚本的执行与编写语法"></a>八、shell脚本的执行与编写语法</h3><ul>
+<li><a href="http://www.cppcns.com/os/linux/309629.html" target="_blank" rel="noopener">shell脚本的执行与编写语法</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"><i class="fa fa-tag"></i> MySQL</a>
+          
+            <a href="/tags/SpringBoot/" rel="tag"><i class="fa fa-tag"></i> SpringBoot</a>
+          
+            <a href="/tags/log4j2/" rel="tag"><i class="fa fa-tag"></i> log4j2</a>
+          
+            <a href="/tags/maven/" rel="tag"><i class="fa fa-tag"></i> maven</a>
+          
+            <a href="/tags/Git/" rel="tag"><i class="fa fa-tag"></i> Git</a>
+          
+            <a href="/tags/SQL/" rel="tag"><i class="fa fa-tag"></i> SQL</a>
+          
+            <a href="/tags/shell/" rel="tag"><i class="fa fa-tag"></i> shell</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/02/27/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="next" title="【基础知识】_设计模式">
+                <i class="fa fa-chevron-left"></i> 【基础知识】_设计模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/03/17/%E3%80%90AgileTC%E3%80%91_Linux%E4%B8%8A%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE%E4%B8%8E%E6%9F%A5%E7%9C%8B%E6%97%A5%E5%BF%97/" rel="prev" title="【AgileTC】_Linux上部署项目与查看日志">
+                【AgileTC】_Linux上部署项目与查看日志 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#【AgileTC】-知识点积累"><span class="nav-number">1.</span> <span class="nav-text">【AgileTC】_知识点积累</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、MySQL树形结构存储"><span class="nav-number">1.1.</span> <span class="nav-text">一、MySQL树形结构存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、springboot中不同application-yml配置文件之间的关系"><span class="nav-number">1.2.</span> <span class="nav-text">二、springboot中不同application.yml配置文件之间的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、log配置文件的使用与日志查看"><span class="nav-number">1.3.</span> <span class="nav-text">三、log配置文件的使用与日志查看</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、Maven远程仓库"><span class="nav-number">1.4.</span> <span class="nav-text">四、Maven远程仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、Git代码管理"><span class="nav-number">1.5.</span> <span class="nav-text">五、Git代码管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、SQL语句"><span class="nav-number">1.6.</span> <span class="nav-text">六、SQL语句</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-sql中的concat-函数"><span class="nav-number">1.6.1.</span> <span class="nav-text">1.sql中的concat()函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-sql中的distinct用于添加在字段前，排除字段重复值"><span class="nav-number">1.6.2.</span> <span class="nav-text">2.sql中的distinct用于添加在字段前，排除字段重复值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七、Postman-Debug在调试代码和查看源码时非常有用"><span class="nav-number">1.7.</span> <span class="nav-text">七、Postman+Debug在调试代码和查看源码时非常有用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#八、shell脚本的执行与编写语法"><span class="nav-number">1.8.</span> <span class="nav-text">八、shell脚本的执行与编写语法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

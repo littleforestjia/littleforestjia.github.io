@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="xml,servlet,http,request,response,cookie,session," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="JAVAWEB基础XMLxml也是一种标记语言，xml标签都是自定义的，不想html标签都是预定义的。xml本来是设计出来与html竞争的，只不过竞争不过，转而改变了发展方向，主要用于作为配置文件存储数据。 约束约束是规定xml文档的书写规则。约束文档一般是由要使用的框架预先编写定义好的，为了使框架能够正确解析xml文档的xml文档书写规则。程序员只需要能够读懂约束文档就可以使用它来编写所需要的x">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【基础知识】_JAVAWEB基础">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/09/22/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JAVAWEB%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="JAVAWEB基础XMLxml也是一种标记语言，xml标签都是自定义的，不想html标签都是预定义的。xml本来是设计出来与html竞争的，只不过竞争不过，转而改变了发展方向，主要用于作为配置文件存储数据。 约束约束是规定xml文档的书写规则。约束文档一般是由要使用的框架预先编写定义好的，为了使框架能够正确解析xml文档的xml文档书写规则。程序员只需要能够读懂约束文档就可以使用它来编写所需要的x">
+<meta property="article:published_time" content="2020-09-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-25T14:42:58.401Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="xml">
+<meta property="article:tag" content="servlet">
+<meta property="article:tag" content="http">
+<meta property="article:tag" content="request">
+<meta property="article:tag" content="response">
+<meta property="article:tag" content="cookie">
+<meta property="article:tag" content="session">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/09/22/【基础知识】_JAVAWEB基础/"/>
+
+
+
+
+
+  <title>【基础知识】_JAVAWEB基础 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/09/22/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JAVAWEB%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【基础知识】_JAVAWEB基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-22T00:00:00+08:00">
+                2020-09-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="JAVAWEB基础"><a href="#JAVAWEB基础" class="headerlink" title="JAVAWEB基础"></a>JAVAWEB基础</h2><h3 id="XML"><a href="#XML" class="headerlink" title="XML"></a>XML</h3><p>xml也是一种标记语言，xml标签都是自定义的，不想html标签都是预定义的。xml本来是设计出来与html竞争的，只不过竞争不过，转而改变了发展方向，<strong>主要用于作为配置文件存储数据。</strong></p>
+<h4 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h4><p>约束是规定xml文档的书写规则。约束文档一般是由要使用的框架预先编写定义好的，为了使框架能够正确解析xml文档的xml文档书写规则。程序员只需要能够读懂约束文档就可以使用它来编写所需要的xml文档。</p>
+<p>当前主流约束主要有两种：DTD和Schema，其中SSM框架使用的就是Schema类型框架。</p>
+<h4 id="Schema"><a href="#Schema" class="headerlink" title="Schema"></a>Schema</h4><p>Schema约束文档的后缀名为<code>.xsd</code>，其内容书写语法其实与xml相同。</p>
+<p>在一个xml文档中引入Schema约束的基本步骤：</p>
+<ol>
+<li>填写xml文档的根元素</li>
+<li>引入xsi前缀.  xmlns:xsi=”<a href="http://www.w3.org/2001/XMLSchema-instance&quot;" target="_blank" rel="noopener">http://www.w3.org/2001/XMLSchema-instance&quot;</a></li>
+<li>引入xsd文件命名空间.  xsi:schemaLocation=”<a href="http://www.itcast.cn/xml" target="_blank" rel="noopener">http://www.itcast.cn/xml</a>  student.xsd”</li>
+<li>为每一个xsd约束声明一个前缀,作为标识  xmlns=”<a href="http://www.itcast.cn/xml&quot;" target="_blank" rel="noopener">http://www.itcast.cn/xml&quot;</a></li>
+</ol>
+<p>e.g.</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">students</span>   <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">          	<span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.itcast.cn/xml  student.xsd"</span></span></span><br><span class="line"><span class="tag">          	<span class="attr">xmlns</span>=<span class="string">"http://www.itcast.cn/xml"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Jsoup"><a href="#Jsoup" class="headerlink" title="Jsoup"></a>Jsoup</h4><p>解析xml文档就是将文档中的数据读取到内存中。Jsoup是一款java的HTML解析器，可以直接解析URL地址、HTML文本内容，也可以解析xml文档。<strong>Jsoup的主要作用就是作为一个java文件中的一个工具类，<u>查询</u>html文件或者xml文件中的标签、属性等内容。</strong></p>
+<ul>
+<li><p>基本使用步骤：</p>
+<ol>
+<li>导入jar包</li>
+<li>获取Document对象</li>
+<li>获取Element对象</li>
+<li>获取标签属性或标签体内容</li>
+</ol>
+<p>e.g.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取xml文件的地址路径字符串</span></span><br><span class="line">String path = JsoupDemo1.class.getClassLoader().getResource("student.xml").getPath();</span><br><span class="line"></span><br><span class="line"><span class="comment">//将xml文档按DOM的形式加载进内存，形成一颗DOM树，并获取Document对象</span></span><br><span class="line">Document document = Jsoup.parse(<span class="keyword">new</span> File(<span class="string">"E:/files/IntelliJ IDEA/041Xml/out/production/041Xml/student.xml"</span>),<span class="string">"utf-8"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取Element对象</span></span><br><span class="line">Elements elements =  document.getElementsByTag(<span class="string">"name"</span>);</span><br><span class="line">Element element = elements.get(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取标签体内容</span></span><br><span class="line">String name1 = element.text();</span><br></pre></td></tr></table></figure>
+
+<p>​</p>
+</li>
+<li><p><strong>Jsoup对象</strong></p>
+<p><strong>Document parse(File in,String charsetName)</strong>：将xml或html文件加载进内存，并返回Document对象</p>
+</li>
+<li><p><strong>Document对象</strong></p>
+<p><strong>Element getElementById(String id)</strong>：根据id属性值获取唯一的标签对象</p>
+<p><strong>Elements select(String cssQuery)</strong>：根据css选择器获取标签对象集合，比如”name”、”#1”、”.tab”</p>
+<p><strong>Elements getElementsByTag(String tagName)</strong>：根据标签名获取标签对象集合</p>
+<p><strong>Elements getElementsByAttribute(String key)</strong>：根据属性名称获取标签对象集合</p>
+<p><strong>Elements getElementsByAttributeValue(String key,String value)</strong>：根据属性键值对获取标签对象集合</p>
+</li>
+<li><p><strong>Elements对象</strong>：Element标签对象的集合，就直接当成ArrayList&lt;Element&gt;来用就可以了。</p>
+<p><strong>Element get(int index)</strong>：获取集合中对应索引位置的标签对象</p>
+</li>
+<li><p><strong>Element对象</strong></p>
+<p><strong>String attr(String key)</strong>：根据属性名获取属性值</p>
+<p><strong>String text()</strong>：获取标签体中的文本内容</p>
+<p><strong>String html()</strong>：获取包括子标签的所有标签体内容</p>
+</li>
+</ul>
+<h4 id="Jsoup使用案例"><a href="#Jsoup使用案例" class="headerlink" title="Jsoup使用案例"></a>Jsoup使用案例</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">    String path = JsoupDemo1.class.getClassLoader().getResource("student.xml").getPath();</span><br><span class="line">    <span class="comment">//非常重要：获取类的类加载器；</span></span><br><span class="line">    <span class="comment">//由类加载器的资源获取方法动态获取到项目中src目录下的student.xml文件的url路径；</span></span><br><span class="line">    <span class="comment">//获取url路径对象中的字符串路径属性。</span></span><br><span class="line"></span><br><span class="line">    System.out.println(path);</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 非常重要：这里出巨大巨大问题，因为我们当初设置的项目存放目录中有一个文件夹IntelliJ IDEA，</span></span><br><span class="line"><span class="comment">     * 当我们在用Java中的一些获取路径方法获取路径字符串时，得到的字符串会将这个文件夹字符串输出为IntelliJ%20IDEA，</span></span><br><span class="line"><span class="comment">     * 也就是说会自动将其中的空格按utf-8进行编码，然后我们在后面将该字符串作为一些IO方法的输入时，这些方法时无法自动</span></span><br><span class="line"><span class="comment">     * 将%20解码为空格，所以这些方法都会执行错误，导致无法找到文件路径。</span></span><br><span class="line"><span class="comment">     * 1.解决办法：在这个文件夹中的项目中，当需要将文件绝对路径作为方法输入时，只能自己手动输入了。</span></span><br><span class="line"><span class="comment">     * 2.经验教训：以后在做项目的时候，项目所在文件路径中的文件夹命名一定要严格一些，像空格这种比较奇怪的字符一定不要有。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    Document document = Jsoup.parse(<span class="keyword">new</span> File(<span class="string">"E:/files/IntelliJ IDEA/041Xml/out/production/041Xml/student.xml"</span>),<span class="string">"utf-8"</span>);<span class="comment">//(parse:解析)</span></span><br><span class="line">    <span class="comment">//将xml文档按DOM的形式加载进内存，形成一颗DOM树，并获取Document对象。（非常重要：此处的绝对路径字符串中的/换成\\也可以。）</span></span><br><span class="line"></span><br><span class="line">    Elements elements =  document.getElementsByTag(<span class="string">"name"</span>);</span><br><span class="line">    <span class="comment">//获取元素Elements对象。(这里通过标签名称获取到了一个元素动态数组)</span></span><br><span class="line"></span><br><span class="line">    Element element = elements.get(<span class="number">0</span>);</span><br><span class="line">    <span class="comment">//获取数组中第一Element对象。</span></span><br><span class="line"></span><br><span class="line">    String name1 = element.text();</span><br><span class="line">    <span class="comment">//通过元素对象的text()方法获取元素文本数据（就是元素对应标签的标签体内容）。</span></span><br><span class="line"></span><br><span class="line">    System.out.println(name1);</span><br><span class="line">    <span class="comment">//因为其实该elment元素中含有两个子元素分别包含两个数据，所以这里输出时系统会自动在两个数据之间加一个空格间隔。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>类名.class.getClassLoader()方法常用于获取类的类加载器</strong></li>
+<li><strong>类加载器的getResource(String 文件名)资源获取方法：该方法可以动态获取项目中src目录下的文件</strong></li>
+<li><strong>getPath()方法用于获取文件对象的url地址绝对路径字符串</strong></li>
+<li>非常重要：这里出巨大巨大问题，因为我们当初设置的项目存放目录中有一个文件夹IntelliJ IDEA，<strong>当我们在用Java中的一些获取路径方法获取路径字符串时，得到的字符串会将这个文件夹字符串输出为IntelliJ%20IDEA，也就是说会自动将其中的空格按utf-8进行编码，然后我们在后面将该字符串作为一些IO方法的输入时，这些方法时无法自动将%20解码为空格，所以这些方法都会执行错误，导致无法找到文件路径。</strong><ul>
+<li><strong>解决办法：在这个文件夹中的项目中，当需要将文件绝对路径作为方法输入时，只能自己手动输入了。</strong></li>
+<li><strong><u>经验教训：以后在做项目的时候，项目所在文件路径中的文件夹命名一定要严格一些，像空格这种比较奇怪的字符一定不要有。</u></strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><h4 id="web服务器软件"><a href="#web服务器软件" class="headerlink" title="web服务器软件"></a>web服务器软件</h4><ul>
+<li>服务器：安装了服务器软件的计算机，比如我们的电脑之前装过MySQL服务器软件，那么我们的电脑就可以叫做MySQL服务器</li>
+<li>服务器软件：接收用户的请求，处理请求，做出响应</li>
+<li>web服务器软件：在web服务器软件中，可以部署web项目，让用户浏览器来访问这些项目</li>
+<li>web项目主要由静态资源和动态资源组成，常用动态资源有Servlet/JSP</li>
+</ul>
+<h4 id="Servlet概念"><a href="#Servlet概念" class="headerlink" title="Servlet概念"></a>Servlet概念</h4><p><strong>Servlet就是运行在服务器端的小程序。Servlet实际上就是java中的一个接口，该接口定义了java类被浏览器访问到的规则，所以服务器动态资源中的java类必须是Servlet接口的实现子类，这样才能被tomcat所识别运用。</strong></p>
+<h4 id="Servlet使用步骤"><a href="#Servlet使用步骤" class="headerlink" title="Servlet使用步骤"></a>Servlet使用步骤</h4><ol>
+<li><p>创建JavaEE项目</p>
+</li>
+<li><p>定义一个类，实现Servlet接口</p>
+</li>
+<li><p>实现接口中的抽象方法</p>
+</li>
+<li><p>在web-inf文件夹中的web.xml配置文件中配置Servlet动态资源</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--配置动态资源的资源名称（其实就是给该Servlet类取一个简短一些的别名，否则直接写全类名称很冗长）--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>demo1<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>jia.zheng.servlet.ServletDemo1<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--配置动态资源的路径，就是访问到该动态资源的url中的一部分（一般就是直接在资源名称前面加/）--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>demo1<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/demo1<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h4 id="通过浏览器请求动态资源的原理步骤"><a href="#通过浏览器请求动态资源的原理步骤" class="headerlink" title="通过浏览器请求动态资源的原理步骤"></a>通过浏览器请求动态资源的原理步骤</h4><ol>
+<li>当服务器接受到客户端浏览器的请求后，会解析所要请求的URL路径，获取访问的Servlet的资源路径</li>
+<li>查找web.xml文件，是否有对应的&lt;url-pattern&gt;标签体内容</li>
+<li>如果有，则在找到对应的&lt;servlet-class&gt;全类名</li>
+<li>tomcat会将该Servlet类的字节码文件加载进内存，并且通过反射创建该类的实例对象 </li>
+<li>通过反射创建并执行类中方法 </li>
+</ol>
+<p>e.g. <a href="http://localhost:8080/day13_tomcat/demo1" target="_blank" rel="noopener">http://localhost:8080/day13_tomcat/demo1</a><strong><u>是一个典型的动态资源url：其中<code>localhost:8080</code>是服务器主机ip地址和服务器软件端口；<code>/day13_tomcat</code>是虚拟目录，我们可以在idea中自行更改和设置；<code>/demo1</code>是资源路径。</u></strong></p>
+<h4 id="Servlet注解配置"><a href="#Servlet注解配置" class="headerlink" title="Servlet注解配置"></a>Servlet注解配置</h4><p>Servlet3.0以后支持通过注解来配置Servlet，不再需要web.xml来配置，这样方便了很多。</p>
+<p>注解配置使用步骤：</p>
+<ol>
+<li>创建JavaEE项目，选择Servlet的版本3.0以上，可以不用创建web-inf文件夹和web.xml文件</li>
+<li>定义一个类，实现Servlet接口</li>
+<li>复写方法</li>
+<li>在类上使用<code>@WebServlet</code>注解，进行配置</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@WebServlet</span>(urlPatterns=<span class="string">"/annotation"</span>)<span class="comment">//使用注解配置，将该servlet接口实现类与一个唯一的资源路径相匹配。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServletAnnotation</span> <span class="keyword">implements</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig servletConfig)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServletConfig <span class="title">getServletConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Servlet3.0来了。。。。。"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getServletInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注解中的<code>urlPatterns=</code>不写也可以，直接写成<code>@WebServlet(&quot;/annotation&quot;)</code>也是可以正确运行的，因为资源路径是默认最重要的配置属性。</li>
+<li>一个Servlet也可以定义多个资源路径，<code>@WebServlet(&quot;/d&quot;,&quot;/dd&quot;,&quot;/ddd&quot;)</code>这三个不同的资源路径访问到的都是同一个Servlet资源。</li>
+<li><code>@WebServlet(&quot;/*&quot;)</code>表示任何字符串代替的资源路径都可以访问到该Servlet资源。</li>
+</ul>
+<p><strong><u>tomcat在于idea结合使用时，项目部署后，tomcat真正访问的是<code>out/artifacts</code>文件夹中的web项目和文件。</u></strong></p>
+<h4 id="Servlet体系结构"><a href="#Servlet体系结构" class="headerlink" title="Servlet体系结构"></a>Servlet体系结构</h4><p>继承关系：Servlet接口——&gt;GenericServlet抽象类——&gt;HttpServlet抽象类</p>
+<ul>
+<li>GenericServlet：将Servlet接口中其他方法做了默认空实现，只将service()方法作为抽象。这样将来要定义Servlet类时，直接继承GenericServlet，只需要实现service()方法就可以。当然，如果还想实现其他方法，直接重写那些方法就可以。</li>
+<li><strong>HttpServlet：对http协议进行了一些封装，简化了操作，在service()方法中已经帮我们编写好了判断请求方式的代码，我们只需要重写出对应判断结果的doGet/doPost方法。实际上这个是最常使用的。</strong></li>
+</ul>
+<hr>
+<h3 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h3><h4 id="HTTP概念"><a href="#HTTP概念" class="headerlink" title="HTTP概念"></a>HTTP概念</h4><p><strong>hyper text transfer protocol超文本传输协议，定义了客户端和服务器端通信时，发送数据的格式，也就是<u>客户端发送给服务器的请求消息</u>和<u>服务器发送给客户端的响应消息</u>的格式。</strong></p>
+<ul>
+<li>一次请求对应一次响应</li>
+<li>每次请求之间相互独立，不能交互数据</li>
+</ul>
+<h4 id="请求消息数据格式"><a href="#请求消息数据格式" class="headerlink" title="请求消息数据格式"></a>请求消息数据格式</h4><ol>
+<li><p>请求行：<strong>请求方式 请求url 请求协议/版本</strong></p>
+<p>其中常用的请求方式主要有两种</p>
+<ul>
+<li>GET：请求参数在请求行中，在url后面；请求的url长度有限制；不太安全</li>
+<li>POST：请求参数在请求体中；请求的url长度没有限制；相对安全</li>
+</ul>
+</li>
+<li><p>请求头：(主要是一些键值对形式的请求信息) <strong>请求头名称：请求头值</strong></p>
+</li>
+<li><p>请求空行</p>
+<p>一个空行，主要用于分割请求头和请求体。<strong>GET请求没有这个部分</strong></p>
+</li>
+<li><p>请求体：<strong>键=值</strong></p>
+<p><strong>封装POST请求消息中的请求参数，<u>比如表单提交的键值对数据</u>。GET请求没有这个部分，GET请求的请求参数直接放在请求行中。</strong></p>
+</li>
+</ol>
+<h4 id="响应消息数据格式"><a href="#响应消息数据格式" class="headerlink" title="响应消息数据格式"></a>响应消息数据格式</h4><ol>
+<li><p>响应行：<strong>协议/版本 响应状态码 状态码描述</strong></p>
+<p><strong>响应状态码都是三位数字，比如200表示响应成功，302表示重定向，404表示找不到请求路径对应的资源，500表示服务器内部出现异常。</strong></p>
+</li>
+<li><p>响应头：<strong>响应头名称：响应头值</strong></p>
+</li>
+<li><p>响应空行</p>
+</li>
+<li><p>响应体</p>
+<p><strong>响应体一般就是一个html代码文档，代表页面的响应显示效果。</strong></p>
+</li>
+</ol>
+<hr>
+<h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p><strong><u>request和response指的是Servlet类中必须要用到的两个实例化对象，其中request对象是用来获取请求消息中数据内容的，response对象是用来设置响应消息数据内容的。</u></strong></p>
+<h4 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h4><p>继承关系：ServletRequest接口——&gt;HttpServletRequest接口——&gt; org.apache.catalina.connector.RequestFacade 类</p>
+<h4 id="获取请求数据的方法"><a href="#获取请求数据的方法" class="headerlink" title="获取请求数据的方法"></a>获取请求数据的方法</h4><ol>
+<li>String getMethod()：获取请求行中的请求方式 </li>
+<li><strong>String getContextPath()：获取请求的url中的虚拟路径</strong></li>
+<li>String getServletPath()：获取请求的url中的Servlet资源路径</li>
+<li>String getQueryString()：获取get方式请求参数</li>
+<li><strong>String getRequestURI()：获取请求URI</strong></li>
+<li><strong>StringBuffer getRequestURL()：获取请求的URL</strong><ul>
+<li><strong>URL：统一资源定位符 ： <code>http://localhost/day14/demo1</code></strong></li>
+<li><strong>URI：统一资源标识符 ：<code>/day14/demo1</code> (虚拟路径+资源路径)</strong></li>
+</ul>
+</li>
+<li>String getProtocol()：获取协议及版本</li>
+<li>String getRemoteAddr()：获取客户机的IP地址</li>
+<li><strong>String getHeader(String name)：通过请求头的名称获取请求头的值</strong></li>
+<li>Enumeration&lt;String&gt; getHeaderNames()：获取所有的请求头名称 </li>
+<li>BufferedReader getReader()：获取字符输入流，只能操作字符数据</li>
+<li>ServletInputStream getInputStream()：获取字节输入流，可以操作所有类型数据</li>
+<li><strong>String getParameter(String name)：根据参数名称获取参数值</strong></li>
+<li><strong>String[] getParameterValues(String name)：根据参数名称获取参数值的数组(一般作用于表单中的复选框)</strong></li>
+<li><strong>Enumeration&lt;String&gt; getParameterNames()：获取所有请求的参数名称</strong></li>
+<li><strong>Map&lt;String,String[]&gt; getParameterMap()：获取所有参数的map集合</strong> </li>
+</ol>
+<h4 id="其他方法"><a href="#其他方法" class="headerlink" title="其他方法"></a>其他方法</h4><ol>
+<li><p><strong>setCharacterEncoding(“utf-8”)：设置请求参数编码方式的方法，实参一般为”utf-8”或”gbk”</strong></p>
+</li>
+<li><p><strong>RequestDispatcher getRequestDispatcher(String path)：通过request对象获取请求转发器对象，<u>参数path一般是资源路径。</u>请求转发器对象中有一个方法<code>forward(ServletRequest request,ServletResponse response)</code>，该方法可以将请求和响应转发到另一个Servlet动态资源中。</strong></p>
+<p>请求转发是一种在服务器内部的资源跳转方式，跳转时浏览器地址栏路径不变，转发虽然访问了一个以上动态资源，但是只算一次请求。</p>
+</li>
+<li><p><strong>void setAttribute(String name,Object obj)：存储数据到request域中</strong></p>
+<p><strong><u>request域代表一次请求的范围，一般用于在请求转发跳转的多个动态资源中共享数据。</u></strong></p>
+</li>
+<li><p><strong>Object getAttitude(String name)：通过键获取request域中值</strong></p>
+</li>
+<li><p><strong>void removeAttribute(String name)：通过键移除request域中键值对</strong> </p>
+</li>
+<li><p><strong>ServletContext getServletContext()：获取ServletContext</strong> </p>
+</li>
+</ol>
+<h4 id="使用案例"><a href="#使用案例" class="headerlink" title="使用案例"></a>使用案例</h4><ol>
+<li>表单提交案例</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/Demo1"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span><span class="comment">&lt;!--表单输入数据提交到的动态资源路径为"/Demo1"，提交方式为"post"--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">"username"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><u>form表单标签的属性action的属性值为动态资源的uri(虚拟路径+资源路径)，可用于指定表单数据所提交到的动态资源；属性method可用于设定提交方式。</u></strong></li>
+</ul>
+<ol>
+<li>转发案例</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doPost</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">    request.setAttribute(<span class="string">"msg"</span>,<span class="string">"hello"</span>);</span><br><span class="line">    <span class="comment">//将数据存储到request域中，数据以键值对的形式存储。</span></span><br><span class="line">    <span class="comment">//如果想要在下一个跳转资源中获取request域中的共享资源，则必须在跳转之前把数据存入request域中。</span></span><br><span class="line"></span><br><span class="line">    RequestDispatcher requestDispatcher = request.getRequestDispatcher(<span class="string">"/ServletRequestDemo1"</span>);</span><br><span class="line">    <span class="comment">//获取一个跳转到"/ServletRequestDemo1"资源的请求转发器对象。</span></span><br><span class="line"></span><br><span class="line">    requestDispatcher.forward(request,response);</span><br><span class="line">    <span class="comment">//带着请求对象和响应对象跳转到另一个动态资源当中去，执行其他操作。</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">    <span class="comment">//直接引用doPost()表示，两种不同提交方式对应执行相同操作。</span></span><br><span class="line">    <span class="keyword">this</span>.doPost(request,response);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h3><h4 id="常用方法"><a href="#常用方法" class="headerlink" title="常用方法"></a>常用方法</h4><ol>
+<li><p>setHeader(String name, String value)：设置响应头</p>
+</li>
+<li><p><strong>PrintWriter getWriter()：获取字符输出流</strong></p>
+<p>e.g.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取响应的Servlet字符输出流。</span></span><br><span class="line">PrintWriter pw = response.getWriter();</span><br><span class="line"></span><br><span class="line"><span class="comment">//输出数据。(字符输出流的write方法直接以字符串为输入，并将其输出显示)</span></span><br><span class="line">pw.write(<span class="string">"&lt;h1&gt;你好&lt;/h1&gt;"</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>ServletOutputStream getOutputStream()：获取字节输出流</strong></p>
+<p>e.g. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将图片输出到页面展示。(也要先获取响应的字节输出流)</span></span><br><span class="line">ImageIO.write(image,<span class="string">"jpg"</span>,response.getOutputStream());</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获取Servlet字节输出流。</span></span><br><span class="line">ServletOutputStream sos = response.getOutputStream();</span><br><span class="line"></span><br><span class="line"><span class="comment">//字节输出流的write方法的输入参数应该为字节码，如果想要输出字符串数据则需要先用getBytes()方法将字符串数据转化为字节码数据。getBytes()默认编码方式为gbk，我们这里可以将其设置为utf-8。</span></span><br><span class="line">sos.write(<span class="string">"&lt;h1&gt;你好啊&lt;/h1&gt;"</span>.getBytes(<span class="string">"utf-8"</span>));</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Byte：四位二进制表示一个字节，字节码一般由十六进制数组成，因为四位二进制数范围正好是0~15</li>
+</ul>
+</li>
+<li><p><strong>sendRedirect(String path)：重定向，跳转到其他资源，<u>其中参数path一般用 uri统一资源标识符</u>。重定向时，浏览器地址栏会发生变化；重定向可以访问其他服务器的资源；重定向是两次请求，每次重定向则浏览器发送一条新的请求，不能使用request对象来共享数据。</strong></p>
+<p><strong>相对路径一般以<code>.</code>开头，绝对路径一般以<code>/</code>开头，url和uri都是绝对路径。转发方法的路径参数一般不需要加虚拟目录，因为虚拟目录由项目唯一确定，而转发只能发生在同一项目的不同资源间；而&lt;a&gt;、&lt;form&gt;、重定向中的路径参数都要加虚拟目录甚至是协议、ip、端口，因为它们能实现不同主机、不同项目之间资源的跳转。</strong></p>
+<p>e.g.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用虚拟路径动态获取方法来获取该动态资源所在项目的虚拟路径，并加上资源路径，作为重定向方法的输入字符串。</span></span><br><span class="line">response.sendRedirect(request.getContextPath()+<span class="string">"/ResponseDemo2"</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>setContentType(“text/html;charset=utf-8”)：设置响应体输出格式和字符串输出编码字符集</strong></p>
+<p><strong>浏览器页面出现乱码的主要原因就是，编、解码使用的字符集不一样。动态资源输出数据时会将字符串数据按某种字符集（gbk或者utf-8）编码，然后到浏览器中要先按某种字符集解码成字符串，才能在界面上显示，当编、解码字符集不一样就会乱码。</strong></p>
+</li>
+</ol>
+<hr>
+<h3 id="ServletContext对象"><a href="#ServletContext对象" class="headerlink" title="ServletContext对象"></a>ServletContext对象</h3><p>ServletContext对象代表整个web项目，<strong>一个web项目对应一个ServletContext对象</strong></p>
+<h4 id="获取"><a href="#获取" class="headerlink" title="获取"></a>获取</h4><ul>
+<li><strong>request.getServletContext()</strong>：通过request对象获取ServletContext对象</li>
+<li><strong>this.getServletContext()</strong>：直接通过动态资源HttpServlet获取ServletContext对象</li>
+</ul>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><ol>
+<li><p>String getMimeType(String file)：获取项目中文件的MIME类型，比如text/html、image/jpeg</p>
+</li>
+<li><p><strong>setAttribute(String name,Object value)</strong>：将键值对存储在项目域中</p>
+</li>
+<li><p><strong>getAttribute(String name)</strong>：根据键获取项目域中的值</p>
+</li>
+<li><p><strong>removeAttribute(String name)</strong>：根据键删除项目域中的键值对</p>
+<p><u><strong>request域中的共享数据只有在一次请求范围内的资源才可以共享；而ServletContext对象对应的项目域中的共享数据可以被整个项目中的所有资源共享，所有用户的所有请求的资源都可以共享。</strong></u></p>
+</li>
+<li><p><strong>String getRealPath(String path)：获取文件的真实路径，也就是服务器路径</strong></p>
+<p>e.g. </p>
+<p><code>String b = context.getRealPath(&quot;/filename&quot;);</code></p>
+<p><u>这句是获取项目中<strong>web目录下的文件部署在tomcat上后的绝对路径</strong></u><br><code>String c = context.getRealPath(&quot;/WEB-INF/filename&quot;);</code></p>
+<p><u>这句是获取项目中<strong>web/WEB-INF目录下的文件部署在tomcat上后的绝对路径</strong></u><br><code>String a = context.getRealPath(&quot;/WEB-INF/classes/filename&quot;);</code></p>
+<p><u>这句是获取项目中<strong>src目录下的文件编译并部署在tomcat上后的绝对路径</strong></u></p>
+<ul>
+<li><strong><u>项目文件部署到tomcat上之后，其实这些文件就是放在了idea项目中的out/artifacts文件夹中。</u></strong></li>
+<li><strong>在工作空间中编写web项目时，一般src文件夹中只放java源代码文件，静态资源、配置文件、图片附件等都放在web文件夹中，jar包放在web/web-inf/lib文件夹中。</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ServletContext servletContext = request.getServletContext();</span><br><span class="line">String path = servletContext.getRealPath(<span class="string">"/img/"</span>+<span class="string">"welcome.jpg"</span>);</span><br><span class="line"><span class="comment">//就一个filename本来就不够，前面要加/才是资源路径。</span></span><br><span class="line"><span class="comment">//而且寻找web中文件真实路径时，注意要把文件夹名称也加上，该方法只能先帮我们找到web文件夹的路径。</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><u>该方法只能先帮我们找到web文件夹的路径，剩下的文件夹目录要我们自己加上。(项目部署到tomcat服务器上之后，原来工作空间中的web文件夹结构保持不变)</u></strong></li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h3><h4 id="会话技术"><a href="#会话技术" class="headerlink" title="会话技术"></a>会话技术</h4><p>会话：浏览器第一次给服务器资源发送请求，会话就建立了，直到有一方断开即结束会话，一次会话中可以包含多次请求和响应。<strong><u>会话技术的主要功能就是为了在一次会话的多此请求之间，共享数据，这个功能主要通过项目中Servlet动态资源创建的Cookie对象和Session对象实现。</u></strong>其中Cookie对象主要用于客户端会话技术，Session主要用于服务器端会话技术。</p>
+<h4 id="Cookie相关方法"><a href="#Cookie相关方法" class="headerlink" title="Cookie相关方法"></a>Cookie相关方法</h4><p>Cookie对象的主要作用就是将数据保存到客户端中</p>
+<ol>
+<li><strong>new Cookie(String name, String value)：在动态资源中创建Cookie对象，绑定数据。从Cookie对象的初始化方法也可以看出，每一个Cookie对象本质上就是一个键和值都为字符串的键值对。一次会话中可以有多个Cookie对象。</strong></li>
+<li><strong>response.addCookie(Cookie cookie)：将Cookie对象从服务器中发送到浏览器中。只有将Cookie对象发送到浏览器中后，该对象才能成为本次会话中的共享数据。在每次浏览器发送请求时，请求信息都会将该共享数据放在cookie请求头中。</strong></li>
+<li><strong>Cookie[] request.getCookies()：获取会话中的所有Cookie，返回一个Cookie对象数组。</strong></li>
+<li>Cookie.setMaxAge(int seconds)：会话共享数据持久化存储方法。输入参数为会话共享数据在硬盘中的存活时间，当输入参数为非正数时，表示不进行持久化存储。</li>
+</ol>
+<ul>
+<li>cookie对象主要用于浏览器用户在不登陆的情况下，完成服务器对客户端的身份识别。</li>
+</ul>
+<h4 id="使用案例-1"><a href="#使用案例-1" class="headerlink" title="使用案例"></a>使用案例</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">String str = <span class="string">"hello cookie!"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//cookie不支持空格等特殊字符，我们先对数据进行URL编码才可以作为cookie信息，使用的时候再URL解码就行了。</span></span><br><span class="line">String urlStr = URLEncoder.encode(str,<span class="string">"Utf-8"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//创建cookie对象。</span></span><br><span class="line">Cookie c = <span class="keyword">new</span> Cookie(<span class="string">"msg"</span>,urlStr);</span><br><span class="line"></span><br><span class="line"><span class="comment">//将cookie对象作为响应数据的一部分发送给浏览器，这样Cookie中的数据才能成为会话共享数据。</span></span><br><span class="line">response.addCookie(c);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong><u>URL使用utf-8字符集编码是将每一个中英文字符和特殊字符都编码成一个%加上两位十六进制数。实际上URL编码的主要意义和作用就是用国际通用字符组成的字符串，来代替包括特殊语言和特殊符号的字符串。</u></strong></li>
+<li><strong>URLEncoder.encode(str, “UTF-8”);//字符串url编码，方法输入和返回值都是字符串。</strong></li>
+<li><strong>URLDecoder.decode(str, “UTF-8”);//字符串url解码，方法输入和返回值都是字符串。</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在另一个动态资源中。</span></span><br><span class="line"></span><br><span class="line">Cookie[] cs = request.getCookies();</span><br><span class="line"><span class="comment">//遍历请求数据中的所有Cookie对象，并获取其中共享数据。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (cs != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (Cookie c : cs) &#123;</span><br><span class="line">        String str = URLDecoder.decode(c.getValue(),<span class="string">"utf-8"</span>);</span><br><span class="line">        <span class="comment">//先将cookie信息中的url码数据进行解码为原来的字符串。</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h3><h4 id="Session相关方法"><a href="#Session相关方法" class="headerlink" title="Session相关方法"></a>Session相关方法</h4><ol>
+<li><strong>HttpSession session = request.getSession()</strong>：获取HttpSession对象，保存在服务器端</li>
+<li><strong>Object HttpSession.getAttribute(String name)</strong>：通过HttpSession中的键获取值</li>
+<li><strong>void HttpSession.setAttribute(String name, Object value)</strong>：将键值对存储到HttpSession对象中</li>
+<li><strong>void HttpSession.removeAttribute(String name)</strong>：通过HttpSession中的键删除值</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/xml/" rel="tag"><i class="fa fa-tag"></i> xml</a>
+          
+            <a href="/tags/servlet/" rel="tag"><i class="fa fa-tag"></i> servlet</a>
+          
+            <a href="/tags/http/" rel="tag"><i class="fa fa-tag"></i> http</a>
+          
+            <a href="/tags/request/" rel="tag"><i class="fa fa-tag"></i> request</a>
+          
+            <a href="/tags/response/" rel="tag"><i class="fa fa-tag"></i> response</a>
+          
+            <a href="/tags/cookie/" rel="tag"><i class="fa fa-tag"></i> cookie</a>
+          
+            <a href="/tags/session/" rel="tag"><i class="fa fa-tag"></i> session</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/19/%E3%80%90%E6%97%A5%E5%B8%B8%E7%94%9F%E6%B4%BB%E3%80%91_%E8%8B%B1%E8%AF%AD%E5%8D%95%E8%AF%8D%E7%A7%AF%E7%B4%AF/" rel="next" title="【日常生活】_英语单词积累">
+                <i class="fa fa-chevron-left"></i> 【日常生活】_英语单词积累
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/23/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JSP/" rel="prev" title="【基础知识】_JSP">
+                【基础知识】_JSP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JAVAWEB基础"><span class="nav-number">1.</span> <span class="nav-text">JAVAWEB基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XML"><span class="nav-number">1.1.</span> <span class="nav-text">XML</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#约束"><span class="nav-number">1.1.1.</span> <span class="nav-text">约束</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Schema"><span class="nav-number">1.1.2.</span> <span class="nav-text">Schema</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Jsoup"><span class="nav-number">1.1.3.</span> <span class="nav-text">Jsoup</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Jsoup使用案例"><span class="nav-number">1.1.4.</span> <span class="nav-text">Jsoup使用案例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Servlet"><span class="nav-number">1.2.</span> <span class="nav-text">Servlet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#web服务器软件"><span class="nav-number">1.2.1.</span> <span class="nav-text">web服务器软件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Servlet概念"><span class="nav-number">1.2.2.</span> <span class="nav-text">Servlet概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Servlet使用步骤"><span class="nav-number">1.2.3.</span> <span class="nav-text">Servlet使用步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过浏览器请求动态资源的原理步骤"><span class="nav-number">1.2.4.</span> <span class="nav-text">通过浏览器请求动态资源的原理步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Servlet注解配置"><span class="nav-number">1.2.5.</span> <span class="nav-text">Servlet注解配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Servlet体系结构"><span class="nav-number">1.2.6.</span> <span class="nav-text">Servlet体系结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP"><span class="nav-number">1.3.</span> <span class="nav-text">HTTP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP概念"><span class="nav-number">1.3.1.</span> <span class="nav-text">HTTP概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#请求消息数据格式"><span class="nav-number">1.3.2.</span> <span class="nav-text">请求消息数据格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#响应消息数据格式"><span class="nav-number">1.3.3.</span> <span class="nav-text">响应消息数据格式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Request"><span class="nav-number">1.4.</span> <span class="nav-text">Request</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#原理"><span class="nav-number">1.4.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#体系结构"><span class="nav-number">1.4.2.</span> <span class="nav-text">体系结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取请求数据的方法"><span class="nav-number">1.4.3.</span> <span class="nav-text">获取请求数据的方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他方法"><span class="nav-number">1.4.4.</span> <span class="nav-text">其他方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用案例"><span class="nav-number">1.4.5.</span> <span class="nav-text">使用案例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Response"><span class="nav-number">1.5.</span> <span class="nav-text">Response</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#常用方法"><span class="nav-number">1.5.1.</span> <span class="nav-text">常用方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ServletContext对象"><span class="nav-number">1.6.</span> <span class="nav-text">ServletContext对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取"><span class="nav-number">1.6.1.</span> <span class="nav-text">获取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法"><span class="nav-number">1.6.2.</span> <span class="nav-text">方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie"><span class="nav-number">1.7.</span> <span class="nav-text">Cookie</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#会话技术"><span class="nav-number">1.7.1.</span> <span class="nav-text">会话技术</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cookie相关方法"><span class="nav-number">1.7.2.</span> <span class="nav-text">Cookie相关方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用案例-1"><span class="nav-number">1.7.3.</span> <span class="nav-text">使用案例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Session"><span class="nav-number">1.8.</span> <span class="nav-text">Session</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Session相关方法"><span class="nav-number">1.8.1.</span> <span class="nav-text">Session相关方法</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

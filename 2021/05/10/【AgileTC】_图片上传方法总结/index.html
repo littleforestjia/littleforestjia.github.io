@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="SpringCloud,Feign," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="【AgileTC】_图片上传方法总结1.直接保存到本地文件夹(AgileTC开源版) 在项目配置文件application-dev.properties中配置图片保存地址： 1web.upload-path&#x3D;&#x2F;Users&#x2F;didi&#x2F;littleforest&#x2F;haha&#x2F;  编写图片上传接口，请求方式为Post，请求参数为文件数组，响应体为文件保存路径； 12345678910111213141516">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【AgileTC】_图片上传方法总结">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/05/10/%E3%80%90AgileTC%E3%80%91_%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="【AgileTC】_图片上传方法总结1.直接保存到本地文件夹(AgileTC开源版) 在项目配置文件application-dev.properties中配置图片保存地址： 1web.upload-path&#x3D;&#x2F;Users&#x2F;didi&#x2F;littleforest&#x2F;haha&#x2F;  编写图片上传接口，请求方式为Post，请求参数为文件数组，响应体为文件保存路径； 12345678910111213141516">
+<meta property="article:published_time" content="2021-05-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-05-14T15:13:28.544Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="SpringCloud">
+<meta property="article:tag" content="Feign">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/05/10/【AgileTC】_图片上传方法总结/"/>
+
+
+
+
+
+  <title>【AgileTC】_图片上传方法总结 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/05/10/%E3%80%90AgileTC%E3%80%91_%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【AgileTC】_图片上传方法总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-10T00:00:00+08:00">
+                2021-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AgileTC/" itemprop="url" rel="index">
+                    <span itemprop="name">AgileTC</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="【AgileTC】-图片上传方法总结"><a href="#【AgileTC】-图片上传方法总结" class="headerlink" title="【AgileTC】_图片上传方法总结"></a>【AgileTC】_图片上传方法总结</h2><h4 id="1-直接保存到本地文件夹-AgileTC开源版"><a href="#1-直接保存到本地文件夹-AgileTC开源版" class="headerlink" title="1.直接保存到本地文件夹(AgileTC开源版)"></a>1.直接保存到本地文件夹(AgileTC开源版)</h4><ol>
+<li><p>在项目配置文件application-dev.properties中配置图片保存地址：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">web.upload-path</span>=<span class="string">/Users/didi/littleforest/haha/</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编写图片上传接口，请求方式为Post，请求参数为文件数组，响应体为文件保存路径；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//加载配置文件中的图片保存地址</span></span><br><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;web.upload-path&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String uploadPath;</span><br><span class="line"></span><br><span class="line"><span class="meta">@PostMapping</span>(value = <span class="string">"/uploadAttachment"</span>, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">uploadAttachment</span><span class="params">(@RequestParam MultipartFile file, HttpServletRequest request)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将日期以文件路径的形式添加到保存路径中，使得每天上传的文件放在不同文件夹中。</span></span><br><span class="line">    SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy/MM/dd/"</span>);</span><br><span class="line">    String format = sdf.format(<span class="keyword">new</span> Date());</span><br><span class="line">    </span><br><span class="line">    File folder = <span class="keyword">new</span> File(uploadPath + format);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//如果不存在该文件夹，则创建该文件夹</span></span><br><span class="line">    <span class="keyword">if</span> (!folder.isDirectory()) &#123;</span><br><span class="line">        folder.mkdirs();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//用UUID工具类对上传的文件重命名，避免文件重名</span></span><br><span class="line">    String oldName = file.getOriginalFilename();</span><br><span class="line">    String newName = UUID.randomUUID().toString()</span><br><span class="line">            + oldName.substring(oldName.lastIndexOf(<span class="string">"."</span>), oldName.length());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 文件保存</span></span><br><span class="line">        file.transferTo(<span class="keyword">new</span> File(folder, newName));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 返回上传文件的访问路径</span></span><br><span class="line">        String filePath = request.getScheme() + <span class="string">"://"</span> + request.getServerName()</span><br><span class="line">                + <span class="string">":"</span> + request.getServerPort() + <span class="string">"/"</span> + format + newName;</span><br><span class="line">        <span class="keyword">return</span> filePath;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"上传文件失败, 请重试。"</span>, e);</span><br><span class="line">      	<span class="keyword">return</span> <span class="string">"null"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h4 id="2-保存到FastDFS-乐优商城"><a href="#2-保存到FastDFS-乐优商城" class="headerlink" title="2.保存到FastDFS(乐优商城)"></a>2.保存到FastDFS(乐优商城)</h4><ul>
+<li><p>1.先在Linux系统上搭建FastDFS服务器。</p>
+</li>
+<li><p>2.针对FastDFS系统的上传接口有很多开源的java工具，这些工具的作用就类似于RestTemplate，对http客户端进行了封装，直接通过pom.xml引入相关依赖包即可使用：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.tobato<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>fastdfs-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.26.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3.创建fastdfs-client配置类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@Import</span>(FdfsClientConfig<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">// 解决<span class="title">jmx</span>重复注册<span class="title">bean</span>的问题</span></span><br><span class="line"><span class="class">@<span class="title">EnableMBeanExport</span>(<span class="title">registration</span> </span>= RegistrationPolicy.IGNORE_EXISTING)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FastClientImporter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.在application.yml文件中配置servlet传输文件大小限制和FastDFS的相关使用属性：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">	<span class="attr">servlet:</span></span><br><span class="line">		<span class="attr">multipart:</span></span><br><span class="line">			<span class="attr">max-file-size:</span> <span class="string">5MB</span> <span class="comment"># 限制文件上传的大小</span></span><br><span class="line"></span><br><span class="line"><span class="attr">fdfs:</span></span><br><span class="line">	<span class="attr">so-timeout:</span> <span class="number">1501</span> <span class="comment"># 超时时间</span></span><br><span class="line">	<span class="attr">connect-timeout:</span> <span class="number">601</span> <span class="comment"># 连接超时时间</span></span><br><span class="line">	<span class="attr">thumb-image:</span> <span class="comment"># 缩略图</span></span><br><span class="line">		<span class="attr">width:</span> <span class="number">60</span></span><br><span class="line">		<span class="attr">height:</span> <span class="number">60</span></span><br><span class="line">	<span class="attr">tracker-list:</span> <span class="comment"># tracker地址：ip地址+端口（默认是22122）</span></span><br><span class="line">		<span class="bullet">-</span> <span class="number">192.168</span><span class="number">.56</span><span class="number">.101</span><span class="string">:22122</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>5.Controller层，请求方式为Post，请求参数为单个文件(如果想接受文件数组，添加相关逻辑即可)，响应体中包含文件保存路径：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"upload"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UploadController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Autowired</span></span><br><span class="line">		<span class="keyword">private</span> UploadService uploadService;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@PostMapping</span>(<span class="string">"image"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResponseEntity&lt;String&gt; <span class="title">uploadImage</span><span class="params">(@RequestParam(<span class="string">"file"</span>)</span> MultipartFile file)</span>&#123;</span><br><span class="line">        String url = <span class="keyword">this</span>.uploadService.upload(file);</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isBlank(url)) &#123;</span><br><span class="line">        		<span class="keyword">return</span> ResponseEntity.badRequest().build();</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> ResponseEntity.status(HttpStatus.CREATED).body(url);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>6.Service层，主要分四步来创建一个http请求上传图片：校验文件类型-&gt;校验文件内容-&gt;使用fastdfs-client对象发送请求消息并接受响应消息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UploadService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//注入fastdfs-client</span></span><br><span class="line">		<span class="meta">@Autowired</span></span><br><span class="line">		<span class="keyword">private</span> FastFileStorageClient storageClient;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//设置合法文件类型，此处设置只接受jpg和gif格式的文件</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;String&gt; CONTENT_TYPES = Arrays.asList(<span class="string">"image/jpeg"</span>, <span class="string">"image/gif"</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(UploadService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">upload</span><span class="params">(MultipartFile file)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        String originalFilename = file.getOriginalFilename();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 校验文件的类型</span></span><br><span class="line">        String contentType = file.getContentType();</span><br><span class="line">        <span class="keyword">if</span> (!CONTENT_TYPES.contains(contentType))&#123;</span><br><span class="line">            <span class="comment">// 文件类型不合法，直接返回null</span></span><br><span class="line">            LOGGER.info(<span class="string">"文件类型不合法：&#123;&#125;"</span>, originalFilename);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125; </span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 运用ImageIO工具类校验文件的内容，防止是修改后缀名的非图片文件</span></span><br><span class="line">            BufferedImage bufferedImage = ImageIO.read(file.getInputStream());</span><br><span class="line">            <span class="keyword">if</span> (bufferedImage == <span class="keyword">null</span>)&#123;</span><br><span class="line">            		LOGGER.info(<span class="string">"文件内容不合法：&#123;&#125;"</span>, originalFilename);</span><br><span class="line">            		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125; </span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保存到服务器</span></span><br><span class="line">            String ext = StringUtils.substringAfterLast(originalFilename, <span class="string">"."</span>);</span><br><span class="line">            StorePath storePath = <span class="keyword">this</span>.storageClient.uploadFile(file.getInputStream(),</span><br><span class="line">    file.getSize(), ext, <span class="keyword">null</span>);</span><br><span class="line">            <span class="comment">// 生成url地址，返回</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">"http://192.168.56.101:22122/"</span> + storePath.getFullPath();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        		LOGGER.info(<span class="string">"服务器内部错误：&#123;&#125;"</span>, originalFilename);</span><br><span class="line">        		e.printStackTrace();</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="3-保存到Gift-AgileTC滴滴内部版"><a href="#3-保存到Gift-AgileTC滴滴内部版" class="headerlink" title="3.保存到Gift(AgileTC滴滴内部版)"></a>3.保存到Gift(AgileTC滴滴内部版)</h4><h5 id="使用httpClient发送http请求完成图片上传"><a href="#使用httpClient发送http请求完成图片上传" class="headerlink" title="使用httpClient发送http请求完成图片上传"></a>使用httpClient发送http请求完成图片上传</h5><ul>
+<li><p>Gift提供了封装好的上传接口，我们先自己编写使用httpClient发送http请求完成图片上传的方法。(其实也可以只用Spring提供的RestTemplate模板工具类，该工具类对HttpClient等http客户端进行了封装，更加方便，不过我们这里并没有使用。)</p>
+</li>
+<li><p>1.在项目配置文件application-dev.properties中配置图片保存地址，该地址是在滴滴Gift服务器中申请的：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">gift.upload.url</span>=<span class="string">http://100.69.238.155:8000/resource/</span></span><br><span class="line"><span class="meta">gift.namespace.value</span>=<span class="string">chefu_qa_file</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2.Controller层，请求方式为Post，请求参数为文件数组，响应体中包含文件保存路径：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/upload"</span>, method = RequestMethod.POST)</span><br><span class="line">    <span class="keyword">public</span> Response&lt;?&gt; uploadFileToGift(<span class="meta">@RequestParam</span>(<span class="string">"files"</span>) List&lt;MultipartFile&gt; multipartFiles) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Response.success(fileService.uploadFile(multipartFiles));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (CaseServerException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> CaseServerException(e.getLocalizedMessage(), e.getStatus());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            LOGGER.error(<span class="string">"[上传文件出错]&#123;&#125;"</span>, e.getMessage());</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            <span class="keyword">return</span> Response.build(StatusCode.FILE_IMPORT_ERROR.getStatus(), StatusCode.FILE_IMPORT_ERROR.getMsg());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>响应体格式如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"code"</span>: <span class="number">200</span>,</span><br><span class="line">    <span class="attr">"msg"</span>: <span class="string">"服务运行成功"</span>,</span><br><span class="line">    <span class="attr">"data"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"uuid"</span>: <span class="string">"15ff038b-74d7-41cf-b0be-7b21ef725f61"</span>,</span><br><span class="line">            <span class="attr">"url"</span>: <span class="string">"http://100.69.238.155:8002/static/chefu_qa_file/69e3e391-081b-436c-86d9-7395b4bf01cf"</span>,</span><br><span class="line">            <span class="attr">"name"</span>: <span class="string">"截屏2021-05-08 下午5.29.44.png"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"uuid"</span>: <span class="string">"ef2073a9-3a42-46c5-a8ed-fba40a9aaf8b"</span>,</span><br><span class="line">            <span class="attr">"url"</span>: <span class="string">"http://100.69.238.155:8002/static/chefu_qa_file/2731b02a-76a6-421b-8a19-e44fcd848391"</span>,</span><br><span class="line">            <span class="attr">"name"</span>: <span class="string">"截屏2021-05-08 下午5.29.54.png"</span></span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3.Service层，主要分四步来创建一个http请求上传图片：创建HttpClient对象-&gt;创建传参体并塞入请求参数-&gt;创建HttpPost连接体并塞入传参体-&gt;使用HttpClient对象发送请求消息并接受响应消息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;gift.namespace.value&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String nameSpace;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;gift.upload.url&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String giftUrl;</span><br><span class="line">		</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;FileMeta&gt; <span class="title">uploadFile</span><span class="params">(List&lt;MultipartFile&gt; multipartFiles)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 传进来不仅要确保!=null 还要确保不为空</span></span><br><span class="line">    <span class="keyword">if</span> (CollectionUtils.isEmpty(multipartFiles)) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">		List&lt;FileMeta&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(MultipartFile file : multipartFiles) &#123;</span><br><span class="line">    list.add(upload(file.getInputStream(), file.getOriginalFilename()));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">private</span> FileMeta <span class="title">upload</span><span class="params">(InputStream inputStream, String fileName)</span> </span>&#123;</span><br><span class="line">		<span class="comment">// 每个文件都开一次http，很浪费网络资源，如果对时间有要求，可以优化为传一堆过去</span></span><br><span class="line">    GiftResponse response = sendRequest(inputStream, fileName, GiftResponse<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">return</span> FileMeta.buildResponse(response, fileName);</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">private</span> &lt;V&gt; <span class="function">V <span class="title">sendRequest</span><span class="params">(InputStream inputStream, String fileName, Class&lt;V&gt; clazz)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> (<span class="keyword">final</span> CloseableHttpClient httpClient = HttpClients.createDefault()) &#123;</span><br><span class="line">		</span><br><span class="line">				<span class="comment">// 构建传参体</span></span><br><span class="line">    		MultipartEntityBuilder builder = MultipartEntityBuilder.create();</span><br><span class="line">    		builder.setMode(HttpMultipartMode.RFC6532);</span><br><span class="line">    		builder.addPart(<span class="string">"filecontent"</span>, <span class="keyword">new</span> InputStreamBody(inputStream, fileName));</span><br><span class="line"></span><br><span class="line">				<span class="comment">// 构建http连接体</span></span><br><span class="line">    		HttpPost request = <span class="keyword">new</span> HttpPost(giftUrl + nameSpace + <span class="string">"/"</span> + UUID.randomUUID().toString());</span><br><span class="line">    		request.setEntity(builder.build());</span><br><span class="line"></span><br><span class="line">				HttpResponse response = httpClient.execute(request);</span><br><span class="line">    		<span class="comment">// 给一个报错的机会</span></span><br><span class="line">    		<span class="keyword">if</span> (response == <span class="keyword">null</span> || response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) &#123;</span><br><span class="line">    		<span class="keyword">throw</span> <span class="keyword">new</span> CaseServerException(<span class="string">"与Gift交互失败"</span>, StatusCode.FILE_UPLOAD_ERROR);</span><br><span class="line">    		&#125;</span><br><span class="line"></span><br><span class="line">				V ret = getResponseEntity(response.getEntity(), clazz);</span><br><span class="line">    		<span class="comment">// 这里不要直接return getResponseEntity 因为jvm会先去执行finally(在这里是隐式httpClient.close()) http被关掉了，httpEntity也没了</span></span><br><span class="line">    		<span class="comment">// 也就是说HttpEntity随着HttpClient域的销毁而销毁，在销毁之前一定要消费掉内部数据</span></span><br><span class="line">    		<span class="keyword">return</span> ret;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    		e.printStackTrace();</span><br><span class="line">    		<span class="keyword">throw</span> <span class="keyword">new</span> CaseServerException(<span class="string">"传直Gift失败，文件名="</span> + fileName, StatusCode.FILE_UPLOAD_ERROR);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h5 id="使用SpringCloud集成的微服务调用工具Feign完成图片上传"><a href="#使用SpringCloud集成的微服务调用工具Feign完成图片上传" class="headerlink" title="使用SpringCloud集成的微服务调用工具Feign完成图片上传"></a>使用SpringCloud集成的微服务调用工具Feign完成图片上传</h5><ul>
+<li><p>使用SpringCloud提供的Feign工具其实本质也是帮我们封装好了HttpClient，并且可以自动实现被调用微服务集群的状态检测、负载均衡等高级功能，但是这也有一个前提，需要创建一个Gift微服务注册到本项目的注册中心上来。</p>
+</li>
+<li><p>1.使用Feign注入Gift微服务中的图片上传接口</p>
+</li>
+<li><p>2.在Controller层直接调用Gift接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/uploadAttachment"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> JSONObject <span class="title">uploadAttachment</span><span class="params">(MultipartHttpServletRequest request)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		JSONObject retJson = <span class="keyword">new</span> JSONObject();</span><br><span class="line">    List&lt;MultipartFile&gt; multipartFileList = request.getFiles(<span class="string">"file"</span>);</span><br><span class="line">    JSONArray fileArray = <span class="keyword">new</span> JSONArray();</span><br><span class="line">    <span class="keyword">for</span> (MultipartFile multipartFile : multipartFileList) &#123;</span><br><span class="line">    		GiftResult giftResult = <span class="keyword">null</span>;</span><br><span class="line">    		String fileName = <span class="keyword">new</span> File(multipartFile.getOriginalFilename()).getName();</span><br><span class="line">    </span><br><span class="line">    		<span class="keyword">try</span> &#123;</span><br><span class="line">    				InputStream fin = multipartFile.getInputStream();</span><br><span class="line">        		String fileKey = UUID.randomUUID().toString();</span><br><span class="line">        		giftResult = giftService.upload(<span class="string">"chefu_qa_file"</span>, fileKey, fileName, fin);</span><br><span class="line">        		fin.close();</span><br><span class="line">    		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    				e.printStackTrace();</span><br><span class="line">       			retJson.put(<span class="string">"success"</span>, <span class="number">0</span>);</span><br><span class="line">    		&#125;</span><br><span class="line">    </span><br><span class="line">    		FileMeta fileMeta = <span class="keyword">new</span> FileMeta();</span><br><span class="line">    		fileMeta.setUrl(giftResult.getDownloadUrl());</span><br><span class="line">    		fileMeta.setName(fileName);</span><br><span class="line">    		fileArray.add(JSON.toJSON(fileMeta));</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">    retJson.put(<span class="string">"success"</span>, <span class="number">1</span>);</span><br><span class="line">    retJson.put(<span class="string">"data"</span>, fileArray);</span><br><span class="line">    <span class="keyword">return</span> retJson;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="4-发现一个重要问题：不用Eureka也可以使用Feign"><a href="#4-发现一个重要问题：不用Eureka也可以使用Feign" class="headerlink" title="4.发现一个重要问题：不用Eureka也可以使用Feign"></a>4.发现一个重要问题：不用Eureka也可以使用Feign</h4><ul>
+<li><p><a href="https://blog.csdn.net/zhanghan18333611647/article/details/85638863?utm_term=feign%E4%B8%8D%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83&utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~sobaiduweb~default-0-85638863&spm=3001.4430" target="_blank" rel="noopener">不用Eureka也可以使用Feign</a>，据说dubbo使用的就是这种形式。<strong>以下代码步骤非常重要，都是我自己写的</strong>，没有将微服务注册到注册中心，却通过Feign成功访问了Gift微服务；</p>
+</li>
+<li><p>1.在项目配置文件application-dev.properties中配置图片保存地址，该地址是在滴滴Gift服务器中申请的：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">gift.upload.url</span>=<span class="string">http://100.69.238.155:8000/resource/</span></span><br><span class="line"><span class="meta">gift.namespace.value</span>=<span class="string">chefu_qa_file</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2.在pom.xml文件中配置feign-httpclient依赖，因为feign默认采用jdk原生HttpURLConnection来发起http请求，会有很多输入输出问题，所以需要改用HttpClient来发送http请求。注意io.github.openfeign:feign-httpclient依赖版本一定要与io.github.openfeign:feign-core依赖版本相同：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.github.openfeign<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>feign-httpclient<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>10.7.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3.Api接口，根据Gift开发团队提供的接口文档可知http请求四件套：</p>
+<ul>
+<li>url：<a href="http://100.69.238.155:8000/resource/chefu_qa_file；" target="_blank" rel="noopener">http://100.69.238.155:8000/resource/chefu_qa_file；</a></li>
+<li>请求方式：POST，且Content-Type必须为multipart/form-data；</li>
+<li>请求参数：参数名为”filecontent”的单个MultipartFile类型文件；</li>
+<li>响应体：json格式的map，我们需要的属性主要是文件保存路径”download_url”；</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@FeignClient</span>(name = <span class="string">"gift"</span>, url = <span class="string">"$&#123;gift.upload.url&#125;"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GiftService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">//consumes用于指定Content-Type</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value=<span class="string">"$&#123;gift.namespace.value&#125;"</span>, consumes= MediaType.MULTIPART_FORM_DATA_VALUE, method = RequestMethod.POST)</span><br><span class="line">    <span class="function">Map&lt;String,Object&gt; <span class="title">upload</span><span class="params">(@RequestPart(<span class="string">"filecontent"</span>)</span> MultipartFile file)</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.Controller层，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line">GiftService giftService;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 无注册中心使用feign</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/uploadFeignNoEureka"</span>, method = RequestMethod.POST)</span><br><span class="line"><span class="keyword">public</span> Response&lt;?&gt; uploadAttachment(<span class="meta">@RequestParam</span>(<span class="string">"files"</span>) List&lt;MultipartFile&gt; multipartFiles) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 传进来不仅要确保!=null 还要确保不为空</span></span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(multipartFiles)) &#123;</span><br><span class="line">            <span class="keyword">return</span> Response.build(<span class="number">10086</span>,<span class="string">"图片列表为空"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (MultipartFile file : multipartFiles) &#123;</span><br><span class="line">            Map&lt;String,Object&gt; giftResult = giftService.upload(file);</span><br><span class="line">            list.add(giftResult.get(<span class="string">"download_url"</span>).toString());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Response.success(list);</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (CaseServerException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> CaseServerException(e.getLocalizedMessage(), e.getStatus());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"[上传文件出错]&#123;&#125;"</span>, e.getMessage());</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> Response.build(StatusCode.FILE_IMPORT_ERROR.getStatus(), StatusCode.FILE_IMPORT_ERROR.getMsg());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SpringCloud/" rel="tag"><i class="fa fa-tag"></i> SpringCloud</a>
+          
+            <a href="/tags/Feign/" rel="tag"><i class="fa fa-tag"></i> Feign</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/04/30/%E3%80%90AgileTC%E3%80%91_%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E9%A1%B5%E9%9D%A2%E9%9C%80%E6%B1%82%E5%AF%B9%E5%BA%94%E6%8E%A5%E5%8F%A3%E4%B8%89%E5%B1%82%E7%BB%93%E6%9E%84%E5%BC%80%E5%8F%91/" rel="next" title="【AgileTC】_测试用例页面需求对应接口三层结构开发">
+                <i class="fa fa-chevron-left"></i> 【AgileTC】_测试用例页面需求对应接口三层结构开发
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/05/13/%E3%80%90AgileTC%E3%80%91_%E7%BB%9F%E4%B8%80%E5%93%8D%E5%BA%94%E4%BD%93%E6%9E%84%E5%BB%BA/" rel="prev" title="【AgileTC】_统一响应体构建">
+                【AgileTC】_统一响应体构建 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#【AgileTC】-图片上传方法总结"><span class="nav-number">1.</span> <span class="nav-text">【AgileTC】_图片上传方法总结</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-直接保存到本地文件夹-AgileTC开源版"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.直接保存到本地文件夹(AgileTC开源版)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-保存到FastDFS-乐优商城"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.保存到FastDFS(乐优商城)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-保存到Gift-AgileTC滴滴内部版"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.保存到Gift(AgileTC滴滴内部版)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#使用httpClient发送http请求完成图片上传"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">使用httpClient发送http请求完成图片上传</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用SpringCloud集成的微服务调用工具Feign完成图片上传"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">使用SpringCloud集成的微服务调用工具Feign完成图片上传</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-发现一个重要问题：不用Eureka也可以使用Feign"><span class="nav-number">1.0.4.</span> <span class="nav-text">4.发现一个重要问题：不用Eureka也可以使用Feign</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="jvm," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="JVM定义Java Virtual Machine - java 程序的运行环境（java二进制字节码的运行环境） 优点 一次编写，到处运行 自动内存管理，垃圾回收功能 数组下标越界越界检查 多态  比较 编译工具：javac、javap等 应用服务器：tomcat等  学习JVM的作用 应付面试 理解底层的实现原理（自动生成、foreach、动态代理） 中高级程序员的必备技能（解决内存溢出、响应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【基础知识】_JVM笔记">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="JVM定义Java Virtual Machine - java 程序的运行环境（java二进制字节码的运行环境） 优点 一次编写，到处运行 自动内存管理，垃圾回收功能 数组下标越界越界检查 多态  比较 编译工具：javac、javap等 应用服务器：tomcat等  学习JVM的作用 应付面试 理解底层的实现原理（自动生成、foreach、动态代理） 中高级程序员的必备技能（解决内存溢出、响应">
+<meta property="og:image" content="http://https/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/1.png">
+<meta property="og:image" content="http://https/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/2.png">
+<meta property="og:image" content="http://https/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/3.png">
+<meta property="og:image" content="http://https/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/4.png">
+<meta property="article:published_time" content="2020-07-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-16T13:24:44.669Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="jvm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://https/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2020/07/29/【基础知识】_JVM笔记/"/>
+
+
+
+
+
+  <title>【基础知识】_JVM笔记 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【基础知识】_JVM笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-29T00:00:00+08:00">
+                2020-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="JVM"><a href="#JVM" class="headerlink" title="JVM"></a>JVM</h1><h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>Java Virtual Machine - java 程序的运行环境（java二进制字节码的运行环境）</p>
+<h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>一次编写，到处运行</li>
+<li>自动内存管理，垃圾回收功能</li>
+<li>数组下标越界越界检查</li>
+<li>多态</li>
+</ul>
+<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><p><img src="/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/1.png" alt="jvm比较"></p>
+<p>编译工具：javac、javap等</p>
+<p>应用服务器：tomcat等</p>
+<hr>
+<h1 id="学习JVM的作用"><a href="#学习JVM的作用" class="headerlink" title="学习JVM的作用"></a>学习JVM的作用</h1><ul>
+<li>应付面试</li>
+<li>理解底层的实现原理（自动生成、foreach、动态代理）</li>
+<li>中高级程序员的必备技能（解决内存溢出、响应过慢等问题）</li>
+</ul>
+<hr>
+<h1 id="常见的JVM"><a href="#常见的JVM" class="headerlink" title="常见的JVM"></a>常见的JVM</h1><p>jvm也可以说是一种标准，很多公司都开发了不同的jvm</p>
+<p><img src="/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/2.png" alt="常见的jvm"></p>
+<p>以HotSpot为主</p>
+<hr>
+<h1 id="学习路线"><a href="#学习路线" class="headerlink" title="学习路线"></a>学习路线</h1><p><img src="/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/3.png" alt="学习路线"></p>
+<hr>
+<h1 id="CSDN重要知识点"><a href="#CSDN重要知识点" class="headerlink" title="CSDN重要知识点"></a>CSDN重要知识点</h1><h2 id="类的加载"><a href="#类的加载" class="headerlink" title="类的加载"></a>类的加载</h2><p><img src="/2020/07/29/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_JVM%E7%AC%94%E8%AE%B0/4.png" alt="类的加载过程"></p>
+<h3 id="loading"><a href="#loading" class="headerlink" title="loading"></a>loading</h3><p>类的加载指的是<u>将类的.class文件中的二进制数据读取到内存中，存放在运行时数据区的方法区</u>中，并创建一个大的Java.lang.Class对象，用来封装方法区内的数据结构。(<u>会创建类的Class对象</u>)</p>
+<h3 id="linking"><a href="#linking" class="headerlink" title="linking"></a>linking</h3><ul>
+<li>验证：确保Class文件的字节流中包含信息符合当前虚拟机要求，保证被加载类的正确性。</li>
+<li>准备：为类变量分配内存并且设置该类变量的默认初始化值，但不会为实例变量分配初始化。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">java中的变量介绍：成员变量和局部变量</span><br><span class="line"></span><br><span class="line">成员变量包括：实例变量和类变量：</span><br><span class="line">- 修饰符：类变量就是类中以static修饰的成员变量，实例变量就是没有static修饰的成员变量。</span><br><span class="line">- 访问：实例变量是一定要用过类的实例化对象来访问的，而类变量可以通过实例化对象来访问也可以直接通过类对象来访问。(这里所说的类对象就是class对象)</span><br><span class="line">- 生存周期：实例变量与类的实例化对象共存亡，类变量与类的Class对象共存亡。</span><br><span class="line">- 变量修改：多个类的实例化对象分别指向不同的堆内存位置，每个实例化对象中的实例变量指向的是不同的内存位置，修改实例变量就是修改相关的实例化对象中的某个内存数据；类变量是多个实例化对象中的变量指向同一个方法区内存，每一个实例化对象都可以调用修改该同一个类变量指向的方法区内存数据，该数据的值即为最后一次修改的值。</span><br><span class="line"></span><br><span class="line">局部变量包括：</span><br><span class="line">- 形参（函数形参）</span><br><span class="line">- 方法局部变量（在方法内定义）</span><br><span class="line">- 代码块局部变量（在代码块内定义）</span><br><span class="line">- 解析：将常量池中的符号引号转换为直接引用的过程。</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="initialization"><a href="#initialization" class="headerlink" title="initialization"></a>initialization</h2><ul>
+<li>为类变量赋予正确的初始化值。</li>
+<li>类的初始化阶段就是执行类构造器方法<clinit>()的过程。(构造器方法主要用于执行静态变量赋值和static{}代码块运行)</clinit></li>
+<li>如果该类有父类，Jvm会保证子类的<clinit>()执行前，父类的<clinit>()已经执行完成。</clinit></clinit></li>
+</ul>
+<h2 id="双亲委派机制"><a href="#双亲委派机制" class="headerlink" title="双亲委派机制"></a>双亲委派机制</h2><ul>
+<li>原理：如果一个类加载器收到了类加载请求，它并不会自己直接去加载，而是把这个亲求委托给父类加载器去执行，如果父类记载器还有父类，则进一步向上委托，依次递归，请求最终到达顶层的启动类加载器。如果父类加载器可以完成类加载任务，就成功返回，倘如父类加载器无法完成次加载任务，子加载器才会尝试自己去加载，这就是双亲委派模式。</li>
+<li>优势：避免类的重复加载；保护程序安全，防止核心API被随意篡改。</li>
+</ul>
+<h2 id="主动使用和被动使用"><a href="#主动使用和被动使用" class="headerlink" title="主动使用和被动使用"></a>主动使用和被动使用</h2><p>java程序对类的主动使用：</p>
+<ul>
+<li>创建类的实例化对象</li>
+<li>访问某个类或者接口的静态变量，或者对该静态变量赋值</li>
+<li>调用类的静态方法</li>
+<li>反射加载类或者类中属性和方法</li>
+<li>初始化类的子类</li>
+<li>被标明为启动类的类</li>
+<li>动态语言支持相关类</li>
+</ul>
+<p>除了以上七种情况，其他使用java类的方式都被看做是对类的被动使用，都不会导致类的加载和初始化。</p>
+<h2 id="栈帧组成部分"><a href="#栈帧组成部分" class="headerlink" title="栈帧组成部分"></a>栈帧组成部分</h2><ul>
+<li>局部变量表Local Variables(用于存储该栈帧的方法参数和定义在方法体内的局部变量)</li>
+<li>操作数栈Operand Stack</li>
+<li>动态链接Dynamic Linking(或指向运行时常量池的方法引用)</li>
+<li>方法返回地址Return Address</li>
+</ul>
+<h2 id="方法区存放内容"><a href="#方法区存放内容" class="headerlink" title="方法区存放内容"></a>方法区存放内容</h2><p><u>静态变量+常量+类信息+运行时常量池</u></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag"><i class="fa fa-tag"></i> jvm</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/05/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AC%94%E8%AE%B0/" rel="prev" title="【基础知识】_数据结构笔记">
+                【基础知识】_数据结构笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">73</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JVM"><span class="nav-number">1.</span> <span class="nav-text">JVM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义"><span class="nav-number">1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优点"><span class="nav-number">1.2.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#比较"><span class="nav-number">1.3.</span> <span class="nav-text">比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#学习JVM的作用"><span class="nav-number">2.</span> <span class="nav-text">学习JVM的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见的JVM"><span class="nav-number">3.</span> <span class="nav-text">常见的JVM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#学习路线"><span class="nav-number">4.</span> <span class="nav-text">学习路线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CSDN重要知识点"><span class="nav-number">5.</span> <span class="nav-text">CSDN重要知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#类的加载"><span class="nav-number">5.1.</span> <span class="nav-text">类的加载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#loading"><span class="nav-number">5.1.1.</span> <span class="nav-text">loading</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linking"><span class="nav-number">5.1.2.</span> <span class="nav-text">linking</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#initialization"><span class="nav-number">5.2.</span> <span class="nav-text">initialization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#双亲委派机制"><span class="nav-number">5.3.</span> <span class="nav-text">双亲委派机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主动使用和被动使用"><span class="nav-number">5.4.</span> <span class="nav-text">主动使用和被动使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#栈帧组成部分"><span class="nav-number">5.5.</span> <span class="nav-text">栈帧组成部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法区存放内容"><span class="nav-number">5.6.</span> <span class="nav-text">方法区存放内容</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
