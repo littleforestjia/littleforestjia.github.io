@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,Bulkload," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload在HBase表数据倾斜治理(1)_shell命令实现bulkload中已经介绍bulkload的原理以及使用shell命令实现bulkload的方法。 数据存储到HBase当中非常容易发生数据倾斜，也就是各个region当中存储的数据数量差距较大。常用于避免HBase表数据倾斜的方法是：预分区+随机散列。此处不再赘述如何实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/04/23/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(3)_%E9%87%87%E7%94%A8rowkey%E5%8F%8D%E8%BD%AC%E7%AD%96%E7%95%A5%E7%9A%84bulkload/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload在HBase表数据倾斜治理(1)_shell命令实现bulkload中已经介绍bulkload的原理以及使用shell命令实现bulkload的方法。 数据存储到HBase当中非常容易发生数据倾斜，也就是各个region当中存储的数据数量差距较大。常用于避免HBase表数据倾斜的方法是：预分区+随机散列。此处不再赘述如何实现">
+<meta property="article:published_time" content="2022-04-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-04-27T13:15:11.272Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="Bulkload">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/04/23/HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/04/23/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(3)_%E9%87%87%E7%94%A8rowkey%E5%8F%8D%E8%BD%AC%E7%AD%96%E7%95%A5%E7%9A%84bulkload/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-04-23T00:00:00+08:00">
+                2022-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase表数据倾斜治理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-3-采用rowkey反转策略的bulkload"><a href="#HBase表数据倾斜治理-3-采用rowkey反转策略的bulkload" class="headerlink" title="HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload"></a>HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload</h2><p>在<a href="https://littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(1)_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/" target="_blank" rel="noopener">HBase表数据倾斜治理(1)_shell命令实现bulkload</a>中已经介绍bulkload的原理以及使用shell命令实现bulkload的方法。</p>
+<p>数据存储到HBase当中非常容易发生数据倾斜，也就是各个region当中存储的数据数量差距较大。常用于避免HBase表数据倾斜的方法是：预分区+随机散列。此处不再赘述如何实现预分区，重点关注通过Mapper类实现rowkey的随机散列，并将其与bulkload相结合。</p>
+<h3 id="1-设计reverse散列策略"><a href="#1-设计reverse散列策略" class="headerlink" title="1.设计reverse散列策略"></a>1.设计reverse散列策略</h3><p>源文件fellow.csv数据如下，总共5列数据：id(int)，birthday(String)，name(String)，sex(String)，work(String)。</p>
+<blockquote>
+<p>38343,2022/4/24,jiazhengyang,男,正式<br>374836,2022/4/4,zengqingfan,男,实习<br>34783484,2022/3/18,lijun,男,正式<br>37438,2022/4/11,lijiazheng,男,实习<br>2384783,2022/3/16,qiuyuchen,男,正式</p>
+</blockquote>
+<p>将int类型的id进行reverse然后转化为字节数组1，将String类型的birthday转化为子节数组2，然后将数组1和数组2拼接在一起组成rowkey。<strong>这样就可以保证在有相应优化需求时直接拆出rowkey的前4个字节得到id。</strong></p>
+<h3 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2.准备工作"></a>2.准备工作</h3><p>与<a href="https://littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(1)_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/" target="_blank" rel="noopener">HBase表数据倾斜治理(1)_shell命令实现bulkload</a>中的准备工作相同，只不过上次使用shell进行bulkload无法随意设计rowkey，使用java变成可以更加灵活地设计rowkey组成规则。</p>
+<ul>
+<li>开启hadoop和hbase</li>
+<li>创建csv数据文件并上传到HDFS系统</li>
+<li>创建Hbase表：<code>create &#39;fellowjava&#39;,&#39;d&#39;</code></li>
+</ul>
+<h3 id="3-创建Mapper类"><a href="#3-创建Mapper类" class="headerlink" title="3.创建Mapper类"></a>3.创建Mapper类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BulkloadMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>, <span class="title">Text</span>, <span class="title">ImmutableBytesWritable</span>, <span class="title">Put</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//重要：Mapper当中map()方法的Text value输入参数默认是Hfile源文件当中的一行数据，也就是Hbase表中的一行。</span></span><br><span class="line">    <span class="comment">//value的结构为id+birthday+name+sex+work，设计id+birthday组成rowkey，name、sex、work作为列族D的列。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        String values = value.toString();</span><br><span class="line">        String[] lines = values.split(<span class="string">","</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] rowkey = generateRowkey(lines[<span class="number">0</span>], lines[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">byte</span>[] columnFamily = <span class="string">"d"</span>.getBytes();</span><br><span class="line">        <span class="keyword">byte</span>[] qualifierName = <span class="string">"name"</span>.getBytes();</span><br><span class="line">        <span class="keyword">byte</span>[] qualifierSex = <span class="string">"sex"</span>.getBytes();</span><br><span class="line">        <span class="keyword">byte</span>[] qualifierWork = <span class="string">"Work"</span>.getBytes();</span><br><span class="line"></span><br><span class="line">        ImmutableBytesWritable putRowKey = <span class="keyword">new</span> ImmutableBytesWritable(rowkey);</span><br><span class="line">        Put put = <span class="keyword">new</span> Put(rowkey);</span><br><span class="line">        put.add(columnFamily, qualifierName, generateValue(lines[<span class="number">2</span>]));</span><br><span class="line">        put.add(columnFamily, qualifierSex, generateValue(lines[<span class="number">3</span>]));</span><br><span class="line">        put.add(columnFamily, qualifierWork, generateValue(lines[<span class="number">4</span>]));</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//重要：该方法执行一次，即表示在HFile文件中写入一行数据</span></span><br><span class="line">        context.write(putRowKey, put);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将id和birthday转化为byte[]，并将id进行reverse，然后拼接在一起组成rowkey，达到散列的目的，避免数据倾斜。</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">byte</span>[] generateRowkey(String id, String birthday) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] newBytes = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//先将id转化成Interger类型，然后进行反转。</span></span><br><span class="line">            <span class="keyword">int</span> d = Integer.parseInt(id);</span><br><span class="line">            <span class="comment">//重要：使用反射调用本类当中的reverse()方法，这样的话就可以输入不同的数据类型。</span></span><br><span class="line">            Object objectId = <span class="keyword">this</span>.getClass().getMethod(<span class="string">"reverse"</span>, Object<span class="class">.<span class="keyword">class</span>).<span class="title">invoke</span>(<span class="title">this</span>, <span class="title">d</span>)</span>;</span><br><span class="line">            <span class="keyword">int</span> reverseId = (<span class="keyword">int</span>) objectId;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">byte</span>[] idByte = Bytes.toBytes(reverseId);</span><br><span class="line">            <span class="keyword">byte</span>[] birthdayByte = Bytes.toBytes(birthday);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//将两个byte[]拼接在一起。</span></span><br><span class="line">            <span class="keyword">int</span> length = idByte.length + birthdayByte.length;</span><br><span class="line">            newBytes = <span class="keyword">new</span> <span class="keyword">byte</span>[length];</span><br><span class="line">            System.arraycopy(idByte, <span class="number">0</span>, newBytes, <span class="number">0</span>, <span class="number">4</span>);</span><br><span class="line">            System.arraycopy(birthdayByte, <span class="number">0</span>, newBytes, <span class="number">4</span>, birthdayByte.length);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> newBytes;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将value字符串转化为byte[]。</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">byte</span>[] generateValue(String value) &#123;</span><br><span class="line">        <span class="keyword">return</span> Bytes.toBytes(value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//重要：要通过反射来调用的方法，访问级别必须是public。</span></span><br><span class="line">    <span class="comment">//对Long、Interger、String三种类型的数据进行reverse。</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">reverse</span><span class="params">(Object data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (Long<span class="class">.<span class="keyword">class</span>.<span class="title">equals</span>(<span class="title">data</span>.<span class="title">getClass</span>())) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> Long.reverse((<span class="keyword">long</span>) data);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (Integer<span class="class">.<span class="keyword">class</span>.<span class="title">equals</span>(<span class="title">data</span>.<span class="title">getClass</span>())) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> Integer.reverse((<span class="keyword">int</span>) data);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> StringUtils.reverse((String) data);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Mapper&lt;KEYIN, VALUEIN, KEYOUT, VALUEOUT&gt;中的四个泛型：</strong><ul>
+<li><strong>KEYIN表示输入数据行的key的数据类型：当输入HFile文件为字符串文件时没有作用；当输入HFile文件为HBase表时用ImmutableBytesWritable对象来装载rowkey。</strong></li>
+<li><strong>VALUEIN表示输入数据行的value的数据类型：当输入HFile文件为字符串文件时用Text对象来装载整行字符数据；当输入HFile文件为HBase表时用Result对象来装载整行单元格对象。</strong></li>
+<li><strong>KEYOUT表示输出数据行的key的数据类型：当输出HFile文件为字符串文件时用Text对象来装载字符数据；当输出HFile文件为HBase表时用ImmutableBytesWritable对象来装载rowkey。</strong></li>
+<li><strong>VALUEOUT表示输出数据行的value的数据类型：当输出HFile文件为字符串文件时用Text对象来字符数据；当输出HFile文件为HBase表时用Put对象来装载整行单元格对象。</strong></li>
+</ul>
+</li>
+<li><strong>map方法中的context.write()方法执行一个就表示在输出HFile中写入一行数据，一个map方法中可以执行多次context.write()方法。执行n次，输出HFile文件的行数就是输入HFile文件行数的n倍。</strong></li>
+<li><strong><a href="https://www.cnblogs.com/east7/p/15887320.html" target="_blank" rel="noopener">反射</a>常用来调用入参类型为Object的方法，如上所编写的reverse方法。</strong></li>
+</ul>
+<h3 id="4-创建Driver类"><a href="#4-创建Driver类" class="headerlink" title="4.创建Driver类"></a>4.创建Driver类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BulkloadDriver</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//这里创建HBase连接的目的是将数据放到目标表当中。</span></span><br><span class="line">        Configuration conf = HBaseConfiguration.create();</span><br><span class="line">        Connection conn = ConnectionFactory.createConnection(conf);</span><br><span class="line">        Table table = conn.getTable(TableName.valueOf(<span class="string">"fellowjava"</span>));</span><br><span class="line">        Admin admin = conn.getAdmin();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置相关类</span></span><br><span class="line">        Job job = Job.getInstance(conf, <span class="string">"jiazhengyang bulkload: fellowjava"</span>);</span><br><span class="line">        job.setJarByClass(BulkloadDriver<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        job.setMapperClass(BulkloadMapper<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        job.setMapOutputKeyClass(ImmutableBytesWritable<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        job.setMapOutputValueClass(Put<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置源Hfile路径和目标Hfile路径</span></span><br><span class="line">        String hdfsRoot = <span class="string">"hdfs://localhost:9005/"</span>;</span><br><span class="line">        String inputFile = hdfsRoot + <span class="string">"fellowtest"</span>;</span><br><span class="line">        String outputFile = hdfsRoot + <span class="string">"fellowjavahfile"</span>;</span><br><span class="line">        Path outputPath = <span class="keyword">new</span> Path(outputFile);</span><br><span class="line">        job.setInputFormatClass(TextInputFormat<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        TextInputFormat.setInputPaths(job, inputFile);</span><br><span class="line">        job.setOutputFormatClass(HFileOutputFormat2<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        HFileOutputFormat2.setOutputPath(job, outputPath);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//配置MR作业任务，将源Hfile数据以增量的形式加载到目标Hfile当中，并生成Hbase表元数据文件。</span></span><br><span class="line">        HFileOutputFormat2.configureIncrementalLoad(job, table, conn.getRegionLocator(TableName.valueOf(<span class="string">"fellowjava"</span>)));</span><br><span class="line"></span><br><span class="line">        job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//在MR作业完成后，将Hbase表元数据文件推送给Hbase的RegionServers，这样就可以通过Hbase操作表数据。</span></span><br><span class="line">        <span class="keyword">if</span> (job.isSuccessful()) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Hfile创建成功！"</span>);</span><br><span class="line">            LoadIncrementalHFiles loader = <span class="keyword">new</span> LoadIncrementalHFiles(conf);</span><br><span class="line">            loader.doBulkLoad(outputPath, admin, table, conn.getRegionLocator(TableName.valueOf(<span class="string">"fellowjava"</span>)));</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"Hfile创建失败！"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行main方法即可。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/Bulkload/" rel="tag"><i class="fa fa-tag"></i> Bulkload</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/" rel="next" title="HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/04/28/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(4)_%E8%AF%BB%E5%8F%96hbase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%B9%B6bulkload%E5%88%B0%E4%B8%8D%E5%90%8C%E7%BB%93%E6%9E%84hbase%E8%A1%A8%E4%B8%AD/" rel="prev" title="HBase表数据倾斜治理(4)_读取hbase表数据并bulkload到不同结构hbase表中">
+                HBase表数据倾斜治理(4)_读取hbase表数据并bulkload到不同结构hbase表中 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">78</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-3-采用rowkey反转策略的bulkload"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理(3)_采用rowkey反转策略的bulkload</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-设计reverse散列策略"><span class="nav-number">1.1.</span> <span class="nav-text">1.设计reverse散列策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-准备工作"><span class="nav-number">1.2.</span> <span class="nav-text">2.准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-创建Mapper类"><span class="nav-number">1.3.</span> <span class="nav-text">3.创建Mapper类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-创建Driver类"><span class="nav-number">1.4.</span> <span class="nav-text">4.创建Driver类</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
