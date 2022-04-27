@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照HBase获取数据的方式1.HBase数据查询分类HBase查询数据的方式主要有get和scan两种方式，其中get用于按照指定rowkey获取唯一一行数据。scan主要用于批量查询，可以通过添加过滤器实现分页等条件查询功能。 scan有三种常见用法：ScanAPI(Scan和SnapScan)、TableScanMR、Sn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照HBase获取数据的方式1.HBase数据查询分类HBase查询数据的方式主要有get和scan两种方式，其中get用于按照指定rowkey获取唯一一行数据。scan主要用于批量查询，可以通过添加过滤器实现分页等条件查询功能。 scan有三种常见用法：ScanAPI(Scan和SnapScan)、TableScanMR、Sn">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/4.jpg">
+<meta property="article:published_time" content="2022-04-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-04-27T11:00:16.475Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/04/18/HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-04-18T00:00:00+08:00">
+                2022-04-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase表数据倾斜治理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-2-Scan读取Hbase表与Hbase表快照"><a href="#HBase表数据倾斜治理-2-Scan读取Hbase表与Hbase表快照" class="headerlink" title="HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照"></a>HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照</h2><h3 id="HBase获取数据的方式"><a href="#HBase获取数据的方式" class="headerlink" title="HBase获取数据的方式"></a>HBase获取数据的方式</h3><h4 id="1-HBase数据查询分类"><a href="#1-HBase数据查询分类" class="headerlink" title="1.HBase数据查询分类"></a>1.HBase数据查询分类</h4><p>HBase查询数据的方式主要有get和scan两种方式，其中get用于按照指定rowkey获取唯一一行数据。scan主要用于批量查询，可以通过添加过滤器实现分页等条件查询功能。</p>
+<p>scan有<a href="http://hbasefly.com/2017/10/29/hbase-scan-3/" target="_blank" rel="noopener">三种常见用法</a>：ScanAPI(Scan和SnapScan)、TableScanMR、SnapshotScanMR。</p>
+<h4 id="2-ScanAPI"><a href="#2-ScanAPI" class="headerlink" title="2.ScanAPI"></a>2.ScanAPI</h4><p>ScanAPI是一种串行读取数据的方式，HBase客户端每次发送请求到RegionServer获取100行数据，获取到100行数据之后才会发送下一次请求，当scan请求的数据量很大时扫描数据效率极低。就连get都实现了不同region并发执行扫描，scan还没实现。</p>
+<h4 id="3-TableScanMR"><a href="#3-TableScanMR" class="headerlink" title="3.TableScanMR"></a>3.TableScanMR</h4><p>TableScanMR使用MapReduce计算任务来实现数据读取，就是ScanAPI的并行化，将scan请求分别并行下放到每个RegionServer，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/1.jpg" alt></p>
+<h4 id="4-SnapshotScanMR"><a href="#4-SnapshotScanMR" class="headerlink" title="4.SnapshotScanMR"></a>4.SnapshotScanMR</h4><p>HBase可以通过api创建snapshot，snapshot是HBase表的元数据的一个快照，并不是整个HBase表的快照。snapshot的主要作用就是帮助我们在扫描HBase表数据时绕过RegionServer直接从HDFS中读取Hfile文件数据，极大减轻RegionServer的压力，并且已经封装好了文件合并、数据版本、Filter等功能。（注意<a href="https://blog.csdn.net/TH_lsq/article/details/115941546" target="_blank" rel="noopener">HBase</a>和<a href="https://blog.csdn.net/Jackson_mvp/article/details/102462064" target="_blank" rel="noopener">HDFS</a>都提供了创建snapshot的api，这两者的snapshot不是同一个东西，创建方式也不相同。）</p>
+<p>SnapshotScanMR同样使用MapReduce计算任务来实现数据读取，但是HBase客户端只需要在最开始与RegionServer交互一次，获取snopshot文件，然后直接根据snopshot找到数据在HDFS系统中的位置并读取。这种扫描方式减少了一次网络传输，极大提高了扫描速度，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/2.jpg" alt></p>
+<h3 id="initTableMapperJob读取Hbase表"><a href="#initTableMapperJob读取Hbase表" class="headerlink" title="initTableMapperJob读取Hbase表"></a>initTableMapperJob读取Hbase表</h3><h4 id="1-创建Mapper类，实现map计算任务"><a href="#1-创建Mapper类，实现map计算任务" class="headerlink" title="1.创建Mapper类，实现map计算任务"></a>1.创建Mapper类，实现map计算任务</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//重要：map计算任务执行完之后一定是以key-value的形式保存到HFile中的，Mapper接口的最后两个泛型类表示存储时key和value的数据类型。此处的TableMapper&lt;Text, Text&gt;表示以字符串形式保存key和value。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReadHFileMapper</span> <span class="keyword">extends</span> <span class="title">TableMapper</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> Text writeKey = <span class="keyword">new</span> Text();</span><br><span class="line"></span><br><span class="line">    	<span class="comment">//重要：一个Result对象表示HBase表中一行数据，一个Text对象表示HFile文件中一行字符串数据。</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(ImmutableBytesWritable row, Result value, Context context)</span></span></span><br><span class="line"><span class="function">                <span class="keyword">throws</span> InterruptedException, IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">//Cell是Hbase当中的最小存储单元，也就是Hbase表中的一个数据单元格，其中主要以key-value的形式保存数据。</span></span><br><span class="line">                        <span class="keyword">for</span> (Cell cell : value.listCells()) &#123;</span><br><span class="line">                                String colName = Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength());</span><br><span class="line">                                String colValue = Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()).replaceAll(<span class="string">"\\n|\\r|\\t|\1|\\\\N"</span>, <span class="string">" "</span>);</span><br><span class="line">                                String res = colName + <span class="string">","</span> + colValue;</span><br><span class="line">                                writeKey.set(<span class="keyword">new</span> Text(Bytes.toString(row.get())));</span><br><span class="line">                                context.write(writeKey, <span class="keyword">new</span> Text(res));</span><br><span class="line">                                System.out.println(Bytes.toString(row.get()) + <span class="string">" "</span> + res);</span><br><span class="line">                        &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>map计算任务执行完之后一定是以key-value的形式保存到HFile中的，Mapper接口的最后两个泛型类表示输出时key和value的数据类型。此处的TableMapper&lt;Text, Text&gt;表示以字符串形式保存key和value到HFile中。</strong></li>
+<li><strong>Mapper实现类的map方法每次对文件或者HBase表中的一行数据执行计算任务，该方法的第二个输入参数就是一行数据，如果是处理字符串文件则用Text对象来装载，如果是读取HBase表则用Result对象来装载。</strong></li>
+<li><strong>HBase java api提供了Cell对象来装载HBase当中最小的存储单元，也就是表中的一个数据单元，数据以key-value的形式保存在其中。</strong></li>
+</ul>
+<h4 id="2-创建Driver类"><a href="#2-创建Driver类" class="headerlink" title="2.创建Driver类"></a>2.创建Driver类</h4><p>initTableMapperJob是HBase提供的实现TableScanMR的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        Configuration conf = HBaseConfiguration.create();</span><br><span class="line">        String hdfsRoot = <span class="string">"hdfs://localhost:9005/"</span>; <span class="comment">//hdfs 的根目录</span></span><br><span class="line">        String tablename = <span class="string">"fellowshell"</span>;</span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line">        scan.setCaching(<span class="number">500</span>);</span><br><span class="line">        scan.setCacheBlocks(<span class="keyword">false</span>);</span><br><span class="line">        Job job = <span class="keyword">null</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            job = Job.getInstance(conf, <span class="string">"read table : "</span> + tablename);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//重要：在该scanMR执行过程中，会自动扫描hbase文件夹，根据表名找到表的元数据文件，不需要设置文件输入路径。</span></span><br><span class="line">            <span class="comment">//tablename为源表名，scan为扫描类对象</span></span><br><span class="line">            TableMapReduceUtil.initTableMapperJob(tablename, scan, ReadHFileMapper<span class="class">.<span class="keyword">class</span>, <span class="title">Text</span>.<span class="title">class</span>, <span class="title">Text</span>.<span class="title">class</span>, <span class="title">job</span>, <span class="title">false</span>)</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//重要：扫描得到的数据以HFile的形式放在HDFS目录下。</span></span><br><span class="line">            FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> Path( hdfsRoot +<span class="string">"fellowshellread1"</span>));</span><br><span class="line">            </span><br><span class="line">            System.exit(job.waitForCompletion(<span class="keyword">true</span>) ? <span class="number">0</span> : <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>scanMR在执行过程中，会自动扫描hbase文件夹，根据表名找到表的元数据文件，不需要配置HDFS文件输入路径。</strong></li>
+<li><strong>scanMR扫描得到的数据按照Mapper中配置好的格式保存到新建的HFile中，需要配置HFile文件输出路径。</strong></li>
+</ul>
+<p>执行main方法后打开HDFS客户端可以看到出现输出文件夹，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/3.jpg" alt></p>
+<p><strong>下载其中HFile文件可以看到就是以字符串形式保存key-value数据的，如下图所示。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(2)_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/4.jpg" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(1)_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/" rel="next" title="HBase表数据倾斜治理(1)_shell命令实现bulkload">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理(1)_shell命令实现bulkload
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">76</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-2-Scan读取Hbase表与Hbase表快照"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理(2)_Scan读取Hbase表与Hbase表快照</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HBase获取数据的方式"><span class="nav-number">1.1.</span> <span class="nav-text">HBase获取数据的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-HBase数据查询分类"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.HBase数据查询分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-ScanAPI"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.ScanAPI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-TableScanMR"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.TableScanMR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-SnapshotScanMR"><span class="nav-number">1.1.4.</span> <span class="nav-text">4.SnapshotScanMR</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#initTableMapperJob读取Hbase表"><span class="nav-number">1.2.</span> <span class="nav-text">initTableMapperJob读取Hbase表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-创建Mapper类，实现map计算任务"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.创建Mapper类，实现map计算任务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-创建Driver类"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.创建Driver类</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
