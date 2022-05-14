@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中1.SnapshotScanMR方法读取hbase快照的两种使用场景前文我们提到snapshot的主要作用就是帮助我们在扫描HBase表数据时绕过RegionServer直接从HDFS中读取Hfile文件数据，减轻RegionServer的压力。 实际上SnapshotScanMR可以读取的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/05/13/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(5)_%E8%AF%BB%E5%8F%96export%20snapshot%E5%B9%B6bulkload%E5%88%B0%E4%B8%8D%E5%90%8C%E7%BB%93%E6%9E%84hbase%E8%A1%A8%E4%B8%AD/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中1.SnapshotScanMR方法读取hbase快照的两种使用场景前文我们提到snapshot的主要作用就是帮助我们在扫描HBase表数据时绕过RegionServer直接从HDFS中读取Hfile文件数据，减轻RegionServer的压力。 实际上SnapshotScanMR可以读取的">
+<meta property="article:published_time" content="2022-05-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-05-14T09:58:36.175Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/05/13/HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/05/13/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(5)_%E8%AF%BB%E5%8F%96export%20snapshot%E5%B9%B6bulkload%E5%88%B0%E4%B8%8D%E5%90%8C%E7%BB%93%E6%9E%84hbase%E8%A1%A8%E4%B8%AD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-05-13T00:00:00+08:00">
+                2022-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase表数据倾斜治理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-5-读取export-snapshot并bulkload到不同结构hbase表中"><a href="#HBase表数据倾斜治理-5-读取export-snapshot并bulkload到不同结构hbase表中" class="headerlink" title="HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中"></a>HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中</h2><h3 id="1-SnapshotScanMR方法读取hbase快照的两种使用场景"><a href="#1-SnapshotScanMR方法读取hbase快照的两种使用场景" class="headerlink" title="1.SnapshotScanMR方法读取hbase快照的两种使用场景"></a>1.SnapshotScanMR方法读取hbase快照的两种使用场景</h3><p>前文我们提到snapshot的主要作用就是帮助我们在扫描HBase表数据时绕过RegionServer直接从HDFS中读取Hfile文件数据，减轻RegionServer的压力。</p>
+<p>实际上SnapshotScanMR可以读取的快照有两种：</p>
+<ul>
+<li>读取本地hbase集群上的快照。</li>
+<li>读取从其他hbase集群上export到本地的快照。</li>
+</ul>
+<h4 id="1-1读取本地快照"><a href="#1-1读取本地快照" class="headerlink" title="1.1读取本地快照"></a>1.1读取本地快照</h4><p>hbase库中存储的表快照，也就是在hbase shell中通过命令list_snapshots可以查到的快照表，它们的快照文件是存储在hbase默认文件夹中的。</p>
+<p>可以在hbase-site.xml文件中如下配置hbase默认文件夹：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.rootdir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://localhost:9005/hbase<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>程序在创建HBaseConfiguration对象时自动加载该参数，initTableSnapshotMapperJob方法会到该目录下去寻找快照文件。</p>
+<h4 id="1-2读取export快照"><a href="#1-2读取export快照" class="headerlink" title="1.2读取export快照"></a>1.2读取export快照</h4><p><strong>从其他hbase集群中使用export导出的快照时，hbase客户端会把快照文件指向的数据文件也一并导出。使用initTableSnapshotMapperJob方法同样可以直接读取这种快照文件，不过必须在代码中将hbase.rootdir设置为快照文件的存储路径，或者将快照文件和数据文件移动到hbase默认文件夹下。</strong></p>
+<h3 id="2-应用实例"><a href="#2-应用实例" class="headerlink" title="2.应用实例"></a>2.应用实例</h3><h4 id="2-1export快照文件"><a href="#2-1export快照文件" class="headerlink" title="2.1export快照文件"></a>2.1export快照文件</h4><p>快照文件具体结构会在后续博文中进行介绍。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hbase\bin&gt;hbase org.apache.hadoop.hbase.snapshot.ExportSnapshot -snapshot "fellowshell_snapshot" -copy-to hdfs://localhost:9005/exportSnapshot</span><br></pre></td></tr></table></figure>
+
+<p><strong>语法说明：</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase org.apache.hadoop.hbase.snapshot.ExportSnapshot -snapshot 快照名 -copy-to 目标文件夹</span><br></pre></td></tr></table></figure>
+
+<p>export日志如下，可以看出导出过程实际上也是一个MR任务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">SLF4J: Class path contains multiple SLF4J bindings.</span><br><span class="line">SLF4J: Found binding in [jar:file:&#x2F;E:&#x2F;HBase&#x2F;hbase&#x2F;lib&#x2F;slf4j-log4j12-1.7.5.jar!&#x2F;org&#x2F;slf4j&#x2F;impl&#x2F;StaticLoggerBinder.class]</span><br><span class="line">SLF4J: Found binding in [jar:file:&#x2F;E:&#x2F;HBase&#x2F;hadoop&#x2F;share&#x2F;hadoop&#x2F;common&#x2F;lib&#x2F;slf4j-log4j12-1.7.5.jar!&#x2F;org&#x2F;slf4j&#x2F;impl&#x2F;StaticLoggerBinder.class]</span><br><span class="line">SLF4J: See http:&#x2F;&#x2F;www.slf4j.org&#x2F;codes.html#multiple_bindings for an explanation.</span><br><span class="line">SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]</span><br><span class="line">2022-05-09 01:20:07,557 INFO  [main] snapshot.ExportSnapshot: Copy Snapshot Manifest</span><br><span class="line">2022-05-09 01:20:07,864 INFO  [main] client.RMProxy: Connecting to ResourceManager at &#x2F;0.0.0.0:8032</span><br><span class="line">2022-05-09 01:20:08,782 INFO  [main] snapshot.ExportSnapshot: Loading Snapshot &#39;fellowshell_snapshot&#39; hfile list</span><br><span class="line">2022-05-09 01:20:08,999 INFO  [main] mapreduce.JobSubmitter: number of splits:1</span><br><span class="line">2022-05-09 01:20:09,078 INFO  [main] mapreduce.JobSubmitter: Submitting tokens for job: job_1652029268976_0001</span><br><span class="line">2022-05-09 01:20:09,424 INFO  [main] impl.YarnClientImpl: Submitted application application_1652029268976_0001</span><br><span class="line">2022-05-09 01:20:09,450 INFO  [main] mapreduce.Job: The url to track the job: http:&#x2F;&#x2F;LAPTOP-1D612HIP:8088&#x2F;proxy&#x2F;application_1652029268976_0001&#x2F;</span><br><span class="line">2022-05-09 01:20:09,451 INFO  [main] mapreduce.Job: Running job: job_1652029268976_0001</span><br><span class="line">2022-05-09 01:20:19,638 INFO  [main] mapreduce.Job: Job job_1652029268976_0001 running in uber mode : false</span><br><span class="line">2022-05-09 01:20:19,644 INFO  [main] mapreduce.Job:  map 0% reduce 0%</span><br><span class="line">2022-05-09 01:20:24,732 INFO  [main] mapreduce.Job:  map 100% reduce 0%</span><br><span class="line">2022-05-09 01:20:24,739 INFO  [main] mapreduce.Job: Job job_1652029268976_0001 completed successfully</span><br><span class="line">2022-05-09 01:20:24,803 INFO  [main] mapreduce.Job: Counters: 37</span><br><span class="line">        File System Counters</span><br><span class="line">                FILE: Number of bytes read&#x3D;0</span><br><span class="line">                FILE: Number of bytes written&#x3D;141262</span><br><span class="line">                FILE: Number of read operations&#x3D;0</span><br><span class="line">                FILE: Number of large read operations&#x3D;0</span><br><span class="line">                FILE: Number of write operations&#x3D;0</span><br><span class="line">                HDFS: Number of bytes read&#x3D;6092</span><br><span class="line">                HDFS: Number of bytes written&#x3D;5885</span><br><span class="line">                HDFS: Number of read operations&#x3D;9</span><br><span class="line">                HDFS: Number of large read operations&#x3D;0</span><br><span class="line">                HDFS: Number of write operations&#x3D;2</span><br><span class="line">        Job Counters</span><br><span class="line">                Launched map tasks&#x3D;1</span><br><span class="line">                Other local map tasks&#x3D;1</span><br><span class="line">                Total time spent by all maps in occupied slots (ms)&#x3D;2742</span><br><span class="line">                Total time spent by all reduces in occupied slots (ms)&#x3D;0</span><br><span class="line">                Total time spent by all map tasks (ms)&#x3D;2742</span><br><span class="line">                Total vcore-seconds taken by all map tasks&#x3D;2742</span><br><span class="line">                Total megabyte-seconds taken by all map tasks&#x3D;2807808</span><br><span class="line">        Map-Reduce Framework</span><br><span class="line">                Map input records&#x3D;1</span><br><span class="line">                Map output records&#x3D;0</span><br><span class="line">                Input split bytes&#x3D;207</span><br><span class="line">                Spilled Records&#x3D;0</span><br><span class="line">                Failed Shuffles&#x3D;0</span><br><span class="line">                Merged Map outputs&#x3D;0</span><br><span class="line">                GC time elapsed (ms)&#x3D;34</span><br><span class="line">                CPU time spent (ms)&#x3D;874</span><br><span class="line">                Physical memory (bytes) snapshot&#x3D;341762048</span><br><span class="line">                Virtual memory (bytes) snapshot&#x3D;361213952</span><br><span class="line">                Total committed heap usage (bytes)&#x3D;196083712</span><br><span class="line">        org.apache.hadoop.hbase.snapshot.ExportSnapshot$Counter</span><br><span class="line">                BYTES_COPIED&#x3D;5885</span><br><span class="line">                BYTES_EXPECTED&#x3D;5885</span><br><span class="line">                BYTES_SKIPPED&#x3D;0</span><br><span class="line">                COPY_FAILED&#x3D;0</span><br><span class="line">                FILES_COPIED&#x3D;1</span><br><span class="line">                FILES_SKIPPED&#x3D;0</span><br><span class="line">                MISSING_FILES&#x3D;0</span><br><span class="line">        File Input Format Counters</span><br><span class="line">                Bytes Read&#x3D;0</span><br><span class="line">        File Output Format Counters</span><br><span class="line">                Bytes Written&#x3D;0</span><br><span class="line">2022-05-09 01:20:24,806 INFO  [main] snapshot.ExportSnapshot: Finalize the Snapshot Export</span><br><span class="line">2022-05-09 01:20:24,815 INFO  [main] snapshot.ExportSnapshot: Verify snapshot integrity</span><br><span class="line">2022-05-09 01:20:24,845 INFO  [main] snapshot.ExportSnapshot: Export Completed: fellowshell_snapshot</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2在新hbase集群中建表"><a href="#2-2在新hbase集群中建表" class="headerlink" title="2.2在新hbase集群中建表"></a>2.2在新hbase集群中建表</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase(main):017:0&gt; create "exportSnapshotReverse","d"</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3创建mapper类"><a href="#2-3创建mapper类" class="headerlink" title="2.3创建mapper类"></a>2.3创建mapper类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReverseMapper</span> <span class="keyword">extends</span> <span class="title">TableMapper</span>&lt;<span class="title">ImmutableBytesWritable</span>, <span class="title">Put</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(ImmutableBytesWritable row, Result value, Context context)</span> <span class="keyword">throws</span> InterruptedException, IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] rowkey = reverseFirstField(row.get(), <span class="number">4</span>);</span><br><span class="line">        ImmutableBytesWritable putRowkey = <span class="keyword">new</span> ImmutableBytesWritable(rowkey);</span><br><span class="line">        Put put = <span class="keyword">new</span> Put(rowkey);</span><br><span class="line">        <span class="keyword">for</span> (Cell cell : value.listCells()) &#123;</span><br><span class="line">            <span class="keyword">byte</span>[] colFamily = <span class="keyword">new</span> <span class="keyword">byte</span>[cell.getFamilyLength()];</span><br><span class="line">            <span class="keyword">byte</span>[] colQualifier = <span class="keyword">new</span> <span class="keyword">byte</span>[cell.getQualifierLength()];</span><br><span class="line">            <span class="keyword">byte</span>[] colValue = <span class="keyword">new</span> <span class="keyword">byte</span>[cell.getValueLength()];</span><br><span class="line">            System.arraycopy(cell.getFamilyArray(), cell.getFamilyOffset(), colFamily, <span class="number">0</span>, cell.getFamilyLength());</span><br><span class="line">            System.arraycopy(cell.getQualifierArray(), cell.getQualifierOffset(), colQualifier, <span class="number">0</span>, cell.getQualifierLength());</span><br><span class="line">            System.arraycopy(cell.getValueArray(), cell.getValueOffset(), colValue, <span class="number">0</span>, cell.getValueLength());</span><br><span class="line"></span><br><span class="line">            put.add(colFamily, colQualifier, colValue);</span><br><span class="line">        &#125;</span><br><span class="line">        context.write(putRowkey, put);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] reverseFirstField(<span class="keyword">byte</span>[] rowkey, <span class="keyword">int</span> firstFieldLenth) &#123;</span><br><span class="line">        <span class="keyword">byte</span>[] reverseField = <span class="keyword">new</span> <span class="keyword">byte</span>[firstFieldLenth];</span><br><span class="line">        System.arraycopy(rowkey, <span class="number">0</span>, reverseField, <span class="number">0</span>, firstFieldLenth);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (firstFieldLenth == <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> reverseInt = Integer.reverse(Bytes.toInt(reverseField));</span><br><span class="line">            reverseField = Bytes.toBytes(reverseInt);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">long</span> reverseLong = Long.reverse(Bytes.toLong(reverseField));</span><br><span class="line">            reverseField = Bytes.toBytes(reverseLong);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.arraycopy(reverseField, <span class="number">0</span>, rowkey, <span class="number">0</span>, firstFieldLenth);</span><br><span class="line">        <span class="keyword">return</span> rowkey;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4创建driver类"><a href="#2-4创建driver类" class="headerlink" title="2.4创建driver类"></a>2.4创建driver类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExportReverseDriver</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">        String hdfsRoot = <span class="string">"hdfs://localhost:9005/"</span>; <span class="comment">//hdfs 的根目录</span></span><br><span class="line">        String snapshotName = <span class="string">"fellowshell_snapshot"</span>;</span><br><span class="line">        String destTableName = <span class="string">"exportSnapshotReverse"</span>;</span><br><span class="line">        String tmpDir = <span class="string">"testpath"</span>;</span><br><span class="line"></span><br><span class="line">        Configuration conf = HBaseConfiguration.create();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**重要：因为我自己电脑的缘故，导致zookeeper的默认端口2181被占用，启动hbase时会自动将zookeeper启动到2182端口上，</span></span><br><span class="line"><span class="comment">         那么就需要我在hbase的hbase-site.xml文件中配置hbase去连接zookeeper的2182端口，</span></span><br><span class="line"><span class="comment">         同时也需要我在java程序中配置hbase.zookeeper.property.clientPort为2182。*/</span></span><br><span class="line">        conf.set(<span class="string">"hbase.zookeeper.property.clientPort"</span>, <span class="string">"2182"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//重要：将hbase.rootdir设置为存储export快照文件的文件夹。</span></span><br><span class="line">        <span class="comment">//此程序中除了获取快照文件，后续不再使用到hbase.rootdir参数，所以该设置并不会影响hbase系统的文件目录结构，如果后续还需要使用则需要注意。</span></span><br><span class="line">        conf.set(<span class="string">"hbase.rootdir"</span>, <span class="string">"hdfs://localhost:9005/exportSnapshot"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//重要：initTableSnapshotMapperJob方法会在添加的tmp目录下创建临时文件夹，用来存放在hbase客户端本地临时创建的region，</span></span><br><span class="line">        <span class="comment">//该方法先根据快照文件和数据文件在该文件夹中重建快照表的region，然后scan再扫描这些region获取数据。</span></span><br><span class="line">        <span class="comment">//创建该文件夹时如果输入参数没有指定文件系统，则文件夹目录为fs.defaultFS+tmp，如果指定了文件系统则就是tmp，</span></span><br><span class="line">        <span class="comment">//扫描数据时则是从fs.defaultFS目录往下去寻找region。所以在设置该tmp参数时，要么不要指定文件系统，要么就指定文件系统为fs.defaultFS。</span></span><br><span class="line">        conf.set(<span class="string">"fs.defaultFS"</span>, hdfsRoot);</span><br><span class="line"></span><br><span class="line">        Connection conn = ConnectionFactory.createConnection(conf);</span><br><span class="line">        Table destTable = conn.getTable(TableName.valueOf(destTableName));</span><br><span class="line">        Admin admin = conn.getAdmin();</span><br><span class="line"></span><br><span class="line">        Job job = Job.getInstance(conf, <span class="string">"reverse table : "</span> + snapshotName);</span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line">        scan.setCaching(<span class="number">500</span>);</span><br><span class="line">        scan.setCacheBlocks(<span class="keyword">false</span>);</span><br><span class="line">        TableMapReduceUtil.initTableSnapshotMapperJob(snapshotName, scan, ReverseMapper<span class="class">.<span class="keyword">class</span>, <span class="title">ImmutableBytesWritable</span>.<span class="title">class</span>, <span class="title">Put</span>.<span class="title">class</span>, <span class="title">job</span>, <span class="title">false</span>, <span class="title">new</span> <span class="title">Path</span>(<span class="title">tmpDir</span>))</span>;</span><br><span class="line"></span><br><span class="line">        Path outputPath = <span class="keyword">new</span> Path(hdfsRoot + destTableName);</span><br><span class="line">        HFileOutputFormat2.setOutputPath(job, outputPath);</span><br><span class="line">        HFileOutputFormat2.configureIncrementalLoad(job, destTable, conn.getRegionLocator(TableName.valueOf(destTableName)));</span><br><span class="line"></span><br><span class="line">        job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (job.isSuccessful()) &#123;</span><br><span class="line">            System.out.println(<span class="string">"reverse成功！"</span>);</span><br><span class="line">            LoadIncrementalHFiles loader = <span class="keyword">new</span> LoadIncrementalHFiles(conf);</span><br><span class="line">            loader.doBulkLoad(outputPath, admin, destTable, conn.getRegionLocator(TableName.valueOf(destTableName)));</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"reverse失败！"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-5重点回顾"><a href="#2-5重点回顾" class="headerlink" title="2.5重点回顾"></a>2.5重点回顾</h4><h5 id="2-5-1-hbase-rootdir"><a href="#2-5-1-hbase-rootdir" class="headerlink" title="2.5.1  hbase.rootdir"></a>2.5.1  hbase.rootdir</h5><p><strong>通过<code>conf.set(&quot;hbase.rootdir&quot;, &quot;hdfs://localhost:9005/exportSnapshot&quot;)</code>将hbase.rootdir设置为存储export快照文件的文件夹。</strong></p>
+<p><strong>但是要注意此程序后续还需不需要使用该参数，如果还需要使用则需注意避免影响hbase系统的文件目录结构。</strong></p>
+<h5 id="2-5-2-initTableSnapshotMapperJob方法tmp参数"><a href="#2-5-2-initTableSnapshotMapperJob方法tmp参数" class="headerlink" title="2.5.2  initTableSnapshotMapperJob方法tmp参数"></a>2.5.2  initTableSnapshotMapperJob方法tmp参数</h5><p><strong>initTableSnapshotMapperJob方法会在添加的tmp目录下创建临时文件夹，用来存放在hbase客户端本地临时创建的region，该方法先根据快照文件和数据文件在该文件夹中重建快照表的region，然后再scan扫描这些region获取数据。</strong></p>
+<p>创建tmp文件夹时：</p>
+<ul>
+<li>如果输入参数tmp没有指定文件系统，如<code>/testpath</code>，则tmp文件夹目录为fs.defaultFS+“/testpath”；</li>
+<li>如果指定了文件系统，如<code>hdfs://localhost:9005/testpath</code>，则tmp文件加就是该参数值。</li>
+</ul>
+<p>扫描读取数据时：</p>
+<ul>
+<li>从fs.defaultFS目录往下去寻找该快照表的region。</li>
+</ul>
+<p><strong>如果我们没有在core-site.xml文件中设置所以在配置fs.defaultFS，则默认fs.defaultFS为本地文件系统<code>file:///</code>，同时我们也可以在代码中通过<code>conf.set(&quot;fs.defaultFS&quot;, hdfsRoot)</code>来重新配置fs.defaultFS。</strong></p>
+<p><strong>总之无论如何配置fs.defaultFS和tmp参数时，一定要保证创建tmp文件夹和扫描读取tmp文件夹的路径是在同一个文件系统中。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/04/28/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(4)_%E8%AF%BB%E5%8F%96hbase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%B9%B6bulkload%E5%88%B0%E4%B8%8D%E5%90%8C%E7%BB%93%E6%9E%84hbase%E8%A1%A8%E4%B8%AD/" rel="next" title="HBase表数据倾斜治理(4)_读取hbase表数据并bulkload到不同结构hbase表中">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理(4)_读取hbase表数据并bulkload到不同结构hbase表中
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">79</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">95</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-5-读取export-snapshot并bulkload到不同结构hbase表中"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理(5)_读取export snapshot并bulkload到不同结构hbase表中</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-SnapshotScanMR方法读取hbase快照的两种使用场景"><span class="nav-number">1.1.</span> <span class="nav-text">1.SnapshotScanMR方法读取hbase快照的两种使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1读取本地快照"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1读取本地快照</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2读取export快照"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2读取export快照</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-应用实例"><span class="nav-number">1.2.</span> <span class="nav-text">2.应用实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1export快照文件"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1export快照文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2在新hbase集群中建表"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2在新hbase集群中建表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3创建mapper类"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3创建mapper类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4创建driver类"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4创建driver类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5重点回顾"><span class="nav-number">1.2.5.</span> <span class="nav-text">2.5重点回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-5-1-hbase-rootdir"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">2.5.1  hbase.rootdir</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-5-2-initTableSnapshotMapperJob方法tmp参数"><span class="nav-number">1.2.5.2.</span> <span class="nav-text">2.5.2  initTableSnapshotMapperJob方法tmp参数</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
