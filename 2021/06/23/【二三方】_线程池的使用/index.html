@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="Retryer," />
+  <meta name="keywords" content="线程池," />
 
 
 
@@ -83,16 +83,16 @@
 
 
 
-<meta name="description" content="Retryer重试器原理与使用 Retryer重试器常用于发送http请求时，针对网络抖动、特定响应等情况，设置重新发送http请求。  Retryer使用步骤：  1.引入Maven依赖： 12345&lt;dependency&gt;  &lt;groupId&gt;com.github.rholder&lt;&#x2F;groupId&gt;  &lt;artifactId&gt;guava-retr">
+<meta name="description" content="线程池的使用 1.新建线程池，填写线程池的七大参数： 12static ThreadPoolExecutor threadPool &#x3D; new ThreadPoolExecutor(50, 100, 30, TimeUnit.SECONDS, new ArrayBlockingQueue&lt;&gt;(1 &lt;&lt; 16),    Executors.defaultThreadFacto">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【随手小记】_Retryer重试器原理与使用">
-<meta property="og:url" content="http://https//littleforestjia.github.io/2021/05/30/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Retryer%E9%87%8D%E8%AF%95%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:title" content="【二三方】_线程池的使用">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/06/23/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
 <meta property="og:site_name" content="岩手县小森的博客">
-<meta property="og:description" content="Retryer重试器原理与使用 Retryer重试器常用于发送http请求时，针对网络抖动、特定响应等情况，设置重新发送http请求。  Retryer使用步骤：  1.引入Maven依赖： 12345&lt;dependency&gt;  &lt;groupId&gt;com.github.rholder&lt;&#x2F;groupId&gt;  &lt;artifactId&gt;guava-retr">
-<meta property="article:published_time" content="2021-05-29T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-07-22T14:15:20.578Z">
+<meta property="og:description" content="线程池的使用 1.新建线程池，填写线程池的七大参数： 12static ThreadPoolExecutor threadPool &#x3D; new ThreadPoolExecutor(50, 100, 30, TimeUnit.SECONDS, new ArrayBlockingQueue&lt;&gt;(1 &lt;&lt; 16),    Executors.defaultThreadFacto">
+<meta property="article:published_time" content="2021-06-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-05-27T08:08:29.423Z">
 <meta property="article:author" content="zju岩手县小森">
-<meta property="article:tag" content="Retryer">
+<meta property="article:tag" content="线程池">
 <meta name="twitter:card" content="summary">
 
 
@@ -123,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/05/30/【随手小记】_Retryer重试器原理与使用/"/>
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/06/23/【二三方】_线程池的使用/"/>
 
 
 
 
 
-  <title>【随手小记】_Retryer重试器原理与使用 | 岩手县小森的博客</title>
+  <title>【二三方】_线程池的使用 | 岩手县小森的博客</title>
   
 
 
@@ -256,7 +256,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/05/30/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Retryer%E9%87%8D%E8%AF%95%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/06/23/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BD%BF%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zju岩手县小森">
@@ -273,7 +273,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">【随手小记】_Retryer重试器原理与使用</h1>
+          <h1 class="post-title" itemprop="name headline">【二三方】_线程池的使用</h1>
         
 
         <div class="post-meta">
@@ -285,8 +285,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-30T00:00:00+08:00">
-                2021-05-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-23T00:00:00+08:00">
+                2021-06-23
               </time>
             
 
@@ -308,8 +308,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0/" itemprop="url" rel="index">
-                    <span itemprop="name">随手小记</span>
+                  <a href="/categories/%E4%BA%8C%E4%B8%89%E6%96%B9/" itemprop="url" rel="index">
+                    <span itemprop="name">二三方</span>
                   </a>
                 </span>
 
@@ -345,39 +345,20 @@
       
 
       
-        <h4 id="Retryer重试器原理与使用"><a href="#Retryer重试器原理与使用" class="headerlink" title="Retryer重试器原理与使用"></a>Retryer重试器原理与使用</h4><ul>
-<li><p><a href="https://zhuanlan.zhihu.com/p/148272194" target="_blank" rel="noopener">Retryer重试器</a>常用于发送http请求时，针对网络抖动、特定响应等情况，设置重新发送http请求。</p>
+        <h4 id="线程池的使用"><a href="#线程池的使用" class="headerlink" title="线程池的使用"></a>线程池的使用</h4><ul>
+<li><p>1.新建线程池，填写线程池的七大参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> ThreadPoolExecutor threadPool = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">50</span>, <span class="number">100</span>, <span class="number">30</span>, TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">16</span>),</span><br><span class="line">    Executors.defaultThreadFactory(), <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()));</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>Retryer使用步骤：</p>
-<ul>
-<li><p>1.引入Maven依赖：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.rholder<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>guava-retrying<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<li><p>2.新建任务，通过实现Runnable接口来创建新任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Runnable task1 = <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            System.out.println(<span class="string">"线程2："</span>+i);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">500</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>2.创建重试器对象：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Retryer&lt;String&gt; retryer = RetryerBuilder.&lt;String&gt;newBuilder()</span><br><span class="line">		.retryIfException()</span><br><span class="line">    .retryIfResult((resp) -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (resp == <span class="keyword">null</span> || StringUtils.isEmpty(resp)) &#123;</span><br><span class="line">            rechargeThirdLog(thirdRechargeOrderRBO, <span class="string">"HTTP_RETRY"</span>, checkUrl, headers, params, resp, <span class="string">"重试"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;<span class="comment">//返回true表示重试</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//返回false表示不重试</span></span><br><span class="line">    &#125;)</span><br><span class="line">    .withWaitStrategy(WaitStrategies.fixedWait(<span class="number">1</span>, TimeUnit.SECONDS))</span><br><span class="line">    .withStopStrategy(StopStrategies.stopAfterAttempt(<span class="number">3</span>))</span><br><span class="line">  	.build();</span><br></pre></td></tr></table></figure>
+<li><p>3.使用线程池执行任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">threadPool.execute(task1);</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>3.创建重试任务，因为该任务一般都具有返回值，所以通过实现Callable接口来创建任务：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Callable&lt;Boolean&gt; callable = <span class="keyword">new</span> Callable&lt;Boolean&gt;() &#123;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">				<span class="keyword">return</span> HttpUtil.postRequest(checkUrl, headers, params);</span><br><span class="line">		&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>4.使用重试器执行任务：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String resp = retryer.call(callable);</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>Retryer常见属性</p>
-<ul>
-<li><p>.retryIfException()：任务抛出runtime异常、checked异常时都会重试，但是抛出error不会重试；</p>
-</li>
-<li><p>.retryIfResult(s -&gt; Objects.equals(s, null))：任务方法返回值为空时重试；</p>
-</li>
-<li><p>.retryIfResult参数中除了返回重试与否，还可以添加其他逻辑，如下添加了打印日志的代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.retryIfResult((resp) -&gt; &#123;</span><br><span class="line">		<span class="keyword">if</span> (resp == <span class="keyword">null</span> || StringUtils.isEmpty(resp)) &#123;</span><br><span class="line">				rechargeThirdLog(thirdRechargeOrderRBO, <span class="string">"HTTP_RETRY"</span>, checkUrl, headers, params, resp, <span class="string">"重试"</span>);</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;<span class="comment">//返回true表示重试</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//返回false表示不重试</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>.withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))：每次失败之后等待1秒再重试；</p>
-</li>
-<li><p>.withStopStrategy(StopStrategies.stopAfterAttempt(3))：最大重试次数为3。</p>
-</li>
-</ul>
+<li><p>以上三步也可以通过lambda表达式函数式编程一步完成：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">1</span>, <span class="number">3</span>, TimeUnit.SECONDS, <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">1</span> &lt;&lt; <span class="number">16</span>),</span><br><span class="line">        Executors.defaultThreadFactory(), <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy()).execute(() -&gt; System.out.println(<span class="string">"线程2"</span>));</span><br></pre></td></tr></table></figure>
+
+
 </li>
 </ul>
 
@@ -397,7 +378,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Retryer/" rel="tag"><i class="fa fa-tag"></i> Retryer</a>
+            <a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" rel="tag"><i class="fa fa-tag"></i> 线程池</a>
           
         </div>
       
@@ -410,8 +391,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2021/05/17/%E3%80%90%E4%B9%90%E4%BC%98%E5%95%86%E5%9F%8E%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Maven%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%AA%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/" rel="next" title="【乐优商城随手小记】_Maven配置多个远程仓库">
-                <i class="fa fa-chevron-left"></i> 【乐优商城随手小记】_Maven配置多个远程仓库
+              <a href="/2021/06/20/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_VO%E3%80%81BO%E3%80%81PO%E3%80%81DO%E3%80%81DTO%E7%9A%84%E5%8C%BA%E5%88%AB/" rel="next" title="【二三方】_VO、BO、PO、DO、DTO的区别">
+                <i class="fa fa-chevron-left"></i> 【二三方】_VO、BO、PO、DO、DTO的区别
               </a>
             
           </div>
@@ -420,8 +401,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2021/06/02/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Mac_IntelliJ_IDEA%E5%BF%AB%E6%8D%B7%E9%94%AE%E5%90%88%E9%9B%86/" rel="prev" title="【随手小记】_Mac_IntelliJ_IDEA快捷键合集">
-                【随手小记】_Mac_IntelliJ_IDEA快捷键合集 <i class="fa fa-chevron-right"></i>
+              <a href="/2021/06/24/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_Spring%E5%AE%B9%E5%99%A8%E4%BC%98%E5%85%88%E8%B0%83%E7%94%A8%E5%AD%90%E7%B1%BB%E7%9A%84%E6%96%B9%E6%B3%95/" rel="prev" title="【二三方】_Spring容器优先调用子类的方法">
+                【二三方】_Spring容器优先调用子类的方法 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -572,7 +553,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Retryer重试器原理与使用"><span class="nav-number">1.</span> <span class="nav-text">Retryer重试器原理与使用</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#线程池的使用"><span class="nav-number">1.</span> <span class="nav-text">线程池的使用</span></a></li></ol></div>
             
 
           </div>

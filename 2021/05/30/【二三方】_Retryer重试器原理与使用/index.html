@@ -72,7 +72,7 @@
 
 
 
-  <meta name="keywords" content="FastJson," />
+  <meta name="keywords" content="Retryer," />
 
 
 
@@ -83,16 +83,16 @@
 
 
 
-<meta name="description" content="FastJson的使用方法FastJson中主要类 JSON：fastJson的解析器，用于JSON格式字符串与JSON对象及javaBean之间的转换。 JSONObject：fastJson提供的JSON对象，public class JSONObject extends JSON implements Map&lt;String, Object&gt;。也就是说，JSON有的属性和方法，JS">
+<meta name="description" content="Retryer重试器原理与使用 Retryer重试器常用于发送http请求时，针对网络抖动、特定响应等情况，设置重新发送http请求。  Retryer使用步骤：  1.引入Maven依赖： 12345&lt;dependency&gt;  &lt;groupId&gt;com.github.rholder&lt;&#x2F;groupId&gt;  &lt;artifactId&gt;guava-retr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【随手小记】_FastJson的使用方法">
-<meta property="og:url" content="http://https//littleforestjia.github.io/2021/08/04/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_FastJson%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:title" content="【二三方】_Retryer重试器原理与使用">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2021/05/30/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_Retryer%E9%87%8D%E8%AF%95%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/index.html">
 <meta property="og:site_name" content="岩手县小森的博客">
-<meta property="og:description" content="FastJson的使用方法FastJson中主要类 JSON：fastJson的解析器，用于JSON格式字符串与JSON对象及javaBean之间的转换。 JSONObject：fastJson提供的JSON对象，public class JSONObject extends JSON implements Map&lt;String, Object&gt;。也就是说，JSON有的属性和方法，JS">
-<meta property="article:published_time" content="2021-08-03T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-08-24T14:46:34.377Z">
+<meta property="og:description" content="Retryer重试器原理与使用 Retryer重试器常用于发送http请求时，针对网络抖动、特定响应等情况，设置重新发送http请求。  Retryer使用步骤：  1.引入Maven依赖： 12345&lt;dependency&gt;  &lt;groupId&gt;com.github.rholder&lt;&#x2F;groupId&gt;  &lt;artifactId&gt;guava-retr">
+<meta property="article:published_time" content="2021-05-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-05-27T08:07:14.038Z">
 <meta property="article:author" content="zju岩手县小森">
-<meta property="article:tag" content="FastJson">
+<meta property="article:tag" content="Retryer">
 <meta name="twitter:card" content="summary">
 
 
@@ -123,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/08/04/【随手小记】_FastJson的使用方法/"/>
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2021/05/30/【二三方】_Retryer重试器原理与使用/"/>
 
 
 
 
 
-  <title>【随手小记】_FastJson的使用方法 | 岩手县小森的博客</title>
+  <title>【二三方】_Retryer重试器原理与使用 | 岩手县小森的博客</title>
   
 
 
@@ -256,7 +256,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/08/04/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_FastJson%E7%9A%84%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2021/05/30/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_Retryer%E9%87%8D%E8%AF%95%E5%99%A8%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zju岩手县小森">
@@ -273,7 +273,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">【随手小记】_FastJson的使用方法</h1>
+          <h1 class="post-title" itemprop="name headline">【二三方】_Retryer重试器原理与使用</h1>
         
 
         <div class="post-meta">
@@ -285,8 +285,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-04T00:00:00+08:00">
-                2021-08-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-30T00:00:00+08:00">
+                2021-05-30
               </time>
             
 
@@ -308,8 +308,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0/" itemprop="url" rel="index">
-                    <span itemprop="name">随手小记</span>
+                  <a href="/categories/%E4%BA%8C%E4%B8%89%E6%96%B9/" itemprop="url" rel="index">
+                    <span itemprop="name">二三方</span>
                   </a>
                 </span>
 
@@ -345,41 +345,42 @@
       
 
       
-        <h4 id="FastJson的使用方法"><a href="#FastJson的使用方法" class="headerlink" title="FastJson的使用方法"></a>FastJson的使用方法</h4><h5 id="FastJson中主要类"><a href="#FastJson中主要类" class="headerlink" title="FastJson中主要类"></a>FastJson中主要类</h5><ul>
-<li>JSON：fastJson的解析器，用于JSON格式字符串与JSON对象及javaBean之间的转换。</li>
-<li>JSONObject：fastJson提供的JSON对象，<code>public class JSONObject extends JSON implements Map&lt;String, Object&gt;</code>。也就是说，JSON有的属性和方法，JSONObject都有。其中数据以Map&lt;String, Object&gt;格式保存，也就是说JSONObject的数据结构与Map是一模一样的。</li>
-<li>JSONArray：fastJson提供的JSON对象，<code>public class JSONArray extends JSON implements List&lt;Object&gt;</code>。也就是说，JSON有的属性和方法，JSONArray都有，而且其中数据以List&lt;Object&gt;格式保存。</li>
-<li>JSONPath：JSONPath表达式通常是用来路径检索或设置Json的，FastJson中虽然有这个类，但是有其他的包做得比它好。</li>
-<li>JSONPatch：JSONPatch是一种用于描述对JSON文档所做的更改的格式，FastJson中虽然有这个类，但是有其他的包做得比它好。</li>
-</ul>
-<h5 id="FastJson中的常用方法"><a href="#FastJson中的常用方法" class="headerlink" title="FastJson中的常用方法"></a>FastJson中的常用方法</h5><ul>
-<li><p>toJSONString()：将map或javaBean对象转换成JSON格式字符串。</p>
-<p>1.将一个javaBean对象转成JSON格式字符串和一个map对象转成JSON字符串的效果是一模一样的：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">UserDTO userDTO = <span class="keyword">new</span> UserDTO(<span class="string">"锦朝"</span>,<span class="string">"努力开心过好每一天"</span>,<span class="number">24</span>,<span class="number">21925155L</span>);</span><br><span class="line"></span><br><span class="line">Map&lt;String,Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">map.put(<span class="string">"name"</span>,<span class="string">"锦朝"</span>);</span><br><span class="line">map.put(<span class="string">"detail"</span>,<span class="string">"努力开心过好每一天"</span>);</span><br><span class="line">map.put(<span class="string">"age"</span>,<span class="number">24</span>);</span><br><span class="line">map.put(<span class="string">"id"</span>,<span class="number">21925155L</span>);</span><br><span class="line"></span><br><span class="line">String userDTOstr = JSON.toJSONString(userDTO);</span><br><span class="line">String mapstr = JSON.toJSONString(map);</span><br></pre></td></tr></table></figure>
-
-<p>所得结果为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;age&quot;:24,&quot;detail&quot;:&quot;努力开心过好每一天&quot;,&quot;id&quot;:21925155,&quot;name&quot;:&quot;锦朝&quot;&#125;</span><br><span class="line">&#123;&quot;name&quot;:&quot;锦朝&quot;,&quot;detail&quot;:&quot;努力开心过好每一天&quot;,&quot;id&quot;:21925155,&quot;age&quot;:24&#125;</span><br></pre></td></tr></table></figure>
-
-<p>2.JSON、JSONObject、JSONArray三个类中都有toJSONString()方法，作用效果完全相同：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String userDTOstr = JSON.toJSONString(userDTO);</span><br><span class="line">String mapstr = JSON.toJSONString(map);</span><br><span class="line">String userDTOstr1 = JSONObject.toJSONString(userDTO);</span><br><span class="line">String mapstr1 = JSONObject.toJSONString(map);</span><br><span class="line">String userDTOstr2 = JSONArray.toJSONString(userDTO);</span><br><span class="line">String mapstr2 = JSONArray.toJSONString(map);</span><br></pre></td></tr></table></figure>
+        <h4 id="Retryer重试器原理与使用"><a href="#Retryer重试器原理与使用" class="headerlink" title="Retryer重试器原理与使用"></a>Retryer重试器原理与使用</h4><ul>
+<li><p><a href="https://zhuanlan.zhihu.com/p/148272194" target="_blank" rel="noopener">Retryer重试器</a>常用于发送http请求时，针对网络抖动、特定响应等情况，设置重新发送http请求。</p>
 </li>
-<li><p>parseObject()：将JSON格式字符串转换成JSON对象。</p>
-<p>1.注意此处&quot;id&quot;:21925155会被转换成Integer类型，写成&quot;id&quot;:21925155L才会被转换成Long类型。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String userselfstr = <span class="string">"&#123;\"name\":\"锦朝\",\"detail\":\"努力开心过好每一天\",\"id\":21925155,\"age\":24&#125;"</span>;</span><br><span class="line">JSONObject userselfObject = JSONObject.parseObject(userselfstr);</span><br></pre></td></tr></table></figure>
+<li><p>Retryer使用步骤：</p>
+<ul>
+<li><p>1.引入Maven依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.rholder<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>guava-retrying<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>toJavaObject()：将JSON对象转换成javaBean对象。</p>
-<p>1.注意进行转换时一定要使属性类型正确，比如此处会将&quot;id&quot;:21925155会被转换成Integer类型，而UserDTO类中的id属性为Long类型，所以会报异常：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String userselfstr = <span class="string">"&#123;\"name\":\"锦朝\",\"detail\":\"努力开心过好每一天\",\"id\":21925155,\"age\":24&#125;"</span>;</span><br><span class="line">JSONObject userselfObject = JSONObject.parseObject(userselfstr);</span><br><span class="line">UserDTO userDTO1 = userselfObject.toJavaObject(UserDTO<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>字符串中改写为&quot;id&quot;:21925155L可使JSON格式字符串转换成JSON对象时，id被转换为Long类型，这样在将JSON对象转换成javaBean对象时就不会报异常：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String userselfstr = <span class="string">"&#123;\"name\":\"锦朝\",\"detail\":\"努力开心过好每一天\",\"id\":21925155L,\"age\":24&#125;"</span>;</span><br><span class="line">JSONObject userselfObject = JSONObject.parseObject(userselfstr);</span><br><span class="line">UserDTO userDTO1 = userselfObject.toJavaObject(UserDTO<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>2.将JSON对象转换成javaBean对象的本质是调用javaBean的默认构造方法，如果我们创建构造方法如下，则执行上述转换语句后，userDTO1对象中的id属性仍为null。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">UserDTO</span><span class="params">(String name, String detail, Integer age, Long id)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">    <span class="keyword">this</span>.detail = detail;</span><br><span class="line">    <span class="keyword">this</span>.age = age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<li><p>2.创建重试器对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Retryer&lt;String&gt; retryer = RetryerBuilder.&lt;String&gt;newBuilder()</span><br><span class="line">		.retryIfException()</span><br><span class="line">    .retryIfResult((resp) -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (resp == <span class="keyword">null</span> || StringUtils.isEmpty(resp)) &#123;</span><br><span class="line">            rechargeThirdLog(thirdRechargeOrderRBO, <span class="string">"HTTP_RETRY"</span>, checkUrl, headers, params, resp, <span class="string">"重试"</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;<span class="comment">//返回true表示重试</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//返回false表示不重试</span></span><br><span class="line">    &#125;)</span><br><span class="line">    .withWaitStrategy(WaitStrategies.fixedWait(<span class="number">1</span>, TimeUnit.SECONDS))</span><br><span class="line">    .withStopStrategy(StopStrategies.stopAfterAttempt(<span class="number">3</span>))</span><br><span class="line">  	.build();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3.创建重试任务，因为该任务一般都具有返回值，所以通过实现Callable接口来创建任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Callable&lt;Boolean&gt; callable = <span class="keyword">new</span> Callable&lt;Boolean&gt;() &#123;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">				<span class="keyword">return</span> HttpUtil.postRequest(checkUrl, headers, params);</span><br><span class="line">		&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.使用重试器执行任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String resp = retryer.call(callable);</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
-<h5 id="JSONPath"><a href="#JSONPath" class="headerlink" title="JSONPath"></a>JSONPath</h5><h5 id="JSONPatch"><a href="#JSONPatch" class="headerlink" title="JSONPatch"></a>JSONPatch</h5>
+</li>
+<li><p>Retryer常见属性</p>
+<ul>
+<li><p>.retryIfException()：任务抛出runtime异常、checked异常时都会重试，但是抛出error不会重试；</p>
+</li>
+<li><p>.retryIfResult(s -&gt; Objects.equals(s, null))：任务方法返回值为空时重试；</p>
+</li>
+<li><p>.retryIfResult参数中除了返回重试与否，还可以添加其他逻辑，如下添加了打印日志的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.retryIfResult((resp) -&gt; &#123;</span><br><span class="line">		<span class="keyword">if</span> (resp == <span class="keyword">null</span> || StringUtils.isEmpty(resp)) &#123;</span><br><span class="line">				rechargeThirdLog(thirdRechargeOrderRBO, <span class="string">"HTTP_RETRY"</span>, checkUrl, headers, params, resp, <span class="string">"重试"</span>);</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;<span class="comment">//返回true表示重试</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;<span class="comment">//返回false表示不重试</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>.withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))：每次失败之后等待1秒再重试；</p>
+</li>
+<li><p>.withStopStrategy(StopStrategies.stopAfterAttempt(3))：最大重试次数为3。</p>
+</li>
+</ul>
+</li>
+</ul>
+
       
     </div>
     
@@ -396,7 +397,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/FastJson/" rel="tag"><i class="fa fa-tag"></i> FastJson</a>
+            <a href="/tags/Retryer/" rel="tag"><i class="fa fa-tag"></i> Retryer</a>
           
         </div>
       
@@ -409,8 +410,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2021/08/01/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E5%B0%8F%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" rel="next" title="【二三方】_小知识积累">
-                <i class="fa fa-chevron-left"></i> 【二三方】_小知识积累
+              <a href="/2021/05/17/%E3%80%90%E4%B9%90%E4%BC%98%E5%95%86%E5%9F%8E%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Maven%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%AA%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/" rel="next" title="【乐优商城随手小记】_Maven配置多个远程仓库">
+                <i class="fa fa-chevron-left"></i> 【乐优商城随手小记】_Maven配置多个远程仓库
               </a>
             
           </div>
@@ -419,8 +420,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2021/08/14/%E3%80%90%E4%BA%8C%E4%B8%89%E6%96%B9%E3%80%91_%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E5%8C%96%E7%89%88/" rel="prev" title="【二三方】_工厂模式的应用进化版">
-                【二三方】_工厂模式的应用进化版 <i class="fa fa-chevron-right"></i>
+              <a href="/2021/06/02/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Mac_IntelliJ_IDEA%E5%BF%AB%E6%8D%B7%E9%94%AE%E5%90%88%E9%9B%86/" rel="prev" title="【随手小记】_Mac_IntelliJ_IDEA快捷键合集">
+                【随手小记】_Mac_IntelliJ_IDEA快捷键合集 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -571,7 +572,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#FastJson的使用方法"><span class="nav-number">1.</span> <span class="nav-text">FastJson的使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#FastJson中主要类"><span class="nav-number">1.1.</span> <span class="nav-text">FastJson中主要类</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FastJson中的常用方法"><span class="nav-number">1.2.</span> <span class="nav-text">FastJson中的常用方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#JSONPath"><span class="nav-number">1.3.</span> <span class="nav-text">JSONPath</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#JSONPatch"><span class="nav-number">1.4.</span> <span class="nav-text">JSONPatch</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Retryer重试器原理与使用"><span class="nav-number">1.</span> <span class="nav-text">Retryer重试器原理与使用</span></a></li></ol></div>
             
 
           </div>
