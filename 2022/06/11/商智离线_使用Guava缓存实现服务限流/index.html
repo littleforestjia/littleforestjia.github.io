@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="商智离线_使用Guava缓存实现服务限流1.Guava Cache原理guava cache就是单个应用运行时保存在本地内存中的缓存，是单机版的。本质与concurrentmap相似，但是concurrentmap只能显式地remove数据，guava cache提供了很多自动回收机制。guava cache常用于服务限流。 guava cache适用于小量被读取频繁的数据，本质是以空间换时间，牺">
+<meta property="og:type" content="article">
+<meta property="og:title" content="商智离线_使用Guava缓存实现服务限流">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="商智离线_使用Guava缓存实现服务限流1.Guava Cache原理guava cache就是单个应用运行时保存在本地内存中的缓存，是单机版的。本质与concurrentmap相似，但是concurrentmap只能显式地remove数据，guava cache提供了很多自动回收机制。guava cache常用于服务限流。 guava cache适用于小量被读取频繁的数据，本质是以空间换时间，牺">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/2.jpg">
+<meta property="article:published_time" content="2022-06-11T11:15:50.662Z">
+<meta property="article:modified_time" content="2022-06-11T11:14:17.652Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/06/11/商智离线_使用Guava缓存实现服务限流/"/>
+
+
+
+
+
+  <title>商智离线_使用Guava缓存实现服务限流 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">商智离线_使用Guava缓存实现服务限流</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-11T19:15:50+08:00">
+                2022-06-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="商智离线-使用Guava缓存实现服务限流"><a href="#商智离线-使用Guava缓存实现服务限流" class="headerlink" title="商智离线_使用Guava缓存实现服务限流"></a>商智离线_使用Guava缓存实现服务限流</h2><h3 id="1-Guava-Cache原理"><a href="#1-Guava-Cache原理" class="headerlink" title="1.Guava Cache原理"></a>1.Guava Cache原理</h3><p>guava cache就是单个应用运行时保存在本地内存中的缓存，是单机版的。本质与concurrentmap相似，但是concurrentmap只能显式地remove数据，guava cache提供了很多自动回收机制。guava cache常用于服务限流。</p>
+<p>guava cache适用于小量被读取频繁的数据，本质是以空间换时间，牺牲内存提高读取速度。</p>
+<p>guava cache的优点：</p>
+<ul>
+<li>线程安全，与concurrentmap类似。</li>
+<li>提供了三种基本回收方式：基于容量回收、定时回收、基于引用回收。其中基于容量回收采用LRU策略。</li>
+<li>监控缓存加载和命中情况。</li>
+<li>集成了多部操作，支持在未命中缓存时，从其他数据源(mysql、redis)获取数据。</li>
+</ul>
+<h3 id="2-服务限流实例"><a href="#2-服务限流实例" class="headerlink" title="2.服务限流实例"></a>2.服务限流实例</h3><h4 id="2-1创建SpringBoot项目和依赖"><a href="#2-1创建SpringBoot项目和依赖" class="headerlink" title="2.1创建SpringBoot项目和依赖"></a>2.1创建SpringBoot项目和依赖</h4><p>创建maven项目，添加pom.xml依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--springboot项目一天要添加该parent属性--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.5.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.example<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>GuavaLimiter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--springboot依赖--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!--guava依赖--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.guava<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>guava<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>23.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!--springboot项目打包工具--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>创建application类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> jia.zheng;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.SpringApplication;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line"></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2创建限流器"><a href="#2-2创建限流器" class="headerlink" title="2.2创建限流器"></a>2.2创建限流器</h4><p>限流逻辑主要在dolimit方法中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> jia.zheng.limiter.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.CacheBuilder;</span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.CacheLoader;</span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.LoadingCache;</span><br><span class="line"><span class="keyword">import</span> jia.zheng.limiter.Limiter;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicLong;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LimiterImpl</span> <span class="keyword">implements</span> <span class="title">Limiter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//计数缓存，key为服务名，value为限流单位时间内的已访问次数，每访问一次就加一，限流单位时间结束则归零开始下一次计数。</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> LoadingCache&lt;String, AtomicLong&gt; counterCache;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//时间缓存，key为服务名，value为限流单位时间的起点，经过一个限流单位时间则更新。</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> LoadingCache&lt;String, Long&gt; timeCache;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> AtomicLong ZERO = <span class="keyword">new</span> AtomicLong(<span class="number">0L</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> timestamp = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">//重要：maximumSize()用于设置counter最大容量为100个entry，超过则会按照LRU策略回收。</span></span><br><span class="line">        <span class="comment">//重要：CacheLoader中的load()方法为cache未命中时从别处加载value的逻辑，还会自动将该value存入cache中。</span></span><br><span class="line">        counterCache = CacheBuilder.newBuilder().maximumSize(<span class="number">100L</span>).refreshAfterWrite(<span class="number">24L</span>, TimeUnit.HOURS).build(<span class="keyword">new</span> CacheLoader&lt;String, AtomicLong&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> AtomicLong <span class="title">load</span><span class="params">(String key)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> LimiterImpl.ZERO;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        timeCache = CacheBuilder.newBuilder().maximumSize(<span class="number">100L</span>).refreshAfterWrite(<span class="number">24L</span>, TimeUnit.HOURS).build(<span class="keyword">new</span> CacheLoader&lt;String, Long&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Long <span class="title">load</span><span class="params">(String key)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> LimiterImpl.timestamp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dolimit</span><span class="params">(String serviceName)</span> <span class="keyword">throws</span> ExecutionException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//重要：这两个数值就是限流设置，在timeLimit时间内限定访问countLimit次。此处我将限流参数在代码中先死，效率较低。</span></span><br><span class="line">        <span class="comment">//常见策略为将该参数保存在redis中，然后使用定时轮询任务轮询获取该参数保存在static修饰的map中，然后本方法直接从该map中拿。</span></span><br><span class="line">        <span class="comment">//因为限流本来就是很重视时效性，所以尽量避免本方法直接从远程redis或mysql中获取限流参数。</span></span><br><span class="line">        <span class="keyword">int</span> countLimit = <span class="number">3</span>;</span><br><span class="line">        <span class="keyword">long</span> timeLimit = <span class="number">30L</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> now = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">if</span> (now - timeCache.get(serviceName) &lt; timeLimit * <span class="number">1000L</span>) &#123;<span class="comment">//本次请求与上次请求时间间隔小于限流单位时间</span></span><br><span class="line">            AtomicLong count = counterCache.get(serviceName);</span><br><span class="line">            <span class="keyword">synchronized</span> (count) &#123;</span><br><span class="line">                <span class="keyword">if</span> (count.get() &lt; countLimit) &#123;<span class="comment">//未达到访问次数限制</span></span><br><span class="line">                    counterCache.put(serviceName, <span class="keyword">new</span> AtomicLong(count.incrementAndGet()));</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;<span class="comment">//已达到访问次数限制</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;<span class="comment">//本次请求与上次请求时间间隔大于限流单位时间</span></span><br><span class="line">            counterCache.put(serviceName, <span class="keyword">new</span> AtomicLong(<span class="number">1L</span>));</span><br><span class="line">            timeCache.put(serviceName, now);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>maximumSize()方法用于设置guava cache的最大容量为100个entry，超过则会按照LRU策略回收。<a href="https://blog.csdn.net/Backpace_/article/details/119087474" target="_blank" rel="noopener">guava cache还提供了很多缓存配置和操作方法</a>，如定时回收、显式清除、设置监听器等。</li>
+<li>CacheLoader中的load()方法为cache未命中时从别处加载value的逻辑，还会自动将该value存入cache中。可以将此处逻辑改为从mysql或远程redis中获取，从而真正地将guava cache作为数据缓存使用。</li>
+<li>限流一般要设置在timeLimit时间内限定访问countLimit次这两个参数，此处为了展示方便直接在代码中写死。<strong>常见策略为将该参数保存在redis中，然后使用定时轮询任务轮询获取该参数保存在static修饰的map中，然后本方法直接从该map中拿。</strong>因为限流本来就是很重视时效性，所以尽量避免本方法直接从远程redis或mysql中获取限流参数。</li>
+</ul>
+<h4 id="2-3创建工具类实现单例模式"><a href="#2-3创建工具类实现单例模式" class="headerlink" title="2.3创建工具类实现单例模式"></a>2.3创建工具类实现单例模式</h4><p>要使用单例模式确保项目中只有一个LimiterImpl类对象在工作，使用<a href="https://littleforestjia.github.io/2020/11/06/%E3%80%90%E5%8A%9B%E6%89%A3%E5%88%B7%E9%A2%98%E3%80%91_%E5%89%91%E6%8C%87offer68%E9%A2%98/" target="_blank" rel="noopener">饿汉模式或饱汉模式</a>都可以。</p>
+<p>spring项目中也可以直接在LimiterImpl类上添加@Component注解，借助spring实现单例bean。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> jia.zheng.limiter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jia.zheng.limiter.impl.LimiterImpl;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"></span><br><span class="line"><span class="comment">//重要：使用单例模式确保项目中只有一个LimiterImpl类对象在工作。spring项目中也可以直接在LimiterImpl类上添加@Component注解，借助spring实现单例bean。</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LimitUtil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Limiter limiter;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//重要：类的加载是私有的，别的线程无法进入。所以不用担心两个命令同时加载limitUtil类导致静态代码块执行两次。</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        limiter = <span class="keyword">new</span> LimiterImpl();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">doLimit</span><span class="params">(String serviceName)</span> <span class="keyword">throws</span> ExecutionException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> limiter.dolimit(serviceName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>类的加载是私有的，别的线程无法进入。所以不用担心两个命令同时加载limitUtil类导致静态代码块执行两次。</li>
+</ul>
+<h4 id="2-4创建Controller"><a href="#2-4创建Controller" class="headerlink" title="2.4创建Controller"></a>2.4创建Controller</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> jia.zheng.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jia.zheng.limiter.LimitUtil;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Visit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"visit"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">visit</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> limit = LimitUtil.doLimit(<span class="string">"visit"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (limit) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"访问成功！visit success!"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"访问限流器！visit limiting!"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-5启动该SpringBoot项目并连续访问"><a href="#2-5启动该SpringBoot项目并连续访问" class="headerlink" title="2.5启动该SpringBoot项目并连续访问"></a>2.5启动该SpringBoot项目并连续访问</h4><p>连续访问3次，浏览器显示都是访问成功：</p>
+<p><img src="//littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/1.jpg" alt></p>
+<p>连续访问第4次及以后都是访问失败：</p>
+<p><img src="//littleforestjia.github.io/2022/06/11/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8Guava%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E9%99%90%E6%B5%81/2.jpg" alt></p>
+<p>过了30s之后再连续访问则又能成功3次。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/05/29/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(9)_HDFS%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4&%E8%81%94%E9%82%A6%E9%9B%86%E7%BE%A4/" rel="next" title="HBase表数据倾斜治理(9)_HDFS高可用集群&联邦集群">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理(9)_HDFS高可用集群&联邦集群
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">85</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#商智离线-使用Guava缓存实现服务限流"><span class="nav-number">1.</span> <span class="nav-text">商智离线_使用Guava缓存实现服务限流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Guava-Cache原理"><span class="nav-number">1.1.</span> <span class="nav-text">1.Guava Cache原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-服务限流实例"><span class="nav-number">1.2.</span> <span class="nav-text">2.服务限流实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1创建SpringBoot项目和依赖"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1创建SpringBoot项目和依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2创建限流器"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2创建限流器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3创建工具类实现单例模式"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3创建工具类实现单例模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4创建Controller"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4创建Controller</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5启动该SpringBoot项目并连续访问"><span class="nav-number">1.2.5.</span> <span class="nav-text">2.5启动该SpringBoot项目并连续访问</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
