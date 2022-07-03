@@ -89,15 +89,15 @@
 <meta property="og:url" content="http://https//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/index.html">
 <meta property="og:site_name" content="岩手县小森的博客">
 <meta property="og:description" content="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个">
-<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.JPG">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.jpg">
 <meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/2.jpg">
 <meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/3.jpg">
 <meta property="article:published_time" content="2022-07-02T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-03T09:41:16.634Z">
+<meta property="article:modified_time" content="2022-07-03T09:50:44.594Z">
 <meta property="article:author" content="zju岩手县小森">
 <meta property="article:tag" content="HBase">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.JPG">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.jpg">
 
 
 
@@ -367,7 +367,7 @@
 </ul>
 <h3 id="2-Filter"><a href="#2-Filter" class="headerlink" title="2.Filter"></a>2.Filter</h3><h4 id="2-1-HBase-Filter原理"><a href="#2-1-HBase-Filter原理" class="headerlink" title="2.1 HBase Filter原理"></a>2.1 HBase Filter原理</h4><p>hbase api中的基础查询操作能够实现的功能较少，hbase还提供了一种高级的查询方法filter，filter可以根据列簇、列、版本等更多条件来对数据进行过滤。<strong>带有filter条件的scan查询会把过滤条件通过rpc分发到各个regionserver上去，在服务段完成数据过滤，而不是先把数据传输到客户端再进行过滤，这样降低了网络传输的压力。</strong></p>
 <p>scan的服务端大致流程如下图所示，<strong>在第六步中服务端会根据filter条件对被查询cell进行过滤</strong>：</p>
-<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.JPG" alt></p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.jpg" alt></p>
 <h4 id="2-2-Filter种类"><a href="#2-2-Filter种类" class="headerlink" title="2.2 Filter种类"></a>2.2 Filter种类</h4><p>比较过滤器：</p>
 <ul>
 <li>行键过滤器：可以基于<strong>rowkey</strong>执行<strong>字节数组精确匹配、字节数组前缀匹配、子字符串匹配、字符串正则表达式匹配</strong>等，过滤掉不匹配的数据cell。</li>
