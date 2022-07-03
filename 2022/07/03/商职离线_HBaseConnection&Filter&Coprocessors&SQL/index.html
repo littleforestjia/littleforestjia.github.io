@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="商智离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.JPG">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/3.jpg">
+<meta property="article:published_time" content="2022-07-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-07-03T09:41:16.634Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.JPG">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/07/03/商职离线_HBaseConnection&Filter&Coprocessors&SQL/"/>
+
+
+
+
+
+  <title>商智离线_HBaseConnection&Filter&Coprocessors&SQL | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">商智离线_HBaseConnection&Filter&Coprocessors&SQL</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-03T00:00:00+08:00">
+                2022-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF/" itemprop="url" rel="index">
+                    <span itemprop="name">商智离线</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="商职离线-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL"><a href="#商职离线-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL" class="headerlink" title="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL"></a>商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL</h2><h3 id="1-Connection"><a href="#1-Connection" class="headerlink" title="1.Connection"></a>1.Connection</h3><h4 id="1-1-HBase-Connection原理"><a href="#1-1-HBase-Connection原理" class="headerlink" title="1.1 HBase Connection原理"></a>1.1 HBase Connection原理</h4><p>hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个Master连接对象、多个RegionServer连接对象。因此Connection对象每次创建都会带来很大的开销，每次使用重新创建会造成严重的性能损耗。</p>
+<p>Connection对象是线程安全的，在一个jvm进程中的多个线程可以共用同一个Connection对象。但是注意Table和Admin对象不是线程安全的，不同线程需要单独创建使用。</p>
+<h4 id="1-2-Client与Zookeeper的关系"><a href="#1-2-Client与Zookeeper的关系" class="headerlink" title="1.2 Client与Zookeeper的关系"></a>1.2 Client与Zookeeper的关系</h4><p>client当中只需要配置zookeeper集群的地址就好了，client api需要访问hbase时先连接zookeeper获取到master和regionserver的地址信息，在连接到master和regionserver。</p>
+<p><strong>当client进行DDL(create、alter、drop)时，会在第一次获得master地址之后直接与master进行通信，修改master中保存的表的元数据信息。</strong></p>
+<p><strong>当client进行DML(insert、delete、update、select)时，并不需要master的参与，直接与regionserver进行通信。</strong></p>
+<h4 id="1-3-HBase-Connection的管理"><a href="#1-3-HBase-Connection的管理" class="headerlink" title="1.3 HBase Connection的管理"></a>1.3 HBase Connection的管理</h4><p>如果client要连接的hbase集群只有一个，在Configuration对象中配置好hbase集群的zookeeper地址，讲该配置对象作为入参，使用单例模式创建一个Connection对象就行了。</p>
+<p>如果client要连接的hbase集群有多个，则使用一个map将连接每个hbase集群的Connection保存下来，每次请求的时候拿出对应的Connection对象进行数据操作即可。然后注意在系统退出时关闭所有的Connection对象。</p>
+<p>应用实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConnectionFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, Connection&gt; connectionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> Connection <span class="title">getConnection</span><span class="params">(String resourceKey, Configuration configuration)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!connectionMap.containsKey(key)) &#123;</span><br><span class="line">            connection = ConnectionFactory.createConnection(configuration);</span><br><span class="line">            connectionMap.put(resourceKey, connection);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> connectionMap.get(key);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>此处还是使用static来实现单例，如果使用了spring框架，也可以借助spring来实现单例模式。</strong></li>
+<li><strong>使用ConcurrentHashMap可以保证map的线程安全。</strong></li>
+<li><strong>使用synchronized修饰方法可以保证创建Connection对象时的线程安全，避免重复创建同一个Connection对象，造成资源浪费。</strong></li>
+<li><strong>也可以为同一个hbase集群中的每个不同实例创建一个Connection对象，具体的粒度可以自行设计。</strong></li>
+</ul>
+<h3 id="2-Filter"><a href="#2-Filter" class="headerlink" title="2.Filter"></a>2.Filter</h3><h4 id="2-1-HBase-Filter原理"><a href="#2-1-HBase-Filter原理" class="headerlink" title="2.1 HBase Filter原理"></a>2.1 HBase Filter原理</h4><p>hbase api中的基础查询操作能够实现的功能较少，hbase还提供了一种高级的查询方法filter，filter可以根据列簇、列、版本等更多条件来对数据进行过滤。<strong>带有filter条件的scan查询会把过滤条件通过rpc分发到各个regionserver上去，在服务段完成数据过滤，而不是先把数据传输到客户端再进行过滤，这样降低了网络传输的压力。</strong></p>
+<p>scan的服务端大致流程如下图所示，<strong>在第六步中服务端会根据filter条件对被查询cell进行过滤</strong>：</p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.JPG" alt></p>
+<h4 id="2-2-Filter种类"><a href="#2-2-Filter种类" class="headerlink" title="2.2 Filter种类"></a>2.2 Filter种类</h4><p>比较过滤器：</p>
+<ul>
+<li>行键过滤器：可以基于<strong>rowkey</strong>执行<strong>字节数组精确匹配、字节数组前缀匹配、子字符串匹配、字符串正则表达式匹配</strong>等，过滤掉不匹配的数据cell。</li>
+<li>列族过滤器：同样可以基于<strong>列族名</strong>执行<strong>字节数组精确匹配、字节数组前缀匹配、子字符串匹配、字符串正则表达式匹配</strong>等，过滤掉不匹配的数据cell。</li>
+<li>列名过滤器：同样可以基于<strong>列名</strong>执行<strong>字节数组精确匹配、字节数组前缀匹配、子字符串匹配、字符串正则表达式匹配</strong>等，过滤掉不匹配的数据cell。</li>
+<li>值过滤器：同样可以基于<strong>值</strong>执行<strong>字节数组精确匹配、字节数组前缀匹配、子字符串匹配、字符串正则表达式匹配</strong>等，过滤掉不匹配的数据cell。</li>
+<li>参考列过滤器：一种更复杂的过滤器，相当于一个值过滤器和时间戳过滤器的组合。</li>
+</ul>
+<p>专用过滤器：</p>
+<ul>
+<li>单列值过滤器：使用某一列的值，决定一行数据是否被过滤。<strong>也就是对某一个cell的值进行匹配，从而对所有与该cell在同一行中不同列的cell进行过滤。</strong></li>
+<li>单列值排除过滤器：与单列值过滤器起到相反的过滤作用。</li>
+<li>行前缀过滤器：作用与行键过滤器的前缀匹配过滤差不多。</li>
+<li>列前缀过滤器：作用与列名过滤器的前缀匹配过滤差不多。</li>
+<li>分页过滤器：对查询结果进行分页，控制每页返回行数，这个功能有点鸡肋。</li>
+<li>只传行键过滤器：<strong>服务端只将行键+列簇+列名传回客户端，不返回值，用于减少数据传输。</strong></li>
+<li>首个行键过滤器：<strong>服务端只返回每一行的第一个cell，可以用于高效的执行行数统计等操作。</strong></li>
+<li>包含结束过滤器：<strong>一般的查询设置一个startkey和endkey，这是一个前开后闭区间，返回结果不包含endkey。使用该过滤器可以将endkey加入到返回结果中。</strong></li>
+<li>时间过滤器：<strong>可以基于cell的时间戳进行匹配，过滤掉不符合版本的数据。</strong></li>
+<li>列计数过滤器：限制每行返回的列数。</li>
+<li>列分页过滤器：对一行的所有列进行分页。</li>
+<li>随机过滤器：<strong>随机取行。</strong></li>
+</ul>
+<p>符加过滤器：</p>
+<ul>
+<li>跳转过滤器</li>
+<li>全匹配过滤器</li>
+</ul>
+<p><a href="http://09itblog.site/?p=533" target="_blank" rel="noopener">为同一个scan设置多个过滤器时需要使用FilterList。</a></p>
+<h3 id="3-Coprocessors"><a href="#3-Coprocessors" class="headerlink" title="3.Coprocessors"></a>3.Coprocessors</h3><h4 id="3-1-HBase-Coprocessors原理"><a href="#3-1-HBase-Coprocessors原理" class="headerlink" title="3.1 HBase Coprocessors原理"></a>3.1 HBase Coprocessors原理</h4><p>在使用hbase时，当数据量非常大，即使网络传输带宽允许，客户端的计算能力也未必能满足要求。协处理器Coprocessors就是为了解决该问题而出现的，<strong>它将写好的业务逻辑代码部署在服务端，在服务端执行客户端远程调用前后先执行预设的业务逻辑代码，这样极大地降低了需要传输地数据量，也降低了对客户端计算能力的要求。</strong></p>
+<p>Coprocessors也可以帮助用户扩展实现原生HBase目前所不具备的功能，如权限校验、二级索引等。</p>
+<p><strong>在我看来，我认为Coprocessors的本质与AOP差不多，就是在服务端regionserver数据查询接口的前后添加逻辑。</strong></p>
+<p>Coprocessors可以全局导入作用在某个hbase集群的所有表上，也可以设置单独作用在某一张指定的表上。</p>
+<h4 id="3-2-Coprocessors分类"><a href="#3-2-Coprocessors分类" class="headerlink" title="3.2 Coprocessors分类"></a>3.2 Coprocessors分类</h4><h5 id="3-2-1-Observer"><a href="#3-2-1-Observer" class="headerlink" title="3.2.1 Observer"></a>3.2.1 Observer</h5><p>Observer就是最典型的AOP，当服务端发生某些事件时，这类协处理器会在事件发生前后被调用。常用来实现如下功能：</p>
+<ul>
+<li>权限校验：比如在执行get或put操作之前，编写preget或preput方法检查权限；</li>
+<li>完整性约束：hbase不支持像关系型数据库中那样的外键功能，可以通过Observer实现在插入或删除数据时，对其他表中的关联数据进行对应操作。</li>
+<li>二级索引：也可以借助Observer来实现二级索引，实际上就是在读和写之前添加一步寻址操作。</li>
+</ul>
+<p>目前hbase支持进行扩展的Observer协处理器主要有四种类型：</p>
+<ul>
+<li>RegionObserver：允许在region级别事件前后添加业务逻辑，例如get和put操作，<strong>具体可以在哪些事件前后添加业务逻辑详情见BaseRegionObserver类源码</strong>；</li>
+<li>RegionServerObserver：允许在regionserver级别事件前后添加业务逻辑，例如启动、停止、执行合并、提交、回滚等，详情见BaseRegionServerObserver源码；</li>
+<li>MasterObserver：允许在master级别事件前后添加业务逻辑，例如表的创建、删除、schema修改，详情见BaseMasterObserver源码；</li>
+<li>WalObserver：允许在WAL级别事件前后添加业务逻辑，详情见BaseWalObserver源码。</li>
+</ul>
+<p><strong>上述四种Observer接口都继承自Coprocessors接口，这四个接口中定义了所有可以实现AOP的钩子方法，我们一般直接继承其Base实现类，重写必要的方法。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/2.jpg" alt></p>
+<p>比如BaseRegionObserver中定义的所有可用的钩子方法，多数方法都是以pre和post形式成对出现，部分方法如下所示：</p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/3.jpg" alt></p>
+<h5 id="3-2-2-Endpoint"><a href="#3-2-2-Endpoint" class="headerlink" title="3.2.2 Endpoint"></a>3.2.2 Endpoint</h5><p>Endpoint与Observer有很大的不同，实现形式也不是AOP形式的，要更加复杂一些。</p>
+<p><strong>Endpoint代码需要实现CoprocessorService、Coprocessor这两个接口，然后部署在服务端。其中的业务逻辑主要是调用regionserver提供的数据操作接口来实现行数计算、最值计算等聚合计算操作。</strong></p>
+<p>客户端可以通过rpc直接远程调用Endpoint方法返回结果。</p>
+<p><strong>在我看来，Observer相当于AOP，可以在服务端数据操作接口前后添加业务逻辑；而Endpoint相当于直接创建新的服务端数据操作接口，可供客户端调用。</strong></p>
+<h3 id="4-SQL"><a href="#4-SQL" class="headerlink" title="4.SQL"></a>4.SQL</h3><h4 id="4-1-HBase-SQL原理"><a href="#4-1-HBase-SQL原理" class="headerlink" title="4.1 HBase SQL原理"></a>4.1 HBase SQL原理</h4><p>关系型数据库的理念深入人心，所以如果能够像查询mysql一样查询hbase，能够带来极大的便利。<strong>相信很多企业也和京东一样开发了类似的hbase的sql语句支持工具，这类工具的本质就是将sql查询语句转化成hbase支持的数据查询java api。</strong></p>
+<p><strong>大部分sql查询需要借助Filter来实现，部分复杂的聚合查询需要借助Coprocessors来实现。</strong></p>
+<p>具体的实现代码案例，可以参考<a href="https://github.com/ufologist/hbase-sql" target="_blank" rel="noopener">github项目1</a>和<a href="https://github.com/dxer/hbase-sql" target="_blank" rel="noopener">github项目2</a>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/06/25/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/" rel="next" title="商智离线_HBaseAPI执行流程与Request&Quota计数">
+                <i class="fa fa-chevron-left"></i> 商智离线_HBaseAPI执行流程与Request&Quota计数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">89</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">101</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#商职离线-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL"><span class="nav-number">1.</span> <span class="nav-text">商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Connection"><span class="nav-number">1.1.</span> <span class="nav-text">1.Connection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-HBase-Connection原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 HBase Connection原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Client与Zookeeper的关系"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 Client与Zookeeper的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-HBase-Connection的管理"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 HBase Connection的管理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Filter"><span class="nav-number">1.2.</span> <span class="nav-text">2.Filter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-HBase-Filter原理"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 HBase Filter原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Filter种类"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Filter种类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Coprocessors"><span class="nav-number">1.3.</span> <span class="nav-text">3.Coprocessors</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-HBase-Coprocessors原理"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 HBase Coprocessors原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Coprocessors分类"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 Coprocessors分类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-1-Observer"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">3.2.1 Observer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-2-Endpoint"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">3.2.2 Endpoint</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-SQL"><span class="nav-number">1.4.</span> <span class="nav-text">4.SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-HBase-SQL原理"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 HBase SQL原理</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
