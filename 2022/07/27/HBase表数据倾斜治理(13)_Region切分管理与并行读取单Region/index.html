@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region1.Region切分管理1.1 Region切分1.1.1预分区预分区就是在建表的时候预先设置拆分点，比如设置9个拆分点，那么建表时就会创建10个region，后序存入的数据与拆分点按字典序比较大小，决定存入哪个region。 拆分点的设置方式主要有四种：直接指定拆分点列表、HexStringSplit算法、Unifor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region1.Region切分管理1.1 Region切分1.1.1预分区预分区就是在建表的时候预先设置拆分点，比如设置9个拆分点，那么建表时就会创建10个region，后序存入的数据与拆分点按字典序比较大小，决定存入哪个region。 拆分点的设置方式主要有四种：直接指定拆分点列表、HexStringSplit算法、Unifor">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/2.jpg">
+<meta property="article:published_time" content="2022-07-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-08-15T15:22:12.202Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/07/27/HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-27T00:00:00+08:00">
+                2022-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase表数据倾斜治理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-13-Region切分管理与并行读取单Region"><a href="#HBase表数据倾斜治理-13-Region切分管理与并行读取单Region" class="headerlink" title="HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region"></a>HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region</h2><h3 id="1-Region切分管理"><a href="#1-Region切分管理" class="headerlink" title="1.Region切分管理"></a>1.Region切分管理</h3><h4 id="1-1-Region切分"><a href="#1-1-Region切分" class="headerlink" title="1.1 Region切分"></a>1.1 Region切分</h4><h5 id="1-1-1预分区"><a href="#1-1-1预分区" class="headerlink" title="1.1.1预分区"></a>1.1.1预分区</h5><p>预分区就是在建表的时候预先设置拆分点，比如设置9个拆分点，那么建表时就会创建10个region，后序存入的数据与拆分点按字典序比较大小，决定存入哪个region。</p>
+<p>拆分点的设置方式主要有四种：直接指定拆分点列表、HexStringSplit算法、UniformSplit算法、自定义算法。</p>
+<h6 id="HBase存储底层"><a href="#HBase存储底层" class="headerlink" title="HBase存储底层"></a>HBase存储底层</h6><p><strong>hbase以二进制码流的形式存储数据，存储单元是byte，rowkey和value都是以byte[]的形式存储的。</strong></p>
+<p><strong>hbase中rowkey的大小比较方式是按照字典序进行比较，其实本质就是byte[]按照字典序进行比较。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/1.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/2.jpg" alt></p>
+<p><strong>上图中第一幅图为按照UniformSplit算法建立的10个region分区信息，下图为表中数据示例。我们一定要牢记的一点就是hbase中保存的startkey、endkey、rowkey本质都是byte[]，而我们在图一中看到的startkey、endkey和图二中看到的rowkey都是由byte[]解码得到的可供阅读的字符串。</strong></p>
+<p><strong>byte[]与字符串之间的转换又叫编码和解码。编码和解码的算法有很多，常见的有ASCII编码、GBK编码、UTF-8编码、16进制字符串编码。那么很明显以上两幅图中使用的也是一种特殊的解码方式，可以看出这种解码方式将ASCII字符集中0-9、A-Z、a-z这几个字符对应的byte按照某种解码方式解码为ASCII字符集中的字符，而除此之外的其他byte按照16进制字符串进行解码后再加上\x标识。</strong></p>
+<h6 id="HexStringSplit算法"><a href="#HexStringSplit算法" class="headerlink" title="HexStringSplit算法"></a>HexStringSplit算法</h6><p><strong>HexStringSplit算法把字符串”00000000”到”FFFFFFFF”之间的字符串进行n等分之后得到分割点字符串进行编码，将这些分割点字符串编码后得到byte[]作为预分区拆分点。</strong></p>
+<p><strong>注意HexStringSplit算法对”00000000”和”FFFFFFFF”这两个字符串进行n等分，这与对”00000000”和”FFFFFFFF”这两个字符串编码得到的byte[]进行n等分是完全不同的，因为”00000000”和”FFFFFFFF”编码之后它们之间会多出很多0-F对应的byte之外的byte，比如&lt;、=、&gt;等字符对应的byte。</strong></p>
+<p><strong>由上述分析也可知，只有rowkey在编码前就是以十六进制字符串作为前缀的数据，才适合使用HexStringSplit算法来进行预分区建表。</strong></p>
+<h6 id="UniformSplit算法"><a href="#UniformSplit算法" class="headerlink" title="UniformSplit算法"></a>UniformSplit算法</h6><p><strong>UniformSplit算法把new byte[0]和new byte[8]{\xFF, \xFF, \xFF, \xFF, \xFF, \xFF, \xFF, \xFF}之间byte[]进行n等分之后得到的分割点byte[]作为预分区拆分点。上图图一就有使用UniformSplit算法进行10等分得到的9个拆分点。</strong></p>
+<h5 id="1-1-2自动分区"><a href="#1-1-2自动分区" class="headerlink" title="1.1.2自动分区"></a>1.1.2自动分区</h5><p><strong>自动分区是指region在每次执行完memstore flush和compaction之后都会检查region存储是否达到split阈值，当达到split阈值时则会进行自动切分。进行split时并不是马上将region中的数据分成两份，而是新建两个region，这两个新region中存储着原region中hfile数据文件的引用。当新region中的引用文件被compaction的时候才会真正将原region中的数据复制到新region当中，而原region不再被引用时才可以被删除。</strong></p>
+<p><strong>注意一点，如果当一个region当中存在引用文件时，该region无法被split。那么就存在一种特殊情况，当一个region中的数据快速增长，然后进行split，子region中的数据同样快速增长导致子region中的compaction始终在合并新的hfile而没有合并到应用文件，那么就会使得子region无法split，这样就会出现大于限定阈值的region。</strong></p>
+<p>hbase2支持<a href="https://blog.51cto.com/u_15080019/2653833" target="_blank" rel="noopener">7种region自动分区策略</a>，目前默认使用的是SteppingSplitPolicy分区策略，也可以自行设置分区阈值。</p>
+<h5 id="1-1-3强制分区"><a href="#1-1-3强制分区" class="headerlink" title="1.1.3强制分区"></a>1.1.3强制分区</h5><p>hbase提供了强制分区的api，过程与自动分区类似，可以不穿分割点参数，则默认以region中最大store的midkey作为分割点，也自行指定一个分割点。</p>
+<h4 id="1-2-Region合并"><a href="#1-2-Region合并" class="headerlink" title="1.2 Region合并"></a>1.2 Region合并</h4><p>当删除大量数据，每个region都变得较小时，可以使用hbase提供的region合并api来减少region数量，避免资源浪费。</p>
+<h4 id="1-3-Hfile合并"><a href="#1-3-Hfile合并" class="headerlink" title="1.3 Hfile合并"></a>1.3 Hfile合并</h4><p>hbase每隔一段时间都要进行数据整理，清除过期数据、旧版本数据、被删除数据，减小文件数量，这么做可以提高查询效率，降低存储消耗，但是并不能提升写效率。</p>
+<h6 id="Minor-Compaction"><a href="#Minor-Compaction" class="headerlink" title="Minor Compaction"></a>Minor Compaction</h6><p><strong>一次Minor Compaction默认会将store中的在规定大小范围内的10个年龄最大的hfile合并成一个hfile，会删除过期数据，但是不会删除旧版本数据和被删除数据。</strong></p>
+<p><strong>hbase默认在每次memstore flush操作之后会<a href="https://blog.csdn.net/May_J_Oldhu/article/details/112317789" target="_blank" rel="noopener">检查是否满足Minor Compaction条件</a>；且会通过CompactionChecker周期轮询线程每10000s检查一次是否满足Minor Compaction条件；hbase也提供了执行Minor Compaction操作的api，可以手动触发。</strong></p>
+<h6 id="Major-Compaction"><a href="#Major-Compaction" class="headerlink" title="Major Compaction"></a>Major Compaction</h6><p><strong>一次Major Compaction会将store中的所有hfile合并成一个hfile，会删除过期数据、旧版本数据、被删除数据。</strong></p>
+<p><strong>hbase默认7天执行一次Major Compaction，但是Major Compaction对整个hbase集群的压力非常大，一般建议设置hbase.hregion.majorcompaction=0关闭自动Major Compaction，通过api采取手动触发的方式定期在访问量较少时进行Major Compaction。</strong></p>
+<h3 id="3-并行读取单Region"><a href="#3-并行读取单Region" class="headerlink" title="3.并行读取单Region"></a>3.并行读取单Region</h3><h4 id="3-1默认情况"><a href="#3-1默认情况" class="headerlink" title="3.1默认情况"></a>3.1默认情况</h4><p>当我们使用MapReduce读取hbase表或者hbase快照时，使用TableInputFormat和TableSnapshotInputFormat作为输入数据的格式类，默认是一个region对应一个map任务。当单个region较大时，比如达到50G大概需要12个小时才能读取完成。</p>
+<p>题外话，当我们使用MapReduce将数据bulkload到hbase表中时，默认是一个region对应一个reduce任务。</p>
+<h4 id="3-2-hbase-mapreduce-input-mappers-per-region"><a href="#3-2-hbase-mapreduce-input-mappers-per-region" class="headerlink" title="3.2 hbase.mapreduce.input.mappers.per.region"></a>3.2 hbase.mapreduce.input.mappers.per.region</h4><p><strong>通过设置job任务的hbase.mapreduce.input.mappers.per.region参数可以实现多个map任务并行读取单个region上的数据，但是每个map任务读取的数据范围是使用类似于UniformSplit预分区算法得到的，本质就是把该region的startkey和endkey之间的所有byte[]进行n等分，然后每个map读取其中一个区间。</strong></p>
+<p><strong>如果某个region内部的数据本身倾斜就非常严重，比如该region中大部分数据的rowkey就集中在上述分区中的一个区间中，那么这种单region的分片读取效果就非常差。</strong></p>
+<p>实现上述逻辑的hbase源代码在TableInputFormatBase类的getSplits()和createNInputSplitsUniform()方法中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(JobContext context)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> closeOnFinish = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Just in case a subclass is relying on JobConfigurable magic.</span></span><br><span class="line">    <span class="keyword">if</span> (table == <span class="keyword">null</span>) &#123;</span><br><span class="line">      initialize(context);</span><br><span class="line">      closeOnFinish = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// null check in case our child overrides getTable to not throw.</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (getTable() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// initialize() must not have been implemented in the subclass.</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IOException(INITIALIZATION_ERROR);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IllegalStateException exception) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IOException(INITIALIZATION_ERROR, exception);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      List&lt;InputSplit&gt; splits = oneInputSplitPerRegion();</span><br><span class="line"></span><br><span class="line">      <span class="comment">// set same number of mappers for each region</span></span><br><span class="line">      <span class="keyword">if</span> (context.getConfiguration().get(<span class="string">"hbase.mapreduce.input.mappers.per.region"</span>) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> nSplitsPerRegion = context.getConfiguration().getInt(<span class="string">"hbase.mapreduce.input.mappers.per.region"</span>, <span class="number">1</span>);</span><br><span class="line">        List&lt;InputSplit&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; splits.size(); i++) &#123;</span><br><span class="line">          List&lt;InputSplit&gt; tmp = createNInputSplitsUniform(splits.get(i), nSplitsPerRegion);</span><br><span class="line">          res.addAll(tmp);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//The default value of "hbase.mapreduce.input.autobalance" is false.</span></span><br><span class="line">      <span class="keyword">if</span> (context.getConfiguration().getBoolean(<span class="string">"hbase.mapreduce.input.autobalance"</span>, <span class="keyword">false</span>)) &#123;</span><br><span class="line">        <span class="keyword">long</span> maxAveRegionSize = context.getConfiguration()</span><br><span class="line">            .getLong(<span class="string">"hbase.mapreduce.input.average.regionsize"</span>, <span class="number">8L</span>*<span class="number">1073741824</span>); <span class="comment">//8GB</span></span><br><span class="line">        <span class="keyword">return</span> calculateAutoBalancedSplits(splits, maxAveRegionSize);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// return one mapper per region</span></span><br><span class="line">      <span class="keyword">return</span> splits;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (NamingException e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IOException(e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (closeOnFinish) &#123;</span><br><span class="line">        closeTable();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> List&lt;InputSplit&gt; <span class="title">createNInputSplitsUniform</span><span class="params">(InputSplit split, <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> IllegalArgumentIOException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (split == <span class="keyword">null</span> || !(split <span class="keyword">instanceof</span> TableSplit)) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentIOException(</span><br><span class="line">          <span class="string">"InputSplit for CreateNSplitsPerRegion can not be null + "</span></span><br><span class="line">              + <span class="string">"and should be instance of TableSplit"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//if n &lt; 1, then still continue using n = 1</span></span><br><span class="line">    n = n &lt; <span class="number">1</span> ? <span class="number">1</span> : n;</span><br><span class="line">    List&lt;InputSplit&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;(n);</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">1</span>) &#123;</span><br><span class="line">      res.add(split);</span><br><span class="line">      <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Collect Region related information</span></span><br><span class="line">    TableSplit ts = (TableSplit) split;</span><br><span class="line">    TableName tableName = ts.getTable();</span><br><span class="line">    String regionLocation = ts.getRegionLocation();</span><br><span class="line">    String encodedRegionName = ts.getEncodedRegionName();</span><br><span class="line">    <span class="keyword">long</span> regionSize = ts.getLength();</span><br><span class="line">    <span class="keyword">byte</span>[] startRow = ts.getStartRow();</span><br><span class="line">    <span class="keyword">byte</span>[] endRow = ts.getEndRow();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// For special case: startRow or endRow is empty</span></span><br><span class="line">    <span class="keyword">if</span> (startRow.length == <span class="number">0</span> &amp;&amp; endRow.length == <span class="number">0</span>)&#123;</span><br><span class="line">      startRow = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1</span>];</span><br><span class="line">      endRow = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1</span>];</span><br><span class="line">      startRow[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">      endRow[<span class="number">0</span>] = -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (startRow.length == <span class="number">0</span> &amp;&amp; endRow.length != <span class="number">0</span>)&#123;</span><br><span class="line">      startRow = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1</span>];</span><br><span class="line">      startRow[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (startRow.length != <span class="number">0</span> &amp;&amp; endRow.length == <span class="number">0</span>)&#123;</span><br><span class="line">      endRow =<span class="keyword">new</span> <span class="keyword">byte</span>[startRow.length];</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; startRow.length; k++)&#123;</span><br><span class="line">        endRow[k] = -<span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Split Region into n chunks evenly</span></span><br><span class="line">    <span class="keyword">byte</span>[][] splitKeys = Bytes.split(startRow, endRow, <span class="keyword">true</span>, n-<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; splitKeys.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">      <span class="comment">//notice that the regionSize parameter may be not very accurate</span></span><br><span class="line">      TableSplit tsplit =</span><br><span class="line">          <span class="keyword">new</span> TableSplit(tableName, scan, splitKeys[i], splitKeys[i + <span class="number">1</span>], regionLocation,</span><br><span class="line">              encodedRegionName, regionSize / n);</span><br><span class="line">      res.add(tsplit);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-hbase-mapreduce-input-autobalance"><a href="#3-3-hbase-mapreduce-input-autobalance" class="headerlink" title="3.3 hbase.mapreduce.input.autobalance"></a>3.3 hbase.mapreduce.input.autobalance</h4><p><strong>默认情况下hbase.mapreduce.input.autobalance该参数为false，当设置job任务的该参数为true时，可以将较小的region合并使用一个map任务来读取，而较大的region拆分为多个map任务来读取。但是这里将region分片的措施与上一节相同，同样是按照byte[]进行等分，对于倾斜的region意义不大。</strong></p>
+<p>实现上述逻辑的hbase源代码在TableInputFormatBase类的calculateAutoBalancedSplits()方法中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">public List&lt;InputSplit&gt; calculateAutoBalancedSplits(List&lt;InputSplit&gt; splits, long maxAverageRegionSize)</span><br><span class="line">      throws IOException &#123;</span><br><span class="line">    if (splits.size() == 0) &#123;</span><br><span class="line">      return splits;</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;InputSplit&gt; resultList = new ArrayList&lt;&gt;();</span><br><span class="line">    long totalRegionSize = 0;</span><br><span class="line">    for (int i = 0; i &lt; splits.size(); i++) &#123;</span><br><span class="line">      TableSplit ts = (TableSplit) splits.get(i);</span><br><span class="line">      totalRegionSize += ts.getLength();</span><br><span class="line">    &#125;</span><br><span class="line">    long averageRegionSize = totalRegionSize / splits.size();</span><br><span class="line">    // totalRegionSize might be overflow, and the averageRegionSize must be positive.</span><br><span class="line">    if (averageRegionSize &lt;= 0) &#123;</span><br><span class="line">      LOG.warn("The averageRegionSize is not positive: " + averageRegionSize + ", " +</span><br><span class="line">          "<span class="keyword">set</span> it <span class="keyword">to</span> Long.MAX_VALUE <span class="string">" + splits.size());</span></span><br><span class="line"><span class="string">      averageRegionSize = Long.MAX_VALUE / splits.size();</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    //if averageRegionSize is too big, change it to default as 8 GB,</span></span><br><span class="line"><span class="string">    if (averageRegionSize &gt; maxAverageRegionSize) &#123;</span></span><br><span class="line"><span class="string">      averageRegionSize = maxAverageRegionSize;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    // if averageRegionSize is too small, we do not need to allocate more mappers for those 'large' region</span></span><br><span class="line"><span class="string">    // set default as 64M = (default hdfs block size);</span></span><br><span class="line"><span class="string">    if (averageRegionSize &lt; 64 * 1048576) &#123;</span></span><br><span class="line"><span class="string">      return splits;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    for (int i = 0; i &lt; splits.size(); i++) &#123;</span></span><br><span class="line"><span class="string">      TableSplit ts = (TableSplit) splits.get(i);</span></span><br><span class="line"><span class="string">      TableName tableName = ts.getTable();</span></span><br><span class="line"><span class="string">      String regionLocation = ts.getRegionLocation();</span></span><br><span class="line"><span class="string">      String encodedRegionName = ts.getEncodedRegionName();</span></span><br><span class="line"><span class="string">      long regionSize = ts.getLength();</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">      if (regionSize &gt;= averageRegionSize) &#123;</span></span><br><span class="line"><span class="string">        // make this region as multiple MapReduce input split.</span></span><br><span class="line"><span class="string">        int n = (int) Math.round(Math.log(((double) regionSize) / ((double) averageRegionSize)) + 1.0);</span></span><br><span class="line"><span class="string">        List&lt;InputSplit&gt; temp = createNInputSplitsUniform(ts, n);</span></span><br><span class="line"><span class="string">        resultList.addAll(temp);</span></span><br><span class="line"><span class="string">      &#125; else &#123;</span></span><br><span class="line"><span class="string">        // if the total size of several small continuous regions less than the average region size,</span></span><br><span class="line"><span class="string">        // combine them into one MapReduce input split.</span></span><br><span class="line"><span class="string">        long totalSize = regionSize;</span></span><br><span class="line"><span class="string">        byte[] splitStartKey = ts.getStartRow();</span></span><br><span class="line"><span class="string">        byte[] splitEndKey = ts.getEndRow();</span></span><br><span class="line"><span class="string">        int j = i + 1;</span></span><br><span class="line"><span class="string">        while (j &lt; splits.size()) &#123;</span></span><br><span class="line"><span class="string">          TableSplit nextRegion = (TableSplit) splits.get(j);</span></span><br><span class="line"><span class="string">          long nextRegionSize = nextRegion.getLength();</span></span><br><span class="line"><span class="string">          if (totalSize + nextRegionSize &lt;= averageRegionSize) &#123;</span></span><br><span class="line"><span class="string">            totalSize = totalSize + nextRegionSize;</span></span><br><span class="line"><span class="string">            splitEndKey = nextRegion.getEndRow();</span></span><br><span class="line"><span class="string">            j++;</span></span><br><span class="line"><span class="string">          &#125; else &#123;</span></span><br><span class="line"><span class="string">            break;</span></span><br><span class="line"><span class="string">          &#125;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        i = j - 1;</span></span><br><span class="line"><span class="string">        TableSplit t = new TableSplit(tableName, scan, splitStartKey, splitEndKey, regionLocation,</span></span><br><span class="line"><span class="string">            encodedRegionName, totalSize);</span></span><br><span class="line"><span class="string">        resultList.add(t);</span></span><br><span class="line"><span class="string">      &#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    return resultList;</span></span><br><span class="line"><span class="string">  &#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-hbase-mapreduce-input-mappers-per-region-hbase-mapreduce-input-autobalance"><a href="#3-4-hbase-mapreduce-input-mappers-per-region-hbase-mapreduce-input-autobalance" class="headerlink" title="3.4 hbase.mapreduce.input.mappers.per.region+hbase.mapreduce.input.autobalance"></a>3.4 hbase.mapreduce.input.mappers.per.region+hbase.mapreduce.input.autobalance</h4><p><strong>当hbase.mapreduce.input.mappers.per.region使用默认值1时，calculateAutoBalancedSplits()方法中获取到的每个split的存储量大小就是对应的每个region的存储量大小，这个值是准确的，所以判断出来的过大和过小的split也是正确的。</strong></p>
+<p><strong>但是当hbase.mapreduce.input.mappers.per.region参数&gt;1时，使用createNInputSplitsUniform()方法进行过一次分片之后，每个split的存储量大小就不是真实值了，而是通过region存储量大小除以hbase.mapreduce.input.mappers.per.region得到的，实际上region中的数据是不可能完全均匀分布的。如果同时设置了hbase.mapreduce.input.autobalance为true，那么再进行均衡时对每个split的大小判断也就不再准确了。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/21/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(12)_HBase%E4%BE%9D%E8%B5%96jar%E5%8C%85%E6%BA%90%E7%A0%81%E4%BF%AE%E6%94%B9%E4%B8%8E%E6%9B%BF%E6%8D%A2/" rel="next" title="HBase表数据倾斜治理(12)_HBase依赖jar包源码修改与替换">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理(12)_HBase依赖jar包源码修改与替换
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">102</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-13-Region切分管理与并行读取单Region"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Region切分管理"><span class="nav-number">1.1.</span> <span class="nav-text">1.Region切分管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-Region切分"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 Region切分</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1-1预分区"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1.1.1预分区</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#HBase存储底层"><span class="nav-number">1.1.1.1.1.</span> <span class="nav-text">HBase存储底层</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#HexStringSplit算法"><span class="nav-number">1.1.1.1.2.</span> <span class="nav-text">HexStringSplit算法</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#UniformSplit算法"><span class="nav-number">1.1.1.1.3.</span> <span class="nav-text">UniformSplit算法</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1-2自动分区"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">1.1.2自动分区</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1-3强制分区"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">1.1.3强制分区</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Region合并"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 Region合并</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-Hfile合并"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 Hfile合并</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Minor-Compaction"><span class="nav-number">1.1.3.0.1.</span> <span class="nav-text">Minor Compaction</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Major-Compaction"><span class="nav-number">1.1.3.0.2.</span> <span class="nav-text">Major Compaction</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-并行读取单Region"><span class="nav-number">1.2.</span> <span class="nav-text">3.并行读取单Region</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1默认情况"><span class="nav-number">1.2.1.</span> <span class="nav-text">3.1默认情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-hbase-mapreduce-input-mappers-per-region"><span class="nav-number">1.2.2.</span> <span class="nav-text">3.2 hbase.mapreduce.input.mappers.per.region</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-hbase-mapreduce-input-autobalance"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.3 hbase.mapreduce.input.autobalance</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-hbase-mapreduce-input-mappers-per-region-hbase-mapreduce-input-autobalance"><span class="nav-number">1.2.4.</span> <span class="nav-text">3.4 hbase.mapreduce.input.mappers.per.region+hbase.mapreduce.input.autobalance</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

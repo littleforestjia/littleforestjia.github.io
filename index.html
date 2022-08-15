@@ -254,6 +254,155 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/" itemprop="url">HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-27T00:00:00+08:00">
+                2022-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase表数据倾斜治理</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          HBase表数据倾斜治理(13)_Region切分管理与并行读取单Region1.Region切分管理1.1 Region切分1.1.1预分区预分区就是在建表的时候预先设置拆分点，比如设置9个拆分点，那么建表时就会创建10个region，后序存入的数据与拆分点按字典序比较大小，决定存入哪个region。
+拆分点的设置方式主要有四种：直接指定拆分点列表、HexStringSplit算法、Unifor
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(13)_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/21/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(12)_HBase%E4%BE%9D%E8%B5%96jar%E5%8C%85%E6%BA%90%E7%A0%81%E4%BF%AE%E6%94%B9%E4%B8%8E%E6%9B%BF%E6%8D%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1589,157 +1738,6 @@ ha通过在集群中运行2个namenode，分别出与active和standby状态，�
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/05/27/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8SLF4J&Log4j/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="zju岩手县小森">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/head.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩手县小森的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2022/05/27/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8SLF4J&Log4j/" itemprop="url">商智离线_使用SLF4J&Log4j</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-05-27T00:00:00+08:00">
-                2022-05-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF/" itemprop="url" rel="index">
-                    <span itemprop="name">商智离线</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          商智离线_使用SLF4J&amp;Log4j1.log发展1.1 JDK Logging在编写程序过程中，常常使用system.out.println()来打印过程变量，测试代码逻辑是否正确。当代码出问题时又要删除这些system.out.println()语句，这样非常麻烦，替代方式就是使用日志。
-java标准库内置了日志工具包java.util.logging，可以直接使用。
-代码示例：
-12
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2022/05/27/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E4%BD%BF%E7%94%A8SLF4J&Log4j/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1794,7 +1792,7 @@ java标准库内置了日志工具包java.util.logging，可以直接使用。
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">92</span>
+                  <span class="site-state-item-count">93</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
