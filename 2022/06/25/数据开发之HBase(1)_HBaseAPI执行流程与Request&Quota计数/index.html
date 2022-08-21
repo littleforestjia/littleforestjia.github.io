@@ -83,14 +83,14 @@
 
 
 
-<meta name="description" content="商智离线_HBaseAPI执行流程与Request&amp;Quota计数1.API汇总1.1客户端的HTable类与服务端的RSRpcServices类HBase client提供的java api主要在HTable类中： 123456Result get(Get get);Result[] get(List&lt;Get&gt; gets);void put(Put put);void put">
+<meta name="description" content="数据开发之HBase(1)_HBaseAPI执行流程与Request&amp;Quota计数1.API汇总1.1客户端的HTable类与服务端的RSRpcServices类HBase client提供的java api主要在HTable类中： 123456Result get(Get get);Result[] get(List&lt;Get&gt; gets);void put(Put put)">
 <meta property="og:type" content="article">
-<meta property="og:title" content="商智离线_HBaseAPI执行流程与Request&amp;Quota计数">
-<meta property="og:url" content="http://https//littleforestjia.github.io/2022/06/25/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/index.html">
+<meta property="og:title" content="数据开发之HBase(1)_HBaseAPI执行流程与Request&amp;Quota计数">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/06/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(1)_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/index.html">
 <meta property="og:site_name" content="岩手县小森的博客">
-<meta property="og:description" content="商智离线_HBaseAPI执行流程与Request&amp;Quota计数1.API汇总1.1客户端的HTable类与服务端的RSRpcServices类HBase client提供的java api主要在HTable类中： 123456Result get(Get get);Result[] get(List&lt;Get&gt; gets);void put(Put put);void put">
+<meta property="og:description" content="数据开发之HBase(1)_HBaseAPI执行流程与Request&amp;Quota计数1.API汇总1.1客户端的HTable类与服务端的RSRpcServices类HBase client提供的java api主要在HTable类中： 123456Result get(Get get);Result[] get(List&lt;Get&gt; gets);void put(Put put)">
 <meta property="article:published_time" content="2022-06-24T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-06-25T09:16:16.387Z">
+<meta property="article:modified_time" content="2022-08-21T15:00:05.722Z">
 <meta property="article:author" content="zju岩手县小森">
 <meta property="article:tag" content="HBase">
 <meta name="twitter:card" content="summary">
@@ -123,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/06/25/商智离线_HBaseAPI执行流程与Request&Quota计数/"/>
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/06/25/数据开发之HBase(1)_HBaseAPI执行流程与Request&Quota计数/"/>
 
 
 
 
 
-  <title>商智离线_HBaseAPI执行流程与Request&Quota计数 | 岩手县小森的博客</title>
+  <title>数据开发之HBase(1)_HBaseAPI执行流程与Request&Quota计数 | 岩手县小森的博客</title>
   
 
 
@@ -256,7 +256,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/06/25/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/06/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(1)_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zju岩手县小森">
@@ -273,7 +273,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">商智离线_HBaseAPI执行流程与Request&Quota计数</h1>
+          <h1 class="post-title" itemprop="name headline">数据开发之HBase(1)_HBaseAPI执行流程与Request&Quota计数</h1>
         
 
         <div class="post-meta">
@@ -308,8 +308,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF/" itemprop="url" rel="index">
-                    <span itemprop="name">商智离线</span>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之HBase</span>
                   </a>
                 </span>
 
@@ -345,7 +345,7 @@
       
 
       
-        <h2 id="商智离线-HBaseAPI执行流程与Request-amp-Quota计数"><a href="#商智离线-HBaseAPI执行流程与Request-amp-Quota计数" class="headerlink" title="商智离线_HBaseAPI执行流程与Request&amp;Quota计数"></a>商智离线_HBaseAPI执行流程与Request&amp;Quota计数</h2><h3 id="1-API汇总"><a href="#1-API汇总" class="headerlink" title="1.API汇总"></a>1.API汇总</h3><h4 id="1-1客户端的HTable类与服务端的RSRpcServices类"><a href="#1-1客户端的HTable类与服务端的RSRpcServices类" class="headerlink" title="1.1客户端的HTable类与服务端的RSRpcServices类"></a>1.1客户端的HTable类与服务端的RSRpcServices类</h4><p>HBase client提供的java api主要在HTable类中：</p>
+        <h2 id="数据开发之HBase-1-HBaseAPI执行流程与Request-amp-Quota计数"><a href="#数据开发之HBase-1-HBaseAPI执行流程与Request-amp-Quota计数" class="headerlink" title="数据开发之HBase(1)_HBaseAPI执行流程与Request&amp;Quota计数"></a>数据开发之HBase(1)_HBaseAPI执行流程与Request&amp;Quota计数</h2><h3 id="1-API汇总"><a href="#1-API汇总" class="headerlink" title="1.API汇总"></a>1.API汇总</h3><h4 id="1-1客户端的HTable类与服务端的RSRpcServices类"><a href="#1-1客户端的HTable类与服务端的RSRpcServices类" class="headerlink" title="1.1客户端的HTable类与服务端的RSRpcServices类"></a>1.1客户端的HTable类与服务端的RSRpcServices类</h4><p>HBase client提供的java api主要在HTable类中：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Result <span class="title">get</span><span class="params">(Get get)</span></span>;</span><br><span class="line">Result[] get(List&lt;Get&gt; gets);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">put</span><span class="params">(Put put)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">put</span><span class="params">(List&lt;Put&gt; puts)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(<span class="keyword">final</span> Delete delete)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(List&lt;Delete&gt; deletes)</span></span>;</span><br></pre></td></tr></table></figure>
 
 <p>HTable类中操作数据的方法本质都是通过RPC远程调用RegionServer上的数据操作方法。RS上的数据操作方法主要在BlockingInterface接口中定义，在RSRpcServices类中实现：</p>
@@ -454,8 +454,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/" rel="prev" title="商智离线_HBaseConnection&Filter&Coprocessors&SQL">
-                商智离线_HBaseConnection&Filter&Coprocessors&SQL <i class="fa fa-chevron-right"></i>
+              <a href="/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/" rel="prev" title="数据开发之HBase(2)_HBaseConnection&Filter&Coprocessors&SQL">
+                数据开发之HBase(2)_HBaseConnection&Filter&Coprocessors&SQL <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -537,7 +537,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-count">95</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -548,7 +548,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -606,7 +606,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#商智离线-HBaseAPI执行流程与Request-amp-Quota计数"><span class="nav-number">1.</span> <span class="nav-text">商智离线_HBaseAPI执行流程与Request&amp;Quota计数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-API汇总"><span class="nav-number">1.1.</span> <span class="nav-text">1.API汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1客户端的HTable类与服务端的RSRpcServices类"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1客户端的HTable类与服务端的RSRpcServices类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-HTable类的主要属性"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 HTable类的主要属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-Request计数原理"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 Request计数原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-Quota计数原理"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 Quota计数原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-put"><span class="nav-number">1.2.</span> <span class="nav-text">2.put</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-put流程源码"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 put流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-request-amp-quota计数"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-put-List-流程"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 put(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-get"><span class="nav-number">1.3.</span> <span class="nav-text">3.get</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-get流程源码"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 get流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-request-amp-quota计数"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-get-List-流程"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 get(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-delete"><span class="nav-number">1.4.</span> <span class="nav-text">4.delete</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-delete流程源码"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 delete流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-request-amp-quota计数"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-delete-List-流程"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 delete(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-scan的request-amp-quota计数"><span class="nav-number">1.5.</span> <span class="nav-text">5.scan的request&amp;quota计数</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之HBase-1-HBaseAPI执行流程与Request-amp-Quota计数"><span class="nav-number">1.</span> <span class="nav-text">数据开发之HBase(1)_HBaseAPI执行流程与Request&amp;Quota计数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-API汇总"><span class="nav-number">1.1.</span> <span class="nav-text">1.API汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1客户端的HTable类与服务端的RSRpcServices类"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1客户端的HTable类与服务端的RSRpcServices类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-HTable类的主要属性"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 HTable类的主要属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-Request计数原理"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 Request计数原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-Quota计数原理"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 Quota计数原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-put"><span class="nav-number">1.2.</span> <span class="nav-text">2.put</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-put流程源码"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 put流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-request-amp-quota计数"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-put-List-流程"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 put(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-get"><span class="nav-number">1.3.</span> <span class="nav-text">3.get</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-get流程源码"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 get流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-request-amp-quota计数"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-get-List-流程"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 get(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-delete"><span class="nav-number">1.4.</span> <span class="nav-text">4.delete</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-delete流程源码"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 delete流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-request-amp-quota计数"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-delete-List-流程"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 delete(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-scan的request-amp-quota计数"><span class="nav-number">1.5.</span> <span class="nav-text">5.scan的request&amp;quota计数</span></a></li></ol></li></ol></div>
             
 
           </div>

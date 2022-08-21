@@ -83,21 +83,21 @@
 
 
 
-<meta name="description" content="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个">
+<meta name="description" content="数据开发之HBase(2)_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeep">
 <meta property="og:type" content="article">
-<meta property="og:title" content="商智离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL">
-<meta property="og:url" content="http://https//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/index.html">
+<meta property="og:title" content="数据开发之HBase(2)_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/index.html">
 <meta property="og:site_name" content="岩手县小森的博客">
-<meta property="og:description" content="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个">
-<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.jpg">
-<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/2.jpg">
-<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/3.jpg">
+<meta property="og:description" content="数据开发之HBase(2)_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL1.Connection1.1 HBase Connection原理hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeep">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/3.jpg">
 <meta property="article:published_time" content="2022-07-02T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-07-03T09:50:44.594Z">
+<meta property="article:modified_time" content="2022-08-21T15:02:12.236Z">
 <meta property="article:author" content="zju岩手县小森">
 <meta property="article:tag" content="HBase">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.jpg">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/1.jpg">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/07/03/商职离线_HBaseConnection&Filter&Coprocessors&SQL/"/>
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/07/03/数据开发之HBase(2)_HBaseConnection&Filter&Coprocessors&SQL/"/>
 
 
 
 
 
-  <title>商智离线_HBaseConnection&Filter&Coprocessors&SQL | 岩手县小森的博客</title>
+  <title>数据开发之HBase(2)_HBaseConnection&Filter&Coprocessors&SQL | 岩手县小森的博客</title>
   
 
 
@@ -260,7 +260,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zju岩手县小森">
@@ -277,7 +277,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">商智离线_HBaseConnection&Filter&Coprocessors&SQL</h1>
+          <h1 class="post-title" itemprop="name headline">数据开发之HBase(2)_HBaseConnection&Filter&Coprocessors&SQL</h1>
         
 
         <div class="post-meta">
@@ -312,8 +312,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF/" itemprop="url" rel="index">
-                    <span itemprop="name">商智离线</span>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之HBase</span>
                   </a>
                 </span>
 
@@ -349,7 +349,7 @@
       
 
       
-        <h2 id="商职离线-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL"><a href="#商职离线-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL" class="headerlink" title="商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL"></a>商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL</h2><h3 id="1-Connection"><a href="#1-Connection" class="headerlink" title="1.Connection"></a>1.Connection</h3><h4 id="1-1-HBase-Connection原理"><a href="#1-1-HBase-Connection原理" class="headerlink" title="1.1 HBase Connection原理"></a>1.1 HBase Connection原理</h4><p>hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个Master连接对象、多个RegionServer连接对象。因此Connection对象每次创建都会带来很大的开销，每次使用重新创建会造成严重的性能损耗。</p>
+        <h2 id="数据开发之HBase-2-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL"><a href="#数据开发之HBase-2-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL" class="headerlink" title="数据开发之HBase(2)_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL"></a>数据开发之HBase(2)_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL</h2><h3 id="1-Connection"><a href="#1-Connection" class="headerlink" title="1.Connection"></a>1.Connection</h3><h4 id="1-1-HBase-Connection原理"><a href="#1-1-HBase-Connection原理" class="headerlink" title="1.1 HBase Connection原理"></a>1.1 HBase Connection原理</h4><p>hbase client中的一个Connection对象包含了对Zookeeper、Master、RegionServer三种socket连接的封装。一个Connection对象中包含一个Zookeeper连接对象、一个Master连接对象、多个RegionServer连接对象。因此Connection对象每次创建都会带来很大的开销，每次使用重新创建会造成严重的性能损耗。</p>
 <p>Connection对象是线程安全的，在一个jvm进程中的多个线程可以共用同一个Connection对象。但是注意Table和Admin对象不是线程安全的，不同线程需要单独创建使用。</p>
 <h4 id="1-2-Client与Zookeeper的关系"><a href="#1-2-Client与Zookeeper的关系" class="headerlink" title="1.2 Client与Zookeeper的关系"></a>1.2 Client与Zookeeper的关系</h4><p>client当中只需要配置zookeeper集群的地址就好了，client api需要访问hbase时先连接zookeeper获取到master和regionserver的地址信息，在连接到master和regionserver。</p>
 <p><strong>当client进行DDL(create、alter、drop)时，会在第一次获得master地址之后直接与master进行通信，修改master中保存的表的元数据信息。</strong></p>
@@ -367,7 +367,7 @@
 </ul>
 <h3 id="2-Filter"><a href="#2-Filter" class="headerlink" title="2.Filter"></a>2.Filter</h3><h4 id="2-1-HBase-Filter原理"><a href="#2-1-HBase-Filter原理" class="headerlink" title="2.1 HBase Filter原理"></a>2.1 HBase Filter原理</h4><p>hbase api中的基础查询操作能够实现的功能较少，hbase还提供了一种高级的查询方法filter，filter可以根据列簇、列、版本等更多条件来对数据进行过滤。<strong>带有filter条件的scan查询会把过滤条件通过rpc分发到各个regionserver上去，在服务段完成数据过滤，而不是先把数据传输到客户端再进行过滤，这样降低了网络传输的压力。</strong></p>
 <p>scan的服务端大致流程如下图所示，<strong>在第六步中服务端会根据filter条件对被查询cell进行过滤</strong>：</p>
-<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/1.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/1.jpg" alt></p>
 <h4 id="2-2-Filter种类"><a href="#2-2-Filter种类" class="headerlink" title="2.2 Filter种类"></a>2.2 Filter种类</h4><p>比较过滤器：</p>
 <ul>
 <li>行键过滤器：可以基于<strong>rowkey</strong>执行<strong>字节数组精确匹配、字节数组前缀匹配、子字符串匹配、字符串正则表达式匹配</strong>等，过滤掉不匹配的数据cell。</li>
@@ -415,9 +415,9 @@
 <li>WalObserver：允许在WAL级别事件前后添加业务逻辑，详情见BaseWalObserver源码。</li>
 </ul>
 <p><strong>上述四种Observer接口都继承自Coprocessors接口，这四个接口中定义了所有可以实现AOP的钩子方法，我们一般直接继承其Base实现类，重写必要的方法。</strong></p>
-<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/2.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/2.jpg" alt></p>
 <p>比如BaseRegionObserver中定义的所有可用的钩子方法，多数方法都是以pre和post形式成对出现，部分方法如下所示：</p>
-<p><img src="//littleforestjia.github.io/2022/07/03/%E5%95%86%E8%81%8C%E7%A6%BB%E7%BA%BF_HBaseConnection&Filter&Coprocessors&SQL/3.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2022/07/03/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(2)_HBaseConnection&Filter&Coprocessors&SQL/3.jpg" alt></p>
 <h5 id="3-2-2-Endpoint"><a href="#3-2-2-Endpoint" class="headerlink" title="3.2.2 Endpoint"></a>3.2.2 Endpoint</h5><p>Endpoint与Observer有很大的不同，实现形式也不是AOP形式的，要更加复杂一些。</p>
 <p><strong>Endpoint代码需要实现CoprocessorService、Coprocessor这两个接口，然后部署在服务端。其中的业务逻辑主要是调用regionserver提供的数据操作接口来实现行数计算、最值计算等聚合计算操作。</strong></p>
 <p>客户端可以通过rpc直接远程调用Endpoint方法返回结果。</p>
@@ -455,8 +455,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2022/06/25/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/" rel="next" title="商智离线_HBaseAPI执行流程与Request&Quota计数">
-                <i class="fa fa-chevron-left"></i> 商智离线_HBaseAPI执行流程与Request&Quota计数
+              <a href="/2022/06/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BHBase(1)_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/" rel="next" title="数据开发之HBase(1)_HBaseAPI执行流程与Request&Quota计数">
+                <i class="fa fa-chevron-left"></i> 数据开发之HBase(1)_HBaseAPI执行流程与Request&Quota计数
               </a>
             
           </div>
@@ -548,7 +548,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">93</span>
+                  <span class="site-state-item-count">95</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -559,7 +559,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -617,7 +617,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#商职离线-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL"><span class="nav-number">1.</span> <span class="nav-text">商职离线_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Connection"><span class="nav-number">1.1.</span> <span class="nav-text">1.Connection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-HBase-Connection原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 HBase Connection原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Client与Zookeeper的关系"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 Client与Zookeeper的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-HBase-Connection的管理"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 HBase Connection的管理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Filter"><span class="nav-number">1.2.</span> <span class="nav-text">2.Filter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-HBase-Filter原理"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 HBase Filter原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Filter种类"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Filter种类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Coprocessors"><span class="nav-number">1.3.</span> <span class="nav-text">3.Coprocessors</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-HBase-Coprocessors原理"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 HBase Coprocessors原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Coprocessors分类"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 Coprocessors分类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-1-Observer"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">3.2.1 Observer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-2-Endpoint"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">3.2.2 Endpoint</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-SQL"><span class="nav-number">1.4.</span> <span class="nav-text">4.SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-HBase-SQL原理"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 HBase SQL原理</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之HBase-2-HBaseConnection-amp-Filter-amp-Coprocessors-amp-SQL"><span class="nav-number">1.</span> <span class="nav-text">数据开发之HBase(2)_HBaseConnection&amp;Filter&amp;Coprocessors&amp;SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Connection"><span class="nav-number">1.1.</span> <span class="nav-text">1.Connection</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-HBase-Connection原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 HBase Connection原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Client与Zookeeper的关系"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 Client与Zookeeper的关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-HBase-Connection的管理"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 HBase Connection的管理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Filter"><span class="nav-number">1.2.</span> <span class="nav-text">2.Filter</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-HBase-Filter原理"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 HBase Filter原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Filter种类"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Filter种类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Coprocessors"><span class="nav-number">1.3.</span> <span class="nav-text">3.Coprocessors</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-HBase-Coprocessors原理"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 HBase Coprocessors原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Coprocessors分类"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 Coprocessors分类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-1-Observer"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">3.2.1 Observer</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-2-Endpoint"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">3.2.2 Endpoint</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-SQL"><span class="nav-number">1.4.</span> <span class="nav-text">4.SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-HBase-SQL原理"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 HBase SQL原理</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
