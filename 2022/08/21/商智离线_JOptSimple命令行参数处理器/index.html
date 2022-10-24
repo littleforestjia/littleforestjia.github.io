@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="商智离线_JOptSimple命令行参数处理器1.使用背景在服务器上运行任务类型的java程序，通常是使用java jar xxx.jar、hadoop jar xxx.jar、spark-submit xxx.jar等linux命令。为了将参数与程序进行解耦，加强代码的通用性，通常会将很多参数值与运行命令一起传入程序。 如hbase快照解析工具的运行命令： 1hadoop jar HBaseSn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="商智离线_JOptSimple命令行参数处理器">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/08/21/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_JOptSimple%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%E5%A4%84%E7%90%86%E5%99%A8/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="商智离线_JOptSimple命令行参数处理器1.使用背景在服务器上运行任务类型的java程序，通常是使用java jar xxx.jar、hadoop jar xxx.jar、spark-submit xxx.jar等linux命令。为了将参数与程序进行解耦，加强代码的通用性，通常会将很多参数值与运行命令一起传入程序。 如hbase快照解析工具的运行命令： 1hadoop jar HBaseSn">
+<meta property="article:published_time" content="2022-08-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-10-24T15:02:08.121Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/08/21/商智离线_JOptSimple命令行参数处理器/"/>
+
+
+
+
+
+  <title>商智离线_JOptSimple命令行参数处理器 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/08/21/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_JOptSimple%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%E5%A4%84%E7%90%86%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">商智离线_JOptSimple命令行参数处理器</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-21T00:00:00+08:00">
+                2022-08-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF/" itemprop="url" rel="index">
+                    <span itemprop="name">商智离线</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="商智离线-JOptSimple命令行参数处理器"><a href="#商智离线-JOptSimple命令行参数处理器" class="headerlink" title="商智离线_JOptSimple命令行参数处理器"></a>商智离线_JOptSimple命令行参数处理器</h2><h3 id="1-使用背景"><a href="#1-使用背景" class="headerlink" title="1.使用背景"></a>1.使用背景</h3><p>在服务器上运行任务类型的java程序，通常是使用<code>java jar xxx.jar</code>、<code>hadoop jar xxx.jar</code>、<code>spark-submit xxx.jar</code>等linux命令。为了将参数与程序进行解耦，加强代码的通用性，通常会将很多参数值与运行命令一起传入程序。</p>
+<p>如hbase快照解析工具的运行命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar HBaseSnapshotRead-1.0-SNAPSHOT.jar -hdfsUrl hdfs://ns22017 -splitAlgorithm UniformSplit -snapshotName snapshot_hb_ibd_HB_IBD_PRODUCT_COMPETE_SOURCE_NEW -numSplitsPerRegion 70 -hbaseRootDir hdfs://ns22017/user/ads_sz_load/hfile_convert/origin -outputPath /user/ads_sz_load/hbasetohive/result/ -tmpPath /user/ads_sz_load/hbasetohive/tmp/snapshot -firstRowKeyType long -compressionAlgorithm Gzip</span><br></pre></td></tr></table></figure>
+
+<p>如spark删数工具的运行命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spark-submit --class com.jd.ads.HbaseMain  --master yarn --deploy-mode client --conf spark.speculation=false  --executor-cores 5 --executor-memory 30g --driver-memory 10g --num-executors 10 --total-executor-cores 500 HbaseDelete-v1.2.6.jar hbase=HB_IBD_INDUSTRY_BRAND_GOODS_NEW_INDEX dt=2022-07-15 dataCycle=d30 sourceFileDir=hiveLocation isRunSql=true hbaseCluster=hbaseCluster_offline isFilterCycle=true batchDeleteSize=10</span><br></pre></td></tr></table></figure>
+
+<p>这些运行命令中的<code>xxx.jar</code>之后的参数都会作为main方法的<code>String[] args</code>入参。</p>
+<p>JOptSimple是一个比较简单常用的命令行解析器，可以以比较优雅的方式进行参数解析。</p>
+<h3 id="2-使用方法"><a href="#2-使用方法" class="headerlink" title="2.使用方法"></a>2.使用方法</h3><h4 id="2-1在pom-xml文件中引入依赖"><a href="#2-1在pom-xml文件中引入依赖" class="headerlink" title="2.1在pom.xml文件中引入依赖"></a>2.1在pom.xml文件中引入依赖</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>jopt-simple<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jopt-simple<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">classifier</span>&gt;</span>rc1<span class="tag">&lt;/<span class="name">classifier</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2创建命令行参数处理类"><a href="#2-2创建命令行参数处理类" class="headerlink" title="2.2创建命令行参数处理类"></a>2.2创建命令行参数处理类</h4><p>提前设计好需要传入哪些参数，在命令行参数处理类中创建对应的属性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> joptsimple.OptionParser;</span><br><span class="line"><span class="keyword">import</span> joptsimple.OptionSet;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 命令行参数处理器</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OptionsProcessor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String hdfsUrl;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String splitAlgorithm;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String snapshotName;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> numSplitsPerRegion;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String hbaseRootDir;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String outputPath;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String tmpPath;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String firstRowKeyType;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String compressionAlgorithm;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//饿汉单例模式</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> OptionsProcessor optionsProcessor;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> OptionsProcessor <span class="title">getOptionsProcessor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (optionsProcessor == <span class="keyword">null</span>)</span><br><span class="line">            optionsProcessor = <span class="keyword">new</span> OptionsProcessor();</span><br><span class="line">        <span class="keyword">return</span> optionsProcessor;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">//解析参数的方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">processOptions</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        OptionParser parser = <span class="keyword">new</span> OptionParser() &#123;</span><br><span class="line">            &#123;</span><br><span class="line">                accepts(<span class="string">"hdfsUrl"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"splitAlgorithm"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"snapshotName"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"numSplitsPerRegion"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"hbaseRootDir"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"outputPath"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"tmpPath"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"firstRowKeyType"</span>).withRequiredArg();</span><br><span class="line">                accepts(<span class="string">"compressionAlgorithm"</span>).withRequiredArg();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        OptionSet options = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            options = parser.parse(args);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            System.exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        hdfsUrl = options.valueOf(<span class="string">"hdfsUrl"</span>).toString();</span><br><span class="line">        splitAlgorithm = options.valueOf(<span class="string">"splitAlgorithm"</span>).toString();</span><br><span class="line">        snapshotName = options.valueOf(<span class="string">"snapshotName"</span>).toString();</span><br><span class="line">        numSplitsPerRegion = Integer.parseInt(options.valueOf(<span class="string">"numSplitsPerRegion"</span>).toString());</span><br><span class="line">        hbaseRootDir = options.valueOf(<span class="string">"hbaseRootDir"</span>).toString();</span><br><span class="line">        outputPath = options.valueOf(<span class="string">"outputPath"</span>).toString();</span><br><span class="line">        tmpPath = options.valueOf(<span class="string">"tmpPath"</span>).toString();</span><br><span class="line">        firstRowKeyType = options.valueOf(<span class="string">"firstRowKeyType"</span>).toString();</span><br><span class="line">        compressionAlgorithm = options.valueOf(<span class="string">"compressionAlgorithm"</span>).toString();</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getHdfsUrl</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> hdfsUrl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSplitAlgorithm</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> splitAlgorithm;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSnapshotName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> snapshotName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNumSplitsPerRegion</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> numSplitsPerRegion;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getHbaseRootDir</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> hbaseRootDir;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getOutputPath</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> outputPath;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTmpPath</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tmpPath;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getFirstRowKeyType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> firstRowKeyType;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getCompressionAlgorithm</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> compressionAlgorithm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>重要：这种配置类一般都是使用饿汉单例模式来创建。</strong></p>
+<h4 id="2-3在main方法类中使用"><a href="#2-3在main方法类中使用" class="headerlink" title="2.3在main方法类中使用"></a>2.3在main方法类中使用</h4><ol>
+<li>创建一个命令行参数处理器静态属性实例。</li>
+<li>创建一个config静态方法，用于执行命令行参数解析等一切前期配置工作。</li>
+<li>在main方法的最前面调用config方法。</li>
+<li>在main方法的后续可以直接通过get方法获取目标参数。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetHbaseTool</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(GetHbaseTool<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">  	<span class="comment">//1.创建一个命令行参数处理器静态属性实例</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> OptionsProcessor optionsProcessor = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">1</span>;</span><br><span class="line">      	<span class="comment">//3.在main方法的最前面调用config方法</span></span><br><span class="line">        config(args);</span><br><span class="line">        System.out.println(<span class="string">"get hbase !"</span>);</span><br><span class="line">        res = ToolRunner.run(<span class="keyword">new</span> Configuration(), <span class="keyword">new</span> GetHbaseTool(), args);</span><br><span class="line">        System.exit(res);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">      	<span class="comment">//4.在main方法的后续可以直接通过get方法获取目标参数</span></span><br><span class="line">        String hdfsUrl = optionsProcessor.getHdfsUrl();</span><br><span class="line">        <span class="comment">//String hdfsUrl = "hdfs://ns22017"</span></span><br><span class="line"></span><br><span class="line">        JobConf conf = <span class="keyword">new</span> JobConf();</span><br><span class="line">        logger.warn(<span class="string">"fs.defaultFS:"</span> + hdfsUrl);</span><br><span class="line">        conf.set(<span class="string">"fs.defaultFS"</span>, hdfsUrl);</span><br><span class="line">        conf.setInt(<span class="string">"mapreduce.map.cpu.vcores"</span>, <span class="number">2</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.map.memory.mb"</span>, <span class="string">"4096"</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.map.java.opts"</span>, <span class="string">"-Xmx3g"</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.task.timeout"</span>, <span class="string">"1800000"</span>);</span><br><span class="line"></span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line">        scan.setCaching(Integer.parseInt(<span class="string">"5000"</span>));</span><br><span class="line">        scan.setCacheBlocks(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        String startRow = <span class="string">""</span>;</span><br><span class="line">        String stopRow = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotEmpty(startRow)) &#123;</span><br><span class="line">            scan.setStartRow(startRow.getBytes());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotEmpty(stopRow)) &#123;</span><br><span class="line">            scan.setStopRow(stopRow.getBytes());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String hbaseSplit = optionsProcessor.getSplitAlgorithm();</span><br><span class="line">        <span class="comment">//String hbaseSplit = "UniformSplit";</span></span><br><span class="line">        String snapshotName = optionsProcessor.getSnapshotName();</span><br><span class="line">        <span class="comment">//String snapshotName = "sanpshot_HB_IBD_SHOP_DIAGNOSIS_INDICATOR_MARKETINGTOOLS";</span></span><br><span class="line">        Integer numSplitsPerRegion = optionsProcessor.getNumSplitsPerRegion();</span><br><span class="line">        <span class="comment">//Integer numSplitsPerRegion = "3";</span></span><br><span class="line">        String hbaseRootDir = optionsProcessor.getHbaseRootDir();</span><br><span class="line">        <span class="comment">//String hbaseRootDir = "hdfs://ns22017/user/ads_sz_load/hfile_convert/origin";</span></span><br><span class="line">        String outputPath = optionsProcessor.getOutputPath();</span><br><span class="line">        <span class="comment">//String outputPath = "/user/ads_sz_load/hbasetohive/result/";</span></span><br><span class="line">        String tmpPath = optionsProcessor.getTmpPath();</span><br><span class="line">        <span class="comment">//String tmpPath = "/user/ads_sz_load/hbasetohive/tmp/snapshot"</span></span><br><span class="line">        String firstRowKeyType = optionsProcessor.getFirstRowKeyType();</span><br><span class="line">        <span class="comment">//String firstRowKeyType = "long";</span></span><br><span class="line">        String compressionAlgorithm = optionsProcessor.getCompressionAlgorithm();</span><br><span class="line">        <span class="comment">//String firstRowKeyType = "null";</span></span><br><span class="line"></span><br><span class="line">        conf.setFloat(<span class="string">"hbase.tablesnapshotinputformat.locality.cutoff.multiplier"</span>, Float.parseFloat(<span class="string">"0.8f"</span>));</span><br><span class="line">        conf.setInt(<span class="string">"hbase.snapshot.thread.pool.max"</span>, <span class="number">8</span>);</span><br><span class="line">        conf.setInt(<span class="string">"hbase.snapshot.thread.pool"</span>,  <span class="number">8</span>);</span><br><span class="line">        conf.set(<span class="string">"hbase.rootdir"</span>, hbaseRootDir);</span><br><span class="line">        conf.set(<span class="string">"first.rowkey.type"</span>, firstRowKeyType);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        String outputStr = hdfsUrl + outputPath;</span><br><span class="line">        String tmpStr = hdfsUrl + tmpPath;</span><br><span class="line">        Path outPath = <span class="keyword">new</span> Path(outputStr);</span><br><span class="line">        Path tmp = <span class="keyword">new</span> Path(tmpStr);</span><br><span class="line">        logger.info(<span class="string">"outPath:"</span> + outputStr);</span><br><span class="line">        logger.info(<span class="string">"tmpPath:"</span> + tmpStr);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            FileSystem fileSystem = FileSystem.get(conf);</span><br><span class="line">            <span class="keyword">if</span> (fileSystem.exists(outPath)) &#123;</span><br><span class="line">                fileSystem.delete(outPath, <span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            fileSystem.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e1) &#123;</span><br><span class="line">            e1.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Job job = Job.getInstance(conf, <span class="string">"GetHbaseTool"</span>);</span><br><span class="line">        job.setJarByClass(GetHbaseTool<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        RegionSplitter.SplitAlgorithm split = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"HexStringSplit"</span>.equals(hbaseSplit)) &#123;</span><br><span class="line">            split = <span class="keyword">new</span> RegionHexStringExtendSplitter();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"UniformSplit"</span>.equals(hbaseSplit)) &#123;</span><br><span class="line">            split = <span class="keyword">new</span> RegionSplitter.UniformSplit();</span><br><span class="line">        &#125;</span><br><span class="line">        logger.info(<span class="string">"SplitAlgorithm:"</span> + split.getClass().getName());</span><br><span class="line">        job.setNumReduceTasks(<span class="number">0</span>);</span><br><span class="line">        logger.info(<span class="string">"reduce size:"</span> + job.getNumReduceTasks());</span><br><span class="line">        <span class="keyword">long</span> start_time = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        Class&lt;? extends TableMapper&gt; mapper;</span><br><span class="line">        Class&lt;?&gt; outputKeyClass;</span><br><span class="line">        Class&lt;?&gt; outputValueClass;</span><br><span class="line"></span><br><span class="line">        mapper = ReverseRowkeyMapper<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        outputKeyClass = Text<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        outputValueClass = Text<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        logger.info(<span class="string">"format:"</span> + mapper.getSimpleName());</span><br><span class="line">        FileOutputFormat.setOutputPath(job, outPath);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置输出文件压缩</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"Gzip"</span>.equals(compressionAlgorithm)) &#123;</span><br><span class="line">            FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line">            FileOutputFormat.setOutputCompressorClass(job, GzipCodec<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"Bzip2"</span>.equals(compressionAlgorithm)) &#123;</span><br><span class="line">            FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line">            FileOutputFormat.setOutputCompressorClass(job, BZip2Codec<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"ZSTD"</span>.equals(compressionAlgorithm)) &#123;</span><br><span class="line">            FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line">            FileOutputFormat.setOutputCompressorClass(job, ZStandardCodec<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ParallelizeTableMapReduceUtil.initTableSnapshotMapperJob(</span><br><span class="line">                snapshotName, <span class="comment">// The name of the snapshot (of a table) to read from</span></span><br><span class="line">                scan, <span class="comment">// Scan instance to control CF and attribute selection</span></span><br><span class="line">                mapper, <span class="comment">// mapper</span></span><br><span class="line">                outputKeyClass,             <span class="comment">// mapper output key</span></span><br><span class="line">                outputValueClass,             <span class="comment">// mapper output value.</span></span><br><span class="line">                job, <span class="comment">// The current job to adjust</span></span><br><span class="line">                <span class="keyword">false</span>, <span class="comment">// upload HBase jars and jars for any of the configured job classes via the distributed cache (tmpjars)</span></span><br><span class="line">                tmp, <span class="comment">// a temporary directory to copy the snapshot files into</span></span><br><span class="line">                split, <span class="comment">// splitAlgo algorithm to split, current split algorithms support RegionSplitter.UniformSplit() and RegionSplitter.HexStringSplit()</span></span><br><span class="line">                numSplitsPerRegion <span class="comment">// how many input splits to generate per one region</span></span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">long</span> end_time = System.currentTimeMillis();</span><br><span class="line">        logger.info(<span class="string">"start:"</span> + start_time);</span><br><span class="line">        logger.info(<span class="string">"end:"</span> + end_time);</span><br><span class="line">        logger.info(<span class="string">"spent time:"</span> + (end_time - start_time) / <span class="number">1000</span>);</span><br><span class="line">        <span class="keyword">return</span> b ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  	<span class="comment">//2.在config方法中使用饿汉模式创建命令行参数处理实例，并调用参数解析方法。</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">config</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        optionsProcessor = OptionsProcessor.getOptionsProcessor();</span><br><span class="line">        optionsProcessor.processOptions(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>重要：一般配置类实例和方法都设置为静态，这样无论启动多少个mian方法类实例，都是使用同一个累之类实例和方法，可以有效减少内存浪费。</strong></p>
+<h4 id="2-4在拼接命令行参数时加入相应参数"><a href="#2-4在拼接命令行参数时加入相应参数" class="headerlink" title="2.4在拼接命令行参数时加入相应参数"></a>2.4在拼接命令行参数时加入相应参数</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar HBaseSnapshotRead-1.0-SNAPSHOT.jar -hdfsUrl hdfs://ns22017 -splitAlgorithm UniformSplit -snapshotName snapshot_hb_ibd_HB_IBD_PRODUCT_COMPETE_SOURCE_NEW -numSplitsPerRegion 70 -hbaseRootDir hdfs://ns22017/user/ads_sz_load/hfile_convert/origin -outputPath /user/ads_sz_load/hbasetohive/result/ -tmpPath /user/ads_sz_load/hbasetohive/tmp/snapshot -firstRowKeyType long -compressionAlgorithm Gzip</span><br></pre></td></tr></table></figure>
+
+<p><strong>重要：使用JOptSimple时必须要以<code>-参数名 参数值</code>的形式拼接命令行。</strong></p>
+<p><strong>重要：如果想要实现某些参数非必传、有默认值、未传抛出异常等功能，都可以在OptionsProcessor命令行参数处理类中进行实现。</strong></p>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h3><p>不使用JOptSimple命令行解析器，当然也可以直接对输入的命令行参数进行解析，比如<code>没有参数名</code>、<code>参数名=参数值</code>的形式。JOptSimple命令行解析器只不过是为我们提供的一种现成的解析方法，我认为最大的两个优点：</p>
+<ol>
+<li><code>-参数名 参数值</code>格式非常优雅，写java代码之中牢记最重要的一点：优雅。</li>
+<li>将参数解析中很多与main方法主程序逻辑分隔开，一方面可以拓展很多其他参数处理功能，另一方面非常的优雅。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/08/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86(15)_Hive%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F%E4%B8%8E%E5%8E%8B%E7%BC%A9%E6%A0%BC%E5%BC%8F&MapReduce%E8%BE%93%E5%87%BAText%E6%96%87%E4%BB%B6%E5%8E%8B%E7%BC%A9%E6%A0%BC%E5%BC%8F%E4%BC%98%E7%BC%BA%E7%82%B9%E5%AF%B9%E6%AF%94/" rel="next" title="HBase表数据倾斜治理(15)_Hive存储格式与压缩格式&MapReduce输出Text文件压缩格式优缺点对比">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理(15)_Hive存储格式与压缩格式&MapReduce输出Text文件压缩格式优缺点对比
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/08/27/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_%E8%AF%BB%E5%8F%96properties%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" rel="prev" title="商智离线_读取properties配置文件">
+                商智离线_读取properties配置文件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">100</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">106</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#商智离线-JOptSimple命令行参数处理器"><span class="nav-number">1.</span> <span class="nav-text">商智离线_JOptSimple命令行参数处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-使用背景"><span class="nav-number">1.1.</span> <span class="nav-text">1.使用背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用方法"><span class="nav-number">1.2.</span> <span class="nav-text">2.使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1在pom-xml文件中引入依赖"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1在pom.xml文件中引入依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2创建命令行参数处理类"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2创建命令行参数处理类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3在main方法类中使用"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3在main方法类中使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4在拼接命令行参数时加入相应参数"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4在拼接命令行参数时加入相应参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-总结"><span class="nav-number">1.3.</span> <span class="nav-text">3.总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
