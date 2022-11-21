@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Mybatis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战11.背景在ck等olap数据服务层，为了抽象化我们创建的接口，扩展接口的可服用性，我们一般会把接口设计成弹性接口。弹性接口的意思就是，传入的维度参数列表是可选的、可变的，传出的指标数据列表也是可选的、可变的。 如下表所描述的一个接口为例来对弹性接口进行理解：    serviceName getBrandIndBrand">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/10/14/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1(1)_ck%E6%9C%8D%E5%8A%A1%E5%BC%B9%E6%80%A7%E6%8E%A5%E5%8F%A3service%E5%B1%82%E5%92%8Cdao%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%981/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战11.背景在ck等olap数据服务层，为了抽象化我们创建的接口，扩展接口的可服用性，我们一般会把接口设计成弹性接口。弹性接口的意思就是，传入的维度参数列表是可选的、可变的，传出的指标数据列表也是可选的、可变的。 如下表所描述的一个接口为例来对弹性接口进行理解：    serviceName getBrandIndBrand">
+<meta property="article:published_time" content="2022-10-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-11-21T15:37:29.504Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/10/14/数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1/"/>
+
+
+
+
+
+  <title>数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/10/14/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1(1)_ck%E6%9C%8D%E5%8A%A1%E5%BC%B9%E6%80%A7%E6%8E%A5%E5%8F%A3service%E5%B1%82%E5%92%8Cdao%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%981/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-10-14T00:00:00+08:00">
+                2022-10-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之数据服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据开发之数据服务-1-ck服务弹性接口service层和dao层设计实战1"><a href="#数据开发之数据服务-1-ck服务弹性接口service层和dao层设计实战1" class="headerlink" title="数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1"></a>数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1</h2><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p><strong>在ck等olap数据服务层，为了抽象化我们创建的接口，扩展接口的可服用性，我们一般会把接口设计成弹性接口。弹性接口的意思就是，传入的维度参数列表是可选的、可变的，传出的指标数据列表也是可选的、可变的。</strong></p>
+<p><strong>如下表所描述的一个接口为例来对弹性接口进行理解：</strong></p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getBrandIndBrandRank</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_SecondIndId_[ThirdIndId]_[ShopType]_[TerminalId]_[BrandId]_[PriceRangeId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>BrandId_BrandName_RankRound_DealAmt_DealProNum_PV_UV_DealCustPriceAvg_DealRate_CartUser</td>
+</tr>
+<tr>
+<td>options</td>
+<td>PageNum_RowNum_OrderBy</td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>首先，维度组合是该接口的入参列表，按照属性我们一般将维度划分为demensions、options。对于弹性接口，就设置了一些可传可不穿的参数，上表中中括号中的demensions维度即为弹性维度，全部options都是弹性维度。通过控制传入的维度参数，就可以通过一个接口实现多维度数据的查询。</strong></p>
+<p><strong>指标组合就是该接口返回的出参列表，按照属性我们一般将指标划分为indicators、attributes。弹性接口的指标就全部都是可选的，只需要在入参中执行本次请求需要哪些指标即可。</strong></p>
+<p><strong>排序字段和分页字段就是比较典型的options维度。</strong></p>
+<h3 id="2-接口文档设计"><a href="#2-接口文档设计" class="headerlink" title="2.接口文档设计"></a>2.接口文档设计</h3><p>1.交易-交易特征-渠道特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradeChannelFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_ShopLevel_MainItemScndCatgCd</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealProNum_DealAmt_DealRate_CatgAvgDealAmt_ChannelId_SecondChannelId</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>2.交易-交易特征-类目特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradeCategoryFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_[ChannelId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealProNum_DealAmt_DealRate_SecondIndId_ThirdIndId_ThirdIndName</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>3.交易-交易特征-品牌特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradeBrandFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_[ChannelId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealProNum_DealAmt_BrandId_BrandName</td>
+</tr>
+<tr>
+<td>options</td>
+<td>PageNum_RowNum_OrderBy</td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>4.交易-交易特征-商品价格带特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradePriceDistrictFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_PriceDistrictList_[ChannelId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealProNum_DealAmt_DealRate_PriceDistrict</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>5.交易-交易特征-新老客户特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradeOldNewCustomerFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_[ChannelId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealAmt_CustomerType</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>6.交易-交易特征-支付方式特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradePayTypeFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_[ChannelId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealAmt_PayTypeId_PayTypeName</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>7.交易-交易特征-客单件数特征</p>
+<table>
+<thead>
+<tr>
+<th>serviceName</th>
+<th>getTradeSaleQuantityFeature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>demensions</td>
+<td>STime_ETime_ShopId_SaleQuantityList_[ChannelId]</td>
+</tr>
+<tr>
+<td>indicators</td>
+<td>DealUserNum_DealOrderNum_DealAmt_SaleQuantity</td>
+</tr>
+<tr>
+<td>options</td>
+<td></td>
+</tr>
+<tr>
+<td>attributes</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-创建dao层param类"><a href="#3-创建dao层param类" class="headerlink" title="3.创建dao层param类"></a>3.创建dao层param类</h3><p><strong>dao层的param类实际上就是承接接口入参列表的bean类，一般直接借助fastjson组件将jsonObject对象转化为param类对象。</strong></p>
+<p><strong>此处我们想要使上述七个弹性接口共用一个param类，那么只需要将这七个接口所涉及到的维度组合全部放进来即可。</strong></p>
+<p>创建param类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jd.ad.dao.bean.sztrade;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.annotation.JSONField;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.jd.ad.utils.common.ReqUtils.getQuotationStrBySet;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.jd.ad.utils.common.ReqUtils.getStrBySet;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SZTradeFeatureParam</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 请求唯一标识</span></span><br><span class="line">    <span class="keyword">private</span> String uuid;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始时间</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"STime"</span>)</span><br><span class="line">    <span class="keyword">private</span> String sTime;</span><br><span class="line">    <span class="comment">// 结束时间</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"ETime"</span>)</span><br><span class="line">    <span class="keyword">private</span> String eTime;</span><br><span class="line">    <span class="comment">// 店铺</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"ShopId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; shopId;</span><br><span class="line">    <span class="comment">// 终端</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"ChannelId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; channelId;</span><br><span class="line">    <span class="comment">// 二级终端</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"SecondChannelId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; secondChannelId;</span><br><span class="line">    <span class="comment">// 二级类目</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"SecondIndId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; secondIndId;</span><br><span class="line">    <span class="comment">// 三级类目</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"ThirdIndId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; thirdIndId;</span><br><span class="line">    <span class="comment">// 价格带列表</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"PriceDistrictList"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; priceDistrictList;</span><br><span class="line">    <span class="comment">// 客单件列表</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"SaleQuantityList"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; saleQuantityList;</span><br><span class="line">    <span class="comment">// 品牌</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"BrandId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; brandId;</span><br><span class="line">    <span class="comment">// 新老客类型</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"CustomerType"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; customerType;</span><br><span class="line">    <span class="comment">// 支付方式</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"PayTypeId"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; payTypeId;</span><br><span class="line">    <span class="comment">// 店铺级别</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"ShopLevel"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; shopLevel;</span><br><span class="line">    <span class="comment">// 店铺主营二级类目</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"MainItemScndCatgCd"</span>)</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; mainItemScndCatgCd;</span><br><span class="line">    <span class="comment">// 排序</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"OrderBy"</span>)</span><br><span class="line">    <span class="keyword">private</span> String orderBy;</span><br><span class="line">    <span class="comment">// 页数</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"PageNum"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> pageNum = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 显示条数</span></span><br><span class="line">    <span class="meta">@JSONField</span>(name = <span class="string">"RowNum"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> rowNum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//起始价格带</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">double</span> sPrice;</span><br><span class="line">    <span class="comment">//结束价格带</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">double</span> ePrice;</span><br><span class="line">    <span class="comment">//起始客单件数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> sSaleQtty;</span><br><span class="line">    <span class="comment">//结束客单件数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> eSaleQtty;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; firstQueryCols;</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; dealQueryCols;</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; trafficQueryCols;</span><br><span class="line">    <span class="keyword">private</span> Set&lt;String&gt; indexQueryCols;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUuid</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> uuid;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUuid</span><span class="params">(String uuid)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.uuid = uuid;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getsTime</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sTime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setsTime</span><span class="params">(String sTime)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.sTime = sTime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">geteTime</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> eTime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">seteTime</span><span class="params">(String eTime)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.eTime = eTime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getShopId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(shopId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setShopId</span><span class="params">(Set&lt;String&gt; shopId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.shopId = shopId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getChannelId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(channelId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setChannelId</span><span class="params">(Set&lt;String&gt; channelId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.channelId = channelId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSecondChannelId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(secondChannelId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSecondChannelId</span><span class="params">(Set&lt;String&gt; secondChannelId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.secondChannelId = secondChannelId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSecondIndId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(secondIndId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSecondIndId</span><span class="params">(Set&lt;String&gt; secondIndId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.secondIndId = secondIndId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getThirdIndId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(thirdIndId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setThirdIndId</span><span class="params">(Set&lt;String&gt; thirdIndId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.thirdIndId = thirdIndId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">getPriceDistrictList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> priceDistrictList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPriceDistrictList</span><span class="params">(Set&lt;String&gt; priceDistrictList)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.priceDistrictList = priceDistrictList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">getSaleQuantityList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> saleQuantityList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSaleQuantityList</span><span class="params">(Set&lt;String&gt; saleQuantityList)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.saleQuantityList = saleQuantityList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getBrandId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(brandId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBrandId</span><span class="params">(Set&lt;String&gt; brandId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.brandId = brandId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getCustomerType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(customerType);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCustomerType</span><span class="params">(Set&lt;String&gt; customerType)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.customerType = customerType;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPayTypeId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(payTypeId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPayTypeId</span><span class="params">(Set&lt;String&gt; payTypeId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.payTypeId = payTypeId;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getShopLevel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(shopLevel);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setShopLevel</span><span class="params">(Set&lt;String&gt; shopLevel)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.shopLevel = shopLevel;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getMainItemScndCatgCd</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getQuotationStrBySet(mainItemScndCatgCd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setMainItemScndCatgCd</span><span class="params">(Set&lt;String&gt; mainItemScndCatgCd)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.mainItemScndCatgCd = mainItemScndCatgCd;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getOrderBy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> orderBy;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOrderBy</span><span class="params">(String orderBy)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.orderBy = orderBy;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPageNum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pageNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPageNum</span><span class="params">(<span class="keyword">int</span> pageNum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.pageNum = pageNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getRowNum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> rowNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setRowNum</span><span class="params">(<span class="keyword">int</span> rowNum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rowNum = rowNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">getsPrice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sPrice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setsPrice</span><span class="params">(<span class="keyword">double</span> sPrice)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.sPrice = sPrice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">getePrice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> ePrice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setePrice</span><span class="params">(<span class="keyword">double</span> ePrice)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.ePrice = ePrice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getsSaleQtty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sSaleQtty;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setsSaleQtty</span><span class="params">(<span class="keyword">int</span> sSaleQtty)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.sSaleQtty = sSaleQtty;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">geteSaleQtty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> eSaleQtty;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">seteSaleQtty</span><span class="params">(<span class="keyword">int</span> eSaleQtty)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.eSaleQtty = eSaleQtty;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getFirstQueryCols</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getStrBySet(firstQueryCols);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFirstQueryCols</span><span class="params">(Set&lt;String&gt; firstQueryCols)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.firstQueryCols = firstQueryCols;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getDealQueryCols</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getStrBySet(dealQueryCols);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDealQueryCols</span><span class="params">(Set&lt;String&gt; dealQueryCols)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.dealQueryCols = dealQueryCols;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTrafficQueryCols</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getStrBySet(trafficQueryCols);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTrafficQueryCols</span><span class="params">(Set&lt;String&gt; trafficQueryCols)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.trafficQueryCols = trafficQueryCols;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getIndexQueryCols</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getStrBySet(indexQueryCols);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setIndexQueryCols</span><span class="params">(Set&lt;String&gt; indexQueryCols)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.indexQueryCols = indexQueryCols;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意添加@JSONField注解设置json字段与param属性的对应关系。</strong></p>
+<h3 id="4-创建工具类将set转化为字符串"><a href="#4-创建工具类将set转化为字符串" class="headerlink" title="4.创建工具类将set转化为字符串"></a>4.创建工具类将set转化为字符串</h3><p><strong>可以看到param类中的属性都有get、set方法，其中get方法非常重要，是mybatis动态代理生成dao方法时获取这些属性所使用的方法。也就是说mapper.xml文件中的占位符参数真实值都是通过这些get方法获取的。</strong></p>
+<p><strong>那么对于Set&lt;String&gt;类型的属性，毫无疑问我们需要在get方法中将它转化为一个String类型的值再放入sql占位符中。</strong></p>
+<p>最常见的两种转化方法：</p>
+<p><strong>1.将Set中的字符串元素直接用逗号拼接起来：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getStrBySet</span><span class="params">(Set&lt;String&gt; sets)</span> </span>&#123;</span><br><span class="line">    String paramStr = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (sets != <span class="keyword">null</span> &amp;&amp; sets.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        <span class="keyword">for</span> (String str : sets) &#123;</span><br><span class="line">            sb.append(str).append(<span class="string">","</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        paramStr = sb.toString();</span><br><span class="line">        paramStr = paramStr.substring(<span class="number">0</span>, paramStr.length() - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> paramStr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.将Set中的每个字符串元素都加上单引号，再用逗号拼接起来，因为在ck中使用单引号标记字符串类型：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getQuotationStrBySet</span><span class="params">(Collection&lt;String&gt; sets)</span> </span>&#123;</span><br><span class="line">    String paramStr = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (sets != <span class="keyword">null</span> &amp;&amp; sets.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        <span class="keyword">for</span> (String str : sets) &#123;</span><br><span class="line">            sb.append(str).append(<span class="string">","</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        paramStr = sb.toString();</span><br><span class="line">        paramStr = paramStr.substring(<span class="number">0</span>, paramStr.length() - <span class="number">1</span>).replace(<span class="string">","</span>, <span class="string">"','"</span>);</span><br><span class="line">        paramStr = <span class="string">"'"</span> + paramStr + <span class="string">"'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> paramStr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-创建dao层的mapper接口类"><a href="#5-创建dao层的mapper接口类" class="headerlink" title="5.创建dao层的mapper接口类"></a>5.创建dao层的mapper接口类</h3><p>dao层的mapper接口类是mybatis基于spring框架生成dao方法实例的基础，供service层依赖引用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jd.ad.dao.mapper.sztrade;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Repository;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.LinkedHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Repository</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SZTradeFeatureMapper</span> </span>&#123;</span><br><span class="line">    <span class="comment">//交易-交易特征-渠道特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradeChannelFeature(SZTradeFeatureParam param);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-类目特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradeCategoryFeature(SZTradeFeatureParam param);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-品牌特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradeBrandFeature(SZTradeFeatureParam param);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-商品价格带特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradePriceDistrictFeature(SZTradeFeatureParam param);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-新老客户特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradeOldNewCustomerFeature(SZTradeFeatureParam param);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-支付方式特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradePayTypeFeature(SZTradeFeatureParam param);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-客单件数特征</span></span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; getTradeSaleQuantityFeature(SZTradeFeatureParam param);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-创建继承整个微服务抽象类的service方法"><a href="#6-创建继承整个微服务抽象类的service方法" class="headerlink" title="6.创建继承整个微服务抽象类的service方法"></a>6.创建继承整个微服务抽象类的service方法</h3><p><strong>整个ck数据微服务的service层使用一个抽象类来获取所有数据查询接口的方法名等信息：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jd.ad.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BrandService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Map&lt;String, Method&gt; <span class="title">getAllMethods</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Map&lt;String, Method&gt; methodMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        Method[] methods = <span class="keyword">this</span>.getClass().getDeclaredMethods();</span><br><span class="line">        <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">            String methodName = method.getName();</span><br><span class="line">            methodMap.put(methodName, method);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> methodMap;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后所有的service类都需要继承该抽象类。</p>
+<p><strong>我们在service类中，为了优雅和美观，将七个接口抽象到同一个query方法中：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jd.ad.service.impl.sztrade;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONObject;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.dao.mapper.sztrade.SZTradeFeatureMapper;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.exception.impl.ErrorEnum;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.exception.impl.ValidateException;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.log.BrandLog;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.service.BrandService;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.utils.common.ReqUtils;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.utils.common.bizUtil.SZTradeFeatureUtil;</span><br><span class="line"><span class="keyword">import</span> com.jd.ad.utils.common.transform.impl.TransformForClickHouse;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.LinkedHashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SZTradeFeatureService</span> <span class="keyword">extends</span> <span class="title">BrandService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    SZTradeFeatureMapper szTradeFeatureMapper;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> JSONObject <span class="title">query</span><span class="params">(JSONObject jsonObject, String methodName)</span> </span>&#123;</span><br><span class="line">        List&lt;LinkedHashMap&lt;String, Object&gt;&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        JSONObject obj;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 校验时间参数，已修改到serviceList.ini中校验</span></span><br><span class="line">            <span class="comment">// CheckUtils.checkDimensionsTime(jsonObject);</span></span><br><span class="line">            SZTradeFeatureParam param = (SZTradeFeatureParam) ReqUtils.generateParam(jsonObject, SZTradeFeatureParam<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">            Set&lt;String&gt; cols = ReqUtils.generateCols(jsonObject);</span><br><span class="line">            <span class="keyword">if</span> (cols == <span class="keyword">null</span> || cols.size() == <span class="number">0</span>) &#123;</span><br><span class="line">                BrandLog.logError(<span class="string">"no query any message:"</span> + jsonObject.toJSONString());</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ValidateException(ErrorEnum.DATA_QUERY_ERROR.code, <span class="string">"no query any message"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 设置查询列信息</span></span><br><span class="line">            SZTradeFeatureUtil.setQueryCols(cols, param);</span><br><span class="line">            Method m = szTradeFeatureMapper.getClass().getMethod(methodName, SZTradeFeatureParam<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//遍历价格带列表，每一个价格带请求一次db</span></span><br><span class="line">            <span class="keyword">if</span> (methodName.equals(<span class="string">"getTradePriceDistrictFeature"</span>)) &#123;</span><br><span class="line">                Set&lt;String&gt; priceDistrictList = param.getPriceDistrictList();</span><br><span class="line">                <span class="keyword">if</span> (priceDistrictList == <span class="keyword">null</span> || priceDistrictList.size() == <span class="number">0</span>) &#123;</span><br><span class="line">                    BrandLog.logError(<span class="string">"priceDistrictList is null"</span> + jsonObject.toJSONString());</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> ValidateException(ErrorEnum.DATA_QUERY_ERROR.code, <span class="string">"priceDistrictList is null"</span>);</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (String priceDistrict : priceDistrictList) &#123;</span><br><span class="line">                        SZTradeFeatureUtil.setPriceDistrict(priceDistrict, param);</span><br><span class="line">                        List&lt;LinkedHashMap&lt;String, Object&gt;&gt; ckData = (List&lt;LinkedHashMap&lt;String, Object&gt;&gt;) m.invoke(szTradeFeatureMapper, param);</span><br><span class="line">                        <span class="keyword">if</span> (ckData != <span class="keyword">null</span> &amp;&amp; ckData.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            ckData.get(<span class="number">0</span>).put(<span class="string">"PriceDistrict"</span>, priceDistrict);<span class="comment">//将价格带放进去</span></span><br><span class="line">                            result.addAll(ckData);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//遍历客单价带列表，每一个客单价带请求一次db</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (methodName.equals(<span class="string">"getTradeSaleQuantityFeature"</span>)) &#123;</span><br><span class="line">                Set&lt;String&gt; saleQuantityList = param.getSaleQuantityList();</span><br><span class="line">                <span class="keyword">if</span> (saleQuantityList == <span class="keyword">null</span> || saleQuantityList.size() == <span class="number">0</span>) &#123;</span><br><span class="line">                    BrandLog.logError(<span class="string">"saleQuantityList is null"</span> + jsonObject.toJSONString());</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> ValidateException(ErrorEnum.DATA_QUERY_ERROR.code, <span class="string">"saleQuantityList is null"</span>);</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (String saleQuantity : saleQuantityList) &#123;</span><br><span class="line">                        SZTradeFeatureUtil.setSaleQuantity(saleQuantity, param);</span><br><span class="line">                        List&lt;LinkedHashMap&lt;String, Object&gt;&gt; ckData = (List&lt;LinkedHashMap&lt;String, Object&gt;&gt;) m.invoke(szTradeFeatureMapper, param);</span><br><span class="line">                        <span class="keyword">if</span> (ckData != <span class="keyword">null</span> &amp;&amp; ckData.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            ckData.get(<span class="number">0</span>).put(<span class="string">"SaleQuantity"</span>, saleQuantity);<span class="comment">//将客单价带放进去</span></span><br><span class="line">                            result.addAll(ckData);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                List&lt;LinkedHashMap&lt;String, Object&gt;&gt; ckData = (List&lt;LinkedHashMap&lt;String, Object&gt;&gt;) m.invoke(szTradeFeatureMapper, param);</span><br><span class="line">                <span class="keyword">if</span> (ckData != <span class="keyword">null</span> &amp;&amp; ckData.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    result.addAll(ckData);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            obj = <span class="keyword">new</span> TransformForClickHouse().transform(result);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            BrandLog.logError(e.getMessage(), e);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ValidateException(ErrorEnum.DATA_QUERY_ERROR.code, e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-渠道特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradeChannelFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradeChannelFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-类目特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradeCategoryFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradeCategoryFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-品牌特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradeBrandFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradeBrandFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-商品价格带特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradePriceDistrictFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradePriceDistrictFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-新老客户特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradeOldNewCustomerFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradeOldNewCustomerFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-支付方式特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradePayTypeFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradePayTypeFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//交易-交易特征-客单件数特征</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JSONObject <span class="title">getTradeSaleQuantityFeature</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> query(jsonObject, <span class="string">"getTradeSaleQuantityFeature"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到query方法中有几个比较重要的工具方法：</p>
+<p>1.ReqUtils.generateParam()将jsonObject转化为parambean类对象</p>
+<p>2.ReqUtils.generateCols()生成查询信息</p>
+<p>3.SZTradeFeatureUtil.setQueryCols()设置查询列信息</p>
+<p>4.SZTradeFeatureUtil.setPriceDistrict()设置价格带信息</p>
+<p>5.SZTradeFeatureUtil.setSaleQuantity()设置客单价带信息</p>
+<p>可以看到上述工具方法前两个是整个service层共用的，后三个是该service类七个弹性接口共用的，下面我们会一一创建并介绍。</p>
+<h3 id="7-创建ReqUtils类与工具方法"><a href="#7-创建ReqUtils类与工具方法" class="headerlink" title="7.创建ReqUtils类与工具方法"></a>7.创建ReqUtils类与工具方法</h3><p>一个请求jsonObject实例如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"header"</span>: &#123;</span><br><span class="line">        <span class="attr">"serviceName"</span>: <span class="string">"getTradeChannelFeature"</span>,</span><br><span class="line">        <span class="attr">"uuid"</span>: <span class="string">"test"</span>,</span><br><span class="line">        <span class="attr">"appkey"</span>: <span class="string">"BRAND"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"body"</span>: &#123;</span><br><span class="line">        <span class="attr">"indicators"</span>: [</span><br><span class="line">            <span class="string">"DealUserNum"</span>,</span><br><span class="line">            <span class="string">"DealOrderNum"</span>,</span><br><span class="line">            <span class="string">"DealProNum"</span>,</span><br><span class="line">            <span class="string">"DealAmt"</span>,</span><br><span class="line">            <span class="string">"DealRate"</span>,</span><br><span class="line">            <span class="string">"CatgAvgDealAmt"</span>,</span><br><span class="line">            <span class="string">"ChannelId"</span>,</span><br><span class="line">            <span class="string">"SecondChannelId"</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="attr">"dimensions"</span>: &#123;</span><br><span class="line">            <span class="attr">"STime"</span>: <span class="string">"2022-11-16"</span>,</span><br><span class="line">            <span class="attr">"ETime"</span>: <span class="string">"2022-11-17"</span>,</span><br><span class="line">            <span class="attr">"ShopId"</span>: [</span><br><span class="line">                <span class="string">"10026"</span></span><br><span class="line">            ],</span><br><span class="line">          	<span class="attr">"ShopLevel"</span>: [</span><br><span class="line">                <span class="string">"4"</span></span><br><span class="line">            ],</span><br><span class="line">      			<span class="attr">"MainItemScndCatgCd"</span>: [</span><br><span class="line">                <span class="string">"738"</span></span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1.generateParam()方法将jsonObject转化为parambean类对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">generateParam</span><span class="params">(JSONObject jsonObject, Class&lt;?&gt; clazz)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    JSONObject bodyMsg = jsonObject.getJSONObject(<span class="string">"body"</span>);</span><br><span class="line">    JSONObject dimsMsg = bodyMsg.getJSONObject(<span class="string">"dimensions"</span>);</span><br><span class="line">    JSONObject optionsMsg = bodyMsg.getJSONObject(<span class="string">"options"</span>);</span><br><span class="line">    String uuid = jsonObject.getJSONObject(<span class="string">"header"</span>).getString(<span class="string">"uuid"</span>);</span><br><span class="line">    String pin = jsonObject.getJSONObject(<span class="string">"header"</span>).getString(<span class="string">"BRAND_PIN"</span>);</span><br><span class="line">    JSONObject uuidMsg = <span class="keyword">new</span> JSONObject();</span><br><span class="line">    uuidMsg.put(<span class="string">"uuid"</span>, uuid);</span><br><span class="line"></span><br><span class="line">    JSONObject conditionMsg = <span class="keyword">new</span> JSONObject();</span><br><span class="line">    conditionMsg.putAll(dimsMsg);</span><br><span class="line">    <span class="keyword">if</span> (optionsMsg != <span class="keyword">null</span>) &#123;</span><br><span class="line">        conditionMsg.putAll(optionsMsg);</span><br><span class="line">    &#125;</span><br><span class="line">    conditionMsg.putAll(uuidMsg);</span><br><span class="line">    conditionMsg.put(<span class="string">"BRAND_PIN"</span>, pin);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> JSONObject.toJavaObject(conditionMsg, clazz);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>很明显，该方法中最主要的步骤，就是把传入的维度组合dimensions、options放入param类对象中。</strong></p>
+<p>2.generateCols()生成查询信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Set <span class="title">generateCols</span><span class="params">(JSONObject jsonObject)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    JSONObject bodyMsg = jsonObject.getJSONObject(<span class="string">"body"</span>);</span><br><span class="line">    JSONArray indicatorsMsg = bodyMsg.getJSONArray(<span class="string">"indicators"</span>);</span><br><span class="line">    JSONArray attributesMsg = bodyMsg.getJSONArray(<span class="string">"attributes"</span>);</span><br><span class="line"></span><br><span class="line">    JSONArray conditionMsg = <span class="keyword">new</span> JSONArray();</span><br><span class="line">    conditionMsg.addAll(indicatorsMsg);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> != attributesMsg)</span><br><span class="line">        conditionMsg.addAll(attributesMsg);</span><br><span class="line"></span><br><span class="line">    Object[] colsArray = conditionMsg.toArray();</span><br><span class="line">    Set&lt;String&gt; cols = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Object col : colsArray) &#123;</span><br><span class="line">        cols.add(String.valueOf(col));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cols;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>很明显，该方法最主要的步骤，就是从传入的参数中获取本次请求所需要的指标组合indicators、attributes。</strong></p>
+<h3 id="8-写出一个接口查询全量指标的sql"><a href="#8-写出一个接口查询全量指标的sql" class="headerlink" title="8.写出一个接口查询全量指标的sql"></a>8.写出一个接口查询全量指标的sql</h3><p>做这一步的目的是为了观察sql，从7个sql中抽象出共性较大的弹性查询字段：</p>
+<h5 id="getTradeChannelFeature"><a href="#getTradeChannelFeature" class="headerlink" title="getTradeChannelFeature"></a>getTradeChannelFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">DealUserNum <span class="keyword">as</span> DealUserNum,</span><br><span class="line">DealOrderNum <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">DealProNum <span class="keyword">as</span> DealProNum,</span><br><span class="line">DealAmt <span class="keyword">as</span> DealAmt,</span><br><span class="line">DealUserNum/uv <span class="keyword">as</span> DealRate,</span><br><span class="line">CatgAvgDealAmt <span class="keyword">as</span> CatgAvgDealAmt,</span><br><span class="line">ChannelId <span class="keyword">as</span> ChannelId,</span><br><span class="line">SecondChannelId <span class="keyword">as</span> SecondChannelId</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">(</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleQtty) <span class="keyword">as</span> DealProNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">	terminalId <span class="keyword">as</span> ChannelId,</span><br><span class="line">  secondTerminalId <span class="keyword">as</span> SecondChannelId</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-14'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-14'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">	terminalId,</span><br><span class="line">  secondTerminalId</span><br><span class="line">) a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> </span><br><span class="line">(</span><br><span class="line">  <span class="keyword">select</span></span><br><span class="line">  	uniq(brwsUniqId) <span class="keyword">as</span> uv,</span><br><span class="line">  	terminalId <span class="keyword">as</span> ChannelId</span><br><span class="line">  <span class="keyword">from</span></span><br><span class="line">  	SZ.ck_sz_trade_featrue_shop_traffic_det_d</span><br><span class="line">  <span class="keyword">where</span></span><br><span class="line">    dateTime &gt;= <span class="string">'2022-11-14'</span></span><br><span class="line">    <span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-14'</span></span><br><span class="line">    <span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">  <span class="keyword">group</span> <span class="keyword">by</span> </span><br><span class="line">		ChannelId</span><br><span class="line">) b <span class="keyword">on</span> a.ChannelId = b.ChannelId</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span></span><br><span class="line">  (</span><br><span class="line">    <span class="keyword">select</span></span><br><span class="line">    	<span class="keyword">avg</span>(ordAmt) <span class="keyword">as</span> CatgAvgDealAmt,</span><br><span class="line">    	terminalId <span class="keyword">as</span> ChannelId</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    	SZ.ck_sz_trade_featrue_shop_index_info_d</span><br><span class="line">    <span class="keyword">where</span></span><br><span class="line">    	dateTime &gt;= <span class="string">'2022-11-14'</span></span><br><span class="line">			<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-14'</span></span><br><span class="line">    	<span class="keyword">and</span> shopLevel <span class="keyword">in</span> (<span class="string">'4'</span>)</span><br><span class="line">    	<span class="keyword">and</span> mainItemScndCatgCd <span class="keyword">in</span> (<span class="string">'738'</span>)</span><br><span class="line">    <span class="keyword">group</span> <span class="keyword">by</span> </span><br><span class="line">    	ChannelId</span><br><span class="line">  ) c <span class="keyword">on</span> a.ChannelId = c.ChannelId</span><br></pre></td></tr></table></figure>
+
+<h5 id="getTradeCategoryFeature"><a href="#getTradeCategoryFeature" class="headerlink" title="getTradeCategoryFeature"></a>getTradeCategoryFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">DealUserNum <span class="keyword">as</span> DealUserNum,</span><br><span class="line">DealOrderNum <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">DealProNum <span class="keyword">as</span> DealProNum,</span><br><span class="line">DealAmt <span class="keyword">as</span> DealAmt,</span><br><span class="line">DealUserNum/uv <span class="keyword">as</span> DealRate,</span><br><span class="line">SecondIndId <span class="keyword">as</span> SecondIndId,</span><br><span class="line">ThirdIndId <span class="keyword">as</span> ThirdIndId,</span><br><span class="line">ThirdIndName <span class="keyword">as</span> ThirdIndName</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">(</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleQtty) <span class="keyword">as</span> DealProNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">  secondIndId <span class="keyword">as</span> SecondIndId,</span><br><span class="line">  thirdIndId <span class="keyword">as</span> ThirdIndId,</span><br><span class="line">  <span class="keyword">any</span>(thirdIndName) <span class="keyword">as</span> ThirdIndName</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">  <span class="keyword">and</span> terminalId <span class="keyword">in</span> (<span class="string">'2'</span>)</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">	secondIndId,</span><br><span class="line">  thirdIndId</span><br><span class="line">) a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> </span><br><span class="line">(</span><br><span class="line">  <span class="keyword">select</span></span><br><span class="line">  	uniq(brwsUniqId) <span class="keyword">as</span> uv,</span><br><span class="line">  	secondIndId <span class="keyword">as</span> SecondIndId,</span><br><span class="line">  	thirdIndId <span class="keyword">as</span> ThirdIndId</span><br><span class="line">  <span class="keyword">from</span></span><br><span class="line">  	SZ.ck_sz_trade_featrue_shop_traffic_det_d</span><br><span class="line">  <span class="keyword">where</span></span><br><span class="line">    dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">    <span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">    <span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">  	<span class="keyword">and</span> terminalId <span class="keyword">in</span> (<span class="string">'2'</span>)</span><br><span class="line">  <span class="keyword">group</span> <span class="keyword">by</span> </span><br><span class="line">		secondIndId,</span><br><span class="line">  	thirdIndId</span><br><span class="line">) b <span class="keyword">on</span> a.SecondIndId = b.SecondIndId</span><br><span class="line"><span class="keyword">and</span> a.ThirdIndId = b.ThirdIndId</span><br></pre></td></tr></table></figure>
+
+<h5 id="getTradeBrandFeature"><a href="#getTradeBrandFeature" class="headerlink" title="getTradeBrandFeature"></a>getTradeBrandFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleQtty) <span class="keyword">as</span> DealProNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">  brandId <span class="keyword">as</span> BrandId,</span><br><span class="line">  <span class="keyword">any</span>(brandName) <span class="keyword">as</span> BrandName</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="keyword">and</span> terminalId <span class="keyword">in</span> (<span class="string">'2'</span>)</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">	brandId</span><br></pre></td></tr></table></figure>
+
+<h5 id="getTradePriceDistrictFeature"><a href="#getTradePriceDistrictFeature" class="headerlink" title="getTradePriceDistrictFeature"></a>getTradePriceDistrictFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">DealUserNum <span class="keyword">as</span> DealUserNum,</span><br><span class="line">DealOrderNum <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">DealProNum <span class="keyword">as</span> DealProNum,</span><br><span class="line">DealAmt <span class="keyword">as</span> DealAmt,</span><br><span class="line">DealUserNum/uv <span class="keyword">as</span> DealRate</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">(</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">	<span class="number">1</span> <span class="keyword">as</span> joinkey,</span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleQtty) <span class="keyword">as</span> DealProNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line">  <span class="keyword">and</span> skuJdPrc &gt; <span class="number">0</span></span><br><span class="line">  <span class="keyword">and</span> skuJdPrc &lt;= <span class="number">999</span></span><br><span class="line">) a </span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> </span><br><span class="line">(</span><br><span class="line">  <span class="keyword">select</span></span><br><span class="line">  	<span class="number">1</span> <span class="keyword">as</span> joinkey,</span><br><span class="line">  	uniq(brwsUniqId) <span class="keyword">as</span> uv</span><br><span class="line">  <span class="keyword">from</span></span><br><span class="line">  	SZ.ck_sz_trade_featrue_shop_traffic_det_d</span><br><span class="line">  <span class="keyword">where</span></span><br><span class="line">    dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">    <span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">    <span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">  	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line">  	<span class="keyword">and</span> skuJdPrc &gt; <span class="number">0</span></span><br><span class="line">  	<span class="keyword">and</span> skuJdPrc &lt;= <span class="number">999</span></span><br><span class="line">) b <span class="keyword">on</span> a.joinkey = b.joinkey;</span><br></pre></td></tr></table></figure>
+
+<h5 id="getTradeOldNewCustomerFeature"><a href="#getTradeOldNewCustomerFeature" class="headerlink" title="getTradeOldNewCustomerFeature"></a>getTradeOldNewCustomerFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">	<span class="keyword">case</span> <span class="keyword">when</span> isAllNew = <span class="string">'1'</span> <span class="keyword">then</span> <span class="string">'0'</span></span><br><span class="line">	<span class="keyword">else</span> <span class="string">'1'</span> <span class="keyword">end</span> <span class="keyword">as</span> CustomerType</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line"> <span class="keyword">group</span> <span class="keyword">by</span> </span><br><span class="line"> 	<span class="keyword">case</span> <span class="keyword">when</span> isAllNew = <span class="string">'1'</span> <span class="keyword">then</span> <span class="string">'0'</span></span><br><span class="line">	<span class="keyword">else</span> <span class="string">'1'</span> <span class="keyword">end</span></span><br><span class="line"><span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">	<span class="keyword">case</span> <span class="keyword">when</span> is180New = <span class="string">'1'</span> <span class="keyword">then</span> <span class="string">'2'</span></span><br><span class="line">	<span class="keyword">else</span> <span class="string">'3'</span> <span class="keyword">end</span> <span class="keyword">as</span> CustomerType</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line"> <span class="keyword">group</span> <span class="keyword">by</span> </span><br><span class="line"> 	<span class="keyword">case</span> <span class="keyword">when</span> is180New = <span class="string">'1'</span> <span class="keyword">then</span> <span class="string">'2'</span></span><br><span class="line">	<span class="keyword">else</span> <span class="string">'3'</span> <span class="keyword">end</span></span><br><span class="line">	<span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">	<span class="keyword">case</span> <span class="keyword">when</span> is730New = <span class="string">'1'</span> <span class="keyword">then</span> <span class="string">'4'</span></span><br><span class="line">	<span class="keyword">else</span> <span class="string">'5'</span> <span class="keyword">end</span> <span class="keyword">as</span> CustomerType</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line"> <span class="keyword">group</span> <span class="keyword">by</span> </span><br><span class="line"> 	<span class="keyword">case</span> <span class="keyword">when</span> is730New = <span class="string">'1'</span> <span class="keyword">then</span> <span class="string">'4'</span></span><br><span class="line">	<span class="keyword">else</span> <span class="string">'5'</span> <span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="getTradePayTypeFeature"><a href="#getTradePayTypeFeature" class="headerlink" title="getTradePayTypeFeature"></a>getTradePayTypeFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">  payMdeCd <span class="keyword">as</span> PayTypeId,</span><br><span class="line">  <span class="keyword">any</span>(payMdeDsc) <span class="keyword">as</span> PayTypeName</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">	payMdeCd</span><br></pre></td></tr></table></figure>
+
+<h5 id="getTradeSaleQuantityFeature"><a href="#getTradeSaleQuantityFeature" class="headerlink" title="getTradeSaleQuantityFeature"></a>getTradeSaleQuantityFeature</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	uniq(userLogAcct) <span class="keyword">as</span> DealUserNum,</span><br><span class="line">	uniq(saleOrdId) <span class="keyword">as</span> DealOrderNum,</span><br><span class="line">	<span class="keyword">sum</span>(saleAmt) <span class="keyword">as</span> DealAmt</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	SZ.ck_sz_trade_featrue_shop_deal_det_d</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-16'</span></span><br><span class="line">	<span class="keyword">and</span> shopId <span class="keyword">in</span> (<span class="string">'10026'</span>)</span><br><span class="line">	<span class="comment">--and terminalId in ('2')</span></span><br><span class="line">  <span class="keyword">and</span> saleQtty &gt;= <span class="number">1</span></span><br><span class="line">  <span class="keyword">and</span> saleQtty &lt;= <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>从以上7个sql中明显可以抽象出4个比较常用的指标字段组合：</strong></p>
+<p><strong>1.与表没有绑定关系的一个外层指标字段组合：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DealUserNum as DealUserNum,</span><br><span class="line">DealOrderNum as DealOrderNum,</span><br><span class="line">DealProNum as DealProNum,</span><br><span class="line">DealAmt as DealAmt,</span><br><span class="line">DealUserNum/uv as DealRate,</span><br><span class="line">CatgAvgDealAmt as CatgAvgDealAmt</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.与ck_sz_trade_featrue_shop_deal_det_d表绑定的一个指标字段组合：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">uniq(userLogAcct) as DealUserNum,</span><br><span class="line">uniq(saleOrdId) as DealOrderNum,</span><br><span class="line">sum(saleQtty) as DealProNum,</span><br><span class="line">sum(saleAmt) as DealAmt</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.与ck_sz_trade_featrue_shop_traffic_det_d表绑定的一个指标字段组合：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uniq(brwsUniqId) as uv</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.与ck_sz_trade_featrue_shop_index_info_d表绑定的一个指标字段组合：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">avg(ordAmt) as CatgAvgDealAmt</span><br></pre></td></tr></table></figure>
+
+<h3 id="9-创建SZTradeFeatureUtil类与工具方法"><a href="#9-创建SZTradeFeatureUtil类与工具方法" class="headerlink" title="9.创建SZTradeFeatureUtil类与工具方法"></a>9.创建SZTradeFeatureUtil类与工具方法</h3><p><strong>1.setQueryCols()设置可弹性变化的查询列：</strong></p>
+<p><strong>在上述总结的可以弹性变化的指标字段组合的基础之上，创建对应的四个查询指标组合Set&lt;String&gt;字段，根据入参中传入的indicators和attributes指标组合来构建这四个字段，并放入到param类对象中，方便后续以占位符的形式放入sql中。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setQueryCols</span><span class="params">(Set&lt;String&gt; cols, SZTradeFeatureParam param)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//一级指标</span></span><br><span class="line">    Set&lt;String&gt; firstQueryCols = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">    <span class="comment">//成交指标</span></span><br><span class="line">    Set&lt;String&gt; dealQueryCols = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">    <span class="comment">//流量指标</span></span><br><span class="line">    Set&lt;String&gt; trafficQueryCols = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">    <span class="comment">//同行同级指标</span></span><br><span class="line">    Set&lt;String&gt; indexQueryCols = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//成交用户人数</span></span><br><span class="line">    <span class="keyword">if</span> (cols.contains(<span class="string">"DealUserNum"</span>)) &#123;</span><br><span class="line">        firstQueryCols.add(<span class="string">"DealUserNum as DealUserNum"</span>);</span><br><span class="line">        dealQueryCols.add(<span class="string">"uniq(userLogAcct) as DealUserNum"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//成交单量</span></span><br><span class="line">    <span class="keyword">if</span> (cols.contains(<span class="string">"DealOrderNum"</span>)) &#123;</span><br><span class="line">        firstQueryCols.add(<span class="string">"DealOrderNum as DealOrderNum"</span>);</span><br><span class="line">        dealQueryCols.add(<span class="string">"uniq(saleOrdId) as DealOrderNum"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//成交商品件数</span></span><br><span class="line">    <span class="keyword">if</span> (cols.contains(<span class="string">"DealProNum"</span>)) &#123;</span><br><span class="line">        firstQueryCols.add(<span class="string">"DealProNum as DealProNum"</span>);</span><br><span class="line">        dealQueryCols.add(<span class="string">"sum(saleQtty) as DealProNum"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//成交金额</span></span><br><span class="line">    <span class="keyword">if</span> (cols.contains(<span class="string">"DealAmt"</span>)) &#123;</span><br><span class="line">        firstQueryCols.add(<span class="string">"DealAmt as DealAmt"</span>);</span><br><span class="line">        dealQueryCols.add(<span class="string">"sum(saleAmt) as DealAmt"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//成交转化率</span></span><br><span class="line">    <span class="keyword">if</span> (cols.contains(<span class="string">"DealRate"</span>)) &#123;</span><br><span class="line">        firstQueryCols.add(<span class="string">"DealUserNum/uv as DealRate"</span>);</span><br><span class="line">        dealQueryCols.add(<span class="string">"uniq(userLogAcct) as DealUserNum"</span>);</span><br><span class="line">        trafficQueryCols.add(<span class="string">"uniq(brwsUniqId) as uv"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//同行同级成交金额</span></span><br><span class="line">    <span class="keyword">if</span> (cols.contains(<span class="string">"CatgAvgDealAmt"</span>)) &#123;</span><br><span class="line">        firstQueryCols.add(<span class="string">"CatgAvgDealAmt as CatgAvgDealAmt"</span>);</span><br><span class="line">        indexQueryCols.add(<span class="string">"avg(ordAmt) as CatgAvgDealAmt"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    param.setFirstQueryCols(firstQueryCols);</span><br><span class="line">    param.setDealQueryCols(dealQueryCols);</span><br><span class="line">    param.setTrafficQueryCols(trafficQueryCols);</span><br><span class="line">    param.setIndexQueryCols(indexQueryCols);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.setPriceDistrict()设置价格带上限和下限：</p>
+<p><strong>对于价格带和客单件带这种可随机变化的区间查询条件，很明显难以在一次db请求中以较为优雅的sql把结果查询出来，那么我这里采用循环查询的方式，每一个价格带请求一次db。该工具方法用来将价格带上、下限参数放入到param类对象中，方便后续以占位符的形式放入sql中。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setPriceDistrict</span><span class="params">(String priceDistrict, SZTradeFeatureParam param)</span> </span>&#123;</span><br><span class="line">    String[] priceStrings = priceDistrict.split(<span class="string">"-"</span>);</span><br><span class="line">    param.setsPrice(Double.parseDouble(priceStrings[<span class="number">0</span>]));</span><br><span class="line">    param.setePrice(Double.parseDouble(priceStrings[<span class="number">1</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.setSaleQuantity()设置客单件带上限和下限：</p>
+<p><strong>与价格带同理，该工具方法用来将客单件带上、下限参数放入到param类对象中，方便后续以占位符的形式放入sql中。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setSaleQuantity</span><span class="params">(String saleQuantity, SZTradeFeatureParam param)</span> </span>&#123;</span><br><span class="line">    String[] saleQuantityStrings = saleQuantity.split(<span class="string">"-"</span>);</span><br><span class="line">    param.setsSaleQtty(Integer.parseInt(saleQuantityStrings[<span class="number">0</span>]));</span><br><span class="line">    param.seteSaleQtty(Integer.parseInt(saleQuantityStrings[<span class="number">1</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="10-完善service类中的query方法"><a href="#10-完善service类中的query方法" class="headerlink" title="10.完善service类中的query方法"></a>10.完善service类中的query方法</h3><p><strong>我们统一使用List&lt;LinkedHashMap&lt;String, Object&gt;&gt;数据类型来承接ck数据库查询sql返回的查询结果，该List中的每个LinkedHashMap元素就是返回的一行数据；然后该LinkedHashMap中的每个entry元素就是一列数据，key为列名，value为数据值。</strong></p>
+<p><strong>所以在query方法中我们可以使用如下代码将多次价格带请求合并在一起，并分别打上PriceDistrict字段的值：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (String priceDistrict : priceDistrictList) &#123;</span><br><span class="line">    SZTradeFeatureUtil.setPriceDistrict(priceDistrict, param);</span><br><span class="line">    List&lt;LinkedHashMap&lt;String, Object&gt;&gt; ckData = (List&lt;LinkedHashMap&lt;String, Object&gt;&gt;) m.invoke(szTradeFeatureMapper, param);</span><br><span class="line">    <span class="keyword">if</span> (ckData != <span class="keyword">null</span> &amp;&amp; ckData.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        ckData.get(<span class="number">0</span>).put(<span class="string">"PriceDistrict"</span>, priceDistrict);<span class="comment">//将价格带放进去</span></span><br><span class="line">        result.addAll(ckData);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="11-创建dao层的mapper-xml配置文件"><a href="#11-创建dao层的mapper-xml配置文件" class="headerlink" title="11.创建dao层的mapper.xml配置文件"></a>11.创建dao层的mapper.xml配置文件</h3><p>创建这个文件最重要的就是优雅，实现优雅的根本秘诀就是抽象与复用，大体顺序就是resultMap-select-dbsql-tablesql-wheresql：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">"-//mybatis.org//DTD Mapper 3.0//EN"</span></span></span><br><span class="line"><span class="meta">        <span class="meta-string">"http://mybatis.org/dtd/mybatis-3-mapper.dtd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"com.jd.ad.dao.mapper.sztrade.SZTradeFeatureMapper"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">"java.util.LinkedHashMap"</span> <span class="attr">id</span>=<span class="string">"returnHashMap"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-渠道特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradeChannelFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"firstQueryCols!=null and firstQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;firstQueryCols&#125;,ChannelId as ChannelId, SecondChannelId as SecondChannelId</span><br><span class="line">            from (</span><br><span class="line">            select <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span>$&#123;dealQueryCols&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span>terminalId as ChannelId, secondTerminalId as SecondChannelId</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span></span><br><span class="line">            group by terminalId, secondTerminalId</span><br><span class="line">            ) a</span><br><span class="line">            <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"trafficQueryCols!=null and trafficQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">                left join</span><br><span class="line">                (select</span><br><span class="line">                $&#123;trafficQueryCols&#125;,terminalId as ChannelId</span><br><span class="line">                from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"trafficDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span></span><br><span class="line">                group by ChannelId</span><br><span class="line">                ) b on a.ChannelId = b.ChannelId</span><br><span class="line">            <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"indexQueryCols!=null and indexQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">                left join</span><br><span class="line">                (select</span><br><span class="line">                $&#123;indexQueryCols&#125;,terminalId as ChannelId</span><br><span class="line">                from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"indexInfoTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"indexInfoWhere"</span>/&gt;</span></span><br><span class="line">                group by ChannelId</span><br><span class="line">                ) c on a.ChannelId = c.ChannelId</span><br><span class="line">            <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-类目特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradeCategoryFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"firstQueryCols!=null and firstQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;firstQueryCols&#125;, SecondIndId as SecondIndId, ThirdIndId as ThirdIndId, ThirdIndName as ThirdIndName</span><br><span class="line">            from (</span><br><span class="line">            select <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span>$&#123;dealQueryCols&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span>secondIndId as SecondIndId, thirdIndId as ThirdIndId, any(thirdIndName) as ThirdIndName</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">            group by secondIndId, thirdIndId</span><br><span class="line">            ) a</span><br><span class="line">            <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"trafficQueryCols!=null and trafficQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">                left join</span><br><span class="line">                (select</span><br><span class="line">                $&#123;trafficQueryCols&#125;, secondIndId as SecondIndId, thirdIndId as ThirdIndId</span><br><span class="line">                from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"trafficDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">                group by secondIndId, thirdIndId</span><br><span class="line">                ) b on a.SecondIndId = b.SecondIndId and a.ThirdIndId = b.ThirdIndId</span><br><span class="line">            <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-品牌特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradeBrandFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;dealQueryCols&#125;, brandId as BrandId, any(brandName) as BrandName</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">            group by brandId</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-商品价格带特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradePriceDistrictFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"firstQueryCols!=null and firstQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;firstQueryCols&#125;</span><br><span class="line">            from (</span><br><span class="line">            select 1 as joinkey<span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span>,$&#123;dealQueryCols&#125;<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"priceWhere"</span>/&gt;</span></span><br><span class="line">            ) a</span><br><span class="line">            <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"trafficQueryCols!=null and trafficQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">                left join</span><br><span class="line">                (select</span><br><span class="line">                1 as joinkey,$&#123;trafficQueryCols&#125;</span><br><span class="line">                from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"trafficDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"priceWhere"</span>/&gt;</span></span><br><span class="line">                ) b on a.joinkey = b.joinkey</span><br><span class="line">            <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-新老客户特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradeOldNewCustomerFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;dealQueryCols&#125;, case when isAllNew = '1' then '0' else '1' end as CustomerType</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">            group by case when isAllNew = '1' then '0' else '1' end</span><br><span class="line">            union all</span><br><span class="line">            select</span><br><span class="line">            $&#123;dealQueryCols&#125;, case when is180New = '1' then '2' else '3' end as CustomerType</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">            group by case when is180New = '1' then '2' else '3' end</span><br><span class="line">            union all</span><br><span class="line">            select</span><br><span class="line">            $&#123;dealQueryCols&#125;, case when is730New = '1' then '4' else '5' end as CustomerType</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">            group by case when is730New = '1' then '4' else '5' end</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-支付方式特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradePayTypeFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;dealQueryCols&#125;, payMdeCd as PayTypeId, any(payMdeDsc) as PayTypeName</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span></span><br><span class="line">            group by payMdeCd</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--行业-交易特征-客单件数特征--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"getTradeSaleQuantityFeature"</span> <span class="attr">resultMap</span>=<span class="string">"returnHashMap"</span></span></span><br><span class="line"><span class="tag">            <span class="attr">parameterType</span>=<span class="string">"com.jd.ad.dao.bean.sztrade.SZTradeFeatureParam"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"dealQueryCols!=null and dealQueryCols.length()&gt;0"</span>&gt;</span></span><br><span class="line">            select</span><br><span class="line">            $&#123;dealQueryCols&#125;</span><br><span class="line">            from <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"database"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"dealDetTable"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"where"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"terminalWhere"</span>/&gt;</span><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"saleQttyWhere"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--库--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"database"</span>&gt;</span>SZ.<span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--表--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"dealDetTable"</span>&gt;</span>ck_sz_trade_featrue_shop_deal_det_d<span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"trafficDetTable"</span>&gt;</span>ck_sz_trade_featrue_shop_traffic_det_d<span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"indexInfoTable"</span>&gt;</span>ck_sz_trade_featrue_shop_index_info_d<span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--查询条件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"where"</span>&gt;</span></span><br><span class="line">        where dateTime <span class="symbol">&amp;gt;</span>=#&#123;sTime&#125; and dateTime <span class="symbol">&amp;lt;</span>= #&#123;eTime&#125; and shopId in ($&#123;shopId&#125;)</span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--渠道条件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"terminalWhere"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"channelId != null and channelId.length()&gt;0"</span>&gt;</span></span><br><span class="line">            and terminalId in ($&#123;channelId&#125;)</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--同行同级条件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"indexInfoWhere"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"shopLevel != null and shopLevel.length()&gt;0"</span>&gt;</span></span><br><span class="line">            and shopLevel in ($&#123;shopLevel&#125;)</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"mainItemScndCatgCd != null and mainItemScndCatgCd.length()&gt;0"</span>&gt;</span></span><br><span class="line">            and mainItemScndCatgCd in ($&#123;mainItemScndCatgCd&#125;)</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--价格带条件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"priceWhere"</span>&gt;</span></span><br><span class="line">        and skuJdPrc <span class="symbol">&amp;gt;</span> #&#123;sPrice&#125;</span><br><span class="line">        and skuJdPrc <span class="symbol">&amp;lt;</span>= #&#123;ePrice&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--客单件数条件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"saleQttyWhere"</span>&gt;</span></span><br><span class="line">        and saleQtty <span class="symbol">&amp;gt;</span>= #&#123;sSaleQtty&#125;</span><br><span class="line">        and saleQtty <span class="symbol">&amp;lt;</span>= #&#123;eSaleQtty&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--排序--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"orderBy"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"orderBy != null and orderBy.length()&gt;0"</span>&gt;</span></span><br><span class="line">            order by $&#123;orderBy&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--翻页--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"limit"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"rowNum &gt;0 "</span>&gt;</span></span><br><span class="line">            limit $&#123;(pageNum-1)*rowNum&#125;,$&#123;rowNum&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="12-在spring-config-mybatis配置文件中创建与ck数据源bean和mapper的bean"><a href="#12-在spring-config-mybatis配置文件中创建与ck数据源bean和mapper的bean" class="headerlink" title="12.在spring-config-mybatis配置文件中创建与ck数据源bean和mapper的bean"></a>12.在spring-config-mybatis配置文件中创建与ck数据源bean和mapper的bean</h3><p>读取配置文件中配置的ck主备集群url、username、password，通过xml配置文件的形式创建ck数据源bean和mapper的bean：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 商家版离线交易特征数据源 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"clickhousePropertiesSZTrade"</span> <span class="attr">class</span>=<span class="string">"ru.yandex.clickhouse.settings.ClickHouseProperties"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">value</span>=<span class="string">"$&#123;clickhouse.username.sztrade&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;clickhouse.password.sztrade&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"socketTimeout"</span> <span class="attr">value</span>=<span class="string">"80000"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"ClickhouseDataSourceSZTrade"</span> <span class="attr">class</span>=<span class="string">"ru.yandex.clickhouse.BalancedClickhouseDataSource"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">value</span>=<span class="string">"$&#123;clickhouse.jdbc.url.sztrade&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"1"</span> <span class="attr">ref</span>=<span class="string">"clickhousePropertiesSZTrade"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"clickhousePropertiesHotSZTrade"</span> <span class="attr">class</span>=<span class="string">"ru.yandex.clickhouse.settings.ClickHouseProperties"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">value</span>=<span class="string">"$&#123;clickhouse.username.sztrade.hot&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;clickhouse.password.sztrade.hot&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"socketTimeout"</span> <span class="attr">value</span>=<span class="string">"80000"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"ClickhouseDataSourceHotSZTrade"</span> <span class="attr">class</span>=<span class="string">"ru.yandex.clickhouse.BalancedClickhouseDataSource"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"0"</span> <span class="attr">value</span>=<span class="string">"$&#123;clickhouse.jdbc.url.sztrade.hot&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">index</span>=<span class="string">"1"</span> <span class="attr">ref</span>=<span class="string">"clickhousePropertiesHotSZTrade"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"dynamicDataSourceSZTrade"</span> <span class="attr">class</span>=<span class="string">"com.jd.ad.utils.common.datasource.DynamicDataSource"</span> &gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"targetDataSources"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">map</span> <span class="attr">key-type</span>=<span class="string">"java.lang.String"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">entry</span> <span class="attr">value-ref</span>=<span class="string">"ClickhouseDataSourceSZTrade"</span> <span class="attr">key</span>=<span class="string">"dataSourceDefaultSZTrade"</span>&gt;</span><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">entry</span> <span class="attr">value-ref</span>=<span class="string">"ClickhouseDataSourceHotSZTrade"</span> <span class="attr">key</span>=<span class="string">"dataSourceHotSZTrade"</span>&gt;</span><span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">map</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"defaultTargetDataSource"</span> <span class="attr">ref</span>=<span class="string">"ClickhouseDataSourceSZTrade"</span> &gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSourceId"</span> <span class="attr">value</span>=<span class="string">"dataSourceIdSZTrade"</span> &gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"brandManagerSZTrade"</span> <span class="attr">class</span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dynamicDataSourceSZTrade"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"clickhouseSqlSessionFactorySZTrade"</span> <span class="attr">class</span>=<span class="string">"org.mybatis.spring.SqlSessionFactoryBean"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dynamicDataSourceSZTrade"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"configLocation"</span> <span class="attr">value</span>=<span class="string">"classpath:/spring/mybatis-configuration.xml"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"mapperLocations"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">array</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>classpath:dao/impl/mapper/sztrade/*.xml<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">array</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"mapperScannerSZTrade"</span> <span class="attr">class</span>=<span class="string">"org.mybatis.spring.mapper.MapperScannerConfigurer"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"basePackage"</span> <span class="attr">value</span>=<span class="string">"com.jd.ad.dao.mapper.sztrade"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sqlSessionFactoryBeanName"</span> <span class="attr">value</span>=<span class="string">"clickhouseSqlSessionFactorySZTrade"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Mybatis/" rel="tag"><i class="fa fa-tag"></i> Mybatis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/10/06/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_Linux%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/" rel="next" title="商智离线_Linux命令大全">
+                <i class="fa fa-chevron-left"></i> 商智离线_Linux命令大全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/10/20/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1(2)_ck%E6%9C%8D%E5%8A%A1%E5%BC%B9%E6%80%A7%E6%8E%A5%E5%8F%A3service%E5%B1%82%E5%92%8Cdao%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%982/" rel="prev" title="数据开发之数据服务(2)_ck服务弹性接口service层和dao层设计实战2">
+                数据开发之数据服务(2)_ck服务弹性接口service层和dao层设计实战2 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">105</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">107</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之数据服务-1-ck服务弹性接口service层和dao层设计实战1"><span class="nav-number">1.</span> <span class="nav-text">数据开发之数据服务(1)_ck服务弹性接口service层和dao层设计实战1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-接口文档设计"><span class="nav-number">1.2.</span> <span class="nav-text">2.接口文档设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-创建dao层param类"><span class="nav-number">1.3.</span> <span class="nav-text">3.创建dao层param类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-创建工具类将set转化为字符串"><span class="nav-number">1.4.</span> <span class="nav-text">4.创建工具类将set转化为字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-创建dao层的mapper接口类"><span class="nav-number">1.5.</span> <span class="nav-text">5.创建dao层的mapper接口类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-创建继承整个微服务抽象类的service方法"><span class="nav-number">1.6.</span> <span class="nav-text">6.创建继承整个微服务抽象类的service方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-创建ReqUtils类与工具方法"><span class="nav-number">1.7.</span> <span class="nav-text">7.创建ReqUtils类与工具方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-写出一个接口查询全量指标的sql"><span class="nav-number">1.8.</span> <span class="nav-text">8.写出一个接口查询全量指标的sql</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradeChannelFeature"><span class="nav-number">1.8.0.1.</span> <span class="nav-text">getTradeChannelFeature</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradeCategoryFeature"><span class="nav-number">1.8.0.2.</span> <span class="nav-text">getTradeCategoryFeature</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradeBrandFeature"><span class="nav-number">1.8.0.3.</span> <span class="nav-text">getTradeBrandFeature</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradePriceDistrictFeature"><span class="nav-number">1.8.0.4.</span> <span class="nav-text">getTradePriceDistrictFeature</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradeOldNewCustomerFeature"><span class="nav-number">1.8.0.5.</span> <span class="nav-text">getTradeOldNewCustomerFeature</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradePayTypeFeature"><span class="nav-number">1.8.0.6.</span> <span class="nav-text">getTradePayTypeFeature</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#getTradeSaleQuantityFeature"><span class="nav-number">1.8.0.7.</span> <span class="nav-text">getTradeSaleQuantityFeature</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-创建SZTradeFeatureUtil类与工具方法"><span class="nav-number">1.9.</span> <span class="nav-text">9.创建SZTradeFeatureUtil类与工具方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-完善service类中的query方法"><span class="nav-number">1.10.</span> <span class="nav-text">10.完善service类中的query方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-创建dao层的mapper-xml配置文件"><span class="nav-number">1.11.</span> <span class="nav-text">11.创建dao层的mapper.xml配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#12-在spring-config-mybatis配置文件中创建与ck数据源bean和mapper的bean"><span class="nav-number">1.12.</span> <span class="nav-text">12.在spring-config-mybatis配置文件中创建与ck数据源bean和mapper的bean</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

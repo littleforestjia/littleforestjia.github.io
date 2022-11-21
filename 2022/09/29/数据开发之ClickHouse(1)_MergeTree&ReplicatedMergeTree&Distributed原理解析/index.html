@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据开发之ClickHouse(1)_MergeTree&amp;ReplicatedMergeTree&amp;Distributed原理解析1.MergeTree引擎1.1 建表ck在建表时需要指定几个关键信息：  order by(排序键)：可以是一组列名的组合，用于数据片段内的数据排序。例如排序键是(CounterID,Date)，则片段内数据首先按照CounterID排序，具有相同Cou">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据开发之ClickHouse(1)_MergeTree&amp;ReplicatedMergeTree&amp;Distributed原理解析">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="数据开发之ClickHouse(1)_MergeTree&amp;ReplicatedMergeTree&amp;Distributed原理解析1.MergeTree引擎1.1 建表ck在建表时需要指定几个关键信息：  order by(排序键)：可以是一组列名的组合，用于数据片段内的数据排序。例如排序键是(CounterID,Date)，则片段内数据首先按照CounterID排序，具有相同Cou">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/1.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/3.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/4.png">
+<meta property="article:published_time" content="2022-09-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-11-21T15:31:50.533Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/09/29/数据开发之ClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed原理解析/"/>
+
+
+
+
+
+  <title>数据开发之ClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed原理解析 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据开发之ClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed原理解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-09-29T00:00:00+08:00">
+                2022-09-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据开发之ClickHouse-1-MergeTree-amp-ReplicatedMergeTree-amp-Distributed原理解析"><a href="#数据开发之ClickHouse-1-MergeTree-amp-ReplicatedMergeTree-amp-Distributed原理解析" class="headerlink" title="数据开发之ClickHouse(1)_MergeTree&amp;ReplicatedMergeTree&amp;Distributed原理解析"></a>数据开发之ClickHouse(1)_MergeTree&amp;ReplicatedMergeTree&amp;Distributed原理解析</h2><h3 id="1-MergeTree引擎"><a href="#1-MergeTree引擎" class="headerlink" title="1.MergeTree引擎"></a>1.MergeTree引擎</h3><h4 id="1-1-建表"><a href="#1-1-建表" class="headerlink" title="1.1 建表"></a>1.1 建表</h4><p>ck在建表时需要指定几个关键信息：</p>
+<ul>
+<li>order by(排序键)：可以是一组列名的组合，用于数据片段内的数据排序。例如排序键是<code>(CounterID,Date)</code>，则片段内数据首先按照CounterID排序，具有相同CounterID的数据行按照Date排序。</li>
+<li>partition by(分区键)：一般是一个列名，用于将不同的数据行按照分区键进行隔离存储，分区键相同的行存储在同一个分区中。</li>
+<li>primary key(主键)：可以是一组列名的组合，用于生成稀疏索引。</li>
+<li>SETTINGS index_granularity = 8192：稀疏索引粒度，也就是每8192行数据生成一个一级索引值。</li>
+</ul>
+<p>我们以一个排序好的数据片段为例，如下图：</p>
+<p><img src="//littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/1.png" alt></p>
+<p><strong>MergeTree引擎的特点就是每次插入数据时，数据会以有序数据片段的形式写入磁盘，但是不同的数据片段之间的数据并不是有序的。ck后台会定期合并同属于一个分区的不同数据片段，使得整个分区的数据存储在一起并有序。</strong></p>
+<p><strong>我们在建表时，可以不设置partition key，这样的话一张本地表相当于只有一个分区，每次插入数据之后全表合并重新排序。我们一般使用日期字段作为partition key。</strong></p>
+<p><strong>我们建表时，一定要设置order key，用于数据片段内数据存储排序。可以不设置primary key，则自动以order key为primary key；如果设置了primary key，则必须保证primary key与order key的前缀，比如primary key为(a,b)，order key必须为(a,b,%)。</strong></p>
+<p><strong>就以上图为例，图中是以<code>(CounterID,Date)</code>为order key和primary key。如果以<code>(CounterID,Date)</code>为order key，以<code>(CounterID)</code>为primary key，则图中组成一级索引的标记就只由CounterID字段组成，应该是a,a,a,b,e,e,g,h,i,i,l。这样的话索引存储空间更小了，但是查询效率会降低。</strong></p>
+<h4 id="1-2-数据合并过程"><a href="#1-2-数据合并过程" class="headerlink" title="1.2 数据合并过程"></a>1.2 数据合并过程</h4><p>伴随着每次insert写入数据，MergeTree都会生成一批新的分区目录，每个分区目录对应一个有序数据片段。ck通过后台任务将属于相同分区的多个目录合并成一个新目录就是数据合并的过程，旧目录默认会在8分钟后通过后台任务删除。</p>
+<p><strong>以一个目录名称为例，介绍新目录的命名规则，如<code>2022-10-01_1_3_1</code>：</strong></p>
+<blockquote>
+<p>2022-10-01：是partition key的值，就是分区名；</p>
+<p>1：是MinBlockNum，表示该新目录合并的最小数据块的编号；</p>
+<p>3：是MaxBlockNum，表示该新目录合并的最大数据块的编号；</p>
+<p>1：是Level，表示合并的层级，也就是该分区被合并过的次数。</p>
+</blockquote>
+<p><strong>一个分区目录合并过程如下图所示：</strong></p>
+<p><img src="//littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/2.png" alt></p>
+<p><strong>分区目录中的文件作用如下图所示，一个表有多少个字段，就会有多少个[Column].bin数据文件，这也体现了列式存储特性：</strong></p>
+<p><img src="//littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/3.png" alt></p>
+<p>primary.idx文件内存放采用稀疏索引实现的一级索引。稠密索引就是每一行索引标记对应一行具体的数据记录，稀疏索引就是每一行索引标记对应一段具体的数据记录。相较而言，稀疏索引占用存储空间较小，但是查询效率更低。</p>
+<p><img src="//littleforestjia.github.io/2022/09/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8BClickHouse(1)_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/4.png" alt></p>
+<h4 id="1-3-数据更新与删除"><a href="#1-3-数据更新与删除" class="headerlink" title="1.3 数据更新与删除"></a>1.3 数据更新与删除</h4><p><strong>与hbase类似，ck也是只增数据库。ck中update与delete的本质是找到更新或删除数据所在的分区，然后新建该分区，使用新分区替换旧分区。</strong></p>
+<p><strong>官方建议update/delete操作一次更新大量数据，因为更新的单位是分区。如果只更新一行数据，那么需要重建一次分区；如果一次更新100行数据，而这100行数据落在3个分区上，那么只需要重建3个分区。相较而言，一次更新一批数据的整体效率高于一次更新一行。</strong></p>
+<h3 id="2-ReplicatedMergeTree引擎"><a href="#2-ReplicatedMergeTree引擎" class="headerlink" title="2.ReplicatedMergeTree引擎"></a>2.ReplicatedMergeTree引擎</h3><h4 id="2-1-建表"><a href="#2-1-建表" class="headerlink" title="2.1 建表"></a>2.1 建表</h4><p><strong>ReplicatedMergeTree引擎默认情况下会删除排序键值相同的重复项。</strong></p>
+<p>ReplicatedMergeTree引擎与Zookeeper配合，组成ck高可用的基础；ReplicatedMergeTree引擎与Distributed引擎配合，组成ck分布式的基础。</p>
+<p>一个ReplicatedMergeTree建表语句案例如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> bc_online.ck_product_browselog_base_testjia <span class="keyword">on</span> cluster <span class="keyword">default</span></span><br><span class="line">(</span><br><span class="line">    <span class="string">`dateTime`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`pv`</span> Float64,</span><br><span class="line">    <span class="string">`spuId`</span> <span class="keyword">String</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = ReplicatedMergeTree(<span class="string">'/ppzhck.jd.local/tables/bc_online/ck_product_browselog_base_testjia/&#123;shard&#125;'</span>, <span class="string">'&#123;replica&#125;'</span>)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> dateTime</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> (dateTime, spuId)</span><br><span class="line"><span class="keyword">SETTINGS</span> index_granularity = <span class="number">8192</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>重点关注ReplicatedMergeTree引擎建表时接受的两个参数：</strong></p>
+<ul>
+<li><strong>zoo_path：Zookeeper中该表的路径</strong></li>
+<li><strong>replica_name：Zookeeper中该表的副本名称</strong></li>
+</ul>
+<p><strong>这两个参数中的分片名shard和副本名replica使用占位符宏替换即可，它们会被替换为ck配置文件里macros部分配置的值。</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">macros</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">shard</span>&gt;</span>01<span class="tag">&lt;/<span class="name">shard</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">replica</span>&gt;</span>01<span class="tag">&lt;/<span class="name">replica</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">macros</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>每一台ck服务器节点上的ck配置文件都是不一样的，使用shard和replica组合可以定位到唯一的一台ck服务器节点。</strong></p>
+<h4 id="2-2-分片与副本信息查看"><a href="#2-2-分片与副本信息查看" class="headerlink" title="2.2 分片与副本信息查看"></a>2.2 分片与副本信息查看</h4><p><strong>分片shard就是指包含数据不同部分的服务器，要读取所有数据，必须访问所有分片；副本replica是存储复制数据的服务器，要读取所有数据，访问任一副本上的数据即可。</strong></p>
+<p><strong>使用如下sql可以查看ck集群的相关配置信息：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> system.clusters</span><br><span class="line"><span class="keyword">WHERE</span> cluster = <span class="string">'LF0_CK_Pub_18'</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>得到查询结果：</strong></p>
+<table>
+<thead>
+<tr>
+<th>cluster</th>
+<th>shard_num</th>
+<th>shard_weight</th>
+<th>replica_num</th>
+<th>host_name</th>
+<th>host_address</th>
+<th>port</th>
+<th>is_local</th>
+<th>user</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LF0_CK_Pub_18</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>10.203.23.104</td>
+<td>10.203.23.104</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>10.203.23.136</td>
+<td>10.203.23.136</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>10.203.23.138</td>
+<td>10.203.23.138</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>1</td>
+<td>1</td>
+<td>4</td>
+<td>10.203.23.162</td>
+<td>10.203.23.162</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+<td>10.203.23.163</td>
+<td>10.203.23.163</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>1</td>
+<td>1</td>
+<td>6</td>
+<td>10.203.23.180</td>
+<td>10.203.23.180</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>10.203.23.232</td>
+<td>10.203.23.232</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>10.203.23.50</td>
+<td>10.203.23.50</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>10.203.23.55</td>
+<td>10.203.23.55</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>2</td>
+<td>1</td>
+<td>4</td>
+<td>10.203.23.58</td>
+<td>10.203.23.58</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+<td>10.203.23.87</td>
+<td>10.203.23.87</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>2</td>
+<td>1</td>
+<td>6</td>
+<td>10.203.24.103</td>
+<td>10.203.24.103</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>10.203.24.187</td>
+<td>10.203.24.187</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>10.203.24.20</td>
+<td>10.203.24.20</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>10.203.24.228</td>
+<td>10.203.24.228</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>3</td>
+<td>1</td>
+<td>4</td>
+<td>10.203.24.40</td>
+<td>10.203.24.40</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>3</td>
+<td>1</td>
+<td>5</td>
+<td>10.203.24.52</td>
+<td>10.203.24.52</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>3</td>
+<td>1</td>
+<td>6</td>
+<td>10.203.24.69</td>
+<td>10.203.24.69</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>10.203.25.104</td>
+<td>10.203.25.104</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>4</td>
+<td>1</td>
+<td>2</td>
+<td>10.203.25.137</td>
+<td>10.203.25.137</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>4</td>
+<td>1</td>
+<td>3</td>
+<td>10.203.25.166</td>
+<td>10.203.25.166</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>4</td>
+<td>1</td>
+<td>4</td>
+<td>10.203.25.41</td>
+<td>10.203.25.41</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>4</td>
+<td>1</td>
+<td>5</td>
+<td>10.203.25.54</td>
+<td>10.203.25.54</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>4</td>
+<td>1</td>
+<td>6</td>
+<td>10.203.25.9</td>
+<td>10.203.25.9</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>5</td>
+<td>1</td>
+<td>1</td>
+<td>10.203.46.114</td>
+<td>10.203.46.114</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>5</td>
+<td>1</td>
+<td>2</td>
+<td>10.203.46.51</td>
+<td>10.203.46.51</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>5</td>
+<td>1</td>
+<td>3</td>
+<td>10.203.46.197</td>
+<td>10.203.46.197</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>5</td>
+<td>1</td>
+<td>4</td>
+<td>10.203.46.213</td>
+<td>10.203.46.213</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>5</td>
+<td>1</td>
+<td>5</td>
+<td>10.203.46.54</td>
+<td>10.203.46.54</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+<tr>
+<td>LF0_CK_Pub_18</td>
+<td>5</td>
+<td>1</td>
+<td>6</td>
+<td>10.203.46.89</td>
+<td>10.203.46.89</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+</tr>
+</tbody></table>
+<p><strong>从上表中可以看出，该LF0_CK_Pub_18集群上共配置了5个shard分片，每个分片具有6个replica副本。也就是说，在此LF0_CK_Pub_18集群上创建分布式表时，写入该表的数据会被分割成5个分片，每个分片上的数据是不一样的，合并起来才是全量数据；然后每个分片又有6个副本，这6个副本上的数据都是一模一样的。</strong></p>
+<h4 id="2-3-主备同步"><a href="#2-3-主备同步" class="headerlink" title="2.3 主备同步"></a>2.3 主备同步</h4><p>ReplicatedMergeTree引擎对Zookeeper的请求压力是非常的大。首先ck集群的副本节点是一个抢主逻辑，所有副本都可以公平写入，数据同步也是双向的。同一个分片的不同副本上任意一个副本上存在出现数据更新，都会将变化日志data part log注册到Zookeeper上，其他副本通过观察Zookeeper会异步的拷贝data part log来进行数据更新。</p>
+<p><strong>一行数据更新涉及到的与Zookeeper的交互就不下于10次，而且这种交互是数据分区粒度的，也就是说一次数据更新涉及到的数据分区有n的，那么ck集群与Zookeeper的交互次数就会是更新一个分区的n倍。那么同样的道理，使用ReplicatedMergeTree引擎进行数据写入时尽量使用batch写入并按照数据分区提前聚合，而不要一行一行的写入，否则对主备同步过程中对Zookeeper的请求压力非常大。</strong></p>
+<h3 id="3-Distributed引擎"><a href="#3-Distributed引擎" class="headerlink" title="3.Distributed引擎"></a>3.Distributed引擎</h3><h4 id="3-1-建表"><a href="#3-1-建表" class="headerlink" title="3.1 建表"></a>3.1 建表</h4><p>Distributed引擎本身不存储数据，是一些本地物理表的分布式视图。</p>
+<p>一个Distributed建表语句案例如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> bc_online.ck_product_deal_detail_testjia_d <span class="keyword">on</span> cluster <span class="keyword">default</span></span><br><span class="line">(</span><br><span class="line">    <span class="string">`dateTime`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`pv`</span> Float64,</span><br><span class="line">    <span class="string">`spuId`</span> <span class="keyword">String</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = <span class="keyword">Distributed</span>(<span class="string">'default'</span>, <span class="string">'bc_online'</span>, <span class="string">'ck_product_deal_detail_testjia'</span>, <span class="keyword">rand</span>());</span><br></pre></td></tr></table></figure>
+
+<p>Distributed引擎的参数为：集群名，数据库名，本地表名，数据分片键(可选)。</p>
+<p><strong>向分布式表中写数据有两种方法：</strong></p>
+<ol>
+<li><strong>自行将数据进行分割，直接向每个shard分片上的本地表执行insert写入命令，使数据完全独立地写入不同的分片，这是最佳的写入方式，ck集群的网络开销最小。</strong></li>
+<li><strong>将全量数据在分布式表上执行insert写入命令，在这种数据插入场景下，必须确保Distributed引擎配置了数据分片键，分布式表依据数据分片键的算法来计算每一行数据分发到哪个shard分片上。常见的数据分片键有随机rand()和哈希halfMD5hash(字段名)等。</strong></li>
+</ol>
+<p>平时我们用的就是自行分割数据分别写入本地表，具体实现另起一文介绍，本文先介绍一下写入分布式表实现原理。</p>
+<h4 id="3-2-写入分布式表"><a href="#3-2-写入分布式表" class="headerlink" title="3.2 写入分布式表"></a>3.2 写入分布式表</h4><p>将数据写入ck分布式表的过程主要分为两步：分布式写入和副本同步。</p>
+<p>分布式写入：客户端选择ck集群中的一台服务器建立连接，如节点1，那么所有的写入数据现在节点1完成写入。假设节点1的分片shard为1，副本replica为1，那么首先按照分片键定义的分区规则，计算每行写入数据所属分片shard。shard为1的数据直接写入节点1本地表，属于其他shard的数据先写入临时目录，然后向其余shard的某个主副本建立连接，将数据发送到对应shard。</p>
+<p>副本同步：副本同步过程如上节所属主备同步过程。</p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://clickhouse.com/docs/zh/engines/table-engines/mergetree-family/mergetree/" target="_blank" rel="noopener">MergeTree引擎官方文档介绍</a></p>
+<p><a href="https://blog.csdn.net/weixin_45320660/article/details/112761790" target="_blank" rel="noopener">MergeTree原理解析</a></p>
+<p><a href="https://blog.csdn.net/u011598442/article/details/118004855" target="_blank" rel="noopener">ClickHouse删改实现原理与优点总结</a></p>
+<p><a href="https://blog.csdn.net/Urbanears/article/details/122089428" target="_blank" rel="noopener">ClickHouse分布式表原理</a></p>
+<p><a href="https://blog.csdn.net/qq_42016966/article/details/109136063" target="_blank" rel="noopener">ReplicatedMergeTree主备同步原理</a></p>
+<p><a href="https://blog.csdn.net/qq_21383435/article/details/113418597?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-113418597-blog-117375282.pc_relevant_aa2&spm=1001.2101.3001.4242.1&utm_relevant_index=3" target="_blank" rel="noopener">Distributed分布式表写入流程</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/09/23/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF(3)_%E8%A1%8C%E8%BD%AC%E5%88%97%E4%B8%8E%E5%88%97%E8%BD%AC%E8%A1%8C/" rel="next" title="HiveSQL实战积累(3)_行转列与列转行">
+                <i class="fa fa-chevron-left"></i> HiveSQL实战积累(3)_行转列与列转行
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/10/06/%E5%95%86%E6%99%BA%E7%A6%BB%E7%BA%BF_Linux%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/" rel="prev" title="商智离线_Linux命令大全">
+                商智离线_Linux命令大全 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">105</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">107</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之ClickHouse-1-MergeTree-amp-ReplicatedMergeTree-amp-Distributed原理解析"><span class="nav-number">1.</span> <span class="nav-text">数据开发之ClickHouse(1)_MergeTree&amp;ReplicatedMergeTree&amp;Distributed原理解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-MergeTree引擎"><span class="nav-number">1.1.</span> <span class="nav-text">1.MergeTree引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-建表"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 建表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-数据合并过程"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 数据合并过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-数据更新与删除"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 数据更新与删除</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-ReplicatedMergeTree引擎"><span class="nav-number">1.2.</span> <span class="nav-text">2.ReplicatedMergeTree引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-建表"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 建表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-分片与副本信息查看"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 分片与副本信息查看</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-主备同步"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 主备同步</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Distributed引擎"><span class="nav-number">1.3.</span> <span class="nav-text">3.Distributed引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-建表"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 建表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-写入分布式表"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 写入分布式表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
