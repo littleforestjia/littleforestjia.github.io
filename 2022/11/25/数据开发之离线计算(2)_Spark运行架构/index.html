@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spark," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据开发之离线计算(2)_Spark运行架构1.Spark核心组件1.1 物理节点：ClusterManager ClusterManager是指集群上用于分配资源的资源调度器，一个spark集群中只有一台ClusterManager节点。当spark引擎搭建在原生的资源管理集群standalone上时，由standalone集群的Master节点来担任；当spark引擎搭建在yarn集群上时，由">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据开发之离线计算(2)_Spark运行架构">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="数据开发之离线计算(2)_Spark运行架构1.Spark核心组件1.1 物理节点：ClusterManager ClusterManager是指集群上用于分配资源的资源调度器，一个spark集群中只有一台ClusterManager节点。当spark引擎搭建在原生的资源管理集群standalone上时，由standalone集群的Master节点来担任；当spark引擎搭建在yarn集群上时，由">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/1.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/3.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/4.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/5.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/7.png">
+<meta property="article:published_time" content="2022-11-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-03-20T14:41:21.457Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/11/25/数据开发之离线计算(2)_Spark运行架构/"/>
+
+
+
+
+
+  <title>数据开发之离线计算(2)_Spark运行架构 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据开发之离线计算(2)_Spark运行架构</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-25T00:00:00+08:00">
+                2022-11-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之离线计算</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据开发之离线计算-2-Spark运行架构"><a href="#数据开发之离线计算-2-Spark运行架构" class="headerlink" title="数据开发之离线计算(2)_Spark运行架构"></a>数据开发之离线计算(2)_Spark运行架构</h2><h3 id="1-Spark核心组件"><a href="#1-Spark核心组件" class="headerlink" title="1.Spark核心组件"></a>1.Spark核心组件</h3><h4 id="1-1-物理节点："><a href="#1-1-物理节点：" class="headerlink" title="1.1 物理节点："></a>1.1 物理节点：</h4><p><strong>ClusterManager</strong></p>
+<p>ClusterManager是指集群上用于分配资源的资源调度器，一个spark集群中只有一台ClusterManager节点。当spark引擎搭建在原生的资源管理集群standalone上时，由standalone集群的Master节点来担任；当spark引擎搭建在yarn集群上时，由yarn中的resourcemanager节点来担任。</p>
+<p><strong>Worker</strong></p>
+<p>worker是集群当中运行计算代码的节点，在standalone集群中通过slave文件配置的worker节点来担任，在yarn集群中由nodemanager节点来担任。</p>
+<h4 id="1-2-应用程序"><a href="#1-2-应用程序" class="headerlink" title="1.2 应用程序"></a>1.2 应用程序</h4><p><strong>Application</strong></p>
+<p>spark application是指用户编写的spark应用程序，其中包含了driver功能的代码和运行在多个worker工作节点上的executer代码。</p>
+<p><strong>Driver</strong></p>
+<p>driver就是application中运行main()函数并创建SparkContext的代码部分，由driver为spark应用程序准备运行环境，并负责与ClusterManager通讯进行资源申请与任务调度、监控，并在executer都运行完毕之后将SparkContext关闭。<strong>根据spark在不同集群上的不同运行模式，driver代码可以运行在standalone集群上的本地client端，也可以运行在standalone集群上的Master节点上，也可以运行在yarn集群上的本地client端，也可以在yarn集群上作为ApplicationMaster启动，具体运行形式见下述1.3节。</strong></p>
+<p><strong>Executer</strong></p>
+<p>executer就是运行在worker节点上负责运行task的计算进程。<strong>满足条件的worker会为每一个application独立的启动一个executer进程，一个worker节点可以同时为多个不同的application启动多个executer。每个executer进程都单独的运行在worker的一个JVM进程中，有一个线程池，每接收到一个task则调用一个线程来执行，所以executer中task的并行度取决于线程池的并行度。某个application的executer进程一旦被创建将一只处于运行状态，它的资源可以被多批次task复用，资源在application运行完成后才会被释放，避免重复申请资源带来的时间开销。当spark程序运行在yarn集群上时，一个executer运行在一个container容器上。</strong></p>
+<h3 id="2-运行流程"><a href="#2-运行流程" class="headerlink" title="2.运行流程"></a>2.运行流程</h3><h4 id="2-1-流程步骤"><a href="#2-1-流程步骤" class="headerlink" title="2.1 流程步骤"></a>2.1 流程步骤</h4><p>spark程序运行的基本流程图如下图：</p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/1.png" alt></p>
+<p>spark应用程序现在比较常用的运行模式有standalone、yarn-client、yarn-cluster三种，其中yarn-cluster模式运行流程图如下图：</p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/2.png" alt></p>
+<p>spark程序运行的基本流程如下：</p>
+<ol>
+<li>客户端提交请求，运行driver，启动SparkContext，SparkContext向ClusterManager注册并申请运行Executer的资源。</li>
+<li>ClusterManager分配Executer资源并启动ExecutorBackEnd，Executor的运行情况将随着心跳发送到ClusterManager。</li>
+<li><strong>SparkContext根据RDD行动操作(action)将application分解为不同的job，application中有多少个action就分解为多少个job，再为每一个作业按照RDD转换操作(transformation)构建一个DAG图。</strong></li>
+<li><strong>SparkContext创建DAGSchedule，对DAG进行拆分，首先将每个job按照transformation切分为最小的数据处理单元，也就是task，一个job中一般包含多个不同的RDD，每个RDD可以按照数据分区partition切分为多个task来处理，一个partition对应一个task。第二步将每个job按照transformation的宽依赖和窄依赖类型切分为顺序执行的stage，每个stage包含一个task任务集合，下一个stage必须等待上一个stage中的所有task执行完毕才可以开始执行。</strong></li>
+<li>SparkContext创建TaskScheduler，将task和应用程序交给相应的executer运行。</li>
+<li>task在executer上运行，运行完毕释放所有资源。</li>
+</ol>
+<h4 id="2-2-转化操作与行动操作"><a href="#2-2-转化操作与行动操作" class="headerlink" title="2.2 转化操作与行动操作"></a>2.2 转化操作与行动操作</h4><p><strong>RDD就是一个分布式对象集合，本质上是保存在集群不同节点上多个数据集片段的集合，帮助统一对集群不同节点上的数据进行并行计算。对RDD的操作分为转化操作(transformation)和行动操作(action)：transformation就是输入RDD输出还是RDD的操作；action就是输入RDD但是输出非RDD的操作，输入一个值或者数组等。RDD的操作都是惰性的，当RDD执行transformation时，实际计算并没有被执行，只有当RDD执行action时才会促发计算任务提交从而执行相应的计算操作。所以一个spark程序中有多少个action就决定了有多少个job。</strong></p>
+<p>常见transformation如下：</p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/3.png" alt></p>
+<p>常见action如下：</p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/4.png" alt></p>
+<h4 id="2-3-宽依赖与窄依赖"><a href="#2-3-宽依赖与窄依赖" class="headerlink" title="2.3 宽依赖与窄依赖"></a>2.3 宽依赖与窄依赖</h4><p>RDD之间有依赖关系：父RDD的一个partition只输出给一个子RDD的partition，这种是窄依赖，父、子partition是一对一或者多对一的关系；父RDD的一个partition中的数据需要输出到子RDD的不同partition中去，这种是宽依赖。<strong>窄依赖与宽依赖的区别就是是否发生洗牌操作(shuffle)：窄依赖是子RDD分区只依赖固定的一个或几个父RDD分区，能够独立计算得到结果；而宽依赖是指子RDD的各个分区会依赖父RDD的各个分区，这会造成父RDD中的数据在集群中重新分片，也就是shuffle操作。</strong></p>
+<p>spark中每一个job的DAG按照宽依赖或者说shuffle来进行拆分为必须顺序执行的stage，一个stage由多个没有shuffle关系的task组成，shuffle是spark中最耗时的操作，是决定spark任务执行速度的关键。<strong>spark基于内存计算的特性就是在shuffle write和shuffle fetch时将数据写到内存上、从内存读取，超出分配内存部分的数据就会存放到磁盘上去，所以为Stage设置合适的并行数防止过多磁盘存写也是提升spark执行速度的关键。没有shuffle关系的task的执行间隙并不会将计算完的数据写下来，而是以管道的形式传递给下一个task，一个stage执行过程是在最后进行shuffle write的时候才会将数据写下来的。stage中task的并行度是由stage的最后一个RDD的分区数来决定的，所以一般可以通过在最后reduce时添加reduceBykey(xxx,numpartiotion),join(xxx,numpartiotion)等操作来改变最后一个RDD的分区数，从而提高stage的并行度。</strong></p>
+<p><strong>DAGSchedule不仅负责job的分割，还负责管理调度stage的提交，DAGSchedule会为每一个stage分配一个stageID，用来表示stage的优先级，stageID越小优先级越高，越应该先提交给集群运行。stage的提交需要参考stage之间的依赖关系和父stage的执行情况，一个stage必须等待它的所有父stage执行完毕才能被提交。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/5.png" alt></p>
+<h3 id="3-不同集群运行模式"><a href="#3-不同集群运行模式" class="headerlink" title="3 不同集群运行模式"></a>3 不同集群运行模式</h3><h4 id="3-1-Spark-on-Standalone"><a href="#3-1-Spark-on-Standalone" class="headerlink" title="3.1 Spark on Standalone"></a>3.1 Spark on Standalone</h4><p>Standalone模式是Spark实现的资源调度框架，其主要的节点有本地Client节点、Master节点和Worker节点。其中Driver既可以运行在Master节点上中，也可以运行在本地Client端。当用spark-shell交互式工具提交Spark任务时，Driver在Master节点上运行；当使用spark-submit工具提交Job或者在Eclipse、IDEA等开发平台上使用<code>new SparkConf().setMaster(“spark://master:7077”)</code>方式运行Spark任务时，Driver是运行在本地Client端上的。</p>
+<h4 id="3-2-Spark-on-Yarn-Client"><a href="#3-2-Spark-on-Yarn-Client" class="headerlink" title="3.2 Spark on Yarn-Client"></a>3.2 Spark on Yarn-Client</h4><p>Yarn-Client模式中，Driver在本地Client中运行，这种模式使得Spark application可以和客户端进行交互，因为Driver在客户端，所以可以通过webUI访问Driver查看任务执行状态。<strong>在Yarn-Client模式，yarn启动的Application Master的作用仅仅是调度资源，为executor申请container，运行在Client节点上的Driver会与这些container保持通行来调度他们工作，也就是说Client不能离开。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/6.png" alt></p>
+<h4 id="3-3-Spark-on-Yarn-Cluster"><a href="#3-3-Spark-on-Yarn-Cluster" class="headerlink" title="3.3 Spark on Yarn-Cluster"></a>3.3 Spark on Yarn-Cluster</h4><p>Yarn-Cluster模式中，当用户向Yarn中提交一个Spark应用程序后，在Yarn为该程序分配的第一个container中启动Application Master，同时还运行Driver代码进行SparkContext等运行环境的初始化。<strong>在Yarn-Cluster模式，yarn启动的Application Master不仅负责调度资源，还要运行Driver。用户提交了应用程序之后，就可以关掉client，应用程序会继续在yarn上运行。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(2)_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/7.png" alt></p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://zhuanlan.zhihu.com/p/484590941" target="_blank" rel="noopener">Spark基础知识学习</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/188465982" target="_blank" rel="noopener">Spark任务生命周期理解</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" rel="tag"><i class="fa fa-tag"></i> Spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/11/18/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(1)_Hdfs&Yarn&MapReuduce%E6%9E%B6%E6%9E%84%E5%85%B3%E7%B3%BB%E4%B8%8EMapReduce%E6%8E%A8%E6%B5%8B%E4%BB%BB%E5%8A%A1%E5%8E%9F%E7%90%86/" rel="next" title="数据开发之离线计算(1)_Hdfs&Yarn&MapReuduce架构关系与MapReduce推测任务原理">
+                <i class="fa fa-chevron-left"></i> 数据开发之离线计算(1)_Hdfs&Yarn&MapReuduce架构关系与MapReduce推测任务原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97(3)_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/" rel="prev" title="数据开发之离线计算(3)_HiveSQL执行计划与JobHistory日志">
+                数据开发之离线计算(3)_HiveSQL执行计划与JobHistory日志 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">113</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">111</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之离线计算-2-Spark运行架构"><span class="nav-number">1.</span> <span class="nav-text">数据开发之离线计算(2)_Spark运行架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Spark核心组件"><span class="nav-number">1.1.</span> <span class="nav-text">1.Spark核心组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-物理节点："><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 物理节点：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-应用程序"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 应用程序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-运行流程"><span class="nav-number">1.2.</span> <span class="nav-text">2.运行流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-流程步骤"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 流程步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-转化操作与行动操作"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 转化操作与行动操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-宽依赖与窄依赖"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 宽依赖与窄依赖</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-不同集群运行模式"><span class="nav-number">1.3.</span> <span class="nav-text">3 不同集群运行模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-Spark-on-Standalone"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Spark on Standalone</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Spark-on-Yarn-Client"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 Spark on Yarn-Client</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-Spark-on-Yarn-Cluster"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 Spark on Yarn-Cluster</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
