@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hive,ClickHouse," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HiveSQL实战积累_分时累计趋势图的多种实现方案与比较分时累计趋势图定义分时累计趋势图一般是指一天内的累积趋势图，与之对应的就是分时窗口趋势图。比如小时累积的24个点中第一个点就是0-1点的数据，第二个点就是0-2点的数据，每个点都是0点到该点的累积数据；小时窗口的第一个点就是0-1点的数据，第二个点就是1-2点的数据，每个点就是一个被等分的时间窗口中的聚合数据。 分时窗口趋势图比较好出数，直">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HiveSQL实战积累_分时累计趋势图的多种实现方案与比较">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HiveSQL实战积累_分时累计趋势图的多种实现方案与比较分时累计趋势图定义分时累计趋势图一般是指一天内的累积趋势图，与之对应的就是分时窗口趋势图。比如小时累积的24个点中第一个点就是0-1点的数据，第二个点就是0-2点的数据，每个点都是0点到该点的累积数据；小时窗口的第一个点就是0-1点的数据，第二个点就是1-2点的数据，每个点就是一个被等分的时间窗口中的聚合数据。 分时窗口趋势图比较好出数，直">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/2.jpg">
+<meta property="article:published_time" content="2024-02-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:22:12.161Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Hive">
+<meta property="article:tag" content="ClickHouse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/10/HiveSQL实战积累_分时累计趋势图的多种实现方案与比较/"/>
+
+
+
+
+
+  <title>HiveSQL实战积累_分时累计趋势图的多种实现方案与比较 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HiveSQL实战积累_分时累计趋势图的多种实现方案与比较</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-10T00:00:00+08:00">
+                2024-02-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">HiveSQL实战积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HiveSQL实战积累-分时累计趋势图的多种实现方案与比较"><a href="#HiveSQL实战积累-分时累计趋势图的多种实现方案与比较" class="headerlink" title="HiveSQL实战积累_分时累计趋势图的多种实现方案与比较"></a>HiveSQL实战积累_分时累计趋势图的多种实现方案与比较</h1><h2 id="分时累计趋势图定义"><a href="#分时累计趋势图定义" class="headerlink" title="分时累计趋势图定义"></a>分时累计趋势图定义</h2><p>分时累计趋势图一般是指一天内的累积趋势图，与之对应的就是分时窗口趋势图。比如小时累积的24个点中第一个点就是0-1点的数据，第二个点就是0-2点的数据，每个点都是0点到该点的累积数据；小时窗口的第一个点就是0-1点的数据，第二个点就是1-2点的数据，每个点就是一个被等分的时间窗口中的聚合数据。</p>
+<p>分时窗口趋势图比较好出数，直接按照时间前缀等方式group聚合即可，但是分时累计趋势图就比较麻烦了，总结常见的出数方式有下述三种。</p>
+<h2 id="流量模块预计算"><a href="#流量模块预计算" class="headerlink" title="流量模块预计算"></a>流量模块预计算</h2><p><img src="//littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/1.jpg" alt></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    dt,</span><br><span class="line">    bs,</span><br><span class="line">    interval_index,</span><br><span class="line">    <span class="keyword">SUM</span>(item_pv_10min_aggr) <span class="keyword">AS</span> item_pv_10min_aggr,</span><br><span class="line">    <span class="keyword">SUM</span>(item_uv_10min_aggr) <span class="keyword">AS</span> item_uv_10min_aggr,</span><br><span class="line">    <span class="number">0</span> <span class="keyword">AS</span> item_rt_10min_aggr,</span><br><span class="line">    <span class="number">0</span> <span class="keyword">AS</span> item_login_users_10min_aggr</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    (</span><br><span class="line">        <span class="keyword">SELECT</span></span><br><span class="line">            dt,</span><br><span class="line">            bs,</span><br><span class="line">            interval_index,</span><br><span class="line">            <span class="keyword">SUM</span>(item_pv_10min_aggr) <span class="keyword">over</span>(partitionBY dt, bs orderby interval_index) <span class="keyword">AS</span> item_pv_10min_aggr,</span><br><span class="line">            <span class="number">0</span> <span class="keyword">AS</span> item_uv_10min_aggr</span><br><span class="line">        <span class="keyword">FROM</span></span><br><span class="line">            (</span><br><span class="line">                <span class="keyword">SELECT</span></span><br><span class="line">                    dt,</span><br><span class="line">                    arrayJoin(<span class="keyword">IF</span>(bs = <span class="string">'7710'</span>, [<span class="string">'7710'</span>, <span class="string">'77'</span>], [bs])) <span class="keyword">AS</span> bs,</span><br><span class="line">                    <span class="keyword">concat</span>(REGEXP_REPLACE(dt, <span class="string">'-'</span>, <span class="string">''</span>), leftPad(toString(toInt32(toInt32(mins) / <span class="number">6</span>)), <span class="number">2</span>, <span class="string">'0'</span>), leftPad(toString(<span class="number">10</span> *((mins) %<span class="number">6</span>)), <span class="number">2</span>, <span class="string">'0'</span>)) <span class="keyword">AS</span> interval_index,</span><br><span class="line">                    <span class="keyword">SUM</span>(item_pv) item_pv_10min_aggr</span><br><span class="line">                <span class="keyword">FROM</span></span><br><span class="line">                    app.app_d14_traffic_plat_item_di_new_opt_aggr_d</span><br><span class="line">                <span class="keyword">WHERE</span></span><br><span class="line">                    dt &gt;= <span class="string">'2021-10-31'</span></span><br><span class="line">                    <span class="keyword">AND</span> dt &lt;= <span class="string">'2021-10-31'</span></span><br><span class="line">                    <span class="keyword">AND</span> bs = <span class="string">'1302'</span></span><br><span class="line">                    <span class="keyword">AND</span> cate_bu_id = <span class="string">'6210'</span></span><br><span class="line">                    <span class="keyword">AND</span> mins &lt;= <span class="number">76</span></span><br><span class="line">                GROUPBY</span><br><span class="line">                    dt,</span><br><span class="line">                    bs,</span><br><span class="line">                    interval_index</span><br><span class="line">            )</span><br><span class="line">            t</span><br><span class="line">        </span><br><span class="line">        UNIONALL</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">SELECT</span></span><br><span class="line">            dt,</span><br><span class="line">            bs,</span><br><span class="line">            interval_index,</span><br><span class="line">            <span class="number">0</span> <span class="keyword">AS</span> item_pv_10min_aggr,</span><br><span class="line">            <span class="keyword">SUM</span>(item_uv_10min_aggr) <span class="keyword">over</span>(partitionBY dt, bs orderby interval_index) <span class="keyword">AS</span> item_uv_10min_aggr</span><br><span class="line">        <span class="keyword">FROM</span></span><br><span class="line">            (</span><br><span class="line">                <span class="keyword">SELECT</span></span><br><span class="line">                    dt,</span><br><span class="line">                    bs,</span><br><span class="line">                    interval_index,</span><br><span class="line">                    <span class="keyword">COUNT</span>( *) <span class="keyword">AS</span> item_uv_10min_aggr</span><br><span class="line">                <span class="keyword">FROM</span></span><br><span class="line">                    (</span><br><span class="line">                        <span class="keyword">SELECT</span></span><br><span class="line">                            dt,</span><br><span class="line">                            arrayJoin(<span class="keyword">IF</span>(bs = <span class="string">'7710'</span>, [<span class="string">'7710'</span>, <span class="string">'77'</span>], [bs])) <span class="keyword">AS</span> bs,</span><br><span class="line">                            bs_browser_uniq_id,</span><br><span class="line">                            <span class="keyword">MIN</span>(<span class="keyword">concat</span>(REGEXP_REPLACE(dt, <span class="string">'-'</span>, <span class="string">''</span>), leftPad(toString(toInt32(toInt32(mins) / <span class="number">6</span>)), <span class="number">2</span>, <span class="string">'0'</span>), leftPad(toString(<span class="number">10</span> *((mins) %<span class="number">6</span>)), <span class="number">2</span>, <span class="string">'0'</span>))) <span class="keyword">AS</span> interval_index</span><br><span class="line">                        <span class="keyword">FROM</span></span><br><span class="line">                            app.app_d14_traffic_plat_item_di_new_opt_aggr_d</span><br><span class="line">                        <span class="keyword">WHERE</span></span><br><span class="line">                            dt &gt;= <span class="string">'2021-10-31'</span></span><br><span class="line">                            <span class="keyword">AND</span> dt &lt;= <span class="string">'2021-10-31'</span></span><br><span class="line">                            <span class="keyword">AND</span> bs = <span class="string">'1302'</span></span><br><span class="line">                            <span class="keyword">AND</span> cate_bu_id = <span class="string">'6210'</span></span><br><span class="line">                            <span class="keyword">AND</span> mins &lt;= <span class="number">76</span></span><br><span class="line">                        GROUPBY</span><br><span class="line">                            dt,</span><br><span class="line">                            bs,</span><br><span class="line">                            bs_browser_uniq_id</span><br><span class="line">                    )</span><br><span class="line">                    t</span><br><span class="line">                GROUPBY</span><br><span class="line">                    dt,</span><br><span class="line">                    bs,</span><br><span class="line">                    interval_index</span><br><span class="line">            )</span><br><span class="line">            tt</span><br><span class="line">    )</span><br><span class="line">    ttt</span><br><span class="line">GROUPBY</span><br><span class="line">    dt,</span><br><span class="line">    bs,</span><br><span class="line">    interval_index</span><br></pre></td></tr></table></figure>
+
+<p><img src="//littleforestjia.github.io/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/2.jpg" alt></p>
+<p><strong>上述预计算流程中，最关键的就是通过group by+min获取到每个用户的最早登陆时间，然后再通过窗口函数直接累加即可得到去重uv。</strong></p>
+<p><strong>主要缺点：</strong></p>
+<ol>
+<li>计算流程复杂，对于去重和非去重指标需要分开按不同逻辑计算，存在多步聚合和指标关联操作。</li>
+<li>存在较为明显的时间断点和uv断点，时间断点是指，某些时间区间内没有pv或uv，导致采用窗口函数累加得到的数据表中，没有该时间维度行；uv断点是指某些时间区间内有pv但是没有uv，导致累加完之后的两指标合并之后，该时间维度行的uv为0或空。这些断点在无论在数据还是服务层面都需要再关联时间维表来补全断点。</li>
+</ol>
+<h2 id="流量olap服务出数"><a href="#流量olap服务出数" class="headerlink" title="流量olap服务出数"></a>流量olap服务出数</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	replaceAll(<span class="keyword">concat</span>(toString(dt), toString(mins)), <span class="string">'-'</span>, <span class="string">''</span>) <span class="keyword">AS</span> point,</span><br><span class="line">	uniqCombinedMerge(item_uv_aggr) <span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> dt, toInt32(mins)) <span class="keyword">AS</span> item_uv_aggr</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	(</span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			uniqCombinedState(browser_uniq_id) <span class="keyword">AS</span> item_uv_aggr,</span><br><span class="line">			mins <span class="keyword">AS</span> mins,</span><br><span class="line">			dt <span class="keyword">AS</span> dt</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			app.app_d14_traffic_plat_item_di_new_opt_aggr_d</span><br><span class="line">		<span class="keyword">WHERE</span></span><br><span class="line">			dt &gt; <span class="string">'2022-04-16'</span></span><br><span class="line">			<span class="keyword">AND</span> dt &lt; <span class="string">'2022-04-17'</span></span><br><span class="line">		<span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">			mins,</span><br><span class="line">			dt</span><br><span class="line">	)</span><br></pre></td></tr></table></figure>
+
+<p><strong>依赖clickhouse引擎的uniqState或者uniqCombinedState函数生成bitmap先计算分时聚合数据，然后再用开窗函数做分时累计。</strong></p>
+<p><strong>主要缺点：</strong></p>
+<ol>
+<li>需要一层嵌套子查询。</li>
+<li>hive中不支持去重计数开窗函数，clickhouse利用了bitmap存储去重数据才支持的。</li>
+<li>同样存在时间断点问题，需要在服务层中再关联时间维表补全断点。</li>
+</ol>
+<h2 id="交易模块预计算"><a href="#交易模块预计算" class="headerlink" title="交易模块预计算"></a>交易模块预计算</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	t.dt dt,</span><br><span class="line">	time_granularity,</span><br><span class="line">	t.shop_id shop_id,</span><br><span class="line">	<span class="keyword">SUM</span>(t.deal_ord_amt) deal_amt,</span><br><span class="line">	<span class="keyword">COUNT</span>(<span class="keyword">DISTINCT</span> t.sku_id) sku_num</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app.app_zh_d0705t04_pre_sale_ord_di t <span class="comment">--测试表</span></span><br><span class="line">	<span class="keyword">lateral</span> <span class="keyword">view</span> <span class="keyword">explode</span>(<span class="keyword">split</span>(<span class="string">'00:00,01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00,18:00,19:00,20:00,21:00,22:00,23:00'</span>,<span class="string">','</span>)) time_granularity time_granularity</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	t.dt = <span class="string">'2023-07-11'</span></span><br><span class="line">	<span class="keyword">AND</span> t.shop_id = <span class="string">'77339'</span></span><br><span class="line">	<span class="keyword">AND</span> t.ord_deal_flag = <span class="number">1</span></span><br><span class="line">	<span class="keyword">AND</span> <span class="keyword">CAST</span>(<span class="keyword">concat</span>(<span class="keyword">SUBSTR</span>(<span class="keyword">TRIM</span>(<span class="keyword">CAST</span>(t.ord_deal_tm <span class="keyword">AS</span> <span class="keyword">string</span>)), <span class="number">12</span>, <span class="number">3</span>), <span class="string">'00'</span>) <span class="keyword">AS</span> <span class="keyword">string</span>) &lt;= time_granularity</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	t.dt,</span><br><span class="line">	time_granularity,</span><br><span class="line">	t.shop_id</span><br></pre></td></tr></table></figure>
+
+<p><strong>将明细数据关联时间维表或侧视图，然后通过where条件过滤出各个累计时间段内的明细数据。</strong></p>
+<p>主要缺点：</p>
+<ol>
+<li>明细数据爆炸造成计算压力较大，加重数据倾斜，在十分和小时情况下数据分别膨胀144倍和24倍还能接受，但如果是分钟粒度或者秒级粒度数据量难以接受。</li>
+</ol>
+<p><strong>通用数据服务生产链路中暂定以lateral view关联时间维表的方式支持十分累计、小时累计两种预计算粒度。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hive/" rel="tag"><i class="fa fa-tag"></i> Hive</a>
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/09/Java%E6%9C%8D%E5%8A%A1_%E5%88%86%E5%B8%83%E5%BC%8F%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97%E8%BF%BD%E8%B8%AA%E5%B7%A5%E5%85%B7MDC/" rel="next" title="Java服务_分布式服务日志追踪工具MDC">
+                <i class="fa fa-chevron-left"></i> Java服务_分布式服务日志追踪工具MDC
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/11/Java%E6%9C%8D%E5%8A%A1_%E6%9C%8D%E5%8A%A1%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E4%B8%8E%E5%91%8A%E8%AD%A6%E6%94%B6%E6%95%9B%E5%AE%9E%E6%88%98/" rel="prev" title="Java服务_服务全局异常处理与告警收敛实战">
+                Java服务_服务全局异常处理与告警收敛实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HiveSQL实战积累-分时累计趋势图的多种实现方案与比较"><span class="nav-number">1.</span> <span class="nav-text">HiveSQL实战积累_分时累计趋势图的多种实现方案与比较</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分时累计趋势图定义"><span class="nav-number">1.1.</span> <span class="nav-text">分时累计趋势图定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流量模块预计算"><span class="nav-number">1.2.</span> <span class="nav-text">流量模块预计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流量olap服务出数"><span class="nav-number">1.3.</span> <span class="nav-text">流量olap服务出数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#交易模块预计算"><span class="nav-number">1.4.</span> <span class="nav-text">交易模块预计算</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

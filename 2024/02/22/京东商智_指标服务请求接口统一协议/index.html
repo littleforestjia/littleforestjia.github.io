@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="指标服务平台," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_指标服务请求接口统一协议1.查询接口协议1.1 maven坐标（调用方引用）12345&lt;dependency&gt;  &lt;groupId&gt;com.jd.bdaa.arch&lt;&#x2F;groupId&gt;  &lt;artifactId&gt;dataservice-provider&lt;&#x2F;artifactId&gt;  &lt;version&amp;gt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_指标服务请求接口统一协议">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/22/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E7%BB%9F%E4%B8%80%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_指标服务请求接口统一协议1.查询接口协议1.1 maven坐标（调用方引用）12345&lt;dependency&gt;  &lt;groupId&gt;com.jd.bdaa.arch&lt;&#x2F;groupId&gt;  &lt;artifactId&gt;dataservice-provider&lt;&#x2F;artifactId&gt;  &lt;version&amp;gt">
+<meta property="article:published_time" content="2024-02-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:37:12.748Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="指标服务平台">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/22/京东商智_指标服务请求接口统一协议/"/>
+
+
+
+
+
+  <title>京东商智_指标服务请求接口统一协议 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/22/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E7%BB%9F%E4%B8%80%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_指标服务请求接口统一协议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-22T00:00:00+08:00">
+                2024-02-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="京东商智-指标服务请求接口统一协议"><a href="#京东商智-指标服务请求接口统一协议" class="headerlink" title="京东商智_指标服务请求接口统一协议"></a>京东商智_指标服务请求接口统一协议</h1><h3 id="1-查询接口协议"><a href="#1-查询接口协议" class="headerlink" title="1.查询接口协议"></a>1.查询接口协议</h3><h4 id="1-1-maven坐标（调用方引用）"><a href="#1-1-maven坐标（调用方引用）" class="headerlink" title="1.1 maven坐标（调用方引用）"></a>1.1 <strong>maven坐标（调用方引用）</strong></h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;com.jd.bdaa.arch&lt;&#x2F;groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;dataservice-provider&lt;&#x2F;artifactId&gt;</span><br><span class="line">  &lt;version&gt;1.1.1-RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-2-请求入参"><a href="#1-2-请求入参" class="headerlink" title="1.2 请求入参"></a>1.2 请求入参</h4><p>接口：com.jd.bdaa.arch.dataservice.UnionDataService</p>
+<p>方法：fetchBizData</p>
+<table>
+<thead>
+<tr>
+<th><strong>参数名</strong></th>
+<th><strong>类型</strong></th>
+<th><strong>必须</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>header</td>
+<td>UReqData.Header</td>
+<td>是</td>
+<td>请求头</td>
+</tr>
+<tr>
+<td>-appkey</td>
+<td>String</td>
+<td>是</td>
+<td>原子服务对调用方的授权key，jdos应用级标识</td>
+</tr>
+<tr>
+<td>-uuid</td>
+<td>String</td>
+<td>是</td>
+<td>调用UUID，为了便于日志采集，需满足正则 [a-zA-Z0-9-|_.]+</td>
+</tr>
+<tr>
+<td>-context</td>
+<td>HashMap&lt;String, String&gt;</td>
+<td>是</td>
+<td>放置不影响数据结果的参数，如统计、分流、鉴权等服务条件。业务如有诉求，经指标服务配置后可在链路中传递，否则会被拦截。目前可传递字段为：指标类型（不传默认离线）:key:INDEX_FREQ value:”REALTIME”/“OFFLINE” (实时/离线)资源场景标识Key（必传）:key:RES_APPKEYvalue:例”ge_jdv_boss”备注：当value为”<strong>MOCKER</strong>“时，代表使用数据探查能力，仅对入参做校验，不实际请求数据库。</td>
+</tr>
+<tr>
+<td>body</td>
+<td>UReqData.Body</td>
+<td>是</td>
+<td>请求体</td>
+</tr>
+<tr>
+<td>-indicators</td>
+<td>List<String></String></td>
+<td>是</td>
+<td>查询指标code列表如需动态传递修饰和函数，请查看本文档附录1</td>
+</tr>
+<tr>
+<td>-attributes</td>
+<td>List<String></String></td>
+<td>否</td>
+<td>查询维度code列表</td>
+</tr>
+<tr>
+<td>-criteria</td>
+<td>UCriteria</td>
+<td>否</td>
+<td>查询条件</td>
+</tr>
+<tr>
+<td>– criterions</td>
+<td>List<UCriterion></UCriterion></td>
+<td>否</td>
+<td>筛选过滤查询条件，不支持“或”逻辑运算符</td>
+</tr>
+<tr>
+<td>– orders</td>
+<td>List<UOrder></UOrder></td>
+<td>否</td>
+<td>排序1、复合指标与同环比类函数指标不支持排序2、定义驱动当前不支持按日期、维度进行排序。</td>
+</tr>
+<tr>
+<td>— ascending</td>
+<td>boolean</td>
+<td>否</td>
+<td>升降序,true 正序，false 倒序</td>
+</tr>
+<tr>
+<td>— propertyName</td>
+<td>String</td>
+<td>否</td>
+<td>排序属性名</td>
+</tr>
+<tr>
+<td>– aliass</td>
+<td>List<UAlias></UAlias></td>
+<td>否</td>
+<td>（仅需调用方关注）字段别名(节后升级为aliases)</td>
+</tr>
+<tr>
+<td>— aliasName</td>
+<td>String</td>
+<td>否</td>
+<td>字段别名</td>
+</tr>
+<tr>
+<td>— name</td>
+<td>String</td>
+<td>否</td>
+<td>字段名</td>
+</tr>
+<tr>
+<td>– maxResults</td>
+<td>Integer</td>
+<td>否</td>
+<td>查询条数，1~2000</td>
+</tr>
+<tr>
+<td>– firstResult</td>
+<td>Integer</td>
+<td>否</td>
+<td>查询数据起始位置 第一条为0</td>
+</tr>
+<tr>
+<td>– group</td>
+<td>List<String></String></td>
+<td>否</td>
+<td>聚合维度</td>
+</tr>
+</tbody></table>
+<p>请求示例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"header"</span>: &#123;</span><br><span class="line">    <span class="attr">"appkey"</span>: <span class="string">"low_code"</span>,</span><br><span class="line">    <span class="attr">"uuid"</span>: <span class="string">"ba09db4a-e34e-4970-b680-3d038230869e"</span>,</span><br><span class="line">    <span class="attr">"context"</span>: &#123;</span><br><span class="line">      <span class="attr">"PIN"</span>: <span class="string">"zuoyang10"</span>,</span><br><span class="line">      <span class="attr">"INDEX_FREQ"</span>: <span class="string">"OFFLINE"</span>,</span><br><span class="line">      <span class="attr">"RES_APPKEY"</span>: <span class="string">"lowcode2374"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"body"</span>: &#123;</span><br><span class="line">    <span class="attr">"indicators"</span>: [</span><br><span class="line">      <span class="string">"jdr_sch_traffic_exposure_event_dis_qtty_traffic_plat_expo_di"</span>,</span><br><span class="line">      <span class="string">"jdr_sch_traffic_click_event_dis_qtty_traffic_plat_click_di"</span>,</span><br><span class="line">      <span class="string">"jdr_sch_traffic_intr_ord_parent__ord_dis_qtty_jd_traffic_order_path_trade_intr_snapshot"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"attributes"</span>: [</span><br><span class="line">      <span class="string">"saler_bu_id"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"criteria"</span>: &#123;</span><br><span class="line">      <span class="attr">"criterions"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"clzType"</span>: <span class="string">"InExpression"</span>,</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"saler_bu_id"</span>,</span><br><span class="line">          <span class="attr">"values"</span>: [</span><br><span class="line">            <span class="string">"9214"</span></span><br><span class="line">          ],</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">          <span class="attr">"op"</span>: <span class="string">"in"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"dt"</span>,</span><br><span class="line">          <span class="attr">"value"</span>: <span class="string">"2023-11-08"</span>,</span><br><span class="line">          <span class="attr">"op"</span>: <span class="string">"&gt;="</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"string"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"dt"</span>,</span><br><span class="line">          <span class="attr">"value"</span>: <span class="string">"2023-11-08"</span>,</span><br><span class="line">          <span class="attr">"op"</span>: <span class="string">"&lt;="</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"string"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"time_interval"</span>,</span><br><span class="line">          <span class="attr">"value"</span>: <span class="string">"BY_DAY"</span>,</span><br><span class="line">          <span class="attr">"op"</span>: <span class="string">"="</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"string"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">"orders"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"clzType"</span>: <span class="string">"UOrder"</span>,</span><br><span class="line">          <span class="attr">"ascending"</span>: <span class="literal">false</span>,</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"jdr_sch_traffic_exposure_event_dis_qtty_traffic_plat_expo_di"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">"aliass"</span>: [],</span><br><span class="line">      <span class="attr">"maxResults"</span>: <span class="number">1000</span>,</span><br><span class="line">      <span class="attr">"firstResult"</span>: <span class="literal">null</span>,</span><br><span class="line">      <span class="attr">"group"</span>: [</span><br><span class="line">        <span class="string">"saler_bu_id"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"dataComparators"</span>: <span class="literal">null</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤条件UCriterion说明：</p>
+<table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>类名</th>
+<th>备注</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>=,&lt;&gt;,like,&gt;,&lt;,&gt;=,&lt;=</td>
+<td>SimpleExpression</td>
+<td>单值value</td>
+<td><code>{  &quot;clzType&quot;:&quot;SimpleExpression&quot;,  &quot;op&quot;:&quot;&gt;=&quot;,  &quot;propertyName&quot;:&quot;dt&quot;,  &quot;type&quot;:&quot;string&quot;,  &quot;value&quot;:&quot;2021-12-13&quot; }</code></td>
+</tr>
+<tr>
+<td>in</td>
+<td>InExpression</td>
+<td>多值values</td>
+<td><code>{ &quot;clzType&quot;:&quot;InExpression&quot;, &quot;op&quot;:&quot;in&quot;, &quot;propertyName&quot;:&quot;bu_id&quot;, &quot;type&quot;:&quot;string&quot;, &quot;values&quot;:[ &quot;4517&quot;,&quot;49747&quot;,&quot;262016&quot;,&quot;359305&quot;,&quot;427324&quot; ] }</code></td>
+</tr>
+<tr>
+<td>notin</td>
+<td>NotInExpression</td>
+<td>多值values</td>
+<td><code>{ &quot;clzType&quot;:&quot;NotInExpression&quot;, &quot;op&quot;:&quot;notin&quot;, &quot;propertyName&quot;:&quot;bu_id&quot;, &quot;type&quot;:&quot;string&quot;, &quot;values&quot;:[   &quot;4517&quot;,&quot;49747&quot;,&quot;262016&quot;,&quot;359305&quot;,&quot;427324&quot;  ] }</code></td>
+</tr>
+<tr>
+<td>hasAny</td>
+<td>HasAnyExpression</td>
+<td>多值values</td>
+<td><code>{ &quot;clzType&quot;:&quot;HasAnyExpression&quot;, &quot;op&quot;:&quot;hasAny&quot;, &quot;propertyName&quot;:&quot;bu_id&quot;, &quot;type&quot;:&quot;string&quot;, &quot;values&quot;:[   &quot;4517&quot;,&quot;49747&quot;,&quot;262016&quot;,&quot;359305&quot;,&quot;427324&quot;  ] }</code></td>
+</tr>
+<tr>
+<td>hasAll</td>
+<td>HasAllExpression</td>
+<td>多值values</td>
+<td><code>{ &quot;clzType&quot;:&quot;HasAllExpression&quot;, &quot;op&quot;:&quot;hasAll&quot;, &quot;propertyName&quot;:&quot;bu_id&quot;, &quot;type&quot;:&quot;string&quot;, &quot;values&quot;:[   &quot;4517&quot;,&quot;49747&quot;,&quot;262016&quot;,&quot;359305&quot;,&quot;427324&quot;  ] }</code></td>
+</tr>
+<tr>
+<td>isnull</td>
+<td>NullExpression</td>
+<td>无值</td>
+<td><code>{ &quot;clzType&quot;:&quot;NullExpression&quot;, &quot;op&quot;:&quot;isnull&quot;, &quot;propertyName&quot;:&quot;bu_id&quot; }</code></td>
+</tr>
+<tr>
+<td>isnotnull</td>
+<td>NotNullExpression</td>
+<td>无值</td>
+<td><code>{ &quot;clzType&quot;:&quot;NotNullExpression&quot;, &quot;op&quot;:&quot;isnotnull&quot;, &quot;propertyName&quot;:&quot;bu_id&quot; }</code></td>
+</tr>
+</tbody></table>
+<h4 id="1-3-返回参数"><a href="#1-3-返回参数" class="headerlink" title="1.3 返回参数"></a>1.3 返回参数</h4><table>
+<thead>
+<tr>
+<th><strong>参数名</strong></th>
+<th><strong>类型</strong></th>
+<th><strong>必须</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>header</td>
+<td></td>
+<td></td>
+<td>返回头</td>
+</tr>
+<tr>
+<td>-code</td>
+<td>String</td>
+<td>是</td>
+<td>响应码</td>
+</tr>
+<tr>
+<td>-desc</td>
+<td>String</td>
+<td>是</td>
+<td>响应描述</td>
+</tr>
+<tr>
+<td>body</td>
+<td>UResData.Body</td>
+<td></td>
+<td>返回体</td>
+</tr>
+<tr>
+<td>-size</td>
+<td>long</td>
+<td></td>
+<td>查询总数</td>
+</tr>
+<tr>
+<td>-data</td>
+<td>List&lt;List<Object>&gt;</Object></td>
+<td></td>
+<td>返回数据集合</td>
+</tr>
+<tr>
+<td>-metaData</td>
+<td>UResData.MetaData</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>– metaIndex</td>
+<td>Map&lt;String, Integer&gt;</td>
+<td></td>
+<td>返回数据的索引</td>
+</tr>
+<tr>
+<td>– meta</td>
+<td>List&lt;UResData.Meta&gt;</td>
+<td></td>
+<td>字段的类型</td>
+</tr>
+<tr>
+<td>— di</td>
+<td>String</td>
+<td></td>
+<td>返回字段名</td>
+</tr>
+<tr>
+<td>— type</td>
+<td>String</td>
+<td></td>
+<td>返回字段数据类型</td>
+</tr>
+<tr>
+<td>-errors</td>
+<td>List<UError></UError></td>
+<td></td>
+<td>查询失败的指标对应的错误信息</td>
+</tr>
+<tr>
+<td>-code</td>
+<td>String</td>
+<td></td>
+<td>错误码</td>
+</tr>
+<tr>
+<td>-desc</td>
+<td>String</td>
+<td></td>
+<td>描述</td>
+</tr>
+<tr>
+<td>-serviceId</td>
+<td>Long</td>
+<td></td>
+<td>原子服务ID</td>
+</tr>
+<tr>
+<td>-indicators</td>
+<td>Set<String></String></td>
+<td></td>
+<td>原子服务相关的指标</td>
+</tr>
+<tr>
+<td>-dims</td>
+<td>Set<String></String></td>
+<td></td>
+<td>code为2003时为查询时忽略的原子服务相关的维度</td>
+</tr>
+</tbody></table>
+<p>返回示例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"header"</span>: &#123;</span><br><span class="line">    <span class="attr">"code"</span>: <span class="string">"200"</span>,</span><br><span class="line">    <span class="attr">"desc"</span>: <span class="string">"成功"</span>,</span><br><span class="line">    <span class="attr">"values"</span>: <span class="string">"CacheDataStableInfo###&#123;\"jdr_sch_traffic_intr_ord_purchase__user_dis_qtty_jd_traffic_order_path_user_valid_steady_cate_1_new_user\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_purchase__user_cnt_jd_traffic_order_path_trade_valid_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_purchase__user_dis_qtty_jd_traffic_order_path_trade_deal_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_sku_piece_jd_traffic_order_path_trade_deal_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_purchase__user_dis_qtty_jd_traffic_order_path_user_valid_steady_cate_2_new_user\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_ord_amt_jd_traffic_order_path_trade_deal_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_exposure_event_dis_qtty_traffic_plat_expo_di\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_parent__ord_dis_qtty_jd_traffic_order_path_trade_intr_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_purchase__user_dis_qtty_jd_traffic_order_path_user_valid_steady_cate_3_new_user\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_parent__ord_dis_qtty_jd_traffic_order_path_trade_valid_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_parent__ord_dis_qtty_jd_traffic_order_path_trade_deal_snapshot\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_click_event_dis_qtty_traffic_plat_click_di\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;,\"jdr_sch_traffic_intr_ord_purchase__user_dis_qtty_jd_traffic_order_path_user_valid_steady_buid_new_user\":&#123;\"tableList\":[\"adm_jdr_sch_d14_mkt_gold_process_tying_expo_d\"],\"stableTime\":1200&#125;&#125;###StableInfoEnd;"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"body"</span>: &#123;</span><br><span class="line">    <span class="attr">"size"</span>: <span class="number">1000</span>,</span><br><span class="line">    <span class="attr">"data"</span>: [</span><br><span class="line">      [</span><br><span class="line">        <span class="string">"9214"</span>,</span><br><span class="line">        <span class="number">3334202</span>,</span><br><span class="line">        <span class="number">89452</span></span><br><span class="line">      ]</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"metaData"</span>: &#123;</span><br><span class="line">      <span class="attr">"metaIndex"</span>: &#123;</span><br><span class="line">        <span class="attr">"saler_bu_id"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="attr">"jdr_sch_traffic_exposure_event_dis_qtty_traffic_plat_expo_di"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"jdr_sch_traffic_click_event_dis_qtty_traffic_plat_click_di"</span>: <span class="number">2</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="attr">"meta"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"di"</span>: <span class="string">"saler_bu_id"</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"java.lang.String"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"di"</span>: <span class="string">"jdr_sch_traffic_exposure_event_dis_qtty_traffic_plat_expo_di"</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"long"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"di"</span>: <span class="string">"jdr_sch_traffic_click_event_dis_qtty_traffic_plat_click_di"</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"long"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"errors"</span>: []</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>统一错误码：</p>
+<table>
+<thead>
+<tr>
+<th><strong>编码区间</strong></th>
+<th></th>
+<th>code</th>
+<th>desc</th>
+<th>value</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2开头</td>
+<td>返回数据类</td>
+<td>200</td>
+<td>successful</td>
+<td>successful</td>
+<td>成功</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>2000</td>
+<td>part fail</td>
+<td>PV,UV</td>
+<td>失败指标例如”PV””,”UV”</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>2001</td>
+<td>rate limit</td>
+<td>PV,UV</td>
+<td>限流指标例如”PV””,”UV”</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>2002</td>
+<td>circuit breaker</td>
+<td>PV,UV</td>
+<td>降级指标例如 “PV”,”UV”</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>2003</td>
+<td>criteria ignored</td>
+<td>PV,UV</td>
+<td>忽略条件后返回指标数据</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>2004</td>
+<td>Exceed the limit of downloaded lines</td>
+<td></td>
+<td>超出40W下载行数上限</td>
+</tr>
+<tr>
+<td>1开头</td>
+<td>用户传参类</td>
+<td>1001</td>
+<td>indicator exception</td>
+<td>PV</td>
+<td>指标传参异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1002</td>
+<td>attributes exception</td>
+<td>cate_1</td>
+<td>维度传参异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1003</td>
+<td>time exception</td>
+<td>2021-10-10</td>
+<td>时间格式传参异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1004</td>
+<td>group by exception</td>
+<td>cate_1</td>
+<td>聚合传参异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1005</td>
+<td>order by exception</td>
+<td></td>
+<td>排序传参异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1006</td>
+<td>criteria is not support</td>
+<td></td>
+<td>criteria传参不支持</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1007</td>
+<td>required parameter is null exception</td>
+<td></td>
+<td>必传参数为空</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1008</td>
+<td>page parameter exception</td>
+<td></td>
+<td>分页参数异常</td>
+</tr>
+<tr>
+<td>3开头</td>
+<td>权限类</td>
+<td>3001</td>
+<td>no permission to call this api</td>
+<td></td>
+<td>API 无权限</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>3002</td>
+<td>app is not in whitelist</td>
+<td></td>
+<td>app 无权限</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>3003</td>
+<td>data auth validate error</td>
+<td></td>
+<td>无指标或维度值权限</td>
+</tr>
+<tr>
+<td>4开头</td>
+<td>系统类</td>
+<td>4001</td>
+<td>system error occurred</td>
+<td></td>
+<td>系统异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>4002</td>
+<td>query time out</td>
+<td></td>
+<td>查询超时</td>
+</tr>
+<tr>
+<td>5开头</td>
+<td>数据服务类</td>
+<td>5001</td>
+<td>physical service error occurred</td>
+<td></td>
+<td>指标服务异常</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>5002</td>
+<td>physical service do not exist</td>
+<td></td>
+<td>指标服务不存在</td>
+</tr>
+</tbody></table>
+<h3 id="2-入参解析"><a href="#2-入参解析" class="headerlink" title="2.入参解析"></a>2.入参解析</h3><p>入参中UCriterion过滤条件的拆解和解析比较有抽象价值。</p>
+<p>构建了一个过滤条件抽象类AbstractUCriterionConverter，然后每种过滤类型有一个实现类，如InExpression：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InExpressionConverter</span> <span class="keyword">extends</span> <span class="title">AbstractUCriterionConverter</span>&lt;<span class="title">InExpression</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(InExpressionConverter<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> DriveMathOperatorEnum opEnum = DriveMathOperatorEnum.IN;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">InExpressionConverter</span><span class="params">(UCriterionConverterManager manager, UnifyDimDefService unifyDimDefService)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(InExpression<span class="class">.<span class="keyword">class</span>, <span class="title">manager</span>, <span class="title">unifyDimDefService</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DriveFilterBO <span class="title">convert</span><span class="params">(InExpression criterion)</span> </span>&#123;</span><br><span class="line">        DriveFilterBO filterBO = <span class="keyword">new</span> DriveFilterBO();</span><br><span class="line">        filterBO.setMathOp(opEnum);</span><br><span class="line">        Long dimId = getDimIdByName(criterion.getPropertyName());</span><br><span class="line">        filterBO.setDimensionDefId(dimId);</span><br><span class="line">        List&lt;String&gt; valueList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        checkValue(criterion);</span><br><span class="line">        Object[] values = criterion.getValues();</span><br><span class="line">        <span class="keyword">for</span> (Object item : values) &#123;</span><br><span class="line">            valueList.add(String.valueOf(item));</span><br><span class="line">        &#125;</span><br><span class="line">        filterBO.setValueList(valueList);</span><br><span class="line">        <span class="keyword">return</span> filterBO;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对筛选值进行校验</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">checkValue</span><span class="params">(InExpression criterion)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (Objects.isNull(criterion.getValues()) || criterion.getValues().length == <span class="number">0</span>) &#123;</span><br><span class="line">            UmpUtil.alarmUser(UmpUserAlarmType.FILTER_EXCEPTION.geErrorMsg(), UmpUserAlarmType.FILTER_EXCEPTION.getInfo());</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UserException(<span class="string">"筛选值为空！"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中的运算符枚举类型如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> DriveMathOperatorEnum &#123;</span><br><span class="line">    UNKNOWN(<span class="string">""</span>, <span class="number">0</span>),</span><br><span class="line">    EQUAL(<span class="string">"="</span>, <span class="number">2</span>),</span><br><span class="line">    NOT_EQUAL(<span class="string">"&lt;&gt;"</span>, <span class="number">2</span>),</span><br><span class="line">    LARGE(<span class="string">"&gt;"</span>, <span class="number">2</span>),</span><br><span class="line">    LESS(<span class="string">"&lt;"</span>, <span class="number">2</span>),</span><br><span class="line">    LARGE_EQUAL(<span class="string">"&gt;="</span>, <span class="number">2</span>),</span><br><span class="line">    LESS_EQUAL(<span class="string">"&lt;="</span>, <span class="number">2</span>),</span><br><span class="line">    LIKE(<span class="string">"like"</span>, <span class="number">2</span>),</span><br><span class="line">    NOT_LIKE(<span class="string">"not like"</span>, <span class="number">2</span>),</span><br><span class="line">    BETWEEN(<span class="string">"between"</span>, <span class="number">2</span>),</span><br><span class="line">    IN(<span class="string">"in"</span>, <span class="number">2</span>),</span><br><span class="line">    NOT_IN(<span class="string">"not in"</span>, <span class="number">2</span>),</span><br><span class="line">    ISNULL(<span class="string">"is null"</span>, <span class="number">2</span>),</span><br><span class="line">    ISNOTNULL(<span class="string">"is not null"</span>, <span class="number">2</span>),</span><br><span class="line">    HAS_ANY(<span class="string">"hasAny"</span>, <span class="number">2</span>),</span><br><span class="line">    HAS_ALL(<span class="string">"hasAll"</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String operator;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> priority;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 枚举名称 map</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, DriveMathOperatorEnum&gt; NAME_MAP;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        NAME_MAP = Arrays.stream(values())</span><br><span class="line">            .collect(toMap(DriveMathOperatorEnum::getOperator, identity()));</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">DriveMathOperatorEnum</span><span class="params">(String operator, <span class="keyword">int</span> priority)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.operator = operator;</span><br><span class="line">        <span class="keyword">this</span>.priority = priority;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getOperator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.operator;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPriority</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.priority;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> DriveMathOperatorEnum <span class="title">of</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> NAME_MAP.getOrDefault(name, UNKNOWN);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%B9%B3%E5%8F%B0/" rel="tag"><i class="fa fa-tag"></i> 指标服务平台</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/21/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%98%8E%E7%BB%86%E6%95%B0%E6%8D%AE%E4%B8%8A%E5%8D%B7%E5%AE%9E%E6%88%98/" rel="next" title="ClickHouse_行业模块ClickHouse明细数据上卷实战">
+                <i class="fa fa-chevron-left"></i> ClickHouse_行业模块ClickHouse明细数据上卷实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#京东商智-指标服务请求接口统一协议"><span class="nav-number">1.</span> <span class="nav-text">京东商智_指标服务请求接口统一协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-查询接口协议"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.查询接口协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-maven坐标（调用方引用）"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">1.1 maven坐标（调用方引用）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-请求入参"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">1.2 请求入参</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-返回参数"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">1.3 返回参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-入参解析"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.入参解析</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

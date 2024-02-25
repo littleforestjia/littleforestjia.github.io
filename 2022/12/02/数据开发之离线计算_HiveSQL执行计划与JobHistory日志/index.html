@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hive," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据开发之离线计算_HiveSQL执行计划与JobHistory日志1.HiveSQL执行计划与Stage划分1.1 Hive划分Stage原理hive的逻辑计划生成器会将sql计算语句抽象成算子，然后物理计划生成器会将hivesql按照join、groupby、orderby等有shuffle操作的算子或者filter、where条件进行划分划分为不同的stage。 一个stage可能是一个ma">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据开发之离线计算_HiveSQL执行计划与JobHistory日志">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="数据开发之离线计算_HiveSQL执行计划与JobHistory日志1.HiveSQL执行计划与Stage划分1.1 Hive划分Stage原理hive的逻辑计划生成器会将sql计算语句抽象成算子，然后物理计划生成器会将hivesql按照join、groupby、orderby等有shuffle操作的算子或者filter、where条件进行划分划分为不同的stage。 一个stage可能是一个ma">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/1.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/3.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/4.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/5.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/6.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/7.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/8.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/9.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/10.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/11.png">
+<meta property="article:published_time" content="2022-12-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:58:24.182Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Hive">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/12/02/数据开发之离线计算_HiveSQL执行计划与JobHistory日志/"/>
+
+
+
+
+
+  <title>数据开发之离线计算_HiveSQL执行计划与JobHistory日志 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据开发之离线计算_HiveSQL执行计划与JobHistory日志</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-12-02T00:00:00+08:00">
+                2022-12-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之离线计算</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据开发之离线计算-HiveSQL执行计划与JobHistory日志"><a href="#数据开发之离线计算-HiveSQL执行计划与JobHistory日志" class="headerlink" title="数据开发之离线计算_HiveSQL执行计划与JobHistory日志"></a>数据开发之离线计算_HiveSQL执行计划与JobHistory日志</h2><h3 id="1-HiveSQL执行计划与Stage划分"><a href="#1-HiveSQL执行计划与Stage划分" class="headerlink" title="1.HiveSQL执行计划与Stage划分"></a>1.HiveSQL执行计划与Stage划分</h3><h4 id="1-1-Hive划分Stage原理"><a href="#1-1-Hive划分Stage原理" class="headerlink" title="1.1 Hive划分Stage原理"></a>1.1 Hive划分Stage原理</h4><p><strong>hive的逻辑计划生成器会将sql计算语句抽象成算子，然后物理计划生成器会将hivesql按照join、groupby、orderby等有shuffle操作的算子或者filter、where条件进行划分划分为不同的stage。</strong></p>
+<p><strong>一个stage可能是一个mapreduce任务；也可能是一个抽数阶段；也可能是一个合并阶段；也可能是一个limit阶段；也可能是一个不会执行的空stage，比如filter、where等运算经过优化器后会放在其他stage里执行。这些stage组成一个有向无环图，必须按照顺序从上游往下执行，默认情况下hive一次只会执行一个stage，如果开启了并发执行也可以同时执行几个没有依赖关系的stage。</strong></p>
+<h4 id="1-2-Explain执行计划"><a href="#1-2-Explain执行计划" class="headerlink" title="1.2 Explain执行计划"></a>1.2 Explain执行计划</h4><p><strong>使用explain命令可以清晰的看到一个hivesql查询命令的执行计划，包括了stage划分与每个stage之间的依赖关系。这个执行计划对于我们了解底层原理、hive调优、排查数据倾斜有很大的帮助。</strong></p>
+<p>拿如下查询hivesql作为例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">explain</span> </span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	a.item_sku_id </span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">(</span><br><span class="line">  <span class="keyword">SELECT</span> </span><br><span class="line">  	item_sku_id </span><br><span class="line">  <span class="keyword">FROM</span> app.app_zh_qyg_ord </span><br><span class="line">  <span class="keyword">WHERE</span> dt = <span class="string">'2023-02-08'</span> </span><br><span class="line">  <span class="keyword">GROUP</span> <span class="keyword">BY</span> item_sku_id</span><br><span class="line">) a  </span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span> </span><br><span class="line">(</span><br><span class="line">  <span class="keyword">SELECT</span> </span><br><span class="line">  	item_sku_id </span><br><span class="line">  <span class="keyword">FROM</span> app.app_zh_qyg_ord </span><br><span class="line">  <span class="keyword">WHERE</span> dt = <span class="string">'2023-02-07'</span> </span><br><span class="line">  <span class="keyword">GROUP</span> <span class="keyword">BY</span> item_sku_id</span><br><span class="line">) b <span class="keyword">ON</span> a.item_sku_id = b.item_sku_id</span><br></pre></td></tr></table></figure>
+
+<p>得到如下执行计划：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line">STAGE DEPENDENCIES:	</span><br><span class="line">  Stage-1 is a root stage	</span><br><span class="line">  Stage-2 depends on stages: Stage-1, Stage-3	</span><br><span class="line">  Stage-3 is a root stage	</span><br><span class="line">  Stage-0 depends on stages: Stage-2	</span><br><span class="line">	</span><br><span class="line">STAGE PLANS:	</span><br><span class="line">  Stage: Stage-1	</span><br><span class="line">    Map Reduce	</span><br><span class="line">	      Map Operator Tree:	</span><br><span class="line">	          TableScan	</span><br><span class="line">	            alias: app_zh_qyg_ord	</span><br><span class="line">	            Statistics: Num rows: 318384 Data size: 31838449 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	            Filter Operator	</span><br><span class="line">	              predicate: (dt = '2023-02-08') (type: boolean)	</span><br><span class="line">	              Statistics: Num rows: 318384 Data size: 31838449 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	              Select Operator	</span><br><span class="line">	                expressions: item_sku_id (type: string)	</span><br><span class="line">	                outputColumnNames: item_sku_id	</span><br><span class="line">	                Statistics: Num rows: 318384 Data size: 31838449 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	                Group By Operator	</span><br><span class="line">	                  keys: item_sku_id (type: string)	</span><br><span class="line">	                  mode: hash	</span><br><span class="line">	                  outputColumnNames: _col0	</span><br><span class="line">	                  Statistics: Num rows: 318384 Data size: 31838449 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	                  Reduce Output Operator	</span><br><span class="line">	                    key expressions: _col0 (type: string)	</span><br><span class="line">	                    sort order: +	</span><br><span class="line">	                    Map-reduce partition columns: _col0 (type: string)	</span><br><span class="line">	                    Statistics: Num rows: 318384 Data size: 31838449 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	      Reduce Operator Tree:	</span><br><span class="line">	        Group By Operator	</span><br><span class="line">	          keys: KEY._col0 (type: string)	</span><br><span class="line">	          mode: mergepartial	</span><br><span class="line">	          outputColumnNames: _col0	</span><br><span class="line">	          Statistics: Num rows: 159192 Data size: 15919224 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	          File Output Operator	</span><br><span class="line">	            compressed: false	</span><br><span class="line">	            table:	</span><br><span class="line">	                input format: org.apache.hadoop.mapred.SequenceFileInputFormat	</span><br><span class="line">	                output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat	</span><br><span class="line">	                serde: org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe	</span><br><span class="line">		</span><br><span class="line">	  Stage: Stage-2	</span><br><span class="line">	    Map Reduce	</span><br><span class="line">	      Map Operator Tree:	</span><br><span class="line">	          TableScan	</span><br><span class="line">	            Reduce Output Operator	</span><br><span class="line">	              key expressions: _col0 (type: string)	</span><br><span class="line">	              sort order: +	</span><br><span class="line">	              Map-reduce partition columns: _col0 (type: string)	</span><br><span class="line">	              Statistics: Num rows: 159192 Data size: 15919224 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	          TableScan	</span><br><span class="line">	            Reduce Output Operator	</span><br><span class="line">	              key expressions: _col0 (type: string)	</span><br><span class="line">	              sort order: +	</span><br><span class="line">	              Map-reduce partition columns: _col0 (type: string)	</span><br><span class="line">	              Statistics: Num rows: 376117 Data size: 617582244 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	      Reduce Operator Tree:	</span><br><span class="line">	        Join Operator	</span><br><span class="line">	          condition map:	</span><br><span class="line">	               Left Outer Join0 to 1	</span><br><span class="line">	          keys:	</span><br><span class="line">	            0 _col0 (type: string)	</span><br><span class="line">	            1 _col0 (type: string)	</span><br><span class="line">	          outputColumnNames: _col0	</span><br><span class="line">	          Statistics: Num rows: 413728 Data size: 679340483 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	          File Output Operator	</span><br><span class="line">	            compressed: false	</span><br><span class="line">	            Statistics: Num rows: 413728 Data size: 679340483 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	            table:	</span><br><span class="line">	                input format: org.apache.hadoop.mapred.TextInputFormat	</span><br><span class="line">	                output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	</span><br><span class="line">	                serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe	</span><br><span class="line">		</span><br><span class="line">	  Stage: Stage-3	</span><br><span class="line">	    Map Reduce	</span><br><span class="line">	      Map Operator Tree:	</span><br><span class="line">	          TableScan	</span><br><span class="line">	            alias: app_zh_qyg_ord	</span><br><span class="line">	            Statistics: Num rows: 752234 Data size: 1235164488 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	            Filter Operator	</span><br><span class="line">	              predicate: (dt = '2023-02-07') (type: boolean)	</span><br><span class="line">	              Statistics: Num rows: 752234 Data size: 1235164488 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	              Select Operator	</span><br><span class="line">	                expressions: item_sku_id (type: string)	</span><br><span class="line">	                outputColumnNames: item_sku_id	</span><br><span class="line">	                Statistics: Num rows: 752234 Data size: 1235164488 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	                Group By Operator	</span><br><span class="line">	                  keys: item_sku_id (type: string)	</span><br><span class="line">	                  mode: hash	</span><br><span class="line">	                  outputColumnNames: _col0	</span><br><span class="line">	                  Statistics: Num rows: 752234 Data size: 1235164488 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	                  Reduce Output Operator	</span><br><span class="line">	                    key expressions: _col0 (type: string)	</span><br><span class="line">	                    sort order: +	</span><br><span class="line">	                    Map-reduce partition columns: _col0 (type: string)	</span><br><span class="line">	                    Statistics: Num rows: 752234 Data size: 1235164488 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	      Reduce Operator Tree:	</span><br><span class="line">	        Group By Operator	</span><br><span class="line">	          keys: KEY._col0 (type: string)	</span><br><span class="line">	          mode: mergepartial	</span><br><span class="line">	          outputColumnNames: _col0	</span><br><span class="line">	          Statistics: Num rows: 376117 Data size: 617582244 Basic stats: COMPLETE Column stats: NONE	</span><br><span class="line">	          File Output Operator	</span><br><span class="line">	            compressed: false	</span><br><span class="line">	            table:	</span><br><span class="line">	                input format: org.apache.hadoop.mapred.SequenceFileInputFormat	</span><br><span class="line">	                output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat	</span><br><span class="line">	                serde: org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe	</span><br><span class="line">		</span><br><span class="line">	  Stage: Stage-0	</span><br><span class="line">	    Fetch Operator	</span><br><span class="line">	      limit: -1	</span><br><span class="line">	      Processor Tree:	</span><br><span class="line">	        ListSink</span><br></pre></td></tr></table></figure>
+
+<p><strong>从最外层开始看，首先是STAGE DEPENDENCIES表示划分得到的各个stage之间的依赖关系，从中可以看出各个satge的执行顺序。</strong></p>
+<p>第二部分是STAGE PLANS表示各个stage的执行计划，详细介绍其中每个参数的含义：</p>
+<ol>
+<li><code>Map Reduce</code>表示这是一个mapreduce类型的stage，其中<code>Map Operator Tree</code>表示map端的执行计划树，<code>Reduce Operator Tree</code>表示reduce端的执行计划树。</li>
+<li><code>TableScan</code>表示表扫描操作，map端的第一个操作肯定都是加载表，其中<code>alias</code>属性表示表名称，<code>Statistics</code>属性表示表统计信息，包含表中数据条数，数据大小等。</li>
+<li><code>Filter Operator</code>表示过滤操作，其中<code>predicate</code>属性表示过滤条件，<code>Statistics</code>属性表示表统计信息。</li>
+<li><code>Select Operator</code>表示选取操作，其中<code>expressions</code>属性表示选取的字段名称和字段类型，<code>outputColumnNames</code>属性表示选取的列名称，<code>Statistics</code>属性表示表统计信息。</li>
+<li><code>Group By Operator</code>表示分组聚合操作，其中<code>aggregations</code>属性表示聚合函数信息，<code>mode</code>属性表示聚合模式，该属性的<code>hash</code>表示随机聚合，<code>partial</code>表示局部聚合，<code>final</code>表示最终聚合，<code>keys</code>属性表示分组字段，如果没有分组就没有该属性，<code>outputColumnNames</code>属性表示聚合后输出的列名，<code>Statistics</code>属性表示表统计信息，包含分组聚合之后的数据条数、数据大小等。</li>
+<li><code>Reduce Output Operator</code>表示输出到redece端操作，其中<code>sort order</code>属性表示规则，属性值为空表示不排序，<code>+</code>表示正序排序，<code>-</code>表示倒序排序，<code>+-</code>表示先按第一列正序再按第二列倒序。</li>
+<li><code>Map Join Operator</code>表示join操作，其中<code>condition map</code>属性表示join方式，<code>keys</code>属性表示join字段，<code>outputColumnNames</code>属性比哦哈斯join完输出的列名，<code>Statistics</code>属性表示join完之后生成的数据条数、数据大小等。</li>
+<li><code>File Output Operator</code>表示文件输出操作，<code>compressed</code>属性表示是否压缩，<code>table</code>属性表示表的信息，包括输入输出文件格式化方式、序列化方式等。</li>
+<li><code>Fetch Operator</code>表示客户端获取数据操作，<code>limit</code>属性表示限制的获取条数，属性值为<code>-1</code>表示不限制条数。</li>
+</ol>
+<h4 id="1-3-定位HiveSQL中产生数据倾斜的代码段"><a href="#1-3-定位HiveSQL中产生数据倾斜的代码段" class="headerlink" title="1.3 定位HiveSQL中产生数据倾斜的代码段"></a>1.3 定位HiveSQL中产生数据倾斜的代码段</h4><p>数据倾斜一般是大key问题导致的，主要通过<a href="http://bjlfrz-10k-149-68.hadoop.jd.local:50320/proxy/application_1671776755801_14929817/mapreduce/job/job_1671776755801_14929817" target="_blank" rel="noopener">hadoop监控平台</a>来查看相关指标判断到底是不是大key导致的。可以通过如下两种方法判断：</p>
+<ol>
+<li><p><strong>通过reduce执行时间elapsed time来判断，如果某个reduce的所有推测任务都明显比其他reduce任务执行时间长，那就是大key问题。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/1.png" alt></p>
+</li>
+<li><p><strong>进入task的监控界面点击查看每个task的counters信息，通过比较输入数据大小number of bytes read也可以进行判断，如果某个reduce任务明显比其他reduce任务输入数据量大，那就是大key问题。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/2.png" alt></p>
+</li>
+</ol>
+<p><strong>确定是大key问题之后可以通过执行日志可以根据发生倾斜的mapreduce任务的jobname确定对应的stageID，然后查看该hivesql的执行计划，就可以确定该stageID对应的是哪一段代码，从而对该段代码进行优化。</strong></p>
+<h3 id="2-MapReduce日志搜集原理"><a href="#2-MapReduce日志搜集原理" class="headerlink" title="2.MapReduce日志搜集原理"></a>2.MapReduce日志搜集原理</h3><h4 id="2-1-MapReduce日志类型"><a href="#2-1-MapReduce日志类型" class="headerlink" title="2.1 MapReduce日志类型"></a>2.1 MapReduce日志类型</h4><p>在Hadoop2.0中，每个mapreduce的job的日志包含两部分，job日志和task日志。<strong>job日志是由ApplicationMaster产生的，详细记录了job启动时间、运行时间、每个任务的启动时间、运行时间、counter值等信息。task日志是由container产生的，主要是task在container的JVM中运行产生的日志，主要包括stderr、stdout、syslog三个文件，如下图所示。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/3.png" alt></p>
+<h4 id="2-2-Job日志生产流程"><a href="#2-2-Job日志生产流程" class="headerlink" title="2.2 Job日志生产流程"></a>2.2 Job日志生产流程</h4><p>第一步：提交作业，ApplicationMaster启动和运行过程中，将日志默认写到/tmp/hadoop-yarn/staging/yarn/.staging/job_XXXXX_XXX/目录下，该目录下主要包括<code>.jhist</code>、<code>.summary</code>、<code>.xml</code>三个文件，分别表示job运行日志、job概要信息、job配置属性。其中job概要信息只有如下一句话：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobId&#x3D;job_1385051297072_0002,submitTime&#x3D;1385393834983,launchTime&#x3D;1385393974505,firstMapTaskLaunchTime&#x3D;1385393976706,firstReduceTaskLaunchTime&#x3D;1385393982581,finishTime&#x3D;1385393985417,resourcesPerMap&#x3D;1024,resourcesPerReduce&#x3D;1024,numMaps&#x3D;8,numReduces&#x3D;1,user&#x3D;yarn,queue&#x3D;default,status&#x3D;SUCCEEDED,mapSlotSeconds&#x3D;47,reduceSlotSeconds&#x3D;5,jobName&#x3D;QuasiMonteCarlo</span><br></pre></td></tr></table></figure>
+
+<p>第二步：所有task运行完成之后，AM将上述三个文件默认拷贝到/tmp/hadoop-yarn/staging/history/done_intermediate/${username}目录下，拷贝过程中在这三个新文件名后添加<code>_tmp</code>，拷贝完成后再去掉<code>_tmp</code>。</p>
+<p>第三步：**周期性扫描线程将done_intermediate文件夹中的日志文件默认转移到/tmp/hadoop-yarn/staging/history/done目录下，同时删除<code>.summary</code>文件，因为<code>.jhist</code>文件已经涵盖了该文件的所有内容。</p>
+<p>第四步：AM移除/tmp/hadoop-yarn/staging/yarn/.staging/job_XXXXX_XXX/目录并结束运行。</p>
+<h4 id="2-3-Task日志生产流程"><a href="#2-3-Task日志生产流程" class="headerlink" title="2.3 Task日志生产流程"></a>2.3 Task日志生产流程</h4><p>默认情况下，task日志是由每个container产生的，每个MR任务的AM本身也是运行在container上的，且是编号为000001的container，可以将它看成一个特殊的task，也会产生自己的task日志。<strong>也就是说一个AM会分别产生job日志和task日志两份独立的日志。</strong>默认情况下，task日志只会存放在container所在nodemanager的本地磁盘上，默认放在该节点的logs/userlogs目录下。</p>
+<p>但是将task日志存放在各个节点上不便于统一管理和分析，需要通过配置参数mapred.job.history.server.embedded=true来启用日志聚合功能。<strong>开启该功能后，各个task运行完成后会将stderr、stdout、syslog三个日志文件合并成一个文件推送到hdfs的一个目录下。</strong></p>
+<h4 id="2-4-JobHistoryServer服务"><a href="#2-4-JobHistoryServer服务" class="headerlink" title="2.4 JobHistoryServer服务"></a>2.4 JobHistoryServer服务</h4><p>JobHistoryServer是hadoop集群一个独立的服务，为了减轻RM的负担通常部署在一台独立的机器上，需要在mapred-site.xml文件中进行特殊配置并使用<code>sbin/mr-jobhistory-daemon.sh start jobhistoryserver</code>命令启动该服务。</p>
+<p><strong>JobHistoryServer的主要工作是完成job日志的迁移，分析和展示job中的各种启动时间、结束时间、运行时间、counter等数据，并生成指向job日志和task日志的连接。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/4.png" alt></p>
+<p><strong>在MR任务运行中，点击任务日志中的如上链接就可以进入yarn监控界面。如果没有部署JobHistoryServer那么在MR任务运行结束之后点击该链接就无法进入任何监控界面，也无法通过java代码获取该任务的counter信息；如果部署了JobHistoryServer那么在MR任务运行结束之后点击该链接就会自动跳转到jobhistory监控界面，如下图所示，也可以通过java代码获取到该任务的counter信息。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/5.png" alt></p>
+<h3 id="3-MapReduce默认Counter含义与使用"><a href="#3-MapReduce默认Counter含义与使用" class="headerlink" title="3.MapReduce默认Counter含义与使用"></a>3.MapReduce默认Counter含义与使用</h3><h4 id="3-1-默认Counter含义"><a href="#3-1-默认Counter含义" class="headerlink" title="3.1 默认Counter含义"></a>3.1 默认Counter含义</h4><p>hadoop的yarn监控平台和jobhistory监控平台都为用户提供了counter监控窗口用于观察mapreduce job运行期间的各种细节数据，在对mapreduce任务进行性能调优工作时通常也是基于这些counter的数值表现来评估是否优化。</p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/6.png" alt></p>
+<p>counter有group的概念，用于表示逻辑上相同范围的所有数值。</p>
+<p><strong>FileSystemCounters</strong></p>
+<p>mapreduce job运行时需要与本地磁盘、hdfs等不同的文件系统进行数据IO，这个group用于表示job与这些文件系统的IO统计。</p>
+<ol>
+<li><p><code>FILE_BYTES_READ</code>表示job读取本地文件系统的总字节数。<strong>如果map的输入数据都来自hdfs系统，那么map阶段的该counter数值应该是0。但是reduce的输入数据都是从map输出文件中拉取经过shuffle和merge后存储在reduce节点本地磁盘中的，所以无论如何reduce阶段该counter数值就是reduce的输入数据总字节数。</strong></p>
+</li>
+<li><p><code>FILE_BYTES_WRITTEN</code>表示job写到本地文件系统的总字节数。<strong>了解了mapreduce运行流程之后就知道，map在运行过程中会将从环形内存缓冲区溢出的数据spill到本地磁盘中，并在map计算结束时将多个小spill文件合并成大的spill文件，如下图中的步骤9，所以map阶段的该counter数值就是map task往本地磁盘中溢出写的数据总字节数。reduce端在shuffle时会不断根据key从map生成的spill文件中拉取对应分区数据，再做merge并spill写到自己的本地磁盘，如下图中的步骤13，所以reduce阶段的该counter数值就是shuffle阶段往本地本地磁盘写的数据总字节数。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/7.png" alt></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/8.png" alt></p>
+</li>
+<li><p><code>HDFS_BYTES_READ</code>表示job从hdfs系统中读取的总字节数。<strong>只有map task运行时，才会从hdfs中读取数据，这些数据不限于源文件内容，还包括所有map的split信息元数据，所以这个counter数值会比FileInputFormatCounters.BYTES_READ数值要略大一些。</strong></p>
+</li>
+<li><p><code>HDFS_BYTES_WRITTEN</code>表示job写入hdfs系统中的总字节数。reduce task的计算结果最终都会写入hdfs系统，也就是一个job执行结果的总数据量。</p>
+</li>
+</ol>
+<p><strong>ShuffleErrors</strong></p>
+<p>该group用于表述shuffle过程中各种错误情况的发生次数，基本就是reduce端的copy线程从map端的spill文件中抓取分区数据时的各种错误。</p>
+<ol>
+<li><code>BAD_ID</code>每个map task的TA都会有一个id，如attempt_201109020150_0254_m_000000_0，如果reduce端的copy线程抓取过来的元数据中的TA id不是这种标准格式，那么此counter数值+1。</li>
+<li><code>CONNECTION</code>表示reduce端的copy线程建立到map端的连接有误数量。</li>
+<li><code>IO_ERROR</code>表示reduce端的copy线程在抓取map端数据时出现IOException的数量。</li>
+<li><code>WRONG_LENGTH</code>map端存储的spill中间文件是经过压缩的有格式数据，所以它有两个length信息，原数据长度和压缩后数据长度，如果这两个length信息传输有误，那么此counter值增加。</li>
+<li><code>WRONG_MAP</code>每个copy线程都是有明确目的的，为某个reduce端抓取某个map端数据，如果抓取的map端不是之前定义好的map端，则此counter值增加。</li>
+<li><code>WRONG_reduce</code>与上一个counter类似，copy线程抓取的数据不是为之前定义好的reduce端准备的，则此cunter值增加。</li>
+</ol>
+<p><strong>JobCounters</strong></p>
+<p>该group与job调度有关。</p>
+<p><strong>Map-ReduceFramework</strong></p>
+<p>该group包含了很多的job执行细节数据。</p>
+<ol>
+<li><code>Combine input records</code><strong>combine是mapreduce计算过程中的一个可选步骤，在maptask阶段的最后可以选择进行一轮combine操作，如上图中的步骤11，本质就是为每个map task的输出文件现在本地进行一次局部的reduce，用于降低shuffle过程中的网络传输数据大小。</strong>该counter表示job的combine阶段的数据输入条数，与map的输出条数是一致的。</li>
+<li><code>Combine output records</code><strong>combiner按照相同key进行聚合之后，在map端就自己解决了很多重复数据，该counter表示combine阶段的数据输出条数，也表示最终在map端spill中间文件中的数据总条数。</strong></li>
+<li><code>Failed Shuffles</code>表示copy线程在抓取map端数据过程中，因为网络链接异常或是IO异常导致的shuffle错误次数。</li>
+<li><code>GC time elapsed(ms)</code>表示所有执行map task和reduce task的JVM总共的GC时间消耗。</li>
+<li><code>Map input records</code>表示map阶段从hdfs系统读取的数据总行数。</li>
+<li><code>Map output records</code>表示map阶段直接输出的数据总行数，就是map方法中调用context.write的次数，也是未经过Combine时的原生输出条数。</li>
+<li><code>Map output bytes</code>map方法的输出结果都会以kv的形式序列化到环形内存缓冲区中，这里的bytes值序列化后的最终字节之和。</li>
+<li><code>Merged Map outputs</code><strong>表示在shuffle过程中总共经历了多少次merge动作。如果未开启combine操作那么map阶段的merge次数肯定是0。</strong></li>
+<li><code>Reduce input groups</code><strong>此处的group表示经过按相同key进行merge聚合之后的一条数据，该counter表示reduce阶段读取的总group数量。</strong></li>
+<li><code>Reduce input records</code><strong>表示reduce端从map端spill文件获取的总数据条数，如果开启了combine该数值就等于Combine output records数值，如果没开启就等于Map output records数值。</strong></li>
+<li><code>Reduce output records</code>表示reduce执行后输出的数据总条数。</li>
+<li><code>Reduce shuffle bytes</code>表示reduce端的copy线程总共从map端抓取的中间数据总字节数。</li>
+<li><code>Shuffled Maps</code><strong>一个reduce端从一个map端拉取中间数据，则该counter+1。如果所有reduce都读取了所有map端，那么该counter的总数等于reduce number * map number。</strong></li>
+<li><code>Spilled Records</code><strong>spill过程在map端和reduce端都会发生，该counter统计了这两个阶段从内存往磁盘中spill的数据总条数。</strong></li>
+<li><code>SPLIT_RAW_BYTES</code>与map端的split相关元数据都会存储在hdfs系统中，该counter表示这部分额外信息的字节大小。</li>
+</ol>
+<p><strong>FileInputFormatCounters</strong></p>
+<ol>
+<li><code>BYTES_READ</code>表示所有map task或者reduce task的所有输入数据的总字节数。</li>
+</ol>
+<h4 id="3-2-自定义Counter"><a href="#3-2-自定义Counter" class="headerlink" title="3.2 自定义Counter"></a>3.2 自定义Counter</h4><p>在MR程序开发过程中，除了默认的counter信息之外，还需要我们通过自定义的counter对分布式计算过程进行监控，获取一些特定的运行状态信息。以java程序开发为例，通常需要以下三个步骤：</p>
+<p>第一步：<strong>在map类或reduce类中创建一个自己的counter枚举类，类名和枚举值名没有特定规范。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">enum</span> FileRecorder&#123;</span><br><span class="line">    ErrorRecorder,</span><br><span class="line">    SrcRecorder,</span><br><span class="line">    DestRecorder</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二步：<strong>在map()或reduce()方法中需要进行统计的地方进行数值变更。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(NullWritable key, OrcStruct value, Context context)</span></span>&#123;</span><br><span class="line">		context.getCounter(FileRecorder.SrcRecorder).increment(<span class="number">1</span>);</span><br><span class="line">  	<span class="keyword">if</span>(values.getRowKey().length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    	context.getCounter(FileRecorder.DestRecorder).increment(<span class="number">1</span>);</span><br><span class="line">  	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    	context.getCounter(FileRecorder.ErrorRecorder).increment(<span class="number">1</span>);</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第三步：<strong>在job运行完成之后获取对应统计信息，用于打印或者校验等。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> sourceCount = job.getCounters().findCounter(BulkLoadMapper.FileRecorder.SrcRecorder).getValue();</span><br><span class="line"><span class="keyword">long</span> destCount = job.getCounters().findCounter(BulkLoadMapper.FileRecorder.DestRecorder).getValue();</span><br></pre></td></tr></table></figure>
+
+<p><strong>在MR应用程序自定义了counter之后，该MR程序运行的yarn监控平台和jobhistory监控平台上也会加上自定义的counter，方便用户直接查看，如下图所示。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/9.png" alt></p>
+<h3 id="4-Bulkload任务获取counter问题处理实例"><a href="#4-Bulkload任务获取counter问题处理实例" class="headerlink" title="4.Bulkload任务获取counter问题处理实例"></a>4.Bulkload任务获取counter问题处理实例</h3><h4 id="4-1-背景"><a href="#4-1-背景" class="headerlink" title="4.1 背景"></a>4.1 背景</h4><p><strong>bulkload任务间歇性失败报错，查看报错日志如下，是在MR任务和load数据到hbase都完成之后报的错。</strong></p>
+<p><strong>报错日志：</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/10.png" alt></p>
+<p><strong>正常执行日志：</strong></p>
+<p><img src="//littleforestjia.github.io/2022/12/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HiveSQL%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92%E4%B8%8EJobHistory%E6%97%A5%E5%BF%97/11.png" alt></p>
+<p><strong>结合正常执行日志和报错日志可以看出，在任务运行完毕之后执行的<code>job.getCounters()</code>代码逻辑，是先去从代理客户端节点(也就是AM)获取counter信息，发现任务已经成功之后，重定向到jobhistoryserver去获取counter信息。那么报错发生的原因就是从jobhistoryserver中获取counter时没有找到对应job。</strong></p>
+<h4 id="4-2-原因分析"><a href="#4-2-原因分析" class="headerlink" title="4.2 原因分析"></a>4.2 原因分析</h4><p><strong>拉hadoop平台侧研发人员一起分析，从报错日志中首先找非依赖jar包中我们自己写的MR程序代码，因为这种报错一般是由我们自己写的代码引起的，我们也知道自己代码的逻辑。从报错日志中，先定位到是我们自己的BulkLoadDriver类中的getCounters方法报错了。进一步分析日志，原因是任务完成-&gt;jobhistory日志归档之间是有时差的，报Unknown Job的原因是获取任务counter时，任务已经完成，但是JH还没完成归档，导致的JH没有对应job信息。</strong></p>
+<p><strong>上文中我们提到过job日志要经过两次迁移，先从yarn目录到history/done_intermediate目录，再到history/done目录。日志至少要已经完成落到history/done_intermediate目录，才可以被查询到。任务结束与日志迁移是异步进行的，当hdfs集群较为繁忙时日志迁移就会比较慢，并不会由于迁移状态没完成而影响AM的正常结束流程，平台侧也没有办法帮我们改变这个规则。</strong></p>
+<h4 id="4-3-问题解决"><a href="#4-3-问题解决" class="headerlink" title="4.3 问题解决"></a>4.3 问题解决</h4><p>打印自定义counter信息的这段代码的作用只是打印信息写入日志，并不影响MR任务主流程和bulkload数据流程，所以直接给这段代码加上try/catch捕捉异常代码，让该异常不影响主流程的正常结束，也算是一种降级处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">  	sourceCount = job.getCounters().findCounter(BulkLoadMapper.FileRecorder.SrcRecorder).getValue();</span><br><span class="line">  	destCount = job.getCounters().findCounter(BulkLoadMapper.FileRecorder.DestRecorder).getValue();</span><br><span class="line">&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://blog.csdn.net/sinat_23030553/article/details/115010212" target="_blank" rel="noopener">hive stage job等划分</a></p>
+<p><a href="https://paxinla.github.io/posts/2020/12/hive-ru-he-hua-fen-stage.html" target="_blank" rel="noopener">hive如何划分stage</a></p>
+<p><a href="https://www.cnblogs.com/itlz/p/16038088.html" target="_blank" rel="noopener">详解HiveSQL执行计划</a></p>
+<p><a href="https://cloud.tencent.com/developer/article/1115832" target="_blank" rel="noopener">hadoop2.0作业日志收集原理</a></p>
+<p><a href="https://www.cnblogs.com/shenh062326/archive/2012/12/16/HistoryServer.html" target="_blank" rel="noopener">HistoryServer原理详解</a></p>
+<p><a href="https://www.cnblogs.com/xuxm2007/archive/2012/06/15/2551030.html" target="_blank" rel="noopener">默认counter的含义与使用</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hive/" rel="tag"><i class="fa fa-tag"></i> Hive</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/11/25/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84/" rel="next" title="数据开发之离线计算_Spark运行架构">
+                <i class="fa fa-chevron-left"></i> 数据开发之离线计算_Spark运行架构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/12/09/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Hive%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/" rel="prev" title="数据开发之离线计算_Hive数据倾斜解决方法">
+                数据开发之离线计算_Hive数据倾斜解决方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之离线计算-HiveSQL执行计划与JobHistory日志"><span class="nav-number">1.</span> <span class="nav-text">数据开发之离线计算_HiveSQL执行计划与JobHistory日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-HiveSQL执行计划与Stage划分"><span class="nav-number">1.1.</span> <span class="nav-text">1.HiveSQL执行计划与Stage划分</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-Hive划分Stage原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 Hive划分Stage原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Explain执行计划"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 Explain执行计划</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-定位HiveSQL中产生数据倾斜的代码段"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 定位HiveSQL中产生数据倾斜的代码段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-MapReduce日志搜集原理"><span class="nav-number">1.2.</span> <span class="nav-text">2.MapReduce日志搜集原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-MapReduce日志类型"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 MapReduce日志类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Job日志生产流程"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 Job日志生产流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-Task日志生产流程"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Task日志生产流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-JobHistoryServer服务"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 JobHistoryServer服务</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-MapReduce默认Counter含义与使用"><span class="nav-number">1.3.</span> <span class="nav-text">3.MapReduce默认Counter含义与使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-默认Counter含义"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 默认Counter含义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-自定义Counter"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 自定义Counter</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Bulkload任务获取counter问题处理实例"><span class="nav-number">1.4.</span> <span class="nav-text">4.Bulkload任务获取counter问题处理实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-背景"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-原因分析"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 原因分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-问题解决"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 问题解决</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.5.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

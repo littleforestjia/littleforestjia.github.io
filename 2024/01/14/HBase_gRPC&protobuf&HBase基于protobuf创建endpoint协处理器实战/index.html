@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,protobuf,Coprocessors,协处理器,RPC,gRPC,endpoint," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_gRPC&amp;protobuf&amp;HBase基于protobuf创建endpoint协处理器实战1.RPC1.1 RPC简介RPC，全称为Remote Procedure Call，即远程过程调用，它是一个计算机通信协议。它允许像调用本地服务一样调用远程服务。另外RPC是与语言无关的。 rpc框架做的最重要的一件事情就是封装，调用者和被调用者的通讯细节，客户端代理负责将调用方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_gRPC&amp;protobuf&amp;HBase基于protobuf创建endpoint协处理器实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_gRPC&amp;protobuf&amp;HBase基于protobuf创建endpoint协处理器实战1.RPC1.1 RPC简介RPC，全称为Remote Procedure Call，即远程过程调用，它是一个计算机通信协议。它允许像调用本地服务一样调用远程服务。另外RPC是与语言无关的。 rpc框架做的最重要的一件事情就是封装，调用者和被调用者的通讯细节，客户端代理负责将调用方">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/8.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/5.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/6.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/7.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/9.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/10.jpg">
+<meta property="article:published_time" content="2024-01-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:40:07.528Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="protobuf">
+<meta property="article:tag" content="Coprocessors">
+<meta property="article:tag" content="协处理器">
+<meta property="article:tag" content="RPC">
+<meta property="article:tag" content="gRPC">
+<meta property="article:tag" content="endpoint">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战/"/>
+
+
+
+
+
+  <title>HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-14T00:00:00+08:00">
+                2024-01-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-gRPC-amp-protobuf-amp-HBase基于protobuf创建endpoint协处理器实战"><a href="#HBase-gRPC-amp-protobuf-amp-HBase基于protobuf创建endpoint协处理器实战" class="headerlink" title="HBase_gRPC&amp;protobuf&amp;HBase基于protobuf创建endpoint协处理器实战"></a>HBase_gRPC&amp;protobuf&amp;HBase基于protobuf创建endpoint协处理器实战</h1><h3 id="1-RPC"><a href="#1-RPC" class="headerlink" title="1.RPC"></a>1.RPC</h3><h4 id="1-1-RPC简介"><a href="#1-1-RPC简介" class="headerlink" title="1.1 RPC简介"></a>1.1 RPC简介</h4><p>RPC，全称为Remote Procedure Call，即远程过程调用，它是一个计算机通信协议。它允许像调用本地服务一样调用远程服务。另外RPC是与语言无关的。</p>
+<p>rpc框架做的最重要的一件事情就是封装，调用者和被调用者的通讯细节，客户端代理负责将调用方法的方法名、参数、返回值包等信息根据通信协议组织成报文发送给服务端，服务端解析报文，根据客户端传递的信息执行对应的方法，然后将返回值按照协议组织成报文发送给客户端，客户端再解析出来。</p>
+<h4 id="1-2-RPC框架的实现"><a href="#1-2-RPC框架的实现" class="headerlink" title="1.2 RPC框架的实现"></a>1.2 RPC框架的实现</h4><p>RPC能够让本地应用简单、高效地调用服务器中的方法，它主要应用在分布式系统，要实现一个RPC框架，主要需要考虑以下四个技术的实现：</p>
+<p>1）通信模型：假设通信的为A机器与B机器，它们之间要有通信模型，在Java中一般基于BIO或NIO；</p>
+<p>2）服务定位：使用给定的通信方式与确定的IP和端口及方法名称，路由到具体的服务和方法；</p>
+<p>3）远程代理对象：本地调用的方法(服务)其实是远程方法的本地代理，因此需要一个远程代理对象，对于Java而言，远程代理对象可以使用Java的动态对象实现，封装了调用远程方法调用；</p>
+<p>4）序列化：将对象名称、方法名称、参数等对象信息进行网络传输需要转换成二进制传输，需要序列化技术方案，如protobuf，Arvo等。</p>
+<h4 id="1-3-Socket通信模型"><a href="#1-3-Socket通信模型" class="headerlink" title="1.3 Socket通信模型"></a>1.3 Socket通信模型</h4><p>Socket(套接字)用来描述IP地址和端口，是通信链的句柄，应用程序可以通过Socket向网络发送请求或者应答网络请求。Socket是支持TCP/IP协议的网络通信基本操作但愿，包含了进行网络通信所必须的五种信息：连接协议、本地主机IP、本地主机端口、远程主机IP、远程主机端口。</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/1.jpg" alt></p>
+<p>首先回顾下计算机网络的五(七)层协议：物理层、数据链路层、网络层、传输层、(会话层、表示层)和应用层。那么从协议上来讲，TCP是传输层协议，主要解决数据如何在网络中传输；HTTP是应用层协议，主要解决如何包装数据（文本信息），是建立在tcp协议之上的应用。</p>
+<p>TCP协议是以二进制数据流的形式解决传输层的事儿，但对上层的应用开发极不友好。Socket是针对TCP或UDP的具体接口实现，提供了在传输层进行网络编程的方法。而HTTP是一种特定的应用层协议，它使用TCP作为传输层协议，通过Socket来实现数据的传输，可以说Socket是HTTP的基础，而HTTP则是在Socket之上的一种具体应用。</p>
+<p>所以RPC跟HTTP不是对立面，也不是同等级，RPC和HTTP的关系只可能是包含关系。RPC可以使用HTTP作为通讯协议，也可以使用其他传输协议。</p>
+<h4 id="1-4-gRPC与Dubbo"><a href="#1-4-gRPC与Dubbo" class="headerlink" title="1.4 gRPC与Dubbo"></a>1.4 gRPC与Dubbo</h4><p>gRPC与Dubbo都是基于RPC思想实现的远程过程调用框架，两者在实现上的差异如下：</p>
+<p>1）通讯协议：gRPC基于Http2.0；Dubbo基于定义TCP。</p>
+<p>2）序列化协议：gRPC使用protocol buffer；Dubbo使用hession2等基于java对象的序列化技术，且它的序列化方式可以自行扩展。</p>
+<p>3）服务注册与发现：gRPC是应用级别的服务注册；Dubbo2.0及之前的版本都是基于更细力度的服务来进行注册，3.0之后转向应用级别的服务注册。</p>
+<p>4）编程语言：gRPC可以使用任何语言编写，Http和Protocol buffer天然就是跨语言的；Dubbo只能使用在构建在JVM之上的语言。</p>
+<p>5）服务治理：gRPC自身的治理能力很弱，只能基于Http连接维度进行容错；Dubbo可以基于服务维度进行治理。</p>
+<p>两者各有优缺点，gRPC的优势在于跨语言、跨平台，但服务治理能力弱；Dubbo服务治理能力强，但是受编程语言限制无法跨编程语言使用。</p>
+<h4 id="1-5-用Java实现简单RPC"><a href="#1-5-用Java实现简单RPC" class="headerlink" title="1.5 用Java实现简单RPC"></a>1.5 用Java实现简单RPC</h4><p>下面使用比较原始的方案实现RPC框架，采用基于BIO的Socket实现通信与服务定位、采用java动态代理与反射实现远程代理，采用Java原生序列化实现序列化。RPC服务架构主要分为三个部分：</p>
+<p>1）服务提供者：运行在服务器端，提供服务接口定义与服务实现类。</p>
+<p>2）服务中心：运行在服务器端，负责将本地服务发布成远程服务提供给服务消费者使用，监听客户端调用。</p>
+<p>3）服务消费者：运行在客户端，通过远程代理对象调用远程服务。</p>
+<p><strong>1.服务提供者接口定义与实现：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HelloService</span> </span>&#123; </span><br><span class="line">  <span class="function">String <span class="title">sayHi</span><span class="params">(String name)</span></span>; </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloServiceImpl</span> <span class="keyword">implements</span> <span class="title">HelloService</span> </span>&#123; </span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">sayHi</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Hi, "</span> + name;</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.服务中心接口定义与实现：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Server</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span></span>; </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>; </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Class serviceInterface, Class impl)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isRunning</span><span class="params">()</span></span>; </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPort</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceCenter</span> <span class="keyword">implements</span> <span class="title">Server</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> HashMap&lt;String, Class&gt; serviceRegistry = <span class="keyword">new</span> HashMap&lt;String, Class&gt;();</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> isRunning = <span class="keyword">false</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> port;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ServiceCenter</span><span class="params">(<span class="keyword">int</span> port)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.port = port;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    isRunning = <span class="keyword">false</span>;</span><br><span class="line">    executor.shutdown();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    ServerSocket server = <span class="keyword">new</span> ServerSocket();</span><br><span class="line">    server.bind(<span class="keyword">new</span> InetSocketAddress(port));</span><br><span class="line">    System.out.println(<span class="string">"start server"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="comment">// 1.监听客户端的TCP连接，接到TCP连接后将其封装成task，由线程池执行</span></span><br><span class="line">        executor.execute(<span class="keyword">new</span> ServiceTask(server.accept()));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      server.close();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Class serviceInterface, Class impl)</span> </span>&#123;</span><br><span class="line">    serviceRegistry.put(serviceInterface.getName(), impl);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isRunning</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> isRunning;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getPort</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> port;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    Socket clent = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ServiceTask</span><span class="params">(Socket client)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.clent = client;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      ObjectInputStream input = <span class="keyword">null</span>;</span><br><span class="line">      ObjectOutputStream output = <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 2.将客户端发送的码流反序列化成对象，反射调用服务实现者，获取执行结果</span></span><br><span class="line">        input = <span class="keyword">new</span> ObjectInputStream(clent.getInputStream());</span><br><span class="line">        String serviceName = input.readUTF();</span><br><span class="line">        String methodName = input.readUTF();</span><br><span class="line">        Class&lt;?&gt;[] parameterTypes = (Class&lt;?&gt;[]) input.readObject();</span><br><span class="line">        Object[] arguments = (Object[]) input.readObject();</span><br><span class="line">        Class serviceClass = serviceRegistry.get(serviceName);</span><br><span class="line">        <span class="keyword">if</span> (serviceClass == <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(serviceName + <span class="string">" not found"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Method method = serviceClass.getMethod(methodName, parameterTypes);</span><br><span class="line">        Object result = method.invoke(serviceClass.newInstance(), arguments);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 3.将执行结果反序列化，通过socket发送给客户端</span></span><br><span class="line">        output = <span class="keyword">new</span> ObjectOutputStream(clent.getOutputStream());</span><br><span class="line">        output.writeObject(result);</span><br><span class="line">        </span><br><span class="line">      &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (output != <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">            output.close();</span><br><span class="line">          &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (input != <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">            input.close();</span><br><span class="line">          &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (clent != <span class="keyword">null</span>) &#123;</span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">            clent.close();</span><br><span class="line">          &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.客户端的远程代理对象：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RPCClient</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">getRemoteProxyObj</span><span class="params">(<span class="keyword">final</span> Class&lt;?&gt; serviceInterface, <span class="keyword">final</span> InetSocketAddress addr)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 1.将本地的接口调用转换成JDK的动态代理，在动态代理中实现接口的远程调用</span></span><br><span class="line">    <span class="keyword">return</span> (T) Proxy.newProxyInstance(serviceInterface.getClassLoader(), <span class="keyword">new</span> Class&lt;?&gt;[]&#123;serviceInterface&#125;, <span class="keyword">new</span> InvocationHandler() &#123;</span><br><span class="line">          <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">            Socket socket = <span class="keyword">null</span>;</span><br><span class="line">            ObjectOutputStream output = <span class="keyword">null</span>;</span><br><span class="line">            ObjectInputStream input = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">              <span class="comment">// 2.创建Socket客户端，根据指定地址连接远程服务提供者</span></span><br><span class="line">              socket = <span class="keyword">new</span> Socket();</span><br><span class="line">              socket.connect(addr);</span><br><span class="line"></span><br><span class="line">              <span class="comment">// 3.将远程服务调用所需的接口类、方法名、参数列表等编码后发送给服务提供者</span></span><br><span class="line">              output = <span class="keyword">new</span> ObjectOutputStream(socket.getOutputStream());</span><br><span class="line">              output.writeUTF(serviceInterface.getName());</span><br><span class="line">              output.writeUTF(method.getName());</span><br><span class="line">              output.writeObject(method.getParameterTypes());</span><br><span class="line">              output.writeObject(args);</span><br><span class="line"></span><br><span class="line">              <span class="comment">// 4.同步阻塞等待服务器返回应答，获取应答后返回</span></span><br><span class="line">              input = <span class="keyword">new</span> ObjectInputStream(socket.getInputStream());</span><br><span class="line">              <span class="keyword">return</span> input.readObject();</span><br><span class="line">              </span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">              <span class="keyword">if</span> (socket != <span class="keyword">null</span>) socket.close();</span><br><span class="line">              <span class="keyword">if</span> (output != <span class="keyword">null</span>) output.close();</span><br><span class="line">              <span class="keyword">if</span> (input != <span class="keyword">null</span>) input.close();</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.调用测试：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RPCTest</span> </span>&#123; </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          Server serviceServer = <span class="keyword">new</span> ServiceCenter(<span class="number">8088</span>);</span><br><span class="line">          serviceServer.register(HelloService<span class="class">.<span class="keyword">class</span>, <span class="title">HelloServiceImpl</span>.<span class="title">class</span>)</span>;</span><br><span class="line">          serviceServer.start();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">    HelloService service = RPCClient.getRemoteProxyObj(HelloService.class, new InetSocketAddress("localhost", 8088));</span><br><span class="line">    System.out.println(service.sayHi(<span class="string">"test"</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里实现的简单RPC框架是使用Java语言开发，与Java语言高度耦合，并且通信方式采用的Socket是基于BIO实现的，IO效率不高，还有Java原生的序列化机制占内存太多，运行效率也不高，可以考虑从以下几个方面进行改进：</p>
+<p>1）可以使用NIO或直接使用Netty替代BIO实现；</p>
+<p>2）服务注册可以使用Zookeeper进行管理，能够让应用更加稳定。</p>
+<p>3）可以采用基于JSON协议进行序列化的数据传输，也可以使用Hadoop Avro与Google protobuf等开源序列化机制。</p>
+<h3 id="2-protobuf"><a href="#2-protobuf" class="headerlink" title="2.protobuf"></a>2.protobuf</h3><h4 id="2-1-protobuf简介"><a href="#2-1-protobuf简介" class="headerlink" title="2.1 protobuf简介"></a>2.1 protobuf简介</h4><p>Protocol Buffers，是Google公司开发的一种数据描述语言，类似于xml、json能够将结构化数据序列化，可用于数据存储、通信协议等方面，它不依赖于语言和平台且可扩展性极强。</p>
+<p>json一般用于web项目中，因为浏览器对于json数据支持非常好，有很多内建的函数支持；xml在webservice中应用最为广泛，但是相比于json，它的数据更加冗余，因为需要成对的闭合标签；protobuf是谷歌开源的一种数据格式，适合高性能，对响应速度有要求的数据传输场景，profobuf本身是二进制数据格式，需要编码和解码，数据本身不具有可读性，因此只能反序列化之后得到真正可读的数据。相比于xml和json，profobuf序列化后数据文件很小，解析速度快，生成了更容易在编程中使用的数据访问。</p>
+<p>但是protobuf与xml和json并不是完全等同的层级，将protobuf、xml、json三者放到一起去比较，应该区分两个维度：数据结构化、数据序列化。数据结构化主要面向开发或业务层面，数据序列化面向通信或存储层面，数据结构化侧重人类可读性甚至有时会强调语义表达能力，而数据序列化侧重效率和压缩。</p>
+<p>xml作为一种扩展标记语言，json作为源于js的数据格式，都具有数据结构化的能力，尽可能保证其人类可读以便开发人员进行编辑，这就是面向业务或开发层面的数据结构化。json和xml同样也可以直接被用来数据序列化，例如直接采用json和xml进行网络通信传输，此时json和xml就成了一种序列化格式，它发挥了数据序列化的能力。但是实际将json和xml直接作为数据序列化通常并不是最优选择，因为它们在速度、效率、空间上并不是最优，它们更适合数据结构化而非数据序列化。</p>
+<p>同样的protobuf也具有数据结构化的能力，其实也就是message定义，我们能够在 .proto文件中，通过message、import、内嵌message等语法来定义数据结构化规则，但是很容易能够看出，protobuf在数据结构化方面和json和xml相差较大，人类可读性较差。但是如果从数据序列化的角度会发现protobuf有着明显的优势，效率、速度、空间几乎全面占优。</p>
+<h4 id="2-2-java简单实现protobuf实战"><a href="#2-2-java简单实现protobuf实战" class="headerlink" title="2.2 java简单实现protobuf实战"></a>2.2 java简单实现protobuf实战</h4><p><strong>1.引入maven依赖</strong></p>
+<p><strong>引入相关依赖，注意这里的依赖版本需要与protoc编辑器一个版本，否则会导致根据.proto文件编辑出的bean文件报语法错误。</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--  protobuf 支持 Java 核心包--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.protobuf<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>protobuf-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.15.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--  proto 与 Json 互转会用到--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.protobuf<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>protobuf-java-util<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.15.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2.编写.proto文件</strong></p>
+<p>.proto其实就是对数据结构的定义，必须按照该结构存储的数据才能够进行序列化和反序列化，如下编写一个demo.proto文件：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//生成 proto 文件所在包路径</span></span><br><span class="line"><span class="keyword">package</span> com.wxw.notes.protobuf.proto;</span><br><span class="line"><span class="comment">//生成 proto 文件所在包路径</span></span><br><span class="line"><span class="keyword">option</span> java_package = <span class="string">"com.wxw.notes.protobuf.proto"</span>;</span><br><span class="line"><span class="comment">//生成 proto 文件名</span></span><br><span class="line"><span class="keyword">option</span> java_outer_classname=<span class="string">"DemoProto"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">Demo</span></span>&#123;</span><br><span class="line">  <span class="comment">//自身属性</span></span><br><span class="line">  <span class="built_in">int32</span> id = <span class="number">1</span>;</span><br><span class="line">  <span class="built_in">string</span> code = <span class="number">2</span>;</span><br><span class="line">  <span class="built_in">string</span> name = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.编译.proto文件生产java类</strong></p>
+<p>编译器下载地址：<a href="https://github.com/protocolbuffers/protobuf/releases，根据依赖protobuf-java包的版本下载对应版本的编译器，下载后解压安装，使用如下查看版本命令检测是否安装成功：（亲测在window上安装和使用更加方便）" target="_blank" rel="noopener">https://github.com/protocolbuffers/protobuf/releases，根据依赖protobuf-java包的版本下载对应版本的编译器，下载后解压安装，使用如下查看版本命令检测是否安装成功：（亲测在window上安装和使用更加方便）</a></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protoc --version</span><br></pre></td></tr></table></figure>
+
+<p>安装成功后使用如下命令编译.proto文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protoc --java_out=. demo.proto</span><br></pre></td></tr></table></figure>
+
+<p>将生成后的.java文件放入项目目录中，生成文件如下：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/2.jpg" alt></p>
+<p><strong>4.protobuf序列化测试</strong></p>
+<p>基于生产结构化类创建数据对象，使用protobuf对其序列化和反序列化，并与json进行比较，相关代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleTestMain</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//初始化数据</span></span><br><span class="line">        DemoProto.Demo.Builder demo = DemoProto.Demo.newBuilder();</span><br><span class="line">        demo.setId(<span class="number">1</span>)</span><br><span class="line">                .setCode(<span class="string">"001"</span>)</span><br><span class="line">                .setName(<span class="string">"张三"</span>)</span><br><span class="line">                .build();</span><br><span class="line">                </span><br><span class="line">        <span class="comment">//构建结构化对象</span></span><br><span class="line">        DemoProto.Demo build = demo.build();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//序列化为字节数组</span></span><br><span class="line">        <span class="keyword">byte</span>[] s = build.toByteArray();</span><br><span class="line">        System.out.println(<span class="string">"protobuf数据bytes[]:"</span> + Arrays.toString(s));</span><br><span class="line">        System.out.println(<span class="string">"protobuf序列化大小: "</span> + s.length);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//反序列化为结构化对象</span></span><br><span class="line">        DemoProto.Demo demo1 = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            demo1 = DemoProto.Demo.parseFrom(s); </span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvalidProtocolBufferException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">      </span><br><span class="line">        <span class="comment">//结构化对象序列化为json字符串</span></span><br><span class="line">        String jsonStr = <span class="keyword">null</span>;</span><br><span class="line">        jsonStr = JsonFormat.printer().print(demo1);</span><br><span class="line">        System.out.println(<span class="string">"Json格式化结果:\n"</span> + jsonStr);</span><br><span class="line">        System.out.println(<span class="string">"Json格式化数据大小: "</span> + jsonStr.getBytes().length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>比较结果如下：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/3.jpg" alt></p>
+<h3 id="3-HBase的RPC架构"><a href="#3-HBase的RPC架构" class="headerlink" title="3.HBase的RPC架构"></a>3.HBase的RPC架构</h3><h4 id="3-1-HBase的RPC概述"><a href="#3-1-HBase的RPC概述" class="headerlink" title="3.1 HBase的RPC概述"></a>3.1 HBase的RPC概述</h4><p>作为一个分布式系统，hbase的设计是典型的master-salve架构。hbase中主要有master，regionserver，client这三个角色，这三个角色之间rpc的调用关系如下图：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/8.jpg" alt></p>
+<p><strong>client</strong></p>
+<p>hbase的client种类有很多，比方说：hbase shell， Java client API等，client只是RPC服务的调用方。</p>
+<p><strong>Master</strong></p>
+<p>master主要实现了MasterService和RegionServerStatus协议，作为RPC服务的提供方分别供Client和RegionServer调用。</p>
+<p>1）MasterService主要定义了获取集群状态，以及获取表的元信息，添加/删除列，assign region， enable/disable table，负载均衡等DML相关的一些服务。而Master提供了对这些服务的实现，并且供客户端去调用。</p>
+<p>2）RegionServerStatus主要定义了regionserver向master汇报集群状态，regionserver启动向master发送rpc请求等相关的服务，而master根据这些rpc请求信息，可以了解整个集群中regionserver的状态。</p>
+<p><strong>ReginServer</strong></p>
+<p>RegionServer主要实现了AdminService和ClientService协议，供client端调用。</p>
+<p>1）AmdinService主要定义了获取table Regin信息，操作region（Open，Flush，Split，Compact， Merge等）相关服务。</p>
+<p>2）ClientService主要定了get，add，delete，multi，Scan等相关的服务。</p>
+<p>注意：RegionServer却只提供了对client的Rpc服务，而没有提供对Master的rpc的服务。当Master想要向RegionServer发送请求时，比如master启动负载均衡时，需要让regionServer移动region时，是通过zookeeper实现的。因为当Master向RegionServer传递信息时，可能需要向多台reginserver传递信息，而通过zookeeper中的node简单变化主动通知regionserver更加方便快捷。</p>
+<h4 id="3-2-Client客户端"><a href="#3-2-Client客户端" class="headerlink" title="3.2 Client客户端"></a>3.2 Client客户端</h4><p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/4.jpg" alt></p>
+<p><strong>调度执行</strong></p>
+<p>该模块主要提供接口转换、错误重试、服务分组等能力：</p>
+<p>1）接口转换：服务层定义的服务接口与用户层的不同，比如put/delete/increment/append等操作底层都是调用的mutate接口；而batch相关的操作，无论是读还是写都调用multi接口。client调用call方法后，首先会把传入的参数封装成call对象（该对象包含方法名称，调用参数，连接地址等信息），client端有一个Map对象connections，缓存了连接信息。最后将所有信息封装为一个callable对象，交由RpcRetryingCaller处理。</p>
+<p>2）错误重试：RpcRetryingCaller负责与服务代理模块直接交互 ，以及错误时的重试；</p>
+<p>3）服务分组：batch相关的操作可能会涉及到多个rs，需要按照rs进行分组，然后多线程并发请求，这些逻辑是在AsyncProcess中；对于非batch类请求则直接使用RpcRetryingCaller进行调用，AsyncProcess的内部实际上也是依赖了该类来执行单个rs请求。</p>
+<p><strong>服务代理</strong></p>
+<p>服务代理通常叫stub，即桩的意思，其实现了与服务端同样的接口，对调度执行模块而言，调用stub的方法就相当于调用远程的服务，而不必关心实现细节。</p>
+<p>这部分依赖protobuf组件，通过在proto文件中定义service及message类型的参数，可直接生成接口和stub实现类。</p>
+<p>在ConnectionImplementation类中有一个Map类型的stubs变量，其key为service name + regionserver，value则是具体每个regionserver对应的stub实例。</p>
+<p><strong>通信模块</strong></p>
+<p>该模块主要进行序列化和io处理，目前HBase已采用netty作为底层的io框架，客户端的核心类为NettyRpcClient。</p>
+<p>序列化则是依赖protobuf组件，序列化与反序列化的逻辑都放在NettyRpcDuplexHandler中，该类注册在netty的pipeline，会基于不同的事件自动调用。</p>
+<h4 id="3-3-Server服务端"><a href="#3-3-Server服务端" class="headerlink" title="3.3 Server服务端"></a>3.3 Server服务端</h4><p><strong>通信模块</strong></p>
+<p>该模块主要负责数据的读取、反序列化并封装为call对象，核心实现类为NettyRpcServer，通过在pipeline中注册的一些handler来完成上述处理。call对象中的数据包括：请求的方法名、优先级、超时时间等总体描述，详情见RPC.proto文件中的RequestHeader；GetRequest、MutateRequest等所请求方法的参数，详情见Client.proto和HBase.proto文件中的相关定义。</p>
+<p><strong>调度执行</strong></p>
+<p>通信模块得到的call对象会交由rpcScheduler进行调度，目前默认实现为SimpleRpcScheduler。rpcScheduler的主要作用是根据请求类型把请求分配给不同的rpcExecutor实例，请求类型有3种：普通请求、高优先级请求和replication请求，而rpcExecutor的实现目前主要由RWQueueRpcExecutor和FastPathBalancedQueueRpcExecutor两种，不同的类型使用了不同实现，关系如下：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/5.jpg" alt></p>
+<p>RWQueueRpcExecutor的特点是内部可以对读写隔离，以及对get和scan隔离，所谓隔离的意思是，call对象会放入独立的callQueue，并使用独立的handler进行处理：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/6.jpg" alt></p>
+<p>FastPathBalancedQueueRpcExecutor不支持隔离，其特点是对于空闲的handler，让其自旋而不是阻塞，以减少线程上下文切换的消耗：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/7.jpg" alt></p>
+<p><strong>服务实现</strong></p>
+<p>服务端实现类需要实现一些接口，HMaster的服务实现类主要是MasterRpcServices，HRegionServer的服务实现类主要是RSRpcServices。service相关的类会在启动阶段进行初始化，然后在请求处理时根据connection的serviceName获取到对应的service实例，再根据call对象的method和param进行方法的调用。</p>
+<h3 id="4-HBase的Coprocessors编写实战"><a href="#4-HBase的Coprocessors编写实战" class="headerlink" title="4.HBase的Coprocessors编写实战"></a>4.HBase的Coprocessors编写实战</h3><h4 id="4-1-HBase的Coprocessors简介"><a href="#4-1-HBase的Coprocessors简介" class="headerlink" title="4.1 HBase的Coprocessors简介"></a>4.1 HBase的Coprocessors简介</h4><p>在使用hbase时，当数据量非常大，即使网络传输带宽允许，客户端的计算能力也未必能满足要求。协处理器Coprocessors就是为了解决该问题而出现的，它将写好的业务逻辑代码部署在服务端，在服务端执行客户端远程调用前后先执行预设的业务逻辑代码，这样极大地降低了需要传输地数据量，也降低了对客户端计算能力的要求。</p>
+<p>Coprocessors也可以帮助用户扩展实现原生HBase目前所不具备的功能，如权限校验、二级索引等。</p>
+<p>Coprocessors可以全局导入作用在某个hbase集群的所有表上，也可以设置单独作用在某一张指定的表上。</p>
+<p>Coprocessors主要有两类：</p>
+<p><strong>Observer</strong></p>
+<p>Observer就是最典型的AOP，当服务端发生某些事件时，这类协处理器会在事件发生前后被调用。常用来实现如下功能：</p>
+<p>1）权限校验：比如在执行get或put操作之前，编写preget或preput方法检查权限；</p>
+<p>2）完整性约束：hbase不支持像关系型数据库中那样的外键功能，可以通过Observer实现在插入或删除数据时，对其他表中的关联数据进行对应操作。</p>
+<p>3）二级索引：也可以借助Observer来实现二级索引，实际上就是在读和写之前添加一步寻址操作。</p>
+<p>目前hbase支持进行扩展的Observer协处理器主要有四种类型：</p>
+<p>1）RegionObserver：允许在region级别事件前后添加业务逻辑，例如get和put操作，具体可以在哪些事件前后添加业务逻辑详情见BaseRegionObserver类源码；</p>
+<p>2）RegionServerObserver：允许在regionserver级别事件前后添加业务逻辑，例如启动、停止、执行合并、提交、回滚等，详情见BaseRegionServerObserver源码；</p>
+<p>3）MasterObserver：允许在master级别事件前后添加业务逻辑，例如表的创建、删除、schema修改，详情见BaseMasterObserver源码；</p>
+<p>4）WalObserver：允许在WAL级别事件前后添加业务逻辑，详情见BaseWalObserver源码。</p>
+<p>上述四种Observer接口都继承自Coprocessors接口，这四个接口中定义了所有可以实现AOP的钩子方法，我们一般直接继承其Base实现类，重写必要的方法。</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/9.jpg" alt></p>
+<p><strong>Endpoint</strong></p>
+<p>Endpoint与Observer有很大的不同，实现形式也不是AOP形式的，要更加复杂一些。Endpoint代码需要实现CoprocessorService、Coprocessor这两个接口，然后部署在服务端。其中的业务逻辑主要是调用regionserver提供的数据操作接口来实现行数计算、最值计算等聚合计算操作。客户端可以通过rpc直接远程调用Endpoint方法返回结果。</p>
+<p>在我看来，Observer相当于AOP，可以在服务端数据操作接口前后添加业务逻辑；而Endpoint相当于直接创建新的服务端数据操作接口，可供客户端调用。</p>
+<h4 id="4-2-借助protobuf实现endpoint协处理器实战"><a href="#4-2-借助protobuf实现endpoint协处理器实战" class="headerlink" title="4.2 借助protobuf实现endpoint协处理器实战"></a>4.2 借助protobuf实现endpoint协处理器实战</h4><p><strong>1.编写proto协议文件</strong></p>
+<p>本次实战实现的是获取最大值的endpoint协处理器，编写getmax.proto协议文件如下：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">option</span> java_package = <span class="string">"com.jd.rtc.proto"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">option</span> java_outer_classname = <span class="string">"GetMaxProto"</span>;</span><br><span class="line"><span class="keyword">option</span> java_generic_services = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">maxRequest</span> </span>&#123;</span><br><span class="line">    <span class="keyword">required</span> <span class="built_in">string</span> family = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">required</span> <span class="built_in">string</span> column = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">message</span> <span class="title">maxResponse</span> </span>&#123;</span><br><span class="line">    <span class="keyword">required</span> <span class="built_in">double</span> max = <span class="number">1</span> [default = <span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">service</span> <span class="title">maxService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">rpc</span> getmax(maxRequest)</span></span><br><span class="line"><span class="function">    <span class="keyword">returns</span> (maxResponse)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>2.使用protoc编译proto协议文件</strong></p>
+<p>由于使用的是hbase1.1.6版本，适配的protobuf是2.5.0版本，那么我们需要找到对应的protoc编译器版本。在mac上直接使用homebrow只能下载安装最新版本的protoc，我只能从github上下载2.5.0的protoc包并进行本地安装了。然后使用上文中的protoc编译命令得到如下适配protobuf2.5.0的java类文件：</p>
+<p><img src="//littleforestjia.github.io/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/10.jpg" alt></p>
+<p><strong>3.实现协处理器server类</strong></p>
+<p>创建协处理器server类继承protobuf的服务类GetMaxProto.maxService，并实现HBase的协处理器接口Coprocessor和CoprocessorService，这个server实现类就是需要打包到jar包中并安装到HBase的regionserver上去的endpoint具体操作类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetMaxServer</span> <span class="keyword">extends</span> <span class="title">GetMaxProto</span>.<span class="title">maxService</span> <span class="keyword">implements</span> <span class="title">Coprocessor</span>, <span class="title">CoprocessorService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> Logger LOG = Logger.getLogger(GetMaxServer<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RegionCoprocessorEnvironment env;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(CoprocessorEnvironment env)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (env <span class="keyword">instanceof</span> RegionCoprocessorEnvironment) &#123;</span><br><span class="line">            <span class="keyword">this</span>.env = (RegionCoprocessorEnvironment) env;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> CoprocessorException(<span class="string">"Must be loaded on a table region!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">(CoprocessorEnvironment coprocessorEnvironment)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Service <span class="title">getService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getmax</span><span class="params">(RpcController controller, GetMaxProto.maxRequest request, RpcCallback&lt;GetMaxProto.maxResponse&gt; done)</span> </span>&#123;</span><br><span class="line">        String family = request.getFamily();</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">""</span>.equals(family)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"you need specify the family"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        String column = request.getColumn();</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">""</span>.equals(column)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(<span class="string">"you need specify the column"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置扫描对象</span></span><br><span class="line">        scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 定义变量</span></span><br><span class="line">        GetMaxProto.maxResponse response = <span class="keyword">null</span>;</span><br><span class="line">        InternalScanner scanner = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 扫描每个region，取值后求和</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            scanner = env.getRegion().getScanner(scan);</span><br><span class="line">            List&lt;Cell&gt; results = <span class="keyword">new</span> ArrayList&lt;Cell&gt;();</span><br><span class="line">            <span class="keyword">boolean</span> hasMore = <span class="keyword">false</span>;</span><br><span class="line">            Double max = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">do</span> &#123;</span><br><span class="line">                hasMore = scanner.next(results);</span><br><span class="line">                <span class="comment">//for (Cell cell : results) &#123;</span></span><br><span class="line">                <span class="keyword">if</span> (results.isEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                Cell kv = results.get(<span class="number">0</span>);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Double temp = Double.parseDouble(<span class="keyword">new</span> String(CellUtil.cloneValue(kv)));</span><br><span class="line">                    max = max != <span class="keyword">null</span> &amp;&amp; (temp == <span class="keyword">null</span> || compare(temp, max) &lt;= <span class="number">0</span>) ? max : temp;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                results.clear();</span><br><span class="line">                <span class="comment">//sum += Long.parseLong(new String(CellUtil.cloneValue(cell)));</span></span><br><span class="line"></span><br><span class="line">                <span class="comment">//results.clear();</span></span><br><span class="line">            &#125; <span class="keyword">while</span> (hasMore);</span><br><span class="line">            <span class="comment">// 设置返回结果</span></span><br><span class="line">            response = GetMaxProto.maxResponse.newBuilder().setMax((max !=<span class="keyword">null</span> ? max.doubleValue():Double.MAX_VALUE)).build();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            ResponseConverter.setControllerException(controller, e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (scanner != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    scanner.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    <span class="comment">//e.printStackTrace();</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将rpc结果返回给客户端</span></span><br><span class="line">        done.run(response);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Double l1, Double l2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (l1 == <span class="keyword">null</span> ^ l2 == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> l1 == <span class="keyword">null</span> ? -<span class="number">1</span> : <span class="number">1</span>; <span class="comment">// either of one is null.</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (l1 == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// both are null</span></span><br><span class="line">        <span class="keyword">return</span> l1.compareTo(l2); <span class="comment">// natural ordering.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.打包和安装jar包</strong></p>
+<p>配置好对应的maven依赖，HBase等依赖包的版本与服务的版本必须适配，将上述协处理器打包成jar包。将jar包上传到HBase集群所在hdfs目录，并使用协处理器安装命令对指定表进行协处理器安装。</p>
+<p>协处理器安装命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter &quot;fellowshell&quot;, method &#x3D;&gt; &quot;table_att&quot;, &quot;coprocessor&quot; &#x3D;&gt; &quot;hdfs:&#x2F;&#x2F;localhost:9005&#x2F;hbase&#x2F;coprocess&#x2F;coprocessor_test-1.0-SNAPSHOT.jar|com.jd.rtc.coprocess.GetMaxServer|&quot;</span><br></pre></td></tr></table></figure>
+
+<p>协处理器卸载命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter &quot;fellowshell&quot;, METHOD &#x3D;&gt; &quot;table_att_unset&quot;, NAME &#x3D;&gt; &quot;coprocessor$1&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>5.编写client测试请求逻辑</strong></p>
+<p>创建封装请求参数的call实现类，并编写多个regionserver返回值的merge操作，对于getmax方法的merge操作就是再比较取最大值：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetMaxTest</span> </span>&#123;</span><br><span class="line">    <span class="comment">//设置参数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TABLE_NAME = <span class="string">"test2"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String FAMILY = <span class="string">"f1"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String COLUMN = <span class="string">"PBRL"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span>[] STRAT_KEY = Bytes.toBytes(<span class="string">"00"</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span>[] END_KEY = Bytes.toBytes(<span class="string">"ff"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 配置HBse</span></span><br><span class="line">        Configuration conf = HBaseConfiguration.create();</span><br><span class="line">        conf.set(<span class="string">"hbase.zookeeper.quorum"</span>, <span class="string">"linux3,linux4,linux5"</span>);</span><br><span class="line">        conf.set(<span class="string">"hbase.zookeeper.property.clientPort"</span>, <span class="string">"2181"</span>);</span><br><span class="line">        conf.setLong(<span class="string">"hbase.rpc.timeout"</span>, <span class="number">600000</span>);</span><br><span class="line">        System.setProperty(<span class="string">"hadoop.home.dir"</span>, <span class="string">"F:/ruanjian/hadoop-2.6.0-cdh5.14.0"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 建立一个连接</span></span><br><span class="line">        Connection conn = ConnectionFactory.createConnection(conf);</span><br><span class="line">        <span class="comment">// 获取表</span></span><br><span class="line">        HTable table = (HTable) conn.getTable(TableName.valueOf(TABLE_NAME));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置请求对象</span></span><br><span class="line">        <span class="keyword">final</span> GetMaxProto.maxRequest request = GetMaxProto.maxRequest.newBuilder().setFamily(FAMILY).setColumn(COLUMN).build();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 获得返回值</span></span><br><span class="line">            Map&lt;<span class="keyword">byte</span>[], Double&gt; result = table.coprocessorService(GetMaxProto.maxService<span class="class">.<span class="keyword">class</span>, <span class="title">STRAT_KEY</span>,  <span class="title">END_KEY</span>,</span></span><br><span class="line"><span class="class">                    <span class="title">new</span> <span class="title">Batch</span>.<span class="title">Call</span>&lt;<span class="title">GetMaxProto</span>.<span class="title">maxService</span>, <span class="title">Double</span>&gt;() </span>&#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="function"><span class="keyword">public</span> Double <span class="title">call</span><span class="params">(GetMaxProto.maxService maxService)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                            BlockingRpcCallback&lt;GetMaxProto.maxResponse&gt; rpcCallback = <span class="keyword">new</span> BlockingRpcCallback&lt;GetMaxProto.maxResponse&gt;();</span><br><span class="line">                            maxService.getmax(<span class="keyword">null</span>, request, rpcCallback);</span><br><span class="line">                            GetMaxProto.maxResponse response = rpcCallback.get();</span><br><span class="line">                            <span class="keyword">return</span> response.getMax();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">            Double max = <span class="keyword">null</span>;</span><br><span class="line">            <span class="comment">// 将返回值进行迭代相加</span></span><br><span class="line">            <span class="keyword">for</span> (Double temp : result.values()) &#123;</span><br><span class="line">                max = max != <span class="keyword">null</span> &amp;&amp; (temp == <span class="keyword">null</span> || compare(temp, max) &lt;= <span class="number">0</span>) ? max : temp;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 结果输出</span></span><br><span class="line">            System.out.println(<span class="string">"max: "</span> + max);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (ServiceException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        table.close();</span><br><span class="line">        conn.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(Double l1, Double l2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (l1 == <span class="keyword">null</span> ^ l2 == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> l1 == <span class="keyword">null</span> ? -<span class="number">1</span> : <span class="number">1</span>; <span class="comment">// either of one is null.</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (l1 == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// both are null</span></span><br><span class="line">        <span class="keyword">return</span> l1.compareTo(l2); <span class="comment">// natural ordering.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://wiki.eclipse.org/Tutorial:_Using_Google_RPC/ProtocolBuffers_for_Remote_Services" target="_blank" rel="noopener">简单实现gPRC案例Tutorial: Using Google RPC/ProtocolBuffers for Remote Services</a></p>
+<p><a href="https://developer.aliyun.com/article/772997?spm=a2c6h.12873639.article-detail.60.2e095d1dwYo8KS" target="_blank" rel="noopener">HBase rpc框架介绍</a></p>
+<p><a href="https://www.cnblogs.com/superhedantou/p/6476421.html" target="_blank" rel="noopener">hbase rpc这点事 </a></p>
+<p><a href="https://blog.csdn.net/weixin_42045791/article/details/89576983" target="_blank" rel="noopener">hbase协处理器endpoint示例（求最值）</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/protobuf/" rel="tag"><i class="fa fa-tag"></i> protobuf</a>
+          
+            <a href="/tags/Coprocessors/" rel="tag"><i class="fa fa-tag"></i> Coprocessors</a>
+          
+            <a href="/tags/%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i> 协处理器</a>
+          
+            <a href="/tags/RPC/" rel="tag"><i class="fa fa-tag"></i> RPC</a>
+          
+            <a href="/tags/gRPC/" rel="tag"><i class="fa fa-tag"></i> gRPC</a>
+          
+            <a href="/tags/endpoint/" rel="tag"><i class="fa fa-tag"></i> endpoint</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/13/Java%E6%9C%8D%E5%8A%A1_git%E5%91%BD%E4%BB%A4%E5%90%88%E5%B9%B6%E6%88%96%E5%88%A0%E9%99%A4%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/" rel="next" title="Java服务_git命令合并或删除提交记录">
+                <i class="fa fa-chevron-left"></i> Java服务_git命令合并或删除提交记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/15/HBase_Spark_Connector%E5%BC%80%E6%BA%90%E4%BB%A3%E7%A0%81%E9%80%82%E9%85%8D%E8%87%AA%E5%AE%9A%E4%B9%89timestamp%E5%92%8CcellTTL%E5%8A%9F%E8%83%BD/" rel="prev" title="HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能">
+                HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-gRPC-amp-protobuf-amp-HBase基于protobuf创建endpoint协处理器实战"><span class="nav-number">1.</span> <span class="nav-text">HBase_gRPC&amp;protobuf&amp;HBase基于protobuf创建endpoint协处理器实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-RPC"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.RPC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-RPC简介"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">1.1 RPC简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-RPC框架的实现"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">1.2 RPC框架的实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-Socket通信模型"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">1.3 Socket通信模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-gRPC与Dubbo"><span class="nav-number">1.0.1.4.</span> <span class="nav-text">1.4 gRPC与Dubbo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-用Java实现简单RPC"><span class="nav-number">1.0.1.5.</span> <span class="nav-text">1.5 用Java实现简单RPC</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-protobuf"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.protobuf</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-protobuf简介"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 protobuf简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-java简单实现protobuf实战"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 java简单实现protobuf实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-HBase的RPC架构"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.HBase的RPC架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-HBase的RPC概述"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">3.1 HBase的RPC概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Client客户端"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">3.2 Client客户端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-Server服务端"><span class="nav-number">1.0.3.3.</span> <span class="nav-text">3.3 Server服务端</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-HBase的Coprocessors编写实战"><span class="nav-number">1.0.4.</span> <span class="nav-text">4.HBase的Coprocessors编写实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-HBase的Coprocessors简介"><span class="nav-number">1.0.4.1.</span> <span class="nav-text">4.1 HBase的Coprocessors简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-借助protobuf实现endpoint协处理器实战"><span class="nav-number">1.0.4.2.</span> <span class="nav-text">4.2 借助protobuf实现endpoint协处理器实战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.0.5.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

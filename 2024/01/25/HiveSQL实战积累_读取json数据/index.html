@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HiveSQL,JSON," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HiveSQL实战积累_读取json数据我们进行ETL（Extract-Transfer-Load）过程中，经常会遇到从不同数据源获取的不同格式的数据，其中某些字段就是json格式字符串，里面拼接了很多字段key和指标值value。 1. get_json_objectget_json_object(string json_string, string path)方法的第一个参数填写字符串类型js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HiveSQL实战积累_读取json数据">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/25/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E8%AF%BB%E5%8F%96json%E6%95%B0%E6%8D%AE/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HiveSQL实战积累_读取json数据我们进行ETL（Extract-Transfer-Load）过程中，经常会遇到从不同数据源获取的不同格式的数据，其中某些字段就是json格式字符串，里面拼接了很多字段key和指标值value。 1. get_json_objectget_json_object(string json_string, string path)方法的第一个参数填写字符串类型js">
+<meta property="article:published_time" content="2024-01-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:42:41.417Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HiveSQL">
+<meta property="article:tag" content="JSON">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/25/HiveSQL实战积累_读取json数据/"/>
+
+
+
+
+
+  <title>HiveSQL实战积累_读取json数据 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/25/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E8%AF%BB%E5%8F%96json%E6%95%B0%E6%8D%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HiveSQL实战积累_读取json数据</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-25T00:00:00+08:00">
+                2024-01-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">HiveSQL实战积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HiveSQL实战积累-读取json数据"><a href="#HiveSQL实战积累-读取json数据" class="headerlink" title="HiveSQL实战积累_读取json数据"></a>HiveSQL实战积累_读取json数据</h2><p>我们进行ETL（Extract-Transfer-Load）过程中，经常会遇到从不同数据源获取的不同格式的数据，其中某些字段就是json格式字符串，里面拼接了很多字段key和指标值value。</p>
+<h3 id="1-get-json-object"><a href="#1-get-json-object" class="headerlink" title="1. get_json_object"></a>1. get_json_object</h3><p>get_json_object(string json_string, string path)方法的第一个参数填写字符串类型json对象变量，第二个参数使用<code>$</code>表示json变量标识，然后用<code>.</code> 或<code>[]</code>读取对象或数组，<strong><code>.</code>和<code>[]</code>可以相互嵌套</strong>。每次只能返回一个数据项，如果输入的json字符串无效，那么返回NULL。</p>
+<p>案例1:获取单层值</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> get_json_object(<span class="string">'&#123;"name":"大郎","sex":"男","age":25&#125;'</span>,<span class="string">'$.name'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 结果为：大郎</span></span><br></pre></td></tr></table></figure>
+
+<p>案例2:获取多层值</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> get_json_object(<span class="string">'&#123;"name":"大郎","sex":"男","age":25,"score":&#123;"math":30&#125;&#125;'</span>,<span class="string">'$.score.math'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 结果为：30</span></span><br></pre></td></tr></table></figure>
+
+<p>案例3:获取数组中json对象</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> get_json_object(<span class="string">'[&#123;"name":"大郎","sex":"男","age":25&#125;,&#123;"name":"西门庆","sex":"男","age":47&#125;]'</span>,<span class="string">"$[1]"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 结果为：&#123;"name":"西门庆","sex":"男","age":47&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>案例4:获取数组中json对象的属性</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> get_json_object(<span class="string">'[&#123;"name":"大郎","sex":"男","age":25&#125;,&#123;"name":"西门庆","sex":"男","age":47&#125;]'</span>,<span class="string">"$[1].name"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 结果为：西门庆</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-json-tuple"><a href="#2-json-tuple" class="headerlink" title="2.json_tuple"></a>2.json_tuple</h3><p> json_tuple(json_string, k1, k2 …)可以指定多个json数据中的key，返回对应的value。一次可以解析多个json字段，如果输入的json字符串无效，那么返回NULL。</p>
+<p>案例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> json_tuple(<span class="string">'&#123;"user_name":"chimchim","age":30,"sex":"woman"&#125;'</span>, <span class="string">'user_name'</span>, <span class="string">'age'</span>,<span class="string">'sex'</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-使用嵌套子查询-explode-regexp-replace-split-json-tuple-解析json数组"><a href="#3-使用嵌套子查询-explode-regexp-replace-split-json-tuple-解析json数组" class="headerlink" title="3.使用嵌套子查询(explode+regexp_replace+split+json_tuple)解析json数组"></a>3.使用嵌套子查询(explode+regexp_replace+split+json_tuple)解析json数组</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> json_tuple(<span class="keyword">json</span>, <span class="string">'user_name'</span>, <span class="string">'age'</span>, <span class="string">'sex'</span>)</span><br><span class="line"><span class="keyword">from</span> (</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">explode</span>( <span class="comment">--将json数组中的元素解析出来，转化为每行显示</span></span><br><span class="line"><span class="keyword">split</span>(regexp_replace(regexp_replace(</span><br><span class="line"><span class="string">'[&#123;"user_name":"chimchim","age":30,"sex":"woman"&#125;,&#123;"user_name":"zonzon","age":2,"sex":"man"&#125;]'</span> <span class="comment">--要解析的json内容</span></span><br><span class="line">, <span class="string">'\\[|\\]'</span>, <span class="string">''</span>)           <span class="comment">--将json数组两边的中括号去掉</span></span><br><span class="line">,<span class="string">'\\&#125;\\,\\&#123;'</span>, <span class="string">'\\&#125;\\;\\&#123;'</span>) <span class="comment">--将json数组元素之间的逗号换成分号</span></span><br><span class="line">, <span class="string">'\\;'</span>))                  <span class="comment">--以分号作为分隔符(split函数以分号作为分隔)</span></span><br><span class="line"><span class="keyword">as</span> <span class="keyword">json</span>) o;</span><br></pre></td></tr></table></figure>
+
+<p><strong>explode()函数可以接收一个array或者map类型的数据作为输入，然后将array或map里面的元素按照每行的形式输出，即将hive一列中复杂的array或者map结构拆分成多行显示，也被称为单元格转行函数。</strong></p>
+<p><strong>lateral view用于和split、explode等UDTF一起使用的，能将一行数据拆分成多行数据，在此基础上可以对拆分的数据进行聚合，lateral view首先为原始表的每行调用UDTF，UDTF会把一行拆分成一行或者多行，lateral view在把结果组合，产生一个支持别名表的虚拟表。</strong></p>
+<p><strong>regexp_replace(string A, string B, string C)函数可以将字符串A中的符合java正则表达式B的部分替换为C。注意，在有些情况下要使用转义字符。</strong></p>
+<h3 id="4-解析服务日志使用案例"><a href="#4-解析服务日志使用案例" class="headerlink" title="4.解析服务日志使用案例"></a>4.解析服务日志使用案例</h3><p>解析数据服务日志，以此为基础分析请求命中的数据库、请求的引擎耗时等，用来支持数据加速。</p>
+<p>进入服务的原始请求日志参数结构，也就是<code>doFetchBizData invoke.</code>日志的params案例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"dataassetdrive"</span>: &#123;</span><br><span class="line">        <span class="attr">"uReqData"</span>: &#123;</span><br><span class="line">            <span class="attr">"header"</span>: &#123;</span><br><span class="line">                <span class="attr">"context"</span>: &#123;</span><br><span class="line">                    <span class="attr">"uuidUnique"</span>: <span class="string">"billionSeckillCms_BfqX3u"</span>,</span><br><span class="line">                    <span class="attr">"SERVICE_ID"</span>: <span class="string">"422"</span>,</span><br><span class="line">                    <span class="attr">"INDEX_FREQ"</span>: <span class="string">"REALTIME"</span>,</span><br><span class="line">                    <span class="attr">"RES_APPKEY"</span>: <span class="string">"billionSaleData"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"appkey"</span>: <span class="string">"seckillcms"</span>,</span><br><span class="line">                <span class="attr">"uuid"</span>: <span class="string">"billionSeckillCms"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"body"</span>: &#123;</span><br><span class="line">                <span class="attr">"criteria"</span>: &#123;</span><br><span class="line">                    <span class="attr">"orders"</span>: [],</span><br><span class="line">                    <span class="attr">"aliass"</span>: [],</span><br><span class="line">                    <span class="attr">"criterions"</span>: [</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="attr">"op"</span>: <span class="string">"&lt;="</span>,</span><br><span class="line">                            <span class="attr">"propertyName"</span>: <span class="string">"dt"</span>,</span><br><span class="line">                            <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">                            <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">                            <span class="attr">"value"</span>: <span class="string">"2023-07-31"</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="attr">"op"</span>: <span class="string">"&gt;="</span>,</span><br><span class="line">                            <span class="attr">"propertyName"</span>: <span class="string">"dt"</span>,</span><br><span class="line">                            <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">                            <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">                            <span class="attr">"value"</span>: <span class="string">"2023-07-29"</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="attr">"op"</span>: <span class="string">"&gt;="</span>,</span><br><span class="line">                            <span class="attr">"propertyName"</span>: <span class="string">"jdr_sch_ord_deal_tm"</span>,</span><br><span class="line">                            <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">                            <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">                            <span class="attr">"value"</span>: <span class="string">"2023-07-29 19:23:23"</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="attr">"op"</span>: <span class="string">"&lt;="</span>,</span><br><span class="line">                            <span class="attr">"propertyName"</span>: <span class="string">"jdr_sch_ord_deal_tm"</span>,</span><br><span class="line">                            <span class="attr">"clzType"</span>: <span class="string">"SimpleExpression"</span>,</span><br><span class="line">                            <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">                            <span class="attr">"value"</span>: <span class="string">"2023-07-31 19:23:23"</span></span><br><span class="line">                        &#125;,</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="attr">"op"</span>: <span class="string">"in"</span>,</span><br><span class="line">                            <span class="attr">"propertyName"</span>: <span class="string">"sku_id"</span>,</span><br><span class="line">                            <span class="attr">"values"</span>: [</span><br><span class="line">                                <span class="string">"10063266095130"</span>,</span><br><span class="line">                                <span class="string">"10063266095131"</span>,</span><br><span class="line">                                <span class="string">"10063266095132"</span>,</span><br><span class="line">                                <span class="string">"10063266095133"</span>,</span><br><span class="line">                                <span class="string">"10063266095134"</span>,</span><br><span class="line">                                <span class="string">"10063266095135"</span>,</span><br><span class="line">                                <span class="string">"10063266095136"</span>,</span><br><span class="line">                                <span class="string">"10063266095137"</span>,</span><br><span class="line">                                <span class="string">"10063266095138"</span>,</span><br><span class="line">                                <span class="string">"10063266095139"</span>,</span><br><span class="line">                                <span class="string">"10063266095140"</span>,</span><br><span class="line">                                <span class="string">"10063266095141"</span>,</span><br><span class="line">                                <span class="string">"10065860562725"</span>,</span><br><span class="line">                                <span class="string">"10065860562726"</span>,</span><br><span class="line">                                <span class="string">"10065860562727"</span>,</span><br><span class="line">                                <span class="string">"10065860562728"</span>,</span><br><span class="line">                                <span class="string">"10065860562729"</span>,</span><br><span class="line">                                <span class="string">"10065860562730"</span>,</span><br><span class="line">                                <span class="string">"10065860562742"</span>,</span><br><span class="line">                                <span class="string">"10065860562741"</span>,</span><br><span class="line">                                <span class="string">"10065860562740"</span>,</span><br><span class="line">                                <span class="string">"10065860562739"</span>,</span><br><span class="line">                                <span class="string">"10065860562738"</span>,</span><br><span class="line">                                <span class="string">"10065860562737"</span></span><br><span class="line">                            ],</span><br><span class="line">                            <span class="attr">"clzType"</span>: <span class="string">"InExpression"</span>,</span><br><span class="line">                            <span class="attr">"type"</span>: <span class="string">"string"</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    ],</span><br><span class="line">                    <span class="attr">"group"</span>: [</span><br><span class="line">                        <span class="string">"sku_id"</span></span><br><span class="line">                    ]</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"attributes"</span>: [</span><br><span class="line">                    <span class="string">"sku_id"</span></span><br><span class="line">                ],</span><br><span class="line">                <span class="attr">"indicators"</span>: [</span><br><span class="line">                    <span class="string">"jdr_sch_deal_ord_sku_piece_tenbillionsubsidy"</span></span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>请求命中easydata数据库并返回的日志参数结构，也就是<code>EasyDataExternalService success executeSql%</code>日志的params案例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"dataassetdrive"</span>: &#123;</span><br><span class="line">        <span class="attr">"apiName"</span>: <span class="string">"ck_pl_bp_ckpub22Query"</span>,</span><br><span class="line">        <span class="attr">"eTime"</span>: <span class="number">1690762422116</span>,</span><br><span class="line">        <span class="attr">"jsfAlias"</span>: <span class="string">"prod_l0_million_shop"</span>,</span><br><span class="line">        <span class="attr">"totalElements"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"number"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="attr">"size"</span>: <span class="number">100</span>,</span><br><span class="line">        <span class="attr">"numberOfElements"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"costTime"</span>: <span class="number">4</span>,</span><br><span class="line">        <span class="attr">"requestId"</span>: <span class="string">"352a8eba-a07b-42f8-9769-b39b71bbaa31"</span>,</span><br><span class="line">        <span class="attr">"apiGroupName"</span>: <span class="string">"one-service-driven"</span>,</span><br><span class="line">        <span class="attr">"totalPages"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"model"</span>: <span class="string">"page"</span>,</span><br><span class="line">        <span class="attr">"executeBO"</span>: &#123;</span><br><span class="line">            <span class="attr">"cluster"</span>: <span class="string">"LF1_CK_Pub_22"</span>,</span><br><span class="line">            <span class="attr">"clusterType"</span>: <span class="string">"ClickHouse"</span>,</span><br><span class="line">            <span class="attr">"apiName"</span>: <span class="string">"ck_pl_bp_ckpub22Query"</span>,</span><br><span class="line">            <span class="attr">"dbTable"</span>: <span class="string">"app_eco_sz_neg_ser_sum_dist"</span>,</span><br><span class="line">            <span class="attr">"firstResult"</span>: <span class="number">0</span>,</span><br><span class="line">            <span class="attr">"sql"</span>: <span class="string">"SELECT n  sum(t.leave_msg_qtty) service_order_asmt_leave_msg_qtty, n  sum(t.work_qtty) service_standard_task_ws_qtty, n  sum(t.work_intime_nodis_qtty) jdr_eco_apply_afs_shop_qtty_eco_ser_nodis_ws_neg, n  sum(t.consult_bad_qtty) service_order_oper_dis_satisfy_est_qtty, n  sum(t.human_3m_receive_qtty) jdr_eco_ask_cus_shop_qtty_eco_ser_3min_neg, n  sum(t.consult_very_bad_qtty) service_order_oper_highly_dis_satisfy_est_rate, n  sum(t.sam_afs_bad_qtty) dissatisfaction_est_qtty, n  sum(t.consult_qtty) service_order_asmt_consult_qtty, n  sum(t.sam_afs_very_bad_qtty) highly_dissatisfaction_est_qtty, n  sum(t.bef_complete_qtty) temp_complete_qtty nFROM service_board.app_eco_sz_neg_ser_sum_dist t -- 定义驱动 消极服务管控指标 nWHERE ( n  t.stat_ct_cd = 'day' n  AND t.dt &gt;= '2023-07-01' n  AND t.dt &lt;= '2023-07-31' n  AND (t.shop_id = '11681334') n)"</span>,</span><br><span class="line">            <span class="attr">"tableName"</span>: <span class="string">"消极服务管控指标"</span>,</span><br><span class="line">            <span class="attr">"existPre"</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"maxResults"</span>: <span class="number">100</span>,</span><br><span class="line">            <span class="attr">"apiGroupName"</span>: <span class="string">"one-service-driven"</span>,</span><br><span class="line">            <span class="attr">"logicTableId"</span>: <span class="number">1645</span>,</span><br><span class="line">            <span class="attr">"db"</span>: <span class="string">"service_board"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"sTime"</span>: <span class="number">1690762422112</span>,</span><br><span class="line">        <span class="attr">"status"</span>: <span class="number">200</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解析sql案例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	req.uuid,</span><br><span class="line">	req.traceid,</span><br><span class="line">	req.pin,</span><br><span class="line">	req.profile_name,</span><br><span class="line">	req.data_freq,</span><br><span class="line">	req.time_interval,</span><br><span class="line">	req.indicators,</span><br><span class="line">	req.criterions,</span><br><span class="line">	req.groups,</span><br><span class="line">	req.attributes,</span><br><span class="line">	req.orders,</span><br><span class="line">	<span class="keyword">CAST</span>(db.cost_time <span class="keyword">AS</span> <span class="built_in">bigint</span>) <span class="keyword">AS</span> cost_time,</span><br><span class="line">	db.message,</span><br><span class="line">	db.req_start_time,</span><br><span class="line">	db.req_end_time,</span><br><span class="line">	db.cluster_type,</span><br><span class="line">	db.cluster_name,</span><br><span class="line">	db.database_1,</span><br><span class="line">	db.table_1,</span><br><span class="line">	db.table_name,</span><br><span class="line">	db.data_form,</span><br><span class="line">	<span class="keyword">CAST</span>(db.logic_table_id <span class="keyword">AS</span> <span class="built_in">bigint</span>) <span class="keyword">AS</span> logic_table_id,</span><br><span class="line">	db.lvlcode,</span><br><span class="line">	<span class="string">''</span> <span class="keyword">AS</span> <span class="keyword">MODIFY</span>,</span><br><span class="line">	db.sql,</span><br><span class="line">	req.params,</span><br><span class="line">	db.params</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	(</span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			<span class="keyword">MAX</span>(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.body.indicators'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\"'</span>, <span class="string">''</span>)) <span class="keyword">AS</span> indicators,</span><br><span class="line">			<span class="keyword">MAX</span>(tab1.criterions_property_name) <span class="keyword">AS</span> criterions,</span><br><span class="line">			<span class="keyword">MAX</span>(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.body.criteria.group'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\"'</span>, <span class="string">''</span>)) <span class="keyword">AS</span> <span class="keyword">groups</span>,</span><br><span class="line">			<span class="keyword">MAX</span>(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.body.attributes'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\"'</span>, <span class="string">''</span>)) <span class="keyword">AS</span> <span class="keyword">attributes</span>,</span><br><span class="line">			<span class="keyword">MAX</span>(tab1.orders_property_name) <span class="keyword">AS</span> orders,</span><br><span class="line">			<span class="keyword">MAX</span>(time_interval) <span class="keyword">AS</span> time_interval,</span><br><span class="line">			<span class="keyword">MAX</span>(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.header.context.PIN'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\"'</span>, <span class="string">''</span>)) <span class="keyword">AS</span> pin,</span><br><span class="line">			<span class="keyword">MAX</span>(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.header.context.INDEX_FREQ'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\"'</span>, <span class="string">''</span>)) <span class="keyword">AS</span> data_freq,</span><br><span class="line">			tab1.params,</span><br><span class="line">			tab1.traceid,</span><br><span class="line">			tab1.uuid,</span><br><span class="line">			tab1.profilename <span class="keyword">AS</span> profile_name</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			(</span><br><span class="line">				<span class="keyword">SELECT</span></span><br><span class="line">					<span class="keyword">concat_ws</span>(<span class="string">','</span>, collect_set(GET_JSON_OBJECT(criterionsjson, <span class="string">'$.propertyName'</span>))) <span class="keyword">AS</span> criterions_property_name,</span><br><span class="line">					<span class="literal">NULL</span> <span class="keyword">AS</span> orders_property_name,</span><br><span class="line">					<span class="keyword">MAX</span>(</span><br><span class="line">						<span class="keyword">CASE</span></span><br><span class="line">							<span class="keyword">WHEN</span> GET_JSON_OBJECT(criterionsjson, <span class="string">'$.propertyName'</span>) = <span class="string">'time_interval'</span></span><br><span class="line">							<span class="keyword">THEN</span> GET_JSON_OBJECT(criterionsjson, <span class="string">'$.value'</span>)</span><br><span class="line">							<span class="keyword">ELSE</span> <span class="literal">NULL</span></span><br><span class="line">						<span class="keyword">END</span>) <span class="keyword">AS</span> time_interval,</span><br><span class="line">					params,</span><br><span class="line">					traceid,</span><br><span class="line">					<span class="keyword">uuid</span>,</span><br><span class="line">					profilename</span><br><span class="line">				<span class="keyword">FROM</span></span><br><span class="line">					fdm.fdm_jdr_plat_bdaa_service_log_prod_v1_log_i t <span class="keyword">lateral</span> <span class="keyword">VIEW</span> <span class="keyword">explode</span>(<span class="keyword">SPLIT</span>(REGEXP_REPLACE(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.body.criteria.criterions'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\s'</span>, <span class="string">''</span>), <span class="string">'\\\\\\&#125;,\\\\\\&#123;'</span>, <span class="string">'\\\\\\&#125;\\\\\\^\\\\\\&#123;'</span>), <span class="string">'\\\\\\^'</span>)) v <span class="keyword">AS</span> criterionsjson</span><br><span class="line">				<span class="keyword">WHERE</span></span><br><span class="line">					dt = <span class="string">'""" + ht.data_day_str + """'</span></span><br><span class="line">					<span class="keyword">AND</span> doctype <span class="keyword">IN</span>(<span class="string">'dataassetdrive'</span>)</span><br><span class="line">					<span class="keyword">AND</span> <span class="keyword">TRIM</span>(MESSAGE) = <span class="string">'doFetchBizData invoke.'</span></span><br><span class="line">				<span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">					params,</span><br><span class="line">					traceid,</span><br><span class="line">					<span class="keyword">uuid</span>,</span><br><span class="line">					profilename</span><br><span class="line">				</span><br><span class="line">				<span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line">				</span><br><span class="line">				<span class="keyword">SELECT</span></span><br><span class="line">					<span class="literal">NULL</span> <span class="keyword">AS</span> criterions_property_name,</span><br><span class="line">					<span class="keyword">concat_ws</span>(<span class="string">','</span>, collect_set(GET_JSON_OBJECT(ordersjson, <span class="string">'$.propertyName'</span>))) <span class="keyword">AS</span> orders_property_name,</span><br><span class="line">					<span class="literal">NULL</span> <span class="keyword">AS</span> time_interval,</span><br><span class="line">					params,</span><br><span class="line">					traceid,</span><br><span class="line">					<span class="keyword">uuid</span>,</span><br><span class="line">					profilename</span><br><span class="line">				<span class="keyword">FROM</span></span><br><span class="line">					fdm.fdm_jdr_plat_bdaa_service_log_prod_v1_log_i t <span class="keyword">lateral</span> <span class="keyword">VIEW</span> <span class="keyword">explode</span>(<span class="keyword">SPLIT</span>(REGEXP_REPLACE(REGEXP_REPLACE(GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.uReqData.body.criteria.orders'</span>), <span class="string">'^\\\\\\[|\\\\\\]$|\\\\\\s'</span>, <span class="string">''</span>), <span class="string">'\\\\\\&#125;,\\\\\\&#123;'</span>, <span class="string">'\\\\\\&#125;\\\\\\^\\\\\\&#123;'</span>), <span class="string">'\\\\\\^'</span>)) v <span class="keyword">AS</span> ordersjson</span><br><span class="line">				<span class="keyword">WHERE</span></span><br><span class="line">					dt = <span class="string">'""" + ht.data_day_str + """'</span></span><br><span class="line">					<span class="keyword">AND</span> doctype <span class="keyword">IN</span>(<span class="string">'dataassetdrive'</span>)</span><br><span class="line">					<span class="keyword">AND</span> <span class="keyword">TRIM</span>(MESSAGE) = <span class="string">'doFetchBizData invoke.'</span></span><br><span class="line">				<span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">					params,</span><br><span class="line">					traceid,</span><br><span class="line">					<span class="keyword">uuid</span>,</span><br><span class="line">					profilename</span><br><span class="line">			)</span><br><span class="line">			tab1</span><br><span class="line">		<span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">			tab1.params,</span><br><span class="line">			tab1.traceid,</span><br><span class="line">			tab1.uuid,</span><br><span class="line">			tab1.profilename</span><br><span class="line">	)</span><br><span class="line">	req</span><br><span class="line"><span class="keyword">LEFT</span> <span class="keyword">JOIN</span></span><br><span class="line">	(</span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			params,</span><br><span class="line">			<span class="keyword">uuid</span>,</span><br><span class="line">			traceid,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.costTime'</span>) <span class="keyword">AS</span> cost_time,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.sTime'</span>) <span class="keyword">AS</span> req_start_time,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.status'</span>) <span class="keyword">AS</span> MESSAGE,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.eTime'</span>) <span class="keyword">AS</span> req_end_time,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.cluster'</span>) <span class="keyword">AS</span> cluster_name,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.clusterType'</span>) <span class="keyword">AS</span> cluster_type,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.dbTable'</span>) <span class="keyword">AS</span> table_1,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.existPre'</span>) <span class="keyword">AS</span> data_form,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.logicTableId'</span>) <span class="keyword">AS</span> logic_table_id,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.db'</span>) <span class="keyword">AS</span> database_1,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.tableName'</span>) <span class="keyword">AS</span> table_name,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.sql'</span>) <span class="keyword">AS</span> <span class="keyword">SQL</span>,</span><br><span class="line">			GET_JSON_OBJECT(params, <span class="string">'$.dataassetdrive.executeBO.lvlCode'</span>) <span class="keyword">AS</span> lvlcode</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			fdm.fdm_jdr_plat_bdaa_service_log_prod_v1_log_i</span><br><span class="line">		<span class="keyword">WHERE</span></span><br><span class="line">			dt = <span class="string">'""" + ht.data_day_str + """'</span></span><br><span class="line">			<span class="keyword">AND</span> doctype <span class="keyword">IN</span>(<span class="string">'dataassetdrive'</span>)</span><br><span class="line">			<span class="keyword">AND</span> <span class="keyword">TRIM</span>(MESSAGE) <span class="keyword">LIKE</span> <span class="string">'EasyDataExternalService success executeSql%'</span></span><br><span class="line">	)</span><br><span class="line">	db</span><br><span class="line"><span class="keyword">ON</span></span><br><span class="line">	req.uuid = db.uuid</span><br><span class="line">	<span class="keyword">AND</span> req.traceid = db.traceid</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HiveSQL/" rel="tag"><i class="fa fa-tag"></i> HiveSQL</a>
+          
+            <a href="/tags/JSON/" rel="tag"><i class="fa fa-tag"></i> JSON</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/" rel="next" title="HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码">
+                <i class="fa fa-chevron-left"></i> HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/26/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_HiveSQL%E9%80%9A%E8%BF%87%E6%A8%AA%E5%90%91%E6%8B%86%E5%88%8610%E4%BB%BD%E7%BC%93%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E5%AE%9E%E6%88%98/" rel="prev" title="HiveSQL实战积累_HiveSQL通过横向拆分10份缓解数据倾斜实战">
+                HiveSQL实战积累_HiveSQL通过横向拆分10份缓解数据倾斜实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HiveSQL实战积累-读取json数据"><span class="nav-number">1.</span> <span class="nav-text">HiveSQL实战积累_读取json数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-get-json-object"><span class="nav-number">1.1.</span> <span class="nav-text">1. get_json_object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-json-tuple"><span class="nav-number">1.2.</span> <span class="nav-text">2.json_tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-使用嵌套子查询-explode-regexp-replace-split-json-tuple-解析json数组"><span class="nav-number">1.3.</span> <span class="nav-text">3.使用嵌套子查询(explode+regexp_replace+split+json_tuple)解析json数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-解析服务日志使用案例"><span class="nav-number">1.4.</span> <span class="nav-text">4.解析服务日志使用案例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

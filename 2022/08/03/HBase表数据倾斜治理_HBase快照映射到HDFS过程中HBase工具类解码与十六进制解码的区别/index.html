@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别1.背景在hbase倾斜治理过程中，将hbase快照数据的读取和bulkload分成两步，第一步读取hbase数据存储到hdfs系统的text文件中，第二步再读取hdfs系统的text文件数据bulkload到hbase中。 2.HBase内置编解码算法HBase内置的Bytes工具类中定义了对St">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/08/03/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E5%BF%AB%E7%85%A7%E6%98%A0%E5%B0%84%E5%88%B0HDFS%E8%BF%87%E7%A8%8B%E4%B8%ADHBase%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%A7%A3%E7%A0%81%E4%B8%8E%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%A7%A3%E7%A0%81%E7%9A%84%E5%8C%BA%E5%88%AB/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别1.背景在hbase倾斜治理过程中，将hbase快照数据的读取和bulkload分成两步，第一步读取hbase数据存储到hdfs系统的text文件中，第二步再读取hdfs系统的text文件数据bulkload到hbase中。 2.HBase内置编解码算法HBase内置的Bytes工具类中定义了对St">
+<meta property="article:published_time" content="2022-08-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:51:29.616Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/08/03/HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/08/03/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E5%BF%AB%E7%85%A7%E6%98%A0%E5%B0%84%E5%88%B0HDFS%E8%BF%87%E7%A8%8B%E4%B8%ADHBase%E5%B7%A5%E5%85%B7%E7%B1%BB%E8%A7%A3%E7%A0%81%E4%B8%8E%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E8%A7%A3%E7%A0%81%E7%9A%84%E5%8C%BA%E5%88%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-03T00:00:00+08:00">
+                2022-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别"><a href="#HBase表数据倾斜治理-HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别" class="headerlink" title="HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别"></a>HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别</h2><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>在hbase倾斜治理过程中，将hbase快照数据的读取和bulkload分成两步，第一步读取hbase数据存储到hdfs系统的text文件中，第二步再读取hdfs系统的text文件数据bulkload到hbase中。</p>
+<h3 id="2-HBase内置编解码算法"><a href="#2-HBase内置编解码算法" class="headerlink" title="2.HBase内置编解码算法"></a>2.HBase内置编解码算法</h3><p>HBase内置的Bytes工具类中定义了对String、boolean、double、float、int、long、short七种类型数据进行编解码的方法：</p>
+<ul>
+<li>String使用UTF-8算法进行编码</li>
+<li>boolean编码为长度为1的byte[]</li>
+<li>double编码为长度为8的byte[]</li>
+<li>float编码为长度为4的byte[]</li>
+<li>int编码为长度为4的byte[]</li>
+<li>long编码为长度为8的byte[]</li>
+<li>short编码为长度为2的byte[]</li>
+</ul>
+<h3 id="3-使用HBase内置算法解码"><a href="#3-使用HBase内置算法解码" class="headerlink" title="3.使用HBase内置算法解码"></a>3.使用HBase内置算法解码</h3><h4 id="3-1读取思路"><a href="#3-1读取思路" class="headerlink" title="3.1读取思路"></a>3.1读取思路</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetHbaseMapper</span> <span class="keyword">extends</span> <span class="title">TableMapper</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Text writeKey = <span class="keyword">new</span> Text();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.setup(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(ImmutableBytesWritable key, Result value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != value) &#123;</span><br><span class="line"></span><br><span class="line">            String res = <span class="string">""</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (Cell cell : value.listCells()) &#123;</span><br><span class="line">              	<span class="comment">//key和value都直接用Bytes.toString()方法进行解码。</span></span><br><span class="line">                String colName = Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength());</span><br><span class="line">                String colValue = Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()).replaceAll(<span class="string">"\\n|\\r|\\t|\1|\\\\N"</span>, <span class="string">" "</span>);</span><br><span class="line">                res += colName + <span class="string">":"</span>;</span><br><span class="line">                res += colValue + <span class="string">"\t"</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            writeKey.set(<span class="keyword">new</span> Text(Bytes.toString(key.get())));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//mapper输出中key和value之间的默认分隔符就是"\t"</span></span><br><span class="line">            context.write(writeKey, <span class="keyword">new</span> Text(res));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>mapper输出数据到Text文件中时key和value之间的默认分隔符就是”\t”。</li>
+<li>“\n”是换行符；”\t”是制表符，也就是Tab；”\r”是回车符；”\f”是换页符。</li>
+</ul>
+<p>写Text文件的思路就是key是行首，与value之间使用制表符分隔，每个value之间也是用制表符分隔。</p>
+<h4 id="3-2读取结果"><a href="#3-2读取结果" class="headerlink" title="3.2读取结果"></a>3.2读取结果</h4><p>读取结果Text文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">UV4�%	ChangeRate: 	ImpactIndex: 	OrdCustNum: �	OrdCustNumDaliyRate: ?�Y��C��	Value: 	</span><br><span class="line">UV4�%	ChangeRate: 	ImpactIndex: 	OrdCustNum: 	OrdCustNumDaliyRate: ��7&#123;S�.p	Value: 	</span><br><span class="line">UV4�%	ChangeRate: 	ImpactIndex: 	OrdCustNum:  �	OrdCustNumDaliyRate: ��~��E	Value: 	</span><br><span class="line">UV4�&amp;	ChangeRate: 	ImpactIndex: 	OrdCustNum: �	OrdCustNumDaliyRate: ?���iao2	Value: 	</span><br><span class="line">UV4�&amp;	ChangeRate: 	ImpactIndex: 	OrdCustNum:  	OrdCustNumDaliyRate: ���,#Or�	Value: 	</span><br><span class="line">UV4�&amp;	ChangeRate: 	ImpactIndex: 	OrdCustNum:  �	OrdCustNumDaliyRate: ��$���	Value: 	</span><br><span class="line">UV4�&#39;	ChangeRate: 	ImpactIndex: 	OrdCustNum: �	OrdCustNumDaliyRate: ?�s� O�	Value: 	</span><br><span class="line">UV4�&#39;	ChangeRate: 	ImpactIndex: 	OrdCustNum: </span><br><span class="line">                                                    	OrdCustNumDaliyRate: ��N\�q	Value: 	</span><br><span class="line">UV4�&#39;	ChangeRate: 	ImpactIndex: 	OrdCustNum:  �	OrdCustNumDaliyRate: ��K�ڌ�&#x3D;	Value: 	</span><br><span class="line">UV4�(	ChangeRate: 	ImpactIndex: 	OrdCustNum: K	OrdCustNumDaliyRate: ?���RG�	Value: 	</span><br><span class="line">UV4�(	ChangeRate: 	ImpactIndex: 	OrdCustNum: </span><br><span class="line">                                                    	OrdCustNumDaliyRate: ���q�r	Value: 	</span><br><span class="line">UV4�(	ChangeRate: 	ImpactIndex: 	OrdCustNum:  8	OrdCustNumDaliyRate: �����S	Value: 	</span><br><span class="line">OrdAmt4�%	ChangeRate: ?��x�c&#123;�	ImpactIndex: @P�^���@	OrdCustNum: �	OrdCustNumDaliyRate: ?�Y��C��	Value: AT�%&lt;(��	</span><br><span class="line">OrdAmt4�%	ChangeRate: ����ΐ	ImpactIndex: ��E&#123;</span><br><span class="line">                                                         D��	OrdCustNum: 	OrdCustNumDaliyRate: ��7&#123;S�.p	Value: @yy�����	</span><br><span class="line">OrdAmt4�%	ChangeRate: ?��7 EHE	ImpactIndex: @?�?�0�	OrdCustNum:  �	OrdCustNumDaliyRate: ��~��E	Value: A&#39;�]�&#x3D;p�	</span><br><span class="line">OrdAmt4�&amp;	ChangeRate: ?�[]�.�	ImpactIndex: @U&#125;��a�	OrdCustNum: �	OrdCustNumDaliyRate: ?���iao2	Value: AY�4��G�	</span><br><span class="line">OrdAmt4�&amp;	ChangeRate: ��u.</span><br><span class="line">                                ���	ImpactIndex: ����s�%	OrdCustNum:  	OrdCustNumDaliyRate: ���,#Or�	Value: @��fffff	</span><br><span class="line">OrdAmt4�&amp;	ChangeRate: ?�sD&#x3D;�&#x2F;	ImpactIndex: @+����|?	OrdCustNum:  �	OrdCustNumDaliyRate: ��$���	Value: A&amp;��p��</span><br><span class="line">                                                                                                                              	</span><br><span class="line">OrdAmt4�&#39;	ChangeRate: ?�HF0|f�	ImpactIndex: @UָH�eH	OrdCustNum: �	OrdCustNumDaliyRate: ?�s� O�	Value: A]�f-p��	</span><br><span class="line">OrdAmt4�&#39;	ChangeRate: �߿��2	ImpactIndex: ����+F�	OrdCustNum: </span><br><span class="line">                                                                            	OrdCustNumDaliyRate: ��N\�q	Value: @�</span><br><span class="line">                                                                                                                         33332</span><br></pre></td></tr></table></figure>
+
+<p><strong>可以看出每一行数据存在比较严重的乱码，甚至出现了乱码中存在换行符的情况，导致一行数据变成了两行。而我们还要将这个Text文件读取回写到hbase当中去，那么读取该Text文件时按照什么规则来分隔每行数据中的rowkey和每个value根本无法统一。而且之前读取hbase快照时将\n|\r|\t|\1|\N等转化为空格的逻辑也直接篡改了数据。</strong></p>
+<h4 id="3-3原因分析"><a href="#3-3原因分析" class="headerlink" title="3.3原因分析"></a>3.3原因分析</h4><p><strong>造成上述错误的根本原因就是，我们的预计算数据的rowkey和value中很多数据都是直接从int、long等非String类型编码成byte[]保存到hbase中。如果直接按String类型使用UTF-8算法来解码，一定会解码出很多具有其他特殊含义的特殊字符，导致解码出的数据无法按照我们预想的格式来存储。</strong></p>
+<p><strong>如果存储在hbase当中的rowkey和value都是String类型的，那么我们按照上述的解码方式得到的就是本身存储的可以看出意义的原数据，就不会出现无意义的乱码和特殊字符。包括解码出来的\n|\r|\t|\1|\N等分隔符号也是我们本来就想保存成这样，那么把它们替换成空格也不会影响原数据的意义。</strong></p>
+<p><strong>那么为什么我们存储预计算数据时将int、long类型数据直接编码，而不是转化成String类型再编码？第一点，当int、long类型数据较大或较长时直接编码为长度为4或8的byte[]可以节约存储；第二点，rowkey都由int、long等非String类型数据直接编码得到的byte[]组成可以实现长度固定，且使用scan进行范围搜索时非常准确，不会出现长度不一致导致的误拼接脏数据。</strong></p>
+<h4 id="3-4解决方案"><a href="#3-4解决方案" class="headerlink" title="3.4解决方案"></a>3.4解决方案</h4><p>思路一：</p>
+<p><strong>可以另外存储一份hbase表的元数据信息，保存rowkey和value的字段数据类型信息。在解析读取hbase快照时获取该表的元数据信息，针对每个不同数据类型的字段使用不同的方法进行解码，这样就可以还原出rowkey和value具有意义的原数据。</strong></p>
+<p>思路二：</p>
+<p><strong>反正我们本来也不是想把数据回写到Text文件中然后直接读该该Text文件中的数据，而是要再回写到hbase当中去，所以Text文件中的数据有没有意义也不重要，只要在回写到hbase时能够被正确分隔就行。那么可以使用十六进制字符串编码格式来对hbase快照中的数据进行解码，这样解码出来的rowkey和value就全都是0~f的字符，不会存在特殊分隔符号。</strong></p>
+<h3 id="4-使用十六进制解码"><a href="#4-使用十六进制解码" class="headerlink" title="4.使用十六进制解码"></a>4.使用十六进制解码</h3><h4 id="4-1读取思路"><a href="#4-1读取思路" class="headerlink" title="4.1读取思路"></a>4.1读取思路</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReverseRowkeyMapper</span> <span class="keyword">extends</span> <span class="title">TableMapper</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String firstRowkeyType;</span><br><span class="line">    <span class="keyword">private</span> Text writeKey = <span class="keyword">new</span> Text();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        Configuration configuration = context.getConfiguration();</span><br><span class="line">        firstRowkeyType = configuration.get(<span class="string">"first.rowkey.type"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(ImmutableBytesWritable key, Result value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != value) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">byte</span>[] rowkey = reverseFirstField(key.get(), firstRowkeyType);</span><br><span class="line">            String res = <span class="string">""</span>;</span><br><span class="line">            <span class="keyword">for</span> (Cell cell : value.listCells()) &#123;</span><br><span class="line">                String colName = Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength());</span><br><span class="line">                <span class="keyword">byte</span>[] colValue = <span class="keyword">new</span> <span class="keyword">byte</span>[cell.getValueLength()];</span><br><span class="line">                System.arraycopy(cell.getValueArray(), cell.getValueOffset(), colValue, <span class="number">0</span>, cell.getValueLength());</span><br><span class="line"></span><br><span class="line">                res += colName + <span class="string">":"</span>;</span><br><span class="line">              	<span class="comment">//16进制字符串格式解码value</span></span><br><span class="line">                res += StringHexUtils.bytesToHexString(colValue) + <span class="string">"\t"</span>;</span><br><span class="line">            &#125;</span><br><span class="line">						</span><br><span class="line">          	<span class="comment">//16进制字符串格式解码rowkey</span></span><br><span class="line">            writeKey.set(<span class="keyword">new</span> Text(StringHexUtils.bytesToHexString(rowkey)));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//mapper输出中key和value之间的默认分隔符就是"\t"</span></span><br><span class="line">            context.write(writeKey, <span class="keyword">new</span> Text(res));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//对组成rowkey的首个字段进行reverse。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] reverseFirstField(<span class="keyword">byte</span>[] rowkey, String firstRowkeyType) &#123;</span><br><span class="line">        <span class="keyword">int</span> firstFieldLenth = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(firstRowkeyType.toUpperCase().equals(<span class="string">"STRING"</span>))&#123;  <span class="comment">//string方式需要单独解析 暂时不实现</span></span><br><span class="line">            <span class="keyword">return</span> rowkey;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(firstRowkeyType.toUpperCase().equals(<span class="string">"INT"</span>))&#123;  <span class="comment">//暂时只处理int和long型</span></span><br><span class="line">            firstFieldLenth =<span class="number">4</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(firstRowkeyType.toUpperCase().equals(<span class="string">"LONG"</span>))&#123;</span><br><span class="line">            firstFieldLenth =<span class="number">8</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> rowkey;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] reverseField = <span class="keyword">new</span> <span class="keyword">byte</span>[firstFieldLenth];</span><br><span class="line">        System.arraycopy(rowkey, <span class="number">0</span>, reverseField, <span class="number">0</span>, firstFieldLenth);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (firstFieldLenth == <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> reverseInt = Integer.reverse(Bytes.toInt(reverseField));</span><br><span class="line">            reverseField = Bytes.toBytes(reverseInt);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">long</span> reverseLong = Long.reverse(Bytes.toLong(reverseField));</span><br><span class="line">            reverseField = Bytes.toBytes(reverseLong);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.arraycopy(reverseField, <span class="number">0</span>, rowkey, <span class="number">0</span>, firstFieldLenth);</span><br><span class="line">        <span class="keyword">return</span> rowkey;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>自定义的十六进制编解码算法：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringHexUtils</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 从字节数组到十六进制字符串转换</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> src</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 十六进制字符串</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">bytesToHexString</span><span class="params">(<span class="keyword">byte</span>[] src)</span> </span>&#123;</span><br><span class="line">        StringBuilder stringBuilder = <span class="keyword">new</span> StringBuilder(<span class="string">""</span>);</span><br><span class="line">        <span class="keyword">if</span> (src == <span class="keyword">null</span> || src.length &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; src.length; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> v = src[i] &amp; <span class="number">0xFF</span>;</span><br><span class="line">            String hv = Integer.toHexString(v);</span><br><span class="line">            <span class="keyword">if</span> (hv.length() &lt; <span class="number">2</span>) &#123;</span><br><span class="line">                <span class="comment">//byte数组转换成16进制字符串会补足两位自动在前面加0</span></span><br><span class="line">                stringBuilder.append(<span class="number">0</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            stringBuilder.append(hv);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stringBuilder.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 从十六进制字符串到字节数组转换</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> src</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] HexStringToBytes(String src) &#123;</span><br><span class="line">        src = src.length() % <span class="number">2</span> != <span class="number">0</span> ? <span class="string">"0"</span> + src : src;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] b = <span class="keyword">new</span> <span class="keyword">byte</span>[src.length() / <span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; b.length; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> index = i * <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">int</span> v = Integer.parseInt(src.substring(index, index + <span class="number">2</span>), <span class="number">16</span>);</span><br><span class="line">            b[i] = (<span class="keyword">byte</span>) v;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2读取结果"><a href="#4-2读取结果" class="headerlink" title="4.2读取结果"></a>4.2读取结果</h4><p>读取结果Text文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">19691900000000000000000255560000000001348b350000000100000001	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000100000002	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000100000003	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000100000004	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000100000005	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:00000001bff0000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000200000001	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000200000002	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000200000003	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000200000004	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b350000000200000005	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:00000001bff0000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b360000000100000001	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b360000000100000002	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b360000000100000003	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000	</span><br><span class="line">19691900000000000000000255560000000001348b360000000100000004	ChangeRate:000000010000000000000000	ImpactIndex:00000001000000000000000OrdCustNum:000000010000000000000000	OrdCustNumDaliyRate:000000010000000000000000	Value:000000010000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>可以看出非常整齐规律，回写到hbase时使用如下mapper即可正确读写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoadHbaseMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>, <span class="title">Text</span>, <span class="title">ImmutableBytesWritable</span>, <span class="title">Put</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ImmutableBytesWritable writeKey = <span class="keyword">new</span> ImmutableBytesWritable();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.setup(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != value) &#123;</span><br><span class="line">            String line = value.toString();</span><br><span class="line">            String[] items = line.split(<span class="string">"\t"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (items.length == <span class="number">0</span> || StringUtils.isBlank(items[<span class="number">0</span>].trim())) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">byte</span>[] rowkey = StringHexUtils.HexStringToBytes(items[<span class="number">0</span>]);</span><br><span class="line">                Put put = <span class="keyword">new</span> Put(rowkey);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; items.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line"></span><br><span class="line">                    put.addColumn(Bytes.toBytes(<span class="string">"d"</span>), Bytes.toBytes(items[i].split(<span class="string">":"</span>)[<span class="number">0</span>]), StringHexUtils.HexStringToBytes(items[i].split(<span class="string">":"</span>)[<span class="number">1</span>]));</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                writeKey.set(rowkey);</span><br><span class="line">                context.write(writeKey, put);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/27/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_Region%E5%88%87%E5%88%86%E7%AE%A1%E7%90%86%E4%B8%8E%E5%B9%B6%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%8D%95Region/" rel="next" title="HBase表数据倾斜治理_Region切分管理与并行读取单Region">
+                <i class="fa fa-chevron-left"></i> HBase表数据倾斜治理_Region切分管理与并行读取单Region
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/08/08/HBase_HBase%E5%88%A0%E6%95%B0%E7%AD%96%E7%95%A5%E6%80%BB%E7%BB%93/" rel="prev" title="HBase_HBase删数策略总结">
+                HBase_HBase删数策略总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理_HBase快照映射到HDFS过程中HBase工具类解码与十六进制解码的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-HBase内置编解码算法"><span class="nav-number">1.2.</span> <span class="nav-text">2.HBase内置编解码算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-使用HBase内置算法解码"><span class="nav-number">1.3.</span> <span class="nav-text">3.使用HBase内置算法解码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1读取思路"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1读取思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2读取结果"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2读取结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3原因分析"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3原因分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4解决方案"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-使用十六进制解码"><span class="nav-number">1.4.</span> <span class="nav-text">4.使用十六进制解码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1读取思路"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1读取思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2读取结果"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2读取结果</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

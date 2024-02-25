@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_行业模块ClickHouse明细数据上卷实战一、前置操作1.函数原理uniqState() uniqState(element)：该函数用于将传入的元素转化为去重中间聚合状态AggregateFunction state，就是将去重指标的字段元素以bitmap的形式存储起来，以便在此基础上再次进行聚合计算。一般输入就是string类型，输出就是AggregateFunctio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_行业模块ClickHouse明细数据上卷实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/21/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%98%8E%E7%BB%86%E6%95%B0%E6%8D%AE%E4%B8%8A%E5%8D%B7%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_行业模块ClickHouse明细数据上卷实战一、前置操作1.函数原理uniqState() uniqState(element)：该函数用于将传入的元素转化为去重中间聚合状态AggregateFunction state，就是将去重指标的字段元素以bitmap的形式存储起来，以便在此基础上再次进行聚合计算。一般输入就是string类型，输出就是AggregateFunctio">
+<meta property="article:published_time" content="2024-02-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:36:05.211Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/21/ClickHouse_行业模块ClickHouse明细数据上卷实战/"/>
+
+
+
+
+
+  <title>ClickHouse_行业模块ClickHouse明细数据上卷实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/21/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%98%8E%E7%BB%86%E6%95%B0%E6%8D%AE%E4%B8%8A%E5%8D%B7%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_行业模块ClickHouse明细数据上卷实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-21T00:00:00+08:00">
+                2024-02-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClickHouse-行业模块ClickHouse明细数据上卷实战"><a href="#ClickHouse-行业模块ClickHouse明细数据上卷实战" class="headerlink" title="ClickHouse_行业模块ClickHouse明细数据上卷实战"></a>ClickHouse_行业模块ClickHouse明细数据上卷实战</h1><h2 id="一、前置操作"><a href="#一、前置操作" class="headerlink" title="一、前置操作"></a>一、前置操作</h2><h3 id="1-函数原理"><a href="#1-函数原理" class="headerlink" title="1.函数原理"></a>1.函数原理</h3><p><strong>uniqState()</strong></p>
+<p>uniqState(element)：该函数用于将传入的元素转化为去重中间聚合状态AggregateFunction state，就是将去重指标的字段元素以bitmap的形式存储起来，以便在此基础上再次进行聚合计算。一般输入就是string类型，输出就是AggregateFunction中间态类型。</p>
+<p><strong>uniqMergeState()</strong></p>
+<p>uniqMergeState(states)：该函数用于将通过<code>uniqState</code>函数获得的多个中间状态合并为一个中间状态，就是再次去重再以bitmap的形式存储起来。输入是AggregateFunction中间态类型，输出也是AggregateFunction中间态类型。</p>
+<p><strong>uniqMerge()</strong></p>
+<p>uniqMerge(state)：该函数用于合并由 <code>uniqState()</code> 产生的多个聚合状态，并计算出最终的去重计数结果，就是输出最终的去重结果数。输入是AggregateFunction中间态类型，输出通常是UInt64类型。</p>
+<h3 id="2-建表"><a href="#2-建表" class="headerlink" title="2.建表"></a>2.建表</h3><p><strong>明细基表建表语句</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> bc_online.ck_zh_industry_product_union_all</span><br><span class="line">(</span><br><span class="line">    <span class="string">`dateTime`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondIndId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`thirdIndId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`skuId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`skuName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`sonBrandId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`sonBrandName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`priceRangeId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondPriceRangeId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`priceRangeName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondPriceRangeName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`terminalId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopType`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`pv`</span> Int64,</span><br><span class="line">    <span class="string">`browseAcct`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`dealAmt`</span> Float64,</span><br><span class="line">    <span class="string">`dealProNum`</span> Int64,</span><br><span class="line">    <span class="string">`dealAcct`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`cartAcct`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`followAcct`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`searchClickNum`</span> Int64,</span><br><span class="line">    <span class="string">`browseSku`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`dealSku`</span> <span class="keyword">String</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = ReplicatedMergeTree(<span class="string">'/ckpub18.olap.jd.com/tables/bc_online/ck_zh_industry_product_union_all/&#123;shard&#125;'</span>, <span class="string">'&#123;replica&#125;'</span>)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> dateTime</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> (dateTime, secondIndId, thirdIndId, shopType, terminalId, priceRangeId, secondPriceRangeId)</span><br><span class="line"><span class="keyword">SETTINGS</span> storage_policy = <span class="string">'jdob_ha'</span>, index_granularity = <span class="number">8192</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>上卷表建表语句</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> bc_online.ck_zh_industry_product_union_all_agg</span><br><span class="line">(</span><br><span class="line">    <span class="string">`dateTime`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`skuId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`skuName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`sonBrandId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`sonBrandName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`terminalId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopType`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondIndId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`thirdIndId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`priceRangeId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondPriceRangeId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`priceRangeName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondPriceRangeName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`pv`</span> AggregateFunction(<span class="keyword">sum</span>, Int64),</span><br><span class="line">    <span class="string">`browseAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`dealAmt`</span> AggregateFunction(<span class="keyword">sum</span>, Float64),</span><br><span class="line">    <span class="string">`dealProNum`</span> AggregateFunction(<span class="keyword">sum</span>, Int64),</span><br><span class="line">    <span class="string">`dealAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`cartAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`followAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`searchClickNum`</span> AggregateFunction(<span class="keyword">sum</span>, Int64),</span><br><span class="line">    <span class="string">`browseSku`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`dealSku`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>))</span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = ReplicatedMergeTree(<span class="string">'/ckpub18.olap.jd.com/tables/bc_online/ck_zh_industry_product_union_all_agg/&#123;shard&#125;'</span>, <span class="string">'&#123;replica&#125;'</span>)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> dateTime</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> (dateTime, secondIndId, thirdIndId, shopType, terminalId, priceRangeId, secondPriceRangeId)</span><br><span class="line"><span class="keyword">SETTINGS</span> index_granularity = <span class="number">8192</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二、明细上卷脚本逻辑步骤"><a href="#二、明细上卷脚本逻辑步骤" class="headerlink" title="二、明细上卷脚本逻辑步骤"></a>二、明细上卷脚本逻辑步骤</h2><h4 id="1-获取集群所有节点列表"><a href="#1-获取集群所有节点列表" class="headerlink" title="1.获取集群所有节点列表"></a>1.获取集群所有节点列表</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://ckpub18.olap.jd.com:2000/?' -d "select host_name from (select shard_num,concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end)) as host_name from system.clusters where cluster='LF0_CK_Pub_18' group by shard_num,host_name,port order by shard_num)"</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	host_name</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shard_num,</span><br><span class="line">		<span class="keyword">concat</span>(host_name,</span><br><span class="line">		<span class="string">':'</span>,</span><br><span class="line">		(<span class="keyword">case</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9600</span> <span class="keyword">then</span> <span class="string">'8623'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9700</span> <span class="keyword">then</span> <span class="string">'8723'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9800</span> <span class="keyword">then</span> <span class="string">'8823'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9900</span> <span class="keyword">then</span> <span class="string">'8923'</span></span><br><span class="line">			<span class="keyword">else</span> <span class="string">'8123'</span></span><br><span class="line">		<span class="keyword">end</span>)) <span class="keyword">as</span> host_name</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		system.clusters</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		cluster = <span class="string">'LF0_CK_Pub_18'</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		shard_num,</span><br><span class="line">		host_name,</span><br><span class="line">		port</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">		shard_num);</span><br></pre></td></tr></table></figure>
+
+<p><strong>通过一下两个语句可以看出，实际上只有30台物理服务器，但是通过不同端口，可以实现一个逻辑上达到120个节点的集群：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> system.clusters;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> host_name <span class="keyword">FROM</span> system.clusters <span class="keyword">group</span> <span class="keyword">by</span> host_name;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：此处获取的是分片+副本去重的所有节点，用于建表。</strong></p>
+<h3 id="2-在每个节点上建立聚合表本地表"><a href="#2-在每个节点上建立聚合表本地表" class="headerlink" title="2.在每个节点上建立聚合表本地表"></a>2.在每个节点上建立聚合表本地表</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://10.203.23.163:8623/?' -d "CREATE TABLE IF NOT EXISTS bc_online.ck_zh_industry_product_union_all_agg (dateTime String, skuId String, skuName String, shopId String, shopName String, sonBrandId String, sonBrandName String, terminalId String, shopType String,secondIndId String, thirdIndId String, priceRangeId String,secondPriceRangeId String, priceRangeName String,secondPriceRangeName String, pv AggregateFunction(sum, Int64), browseAcct AggregateFunction(uniq, Nullable(String)),dealAmt AggregateFunction(sum, Float64), dealProNum AggregateFunction(sum, Int64), dealAcct AggregateFunction(uniq, Nullable(String)), cartAcct AggregateFunction(uniq, Nullable(String)), followAcct AggregateFunction(uniq, Nullable(String)), searchClickNum AggregateFunction(sum, Int64), browseSku AggregateFunction(uniq, Nullable(String)), dealSku AggregateFunction(uniq, Nullable(String))) ENGINE = ReplicatedMergeTree('/ckpub18.olap.jd.com/tables/bc_online/ck_zh_industry_product_union_all_agg/&#123;shard&#125;', '&#123;replica&#125;') PARTITION BY dateTime ORDER BY (dateTime,secondIndId,thirdIndId,shopType,terminalId,priceRangeId,secondPriceRangeId) SETTINGS index_granularity = 8192"</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> bc_online.ck_zh_industry_product_union_all_agg </span><br><span class="line">(</span><br><span class="line">	dateTime <span class="keyword">String</span>,</span><br><span class="line">	skuId <span class="keyword">String</span>,</span><br><span class="line">	skuName <span class="keyword">String</span>,</span><br><span class="line">	shopId <span class="keyword">String</span>,</span><br><span class="line">	shopName <span class="keyword">String</span>,</span><br><span class="line">	sonBrandId <span class="keyword">String</span>,</span><br><span class="line">	sonBrandName <span class="keyword">String</span>,</span><br><span class="line">	terminalId <span class="keyword">String</span>,</span><br><span class="line">	shopType <span class="keyword">String</span>,</span><br><span class="line">	secondIndId <span class="keyword">String</span>,</span><br><span class="line">	thirdIndId <span class="keyword">String</span>,</span><br><span class="line">	priceRangeId <span class="keyword">String</span>,</span><br><span class="line">	secondPriceRangeId <span class="keyword">String</span>,</span><br><span class="line">	priceRangeName <span class="keyword">String</span>,</span><br><span class="line">	secondPriceRangeName <span class="keyword">String</span>,</span><br><span class="line">	pv AggregateFunction(<span class="keyword">sum</span>,Int64),</span><br><span class="line">	browseAcct AggregateFunction(uniq,Nullable(<span class="keyword">String</span>)),</span><br><span class="line">	dealAmt AggregateFunction(<span class="keyword">sum</span>,Float64),</span><br><span class="line">	dealProNum AggregateFunction(<span class="keyword">sum</span>,Int64),</span><br><span class="line">	dealAcct AggregateFunction(uniq,Nullable(<span class="keyword">String</span>)),</span><br><span class="line">	cartAcct AggregateFunction(uniq,Nullable(<span class="keyword">String</span>)),</span><br><span class="line">	followAcct AggregateFunction(uniq,Nullable(<span class="keyword">String</span>)),</span><br><span class="line">	searchClickNum AggregateFunction(<span class="keyword">sum</span>,Int64),</span><br><span class="line">	browseSku AggregateFunction(uniq,Nullable(<span class="keyword">String</span>)),</span><br><span class="line">	dealSku AggregateFunction(uniq,Nullable(<span class="keyword">String</span>))</span><br><span class="line">) </span><br><span class="line"><span class="keyword">ENGINE</span> = ReplicatedMergeTree(<span class="string">'/ckpub18.olap.jd.com/tables/bc_online/ck_zh_industry_product_union_all_agg/&#123;shard&#125;'</span>,<span class="string">'&#123;replica&#125;'</span>) </span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> dateTime</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> (dateTime,secondIndId,thirdIndId,shopType,terminalId,priceRangeId,secondPriceRangeId) <span class="keyword">SETTINGS</span> index_granularity = <span class="number">8192</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-在每个节点上创建聚合表分布式表"><a href="#3-在每个节点上创建聚合表分布式表" class="headerlink" title="3.在每个节点上创建聚合表分布式表"></a>3.在每个节点上创建聚合表分布式表</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://10.203.23.163:8623/?' -d "CREATE TABLE IF NOT EXISTS bc_online.ck_zh_industry_product_union_all_agg_d (dateTime String, skuId String, skuName String, shopId String, shopName String, sonBrandId String, sonBrandName String, terminalId String, shopType String,secondIndId String, thirdIndId String, priceRangeId String,secondPriceRangeId String, priceRangeName String,secondPriceRangeName String, pv AggregateFunction(sum, Int64), browseAcct AggregateFunction(uniq, Nullable(String)),dealAmt AggregateFunction(sum, Float64), dealProNum AggregateFunction(sum, Int64), dealAcct AggregateFunction(uniq, Nullable(String)), cartAcct AggregateFunction(uniq, Nullable(String)), followAcct AggregateFunction(uniq, Nullable(String)), searchClickNum AggregateFunction(sum, Int64), browseSku AggregateFunction(uniq, Nullable(String)), dealSku AggregateFunction(uniq, Nullable(String))) ENGINE = Distributed(LF0_CK_Pub_18, bc_online, ck_zh_industry_product_union_all_agg_d, rand())"</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-再次获取集群节点列表"><a href="#4-再次获取集群节点列表" class="headerlink" title="4.再次获取集群节点列表"></a>4.再次获取集群节点列表</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://ckpub18.olap.jd.com:2000/?' -d "select host_name from (select shard_num,concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end)) as host_name from system.clusters where cluster='LF0_CK_Pub_18' group by shard_num,host_name,port order by shard_num)"</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	host_name</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shard_num,</span><br><span class="line">		<span class="keyword">concat</span>(host_name,</span><br><span class="line">		<span class="string">':'</span>,</span><br><span class="line">		(<span class="keyword">case</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9600</span> <span class="keyword">then</span> <span class="string">'8623'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9700</span> <span class="keyword">then</span> <span class="string">'8723'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9800</span> <span class="keyword">then</span> <span class="string">'8823'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9900</span> <span class="keyword">then</span> <span class="string">'8923'</span></span><br><span class="line">			<span class="keyword">else</span> <span class="string">'8123'</span></span><br><span class="line">		<span class="keyword">end</span>)) <span class="keyword">as</span> host_name</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		system.clusters</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		cluster = <span class="string">'LF0_CK_Pub_18'</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		shard_num,</span><br><span class="line">		host_name,</span><br><span class="line">		port</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">		shard_num);</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：此处获取的是分片+副本去重的所有节点，用于删除分区。对于ReplicatedMergeTree引擎的表，其实drop、move、replace、attach等分区操作也都只需要在相同分片的一个副本上执行，对应的操作会被记录在ZooKeeper中，其他副本会监控zk中的指令并应用相同的操作，确保所有副本数据一致。如果在多个副本上都执行这些操作，反而可能引发错误导致数据问题，此处drop分区操作倒是不会导致数据问题，大不了多删几次，但是move、replace、attach等增改数据可能会导致数据问题。甚至建表和删表操作都只需要在一个副本上执行就行。</strong></p>
+<h3 id="5-先删除聚合表中的当天分区"><a href="#5-先删除聚合表中的当天分区" class="headerlink" title="5.先删除聚合表中的当天分区"></a>5.先删除聚合表中的当天分区</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://10.203.23.163:8623/?' -d "alter table bc_online.ck_zh_industry_product_union_all_agg drop partition '2022-12-05' ;" &amp;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> bc_online.ck_zh_industry_product_union_all_agg <span class="keyword">drop</span> <span class="keyword">partition</span> <span class="string">'2022-12-05'</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="6-再次获取集群节点列表"><a href="#6-再次获取集群节点列表" class="headerlink" title="6.再次获取集群节点列表"></a>6.再次获取集群节点列表</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://ckpub18.olap.jd.com:2000/?' -d "select host_name from (select shard_num,any(concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end))) as host_name from system.%s where cluster='LF0_CK_Pub_18' group by shard_num order by shard_num)"</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	host_name</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shard_num,</span><br><span class="line">		<span class="keyword">concat</span>(host_name,</span><br><span class="line">		<span class="string">':'</span>,</span><br><span class="line">		(<span class="keyword">case</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9600</span> <span class="keyword">then</span> <span class="string">'8623'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9700</span> <span class="keyword">then</span> <span class="string">'8723'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9800</span> <span class="keyword">then</span> <span class="string">'8823'</span></span><br><span class="line">			<span class="keyword">when</span> port = <span class="number">9900</span> <span class="keyword">then</span> <span class="string">'8923'</span></span><br><span class="line">			<span class="keyword">else</span> <span class="string">'8123'</span></span><br><span class="line">		<span class="keyword">end</span>)) <span class="keyword">as</span> host_name</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		system.clusters</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		cluster = <span class="string">'LF0_CK_Pub_18'</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		shard_num,</span><br><span class="line">		host_name,</span><br><span class="line">		port</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">		shard_num);</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：此处获取的是按分片去重的节点，也就是每个分片选出一个副本即可，用于插入数据，其他副本借助clickhouse的ReplicatedMergeTree引擎的特性自动迁移即可。</strong></p>
+<h3 id="7-查询基表将数据插入聚合表"><a href="#7-查询基表将数据插入聚合表" class="headerlink" title="7.查询基表将数据插入聚合表"></a>7.查询基表将数据插入聚合表</h3><p><strong>本地到本地插入</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://10.203.23.163:8623/?' -d "insert into bc_online.ck_zh_industry_product_union_all_agg select dateTime,skuId,any(skuName) as skuName,any(shopId) as shopId,any(shopName) as shopName,any(sonBrandId) as sonBrandId,any(sonBrandName) as sonBrandName,terminalId,shopType,any(secondIndId) as secondIndId,any(thirdIndId) as thirdIndId,any(priceRangeId) as priceRangeId,any(secondPriceRangeId) as secondPriceRangeId,any(priceRangeName) as priceRangeName,any(secondPriceRangeName) as secondPriceRangeName,sumState(pv) as pv,uniqState(if(browseAcct = '',null,browseAcct)) as browseAcct,sumState(dealAmt) as dealAmt,sumState(dealProNum) as dealProNum,uniqState(if(dealAcct = '',null,dealAcct)) as dealAcct,uniqState(if(cartAcct = '',null,cartAcct)) as cartAcct,uniqState(if(followAcct = '',null,followAcct)) as followAcct,sumState(searchClickNum) as searchClickNum,uniqState(if(browseSku = '',null,browseSku)) as browseSku,uniqState(if(dealSku = '',null,dealSku)) as dealSku from bc_online.ck_zh_industry_product_union_all where dateTime&gt;='2022-12-05' and dateTime&lt;='2022-12-05' group by dateTime,skuId,terminalId,shopType;" &amp;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span></span><br><span class="line">	<span class="keyword">into</span></span><br><span class="line">	bc_online.ck_zh_industry_product_union_all_agg</span><br><span class="line"><span class="keyword">select</span></span><br><span class="line">	dateTime,</span><br><span class="line">	skuId,</span><br><span class="line">	<span class="keyword">any</span>(skuName) <span class="keyword">as</span> skuName,</span><br><span class="line">	<span class="keyword">any</span>(shopId) <span class="keyword">as</span> shopId,</span><br><span class="line">	<span class="keyword">any</span>(shopName) <span class="keyword">as</span> shopName,</span><br><span class="line">	<span class="keyword">any</span>(sonBrandId) <span class="keyword">as</span> sonBrandId,</span><br><span class="line">	<span class="keyword">any</span>(sonBrandName) <span class="keyword">as</span> sonBrandName,</span><br><span class="line">	terminalId,</span><br><span class="line">	shopType,</span><br><span class="line">	<span class="keyword">any</span>(secondIndId) <span class="keyword">as</span> secondIndId,</span><br><span class="line">	<span class="keyword">any</span>(thirdIndId) <span class="keyword">as</span> thirdIndId,</span><br><span class="line">	<span class="keyword">any</span>(priceRangeId) <span class="keyword">as</span> priceRangeId,</span><br><span class="line">	<span class="keyword">any</span>(secondPriceRangeId) <span class="keyword">as</span> secondPriceRangeId,</span><br><span class="line">	<span class="keyword">any</span>(priceRangeName) <span class="keyword">as</span> priceRangeName,</span><br><span class="line">	<span class="keyword">any</span>(secondPriceRangeName) <span class="keyword">as</span> secondPriceRangeName,</span><br><span class="line">	sumState(pv) <span class="keyword">as</span> pv,</span><br><span class="line">	uniqState(<span class="keyword">if</span>(browseAcct = <span class="string">''</span>,<span class="literal">null</span>,browseAcct)) <span class="keyword">as</span> browseAcct,</span><br><span class="line">	sumState(dealAmt) <span class="keyword">as</span> dealAmt,</span><br><span class="line">	sumState(dealProNum) <span class="keyword">as</span> dealProNum,</span><br><span class="line">	uniqState(<span class="keyword">if</span>(dealAcct = <span class="string">''</span>,<span class="literal">null</span>,dealAcct)) <span class="keyword">as</span> dealAcct,</span><br><span class="line">	uniqState(<span class="keyword">if</span>(cartAcct = <span class="string">''</span>,<span class="literal">null</span>,cartAcct)) <span class="keyword">as</span> cartAcct,</span><br><span class="line">	uniqState(<span class="keyword">if</span>(followAcct = <span class="string">''</span>,<span class="literal">null</span>,followAcct)) <span class="keyword">as</span> followAcct,</span><br><span class="line">	sumState(searchClickNum) <span class="keyword">as</span> searchClickNum,</span><br><span class="line">	uniqState(<span class="keyword">if</span>(browseSku = <span class="string">''</span>,<span class="literal">null</span>,browseSku)) <span class="keyword">as</span> browseSku,</span><br><span class="line">	uniqState(<span class="keyword">if</span>(dealSku = <span class="string">''</span>,<span class="literal">null</span>,dealSku)) <span class="keyword">as</span> dealSku</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	bc_online.ck_zh_industry_product_union_all</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-12-05'</span></span><br><span class="line">	<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-12-05'</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">	dateTime,</span><br><span class="line">	skuId,</span><br><span class="line">	terminalId,</span><br><span class="line">	shopType;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="8-分别查询聚合表分布式表和hive表中的数据行数，验证分布式表总行数与hive表中的是否一致。"><a href="#8-分别查询聚合表分布式表和hive表中的数据行数，验证分布式表总行数与hive表中的是否一致。" class="headerlink" title="8.分别查询聚合表分布式表和hive表中的数据行数，验证分布式表总行数与hive表中的是否一致。"></a>8.分别查询聚合表分布式表和hive表中的数据行数，验证分布式表总行数与hive表中的是否一致。</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -u ads:1qaz^RFV 'http://ckpub18.olap.jd.com:2000/?' -d "select count(1) from bc_online.ck_zh_industry_product_union_all_agg_d where dateTime&gt;='2022-12-05' and dateTime&lt;='2022-12-05';   "</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">count</span>(<span class="number">1</span>) <span class="keyword">from</span> bc_online.ck_zh_industry_product_union_all_agg_d <span class="keyword">where</span> dateTime&gt;=<span class="string">'2022-12-05'</span> <span class="keyword">and</span> dateTime&lt;=<span class="string">'2022-12-05'</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hive -e "select count(1) from (select dt,item_sku_id,terminal_type,trade_type from app.app_zh_industry_sku_union_index_d  where dt&gt;='2022-12-05' and dt &lt;= '2022-12-05' group by dt,item_sku_id,terminal_type,trade_type) tmp;"</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="三、原Python脚本"><a href="#三、原Python脚本" class="headerlink" title="三、原Python脚本"></a>三、原Python脚本</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">xml=<span class="string">"false"</span> </span><br><span class="line">cmd = <span class="string">"""curl -u %s:%s 'http://%s:%s/?' -d "select host_name from (select shard_num,concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end)) as host_name from system.%s where cluster='%s' group by shard_num,host_name,port order by shard_num)"   """</span> % (user,password,ip,port,systemTable,clusterName)</span><br><span class="line">   </span><br><span class="line">p = subprocess.Popen(cmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">buff = p.stdout.readlines()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> ipele <span class="keyword">in</span> buff:</span><br><span class="line">    ip1 = str(ipele, encoding=<span class="string">'utf-8'</span>).strip()</span><br><span class="line">    print(<span class="string">"ip1=============&gt;"</span>+ip1)</span><br><span class="line">    cmd=<span class="string">"""curl -u %s:%s 'http://%s/?' -d "CREATE TABLE IF NOT EXISTS %s.%s (dateTime String, skuId String, skuName String, shopId String, shopName String, sonBrandId String, sonBrandName String, terminalId String, shopType String,secondIndId String, thirdIndId String, priceRangeId String,secondPriceRangeId String, priceRangeName String,secondPriceRangeName String, pv AggregateFunction(sum, Int64), browseAcct AggregateFunction(uniq, Nullable(String)),dealAmt AggregateFunction(sum, Float64), dealProNum AggregateFunction(sum, Int64), dealAcct AggregateFunction(uniq, Nullable(String)), cartAcct AggregateFunction(uniq, Nullable(String)), followAcct AggregateFunction(uniq, Nullable(String)), searchClickNum AggregateFunction(sum, Int64), browseSku AggregateFunction(uniq, Nullable(String)), dealSku AggregateFunction(uniq, Nullable(String)), spuId String) ENGINE = ReplicatedMergeTree('/%s/tables/bc_online/ck_zh_industry_product_union_all_agg/&#123;shard&#125;', '&#123;replica&#125;') PARTITION BY dateTime ORDER BY (dateTime,secondIndId,thirdIndId,shopType,terminalId,priceRangeId,secondPriceRangeId) SETTINGS index_granularity = 8192" """</span>% (user,password,ip1,clickhouse_dataBase,clickhouse_table,ip)</span><br><span class="line">    print(cmd)</span><br><span class="line">    p = subprocess.Popen(cmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    returncode = p.wait()</span><br><span class="line">    <span class="keyword">if</span> returncode != <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"create local table Failed! try again..."</span>)</span><br><span class="line">        p = subprocess.Popen(cmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">        <span class="keyword">if</span> p.wait()!=<span class="number">0</span>:</span><br><span class="line">            print(ip1)</span><br><span class="line">            print(cmd)</span><br><span class="line">            print(<span class="string">"try failed! progress exit!"</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">            </span><br><span class="line">    cmd_d=<span class="string">"""curl -u %s:%s 'http://%s/?' -d "CREATE TABLE IF NOT EXISTS %s.%s_d (dateTime String, skuId String, skuName String, shopId String, shopName String, sonBrandId String, sonBrandName String, terminalId String, shopType String,secondIndId String, thirdIndId String, priceRangeId String,secondPriceRangeId String, priceRangeName String,secondPriceRangeName String, pv AggregateFunction(sum, Int64), browseAcct AggregateFunction(uniq, Nullable(String)),dealAmt AggregateFunction(sum, Float64), dealProNum AggregateFunction(sum, Int64), dealAcct AggregateFunction(uniq, Nullable(String)), cartAcct AggregateFunction(uniq, Nullable(String)), followAcct AggregateFunction(uniq, Nullable(String)), searchClickNum AggregateFunction(sum, Int64), browseSku AggregateFunction(uniq, Nullable(String)), dealSku AggregateFunction(uniq, Nullable(String)), spuId String) ENGINE = Distributed(%s, %s, %s, rand())" """</span>% (user,password,ip1,clickhouse_dataBase,clickhouse_table,clusterName,clickhouse_dataBase,clickhouse_table)</span><br><span class="line">    print(<span class="string">"cmd_d==============&gt;"</span>+cmd_d)</span><br><span class="line">    p = subprocess.Popen(cmd_d, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    returncode = p.wait()</span><br><span class="line">    <span class="keyword">if</span> returncode != <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"create distribute table Failed! try again..."</span>)</span><br><span class="line">        p = subprocess.Popen(cmd_d, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">        <span class="keyword">if</span> p.wait()!=<span class="number">0</span>:</span><br><span class="line">            print(ip1)</span><br><span class="line">            print(cmd_d)</span><br><span class="line">            print(<span class="string">"try failed! progress exit!"</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line">            </span><br><span class="line">cmd2 = <span class="string">"""curl -u %s:%s 'http://%s:%s/?' -d "select host_name from (select shard_num,concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end)) as host_name from system.%s where cluster='%s' group by shard_num,host_name,port order by shard_num)"   """</span> % (user,password,ip,port,systemTable,clusterName)</span><br><span class="line">p = subprocess.Popen(cmd2, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">buff = p.stdout.readlines()</span><br><span class="line"><span class="keyword">for</span> ipele <span class="keyword">in</span> buff:</span><br><span class="line">    ip1 = str(ipele, encoding=<span class="string">'utf-8'</span>).strip()    </span><br><span class="line">    dropcmd=<span class="string">"""curl -u %s:%s 'http://%s/?' -d "alter table %s.%s drop partition '%s' ;" &amp; """</span>% (user,password,ip1,clickhouse_dataBase,clickhouse_table,startDate)</span><br><span class="line">    p = subprocess.Popen(dropcmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    returncode = p.wait()</span><br><span class="line">    <span class="keyword">if</span> returncode != <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"insert table Failed! try again..."</span>)</span><br><span class="line">        p = subprocess.Popen(dropcmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">        <span class="keyword">if</span> p.wait()!=<span class="number">0</span>:</span><br><span class="line">            print(ip1)</span><br><span class="line">            print(dropcmd)</span><br><span class="line">            print(<span class="string">"try failed! progress exit!"</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">20</span>)     </span><br><span class="line"></span><br><span class="line">cmd3 = <span class="string">"""curl -u %s:%s 'http://%s:%s/?' -d "select host_name from (select shard_num,any(concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end))) as host_name from system.%s where cluster='%s' group by shard_num order by shard_num)"   """</span>% (user,password,ip,port,systemTable,clusterName)</span><br><span class="line">p = subprocess.Popen(cmd3, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">buff = p.stdout.readlines()</span><br><span class="line"><span class="keyword">for</span> ipele <span class="keyword">in</span> buff:</span><br><span class="line">    ip1 = str(ipele, encoding=<span class="string">'utf-8'</span>).strip() </span><br><span class="line">    insert_sql=<span class="string">"""curl -u %s:%s 'http://%s/?' -d "insert into %s.%s select dateTime,skuId,any(skuName) as skuName,any(shopId) as shopId,any(shopName) as shopName,any(sonBrandId) as sonBrandId,any(sonBrandName) as sonBrandName,terminalId,shopType,any(secondIndId) as secondIndId,any(thirdIndId) as thirdIndId,any(priceRangeId) as priceRangeId,any(secondPriceRangeId) as secondPriceRangeId,any(priceRangeName) as priceRangeName,any(secondPriceRangeName) as secondPriceRangeName,sumState(pv) as pv,uniqState(if(browseAcct = '',null,browseAcct)) as browseAcct,sumState(dealAmt) as dealAmt,sumState(dealProNum) as dealProNum,uniqState(if(dealAcct = '',null,dealAcct)) as dealAcct,uniqState(if(cartAcct = '',null,cartAcct)) as cartAcct,uniqState(if(followAcct = '',null,followAcct)) as followAcct,sumState(searchClickNum) as searchClickNum,uniqState(if(browseSku = '',null,browseSku)) as browseSku,uniqState(if(dealSku = '',null,dealSku)) as dealSku, spuId from bc_online.ck_zh_industry_product_union_all where dateTime&gt;='%s' and dateTime&lt;='%s' group by dateTime,skuId,terminalId,shopType,spuId;" &amp; """</span>% (user,password,ip1,clickhouse_dataBase,clickhouse_table,startDate,endDate)</span><br><span class="line">    print(insert_sql)</span><br><span class="line">    p = subprocess.Popen(insert_sql, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    returncode = p.wait()</span><br><span class="line">    <span class="keyword">if</span> returncode != <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"insert table Failed! try again..."</span>)</span><br><span class="line">        p = subprocess.Popen(insert_sql, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">        <span class="keyword">if</span> p.wait()!=<span class="number">0</span>:</span><br><span class="line">            print(ip1)</span><br><span class="line">            print(insert_sql)</span><br><span class="line">            print(<span class="string">"try failed! progress exit!"</span>)</span><br><span class="line">            sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">time.sleep(<span class="number">120</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#校验条数</span></span><br><span class="line"></span><br><span class="line">cmdAggCnt = <span class="string">"""curl -u %s:%s 'http://%s:%s/?' -d "select count(1) from %s.%s_d where dateTime&gt;='%s' and dateTime&lt;='%s';   "  """</span>% (user,password,ip,port,clickhouse_dataBase,clickhouse_table,startDate,endDate)</span><br><span class="line">print(<span class="string">"cmdAggCnt==============&gt;"</span>+cmdAggCnt)</span><br><span class="line">pAgg = subprocess.Popen(cmdAggCnt, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line"><span class="keyword">if</span> pAgg.wait() != <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">"get agg table count Failed! try again..."</span>)</span><br><span class="line">    pAgg = subprocess.Popen(cmdAggCnt, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    <span class="keyword">if</span> pAgg.wait()!=<span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"try get agg table count failed! progress exit!"</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line">aggCntBuff = pAgg.stdout.readlines()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> aggCnts <span class="keyword">in</span> aggCntBuff:</span><br><span class="line">    aggCnt = str(aggCnts, encoding=<span class="string">'utf-8'</span>).strip()   </span><br><span class="line">print(<span class="string">"aggCnt= "</span> + aggCnt)</span><br><span class="line"></span><br><span class="line">cmdOldCnt = <span class="string">"""hive -e "select count(1) from (select dt,item_sku_id,terminal_type,trade_type,spu_id from %s.app_zh_industry_sku_union_index_d  where dt&gt;='%s' and dt &lt;= '%s' group by dt,item_sku_id,terminal_type,trade_type,spu_id) tmp;"  """</span>% (APP, startDate, endDate)</span><br><span class="line"></span><br><span class="line">print(<span class="string">"cmdOldCnt==============&gt;"</span>+cmdOldCnt)</span><br><span class="line"><span class="comment">#</span></span><br><span class="line">pOld = subprocess.Popen(cmdOldCnt, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line"><span class="keyword">if</span> pOld.wait() != <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">"get old table count Failed! try again..."</span>)</span><br><span class="line">    pOld = subprocess.Popen(cmdOldCnt, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    <span class="keyword">if</span> pOld.wait()!=<span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"try get old table count failed! progress exit!"</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line">oldCntBuff = pOld.stdout.readlines()</span><br><span class="line">oldCnt = <span class="string">''</span></span><br><span class="line"><span class="keyword">for</span> oldCnts <span class="keyword">in</span> oldCntBuff:</span><br><span class="line">    oldCnt = str(oldCnts, encoding=<span class="string">'utf-8'</span>).strip()</span><br><span class="line"></span><br><span class="line">print(<span class="string">"oldCnt= "</span> + oldCnt)</span><br><span class="line"><span class="keyword">if</span> aggCnt != oldCnt:</span><br><span class="line">    </span><br><span class="line">    print(<span class="string">"data check failed! progress exit!"</span>)</span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'data check Success!'</span>)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/20/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%9C%8D%E5%8A%A1%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" rel="next" title="ClickHouse_行业模块ClickHouse服务优化实战">
+                <i class="fa fa-chevron-left"></i> ClickHouse_行业模块ClickHouse服务优化实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/22/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E8%AF%B7%E6%B1%82%E6%8E%A5%E5%8F%A3%E7%BB%9F%E4%B8%80%E5%8D%8F%E8%AE%AE/" rel="prev" title="京东商智_指标服务请求接口统一协议">
+                京东商智_指标服务请求接口统一协议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClickHouse-行业模块ClickHouse明细数据上卷实战"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_行业模块ClickHouse明细数据上卷实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、前置操作"><span class="nav-number">1.1.</span> <span class="nav-text">一、前置操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-函数原理"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.函数原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-建表"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.建表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、明细上卷脚本逻辑步骤"><span class="nav-number">1.2.</span> <span class="nav-text">二、明细上卷脚本逻辑步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-获取集群所有节点列表"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">1.获取集群所有节点列表</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-在每个节点上建立聚合表本地表"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.在每个节点上建立聚合表本地表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-在每个节点上创建聚合表分布式表"><span class="nav-number">1.2.2.</span> <span class="nav-text">3.在每个节点上创建聚合表分布式表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-再次获取集群节点列表"><span class="nav-number">1.2.3.</span> <span class="nav-text">4.再次获取集群节点列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-先删除聚合表中的当天分区"><span class="nav-number">1.2.4.</span> <span class="nav-text">5.先删除聚合表中的当天分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-再次获取集群节点列表"><span class="nav-number">1.2.5.</span> <span class="nav-text">6.再次获取集群节点列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-查询基表将数据插入聚合表"><span class="nav-number">1.2.6.</span> <span class="nav-text">7.查询基表将数据插入聚合表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-分别查询聚合表分布式表和hive表中的数据行数，验证分布式表总行数与hive表中的是否一致。"><span class="nav-number">1.2.7.</span> <span class="nav-text">8.分别查询聚合表分布式表和hive表中的数据行数，验证分布式表总行数与hive表中的是否一致。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、原Python脚本"><span class="nav-number">1.3.</span> <span class="nav-text">三、原Python脚本</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Mybatis,Spring,Java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_Mybatis动态SQL总结1.Mybatis映射xml文件概述【基础知识】_MyBatis 2.Mybatis动态SQLOGNL，全称为Object-Graph Navigation Language，它是一个功能强大的表达式语言，用来获取和设置Java对象的属性，它旨在提供一个更高的更抽象的层次来对Java对象图进行导航。 mybatis 的动态sql语句是基于OGNL表达式的，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_Mybatis动态SQL总结">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2023/05/18/Java%E6%9C%8D%E5%8A%A1_Mybatis%E5%8A%A8%E6%80%81SQL%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_Mybatis动态SQL总结1.Mybatis映射xml文件概述【基础知识】_MyBatis 2.Mybatis动态SQLOGNL，全称为Object-Graph Navigation Language，它是一个功能强大的表达式语言，用来获取和设置Java对象的属性，它旨在提供一个更高的更抽象的层次来对Java对象图进行导航。 mybatis 的动态sql语句是基于OGNL表达式的，">
+<meta property="article:published_time" content="2023-05-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:35:58.198Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Mybatis">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2023/05/18/Java服务_Mybatis动态SQL总结/"/>
+
+
+
+
+
+  <title>Java服务_Mybatis动态SQL总结 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2023/05/18/Java%E6%9C%8D%E5%8A%A1_Mybatis%E5%8A%A8%E6%80%81SQL%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_Mybatis动态SQL总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-05-18T00:00:00+08:00">
+                2023-05-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Java服务-Mybatis动态SQL总结"><a href="#Java服务-Mybatis动态SQL总结" class="headerlink" title="Java服务_Mybatis动态SQL总结"></a>Java服务_Mybatis动态SQL总结</h2><h3 id="1-Mybatis映射xml文件概述"><a href="#1-Mybatis映射xml文件概述" class="headerlink" title="1.Mybatis映射xml文件概述"></a>1.Mybatis映射xml文件概述</h3><p><a href="https://littleforestjia.github.io/2020/10/30/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_MyBatis/" target="_blank" rel="noopener">【基础知识】_MyBatis</a></p>
+<h3 id="2-Mybatis动态SQL"><a href="#2-Mybatis动态SQL" class="headerlink" title="2.Mybatis动态SQL"></a>2.Mybatis动态SQL</h3><p>OGNL，全称为Object-Graph Navigation Language，它是一个功能强大的表达式语言，用来获取和设置Java对象的属性，它旨在提供一个更高的更抽象的层次来对Java对象图进行导航。</p>
+<p>mybatis 的动态sql语句是基于OGNL表达式的，可以方便的在sql语句中实现某些逻辑，总体说来mybatis动态SQL 语句主要有以下几类:</p>
+<pre><code> 　　1. if (简单的条件判断)；
+ 　　2. choose (when,otherwize)相当于java语言中的switch；
+ 　　3. trim (对包含的内容加上前缀或者后缀等)；
+ 　　4. where (主要是用来简化sql语句中where条件判断的，能智能的处理and/or，不必担心多余导致语法错误)；
+ 　　5. set (主要用于update语句中)；
+ 　　6. foreach (在实现mybatis in语句查询时特别有用)。</code></pre><h4 id="2-1-if-语句"><a href="#2-1-if-语句" class="headerlink" title="2.1 if 语句"></a>2.1 if 语句</h4><h4 id="2-1-if-语句-1"><a href="#2-1-if-语句-1" class="headerlink" title="2.1 if 语句"></a>2.1 if 语句</h4><h4 id="2-1-if-语句-2"><a href="#2-1-if-语句-2" class="headerlink" title="2.1 if 语句"></a>2.1 if 语句</h4><p>案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicIfTest"</span> <span class="attr">parameterType</span>=<span class="string">"Blog"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog where 1 = 1</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"title != null"</span>&gt;</span></span><br><span class="line">    and title = #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"content != null"</span>&gt;</span></span><br><span class="line">    and content = #&#123;content&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"owner != null"</span>&gt;</span></span><br><span class="line">    and owner = #&#123;owner&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果Blog对象入参提供了title参数，那么sql中就要加上<code>title=#{title}</code>，同样如果提供了content和owner的时候，它们也需要满足相应的条件。</p>
+<p>以往使用其他类型框架或者直接使用JDBC的时候， 如果我们要达到同样的选择效果的时候，就需要在java代码中拼SQL语句，这是极其麻烦的，上述的动态SQL就要简单多了。</p>
+<h4 id="2-2-choose-when-otherwize-语句"><a href="#2-2-choose-when-otherwize-语句" class="headerlink" title="2.2 choose(when,otherwize) 语句"></a>2.2 choose(when,otherwize) 语句</h4><p>choose(when,otherwize)相当于java语言中的switch，案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicChooseTest"</span> <span class="attr">parameterType</span>=<span class="string">"Blog"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog where 1 = 1 </span><br><span class="line">  <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">"title != null"</span>&gt;</span></span><br><span class="line">      and title = #&#123;title&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">"content != null"</span>&gt;</span></span><br><span class="line">      and content = #&#123;content&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span></span><br><span class="line">      and owner = "owner1"</span><br><span class="line">    <span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>when元素表示当when中的条件满足的时候就拼接其中的内容，跟JAVA中的switch效果差不多，按照条件的顺序，当when中有条件满足的时候，就会跳出choose，即所有的when和otherwise条件中，只有一个会拼接，当所有的条件都不满足的时候就拼接otherwise中的内容。</strong></p>
+<p>所以上述语句的意思非常简单， 当<code>title!=null</code>的时候就拼接<code>and titlte = #{title}</code>，不再往下判断条件，当title为空且<code>content!=null</code>的时候就输出<code>and content = #{content}</code>，当所有条件都不满足的时候就输出otherwise中的内容。</p>
+<h4 id="2-3-trim-语句"><a href="#2-3-trim-语句" class="headerlink" title="2.3 trim 语句"></a>2.3 trim 语句</h4><p>trim对包含的内容加上prefix或者suffix等，案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicTrimTest"</span> <span class="attr">parameterType</span>=<span class="string">"Blog"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog </span><br><span class="line">  <span class="tag">&lt;<span class="name">trim</span> <span class="attr">prefix</span>=<span class="string">"where"</span> <span class="attr">prefixOverrides</span>=<span class="string">"and|or"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"title != null"</span>&gt;</span></span><br><span class="line">      title = #&#123;title&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"content != null"</span>&gt;</span></span><br><span class="line">      and content = #&#123;content&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"owner != null"</span>&gt;</span></span><br><span class="line">      or owner = #&#123;owner&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">trim</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>trim元素的主要功能是可以在其包含的内容前加上某些前缀，或者在其后加上某些后缀，与之对应的属性是prefix和suffix；同时可以把包含内容的首部某些内容覆盖，即忽略，或者把尾部的某些内容覆盖，对应的属性是 prefixOverrides和suffixOverrides。</strong>正因为trim有这样的功能，所以我们也可以非常简单的利用trim来代替where元素的功能。</p>
+<p>所以上述语句是为trim元素中语句先将and或or的前缀去掉，再加上where前缀。</p>
+<h4 id="2-4-where-语句"><a href="#2-4-where-语句" class="headerlink" title="2.4 where 语句"></a>2.4 where 语句</h4><p>where主要是用来简化sql语句中where条件判断的，能智能的处理and/or条件，案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicWhereTest"</span> <span class="attr">parameterType</span>=<span class="string">"Blog"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog </span><br><span class="line">  <span class="tag">&lt;<span class="name">where</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"title != null"</span>&gt;</span></span><br><span class="line">      title = #&#123;title&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"content != null"</span>&gt;</span></span><br><span class="line">      and content = #&#123;content&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"owner != null"</span>&gt;</span></span><br><span class="line">      and owner = #&#123;owner&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">where</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>where元素经常与if搭配使用，作用是会在写入where元素的地方拼接一个where，用户不需要考虑where元素里面的条件拼接是什么样子的，MyBatis智能处理。<strong>如果where元素中的所有if语句都不满足，那么MyBatis就不会把where拼接上去；如果拼接内容是以and开头的，MyBatis会把第一个and忽略，当然如果是or开头的，MyBatis也会把它忽略；此外，在where元素中不需要考虑空格的问题，MyBatis会智能填充。</strong></p>
+<p>像上述例子中，如果<code>title=null</code>， 而<code>content != null</code>，那么输出的整个语句会是<code>select * from t_blog where content = #{content}</code>，而不是<code>select * from t_blog where and content = #{content}</code>，因为MyBatis会智能的把首个and或or给忽略。</p>
+<h4 id="2-5-set-语句"><a href="#2-5-set-语句" class="headerlink" title="2.5 set 语句"></a>2.5 set 语句</h4><p>set主要用于update语句中，案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">"dynamicSetTest"</span> <span class="attr">parameterType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  update t_blog</span><br><span class="line">  <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"title != null"</span>&gt;</span></span><br><span class="line">      title = #&#123;title&#125;,</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"content != null"</span>&gt;</span></span><br><span class="line">      content = #&#123;content&#125;,</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"owner != null"</span>&gt;</span></span><br><span class="line">      owner = #&#123;owner&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">  where id = #&#123;id&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>set元素主要是用在更新操作的时候，它的主要功能和where元素其实是差不多的，主要是在包含的语句前拼接一个set，然后如果包含的语句是以逗号结束的话将会把该逗号忽略，如果set包含的内容为空的话则会出错。</strong>有了set元素我们就可以动态的更新那些修改了的字段</p>
+<h4 id="2-6-foreach-语句"><a href="#2-6-foreach-语句" class="headerlink" title="2.6 foreach 语句"></a>2.6 foreach 语句</h4><p>foreach的主要用在构建in条件中，它可以在SQL语句中进行遍历一个集合。foreach元素的属性主要有item，index，collection，open，separator，close。</p>
+<ul>
+<li>item 表示集合中每一个元素进行迭代时的别名；</li>
+<li>index 指定一个名字，用于表示在迭代过程中，每次迭代到的位置；</li>
+<li>open 表示该语句以什么开始；</li>
+<li>separator 表示在每次进行迭代之间以什么符号作为分隔符；</li>
+<li>close 表示以什么结束。</li>
+</ul>
+<p>在使用foreach的时候最关键的也是最容易出错的就是collection属性，该属性是必须指定的，但是在不同情况下，该属性的值是不一样的，主要有一下3种情况：</p>
+<ul>
+<li>如果传入的是单参数且参数类型是一个List的时候，collection属性值为list；</li>
+<li>如果传入的是单参数且参数类型是一个array数组的时候，collection的属性值为array；</li>
+<li>如果传入的参数是多个的时候，我们就需要把它们封装成一个Map了，当然单参数也可以封装成map，实际上如果你在传入参数的时候，在MyBatis里面也是会把它封装成一个Map的，map的key就是参数名，所以这个时候collection属性值就是传入的List或array对象在自己封装的map里面的key。</li>
+</ul>
+<p>单参数List的案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicForeachTest"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog where id in</span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"list"</span> <span class="attr">index</span>=<span class="string">"index"</span> <span class="attr">item</span>=<span class="string">"item"</span> <span class="attr">open</span>=<span class="string">"("</span> <span class="attr">separator</span>=<span class="string">","</span> <span class="attr">close</span>=<span class="string">")"</span>&gt;</span></span><br><span class="line">    #&#123;item&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述案例对应mapper为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Blog&gt; <span class="title">dynamicForeachTest</span><span class="params">(List&lt;Integer&gt; ids)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>单参数array的案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicForeach2Test"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog where id in</span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"array"</span> <span class="attr">index</span>=<span class="string">"index"</span> <span class="attr">item</span>=<span class="string">"item"</span> <span class="attr">open</span>=<span class="string">"("</span> <span class="attr">separator</span>=<span class="string">","</span> <span class="attr">close</span>=<span class="string">")"</span>&gt;</span></span><br><span class="line">    #&#123;item&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述案例对应mapper为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Blog&gt; <span class="title">dynamicForeach2Test</span><span class="params">(<span class="keyword">int</span>[] ids)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>多参数map的案例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"dynamicForeach3Test"</span> <span class="attr">resultType</span>=<span class="string">"Blog"</span>&gt;</span></span><br><span class="line">  select * from t_blog where title like "%"#&#123;title&#125;"%" and id in</span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"ids"</span> <span class="attr">index</span>=<span class="string">"index"</span> <span class="attr">item</span>=<span class="string">"item"</span> <span class="attr">open</span>=<span class="string">"("</span> <span class="attr">separator</span>=<span class="string">","</span> <span class="attr">close</span>=<span class="string">")"</span>&gt;</span></span><br><span class="line">    #&#123;item&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述案例对应mapper为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Blog&gt; <span class="title">dynamicForeach3Test</span><span class="params">(Map&lt;String, Object&gt; params)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-Mybatis将insert方法将自增主键返回入参对象"><a href="#3-Mybatis将insert方法将自增主键返回入参对象" class="headerlink" title="3.Mybatis将insert方法将自增主键返回入参对象"></a>3.Mybatis将insert方法将自增主键返回入参对象</h3><p><strong>mybatis的配置参数mybatis.configuration.use-generated-keys=true标识允许JDBC生成主键，默认为false，如果设为了true，这个设置将强制将被生成的主键返回给入参对象。</strong></p>
+<p>案例如下:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">mybatis:</span></span><br><span class="line">  <span class="attr">mapper-locations:</span> <span class="string">classpath:mybatis/mapper/*/*.xml</span></span><br><span class="line">  <span class="attr">configuration:</span></span><br><span class="line">    <span class="attr">log-impl:</span> <span class="string">org.apache.ibatis.logging.nologging.NoLoggingImpl</span></span><br><span class="line">    <span class="attr">cache-enabled:</span> <span class="literal">false</span></span><br><span class="line">    <span class="attr">use-generated-keys:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">default-executor-type:</span> <span class="string">reuse</span></span><br><span class="line">    <span class="attr">map-underscore-to-camel-case:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"addUser"</span> <span class="attr">parameterType</span>=<span class="string">"com.model.User"</span>  <span class="attr">keyProperty</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">    insert into User(name, age) values(#&#123;name&#125;, #&#123;age&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">User user = <span class="keyword">new</span> User();</span><br><span class="line">user.setName(<span class="string">"jia"</span>);</span><br><span class="line">user.setAge(<span class="number">17</span>);</span><br><span class="line"><span class="keyword">int</span> rows = userMapper.insert(user);</span><br><span class="line"><span class="comment">// 重要：insert方法总是自动返回一个int值，表示插入数据库的行数；如果设置mybatis.configuration.use-generated-keys=true则会将自动生产的id键值赋值给入参对象。</span></span><br><span class="line">System.out.println(<span class="string">"rows inserted = "</span> + rows);</span><br><span class="line">System.out.println(<span class="string">"generated key value = "</span> + user.getId());</span><br></pre></td></tr></table></figure>
+
+<p><strong>insert方法总是自动返回一个int值，表示插入数据库的行数；如果设置mybatis.configuration.use-generated-keys=true则会将自动生产的id键值赋值给入参对象。</strong></p>
+<h3 id="4-Mybatis映射xml文件案例"><a href="#4-Mybatis映射xml文件案例" class="headerlink" title="4.Mybatis映射xml文件案例"></a>4.Mybatis映射xml文件案例</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">"-//mybatis.org//DTD Mapper 3.0//EN"</span></span></span><br><span class="line"><span class="meta">  <span class="meta-string">"http://mybatis.org/dtd/mybatis-3-mapper.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"com.jd.bdaa.arch.dao.mapper.drive.DrivePhysicTableMapper"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">parameterMap</span> <span class="attr">id</span>=<span class="string">"map"</span> <span class="attr">type</span>=<span class="string">"java.util.Map"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"BaseResultMap"</span> <span class="attr">type</span>=<span class="string">"com.jd.bdaa.arch.model.po.drive.DrivePhysicTablePO"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">jdbcType</span>=<span class="string">"BIGINT"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"engine"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"engine"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"physic_table_type"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"physicTableType"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"physic_data_source_id"</span> <span class="attr">jdbcType</span>=<span class="string">"BIGINT"</span> <span class="attr">property</span>=<span class="string">"physicDataSourceId"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"original_data_source_id"</span> <span class="attr">jdbcType</span>=<span class="string">"BIGINT"</span> <span class="attr">property</span>=<span class="string">"originalDataSourceId"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"execution_engine"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"executionEngine"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"task_id"</span> <span class="attr">jdbcType</span>=<span class="string">"BIGINT"</span> <span class="attr">property</span>=<span class="string">"taskId"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"task_time_interval"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"taskTimeInterval"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"partition_by"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"partitionBy"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"sharding_key"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"shardingKey"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"order_by"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"orderBy"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"committer"</span> <span class="attr">jdbcType</span>=<span class="string">"VARCHAR"</span> <span class="attr">property</span>=<span class="string">"committer"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"create_time"</span> <span class="attr">jdbcType</span>=<span class="string">"TIMESTAMP"</span> <span class="attr">property</span>=<span class="string">"createTime"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"update_time"</span> <span class="attr">jdbcType</span>=<span class="string">"TIMESTAMP"</span> <span class="attr">property</span>=<span class="string">"updateTime"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!--表名--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"meta_table"</span>&gt;</span>unify_drive_physic_table<span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">"Base_Column_List"</span>&gt;</span></span><br><span class="line">    id,physic_table_type,physic_data_source_id,original_data_source_id,execution_engine,task_id,task_time_interval,partition_by, sharding_key, order_by, committer,create_time,update_time,engine</span><br><span class="line">  <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectByDrivePhysicTableIds"</span> <span class="attr">resultMap</span>=<span class="string">"BaseResultMap"</span> <span class="attr">parameterType</span>=<span class="string">"java.util.List"</span>&gt;</span></span><br><span class="line">    select</span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"Base_Column_List"</span>/&gt;</span></span><br><span class="line">    from</span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"meta_table"</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">    where id in</span><br><span class="line">    <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"physicTableIds"</span> <span class="attr">index</span>=<span class="string">"index"</span> <span class="attr">item</span>=<span class="string">"physicTableId"</span> <span class="attr">open</span>=<span class="string">"("</span> <span class="attr">separator</span>=<span class="string">","</span> <span class="attr">close</span>=<span class="string">")"</span>&gt;</span></span><br><span class="line">      #&#123;physicTableId&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">"insert"</span>  <span class="attr">keyProperty</span>=<span class="string">"id"</span> <span class="attr">parameterType</span>=<span class="string">"com.jd.bdaa.arch.model.po.drive.DrivePhysicTablePO"</span>&gt;</span></span><br><span class="line">   insert into</span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"meta_table"</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">    (</span><br><span class="line">    <span class="tag">&lt;<span class="name">trim</span> <span class="attr">prefix</span>=<span class="string">""</span> <span class="attr">suffixOverrides</span>=<span class="string">","</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"engine != null"</span>&gt;</span>engine, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"physicTableType != null"</span>&gt;</span>physic_table_type, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"physicDataSourceId != null"</span>&gt;</span>physic_data_source_id, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"originalDataSourceId != null"</span>&gt;</span>original_data_source_id, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"committer != null"</span>&gt;</span>committer,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"executionEngine != null"</span>&gt;</span>execution_engine,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"taskId != null"</span>&gt;</span>task_id,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"taskTimeInterval != null"</span>&gt;</span>task_time_interval,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"partitionBy != null"</span>&gt;</span>partition_by,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"shardingKey != null"</span>&gt;</span>sharding_key,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"orderBy != null"</span>&gt;</span>order_by,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">trim</span>&gt;</span></span><br><span class="line">    ) values</span><br><span class="line">    (</span><br><span class="line">    <span class="tag">&lt;<span class="name">trim</span> <span class="attr">prefix</span>=<span class="string">""</span> <span class="attr">suffixOverrides</span>=<span class="string">","</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"engine != null"</span>&gt;</span>#&#123;engine&#125;, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"physicTableType != null"</span>&gt;</span>#&#123;physicTableType&#125;, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"physicDataSourceId != null"</span>&gt;</span>#&#123;physicDataSourceId&#125;, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"originalDataSourceId != null"</span>&gt;</span>#&#123;originalDataSourceId&#125;, <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"committer != null"</span>&gt;</span>#&#123;committer&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"executionEngine != null"</span>&gt;</span>#&#123;executionEngine&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"taskId != null"</span>&gt;</span>#&#123;taskId&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"taskTimeInterval != null"</span>&gt;</span>#&#123;taskTimeInterval&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"partitionBy != null"</span>&gt;</span>#&#123;partitionBy&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"shardingKey != null"</span>&gt;</span>#&#123;shardingKey&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"orderBy != null"</span>&gt;</span>#&#123;orderBy&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">trim</span>&gt;</span></span><br><span class="line">    )</span><br><span class="line">  <span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- 更新任务执行信息--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">"updateTaskInfo"</span>&gt;</span></span><br><span class="line">    update</span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"meta_table"</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">set</span>&gt;</span></span><br><span class="line">      task_id = #&#123;taskId&#125;,</span><br><span class="line">      task_time_interval = #&#123;taskTimeInterval&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">set</span>&gt;</span></span><br><span class="line">    where id = #&#123;id&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">delete</span> <span class="attr">id</span>=<span class="string">"deleteByIds"</span>&gt;</span></span><br><span class="line">    delete</span><br><span class="line">    from</span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"meta_table"</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">    where id in</span><br><span class="line">    <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">"physicTableIds"</span> <span class="attr">index</span>=<span class="string">"index"</span> <span class="attr">item</span>=<span class="string">"physicTableId"</span> <span class="attr">open</span>=<span class="string">"("</span> <span class="attr">separator</span>=<span class="string">","</span> <span class="attr">close</span>=<span class="string">")"</span>&gt;</span></span><br><span class="line">      #&#123;physicTableId&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">delete</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">"update"</span> <span class="attr">parameterType</span>=<span class="string">"com.jd.bdaa.arch.model.po.drive.DrivePhysicTablePO"</span>&gt;</span></span><br><span class="line">    update</span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">"meta_table"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">trim</span> <span class="attr">prefix</span>=<span class="string">"set"</span> <span class="attr">suffixOverrides</span>=<span class="string">","</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"nameCn != null"</span>&gt;</span>name_cn = #&#123;nameCn&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"description != null"</span>&gt;</span>description = #&#123;description&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"committer != null"</span>&gt;</span>committer = #&#123;committer&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"decorateDefIdList != null"</span>&gt;</span>decorate_def_id_list = #&#123;decorateDefIdList&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"physicTableId != null"</span>&gt;</span>physic_table_id = #&#123;physicTableId&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"timeInterval != null"</span>&gt;</span>time_interval = #&#123;timeInterval&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"ezdApiId != null"</span>&gt;</span>ezd_api_id = #&#123;ezdApiId&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"isFromDataSet != null"</span>&gt;</span>is_from_dataset = #&#123;isFromDataSet&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"version != null"</span>&gt;</span>version = #&#123;version&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">"serviceType != null"</span>&gt;</span>version = #&#123;serviceType&#125;,<span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">trim</span>&gt;</span></span><br><span class="line">    where id = #&#123;id&#125; and enable = 1 and data_checked = 1</span><br><span class="line">  <span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-参考文献"><a href="#5-参考文献" class="headerlink" title="5.参考文献"></a>5.参考文献</h3><p><a href="https://www.cnblogs.com/aaronL/p/5182808.html" target="_blank" rel="noopener">mybatis 动态sql</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Mybatis/" rel="tag"><i class="fa fa-tag"></i> Mybatis</a>
+          
+            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/05/12/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_hiveUDF%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/" rel="next" title="HiveSQL实战积累_hiveUDF原理与使用">
+                <i class="fa fa-chevron-left"></i> HiveSQL实战积累_hiveUDF原理与使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/05/24/Java%E6%9C%8D%E5%8A%A1_java%E4%B8%AD%E7%9A%84Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8EStream%E6%B5%81%E5%87%BD%E6%95%B0%E6%80%BB%E7%BB%93/" rel="prev" title="Java服务_java中的Lambda表达式与Stream流函数总结">
+                Java服务_java中的Lambda表达式与Stream流函数总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java服务-Mybatis动态SQL总结"><span class="nav-number">1.</span> <span class="nav-text">Java服务_Mybatis动态SQL总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Mybatis映射xml文件概述"><span class="nav-number">1.1.</span> <span class="nav-text">1.Mybatis映射xml文件概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Mybatis动态SQL"><span class="nav-number">1.2.</span> <span class="nav-text">2.Mybatis动态SQL</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-if-语句"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 if 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-if-语句-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.1 if 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-if-语句-2"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.1 if 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-choose-when-otherwize-语句"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.2 choose(when,otherwize) 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-trim-语句"><span class="nav-number">1.2.5.</span> <span class="nav-text">2.3 trim 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-where-语句"><span class="nav-number">1.2.6.</span> <span class="nav-text">2.4 where 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-set-语句"><span class="nav-number">1.2.7.</span> <span class="nav-text">2.5 set 语句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-foreach-语句"><span class="nav-number">1.2.8.</span> <span class="nav-text">2.6 foreach 语句</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Mybatis将insert方法将自增主键返回入参对象"><span class="nav-number">1.3.</span> <span class="nav-text">3.Mybatis将insert方法将自增主键返回入参对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Mybatis映射xml文件案例"><span class="nav-number">1.4.</span> <span class="nav-text">4.Mybatis映射xml文件案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-参考文献"><span class="nav-number">1.5.</span> <span class="nav-text">5.参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

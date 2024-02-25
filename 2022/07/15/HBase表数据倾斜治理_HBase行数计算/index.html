@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理_HBase行数计算1.主备一致性验证数据库最常见的主备一致性验证主要有两个方面：一个是数据准确性验证，这方面主要通过同一个查询语句得到的查询结果是否相同来验证；另一个是数据量的一致性验证，这方面主要通过行数计算来验证，比如全量数据条数、某个时间段内数据条数。如京东当前的clickhouse、hbase、durid数据库都是采用这种方式来验证主备一致性。 2.使用Filte">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理_HBase行数计算">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/07/15/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E8%A1%8C%E6%95%B0%E8%AE%A1%E7%AE%97/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理_HBase行数计算1.主备一致性验证数据库最常见的主备一致性验证主要有两个方面：一个是数据准确性验证，这方面主要通过同一个查询语句得到的查询结果是否相同来验证；另一个是数据量的一致性验证，这方面主要通过行数计算来验证，比如全量数据条数、某个时间段内数据条数。如京东当前的clickhouse、hbase、durid数据库都是采用这种方式来验证主备一致性。 2.使用Filte">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/07/15/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E8%A1%8C%E6%95%B0%E8%AE%A1%E7%AE%97/1.jpg">
+<meta property="article:published_time" content="2022-07-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:49:50.024Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/07/15/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E8%A1%8C%E6%95%B0%E8%AE%A1%E7%AE%97/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/07/15/HBase表数据倾斜治理_HBase行数计算/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理_HBase行数计算 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/07/15/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E8%A1%8C%E6%95%B0%E8%AE%A1%E7%AE%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理_HBase行数计算</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-15T00:00:00+08:00">
+                2022-07-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-HBase行数计算"><a href="#HBase表数据倾斜治理-HBase行数计算" class="headerlink" title="HBase表数据倾斜治理_HBase行数计算"></a>HBase表数据倾斜治理_HBase行数计算</h2><h3 id="1-主备一致性验证"><a href="#1-主备一致性验证" class="headerlink" title="1.主备一致性验证"></a>1.主备一致性验证</h3><p>数据库最常见的主备一致性验证主要有两个方面：一个是数据准确性验证，这方面主要通过同一个查询语句得到的查询结果是否相同来验证；另一个是数据量的一致性验证，这方面主要通过行数计算来验证，比如全量数据条数、某个时间段内数据条数。如京东当前的clickhouse、hbase、durid数据库都是采用这种方式来验证主备一致性。</p>
+<h3 id="2-使用Filter来实现HBase行数计算"><a href="#2-使用Filter来实现HBase行数计算" class="headerlink" title="2.使用Filter来实现HBase行数计算"></a>2.使用Filter来实现HBase行数计算</h3><h4 id="2-1基本原理"><a href="#2-1基本原理" class="headerlink" title="2.1基本原理"></a>2.1基本原理</h4><p>hbase行数计算的本质就是使用scan扫描全表数据来进行行数统计，那么hbase行数计算的优化本质就是提升scan效率。</p>
+<h4 id="2-2优化策略"><a href="#2-2优化策略" class="headerlink" title="2.2优化策略"></a>2.2优化策略</h4><p>本文采用了从3个方面来进行优化：</p>
+<ul>
+<li>通过Scan.addFamily()和scan.addColumn()来实现仅扫描单列簇或单列，减少扫描时间。</li>
+<li>通过Scan.setTimeRange()来实现扫描指定时间段内存入数据，可以实现不扫描全表，而仅计算某一天存入的数据条数。</li>
+<li>通过FirstKeyOnlyFilter过滤器来实现仅扫描同一个rowkey的第一个cell，减少扫描时间。</li>
+</ul>
+<p>之前就学习和总结过scan的流程，如下图所示：</p>
+<p><img src="//littleforestjia.github.io/2022/07/15/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E8%A1%8C%E6%95%B0%E8%AE%A1%E7%AE%97/1.jpg" alt></p>
+<p>上述的列簇的扫描过滤是在步骤1当中，只会对指定的列簇生成StoreScanner进行数据检索；</p>
+<p>时间戳扫描过滤是在步骤3和步骤6当中，步骤3当中是直接过滤掉根本没有该时间戳数据的文件，步骤6当中则是对正在扫描的cell进行时间戳比较过滤；</p>
+<p>FirstKeyOnlyFilter过滤器过滤是在步骤7.2当中，完成了一个rowkey的一个cell扫描之后就直接准备下一行数据的检索，而不进行下一列数据的检索。</p>
+<h4 id="2-3-HBase时间戳与TTL"><a href="#2-3-HBase时间戳与TTL" class="headerlink" title="2.3 HBase时间戳与TTL"></a>2.3 HBase时间戳与TTL</h4><p>每个cell当中保存的版本号其实就是该cell插入时存入的时间戳timestamp字段，单位为毫秒。如果存入数据时添加了该字段值则为设置值，如果没有添加则默认该字段值为数据插入的当前时间戳。</p>
+<blockquote>
+<p>比如一个cell数据实例：</p>
+<p>rowkey=\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x03\x15\xDF\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x07\xD2\x00\x00\x00\x00\x00\x1E\x8CT\x1C\xFC\xCF\x05, column=d:AvgDepthSingle , <strong>timestamp=1656880971313</strong> , value= ?�</p>
+</blockquote>
+<p>hbase有一个TTL(time to live)数据有效期标识，单位是毫秒。TTL是一个表级别的设置，也就是一整张表中所有数据的TTL都是相同的。</p>
+<p>那么TTL生效的本质就是利用数据的时间戳与TTL进行比较，比如一张表的TTL为86400000，也就是一天，那么进行数据查询或者数据整理是，判断该数据能否被返回或者是否被清理的标准就是当前系统时间currentMilliseconds-timestamp&gt;86400000，如果满足该条件则该cell数据不能被返回或被清理。</p>
+<p>hbase当中的update操作本质就是添加一条相同rowkey而不同timestamp的数据；delete操作本质就是对小于当前currentMilliseconds的cell中timestamp最大的那个cell打上删除标识；scan操作本质就是获取小于当前currentMilliseconds的cell中timestamp最大的那个cell。也是就是说add、update、delete、scan操作实际上都是带时间戳的。</p>
+<p>那么有一种情况就是在进行增删改查时自定义timestamp。尤其是在add时借助自定义timestamp可以实现个性化的TTL。但是要小心使用，如果添加数据时使用了自定义timestamp，那么在update、delete、scan时也要考虑是否使用<a href="https://www.yisu.com/zixun/555692.html" target="_blank" rel="noopener">自定义timestamp才能达到目的</a>。</p>
+<h4 id="2-4应用实例"><a href="#2-4应用实例" class="headerlink" title="2.4应用实例"></a>2.4应用实例</h4><h5 id="2-4-1-MapReduce实现scan扫描与行数计算"><a href="#2-4-1-MapReduce实现scan扫描与行数计算" class="headerlink" title="2.4.1 MapReduce实现scan扫描与行数计算"></a>2.4.1 MapReduce实现scan扫描与行数计算</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RowCounterTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RowCounterTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Configuration configuration = HBaseConfiguration.create();</span><br><span class="line"></span><br><span class="line">        configuration.set(<span class="string">"bdp.hbase.erp"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"bdp.hbase.accesskey"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"bdp.hbase.instance.name"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.zookeeper.quorum"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.client.retries.number"</span>,<span class="string">"3"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.rpc.timeout"</span>,<span class="string">"3600000"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.client.operation.timeout"</span>,<span class="string">"3600000"</span>);</span><br><span class="line"></span><br><span class="line">        configuration.set(<span class="string">"mapreduce.map.memory.mb"</span>,<span class="string">"8192"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.map.java.opts"</span>,<span class="string">"-Xmx6144M"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.map.cpu.vcores"</span>,<span class="string">"2"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.reduce.memory.mb"</span>,<span class="string">"8192"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.reduce.java.opts"</span>,<span class="string">"-Xmx6144M"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.reduce.cpu.vcores"</span>,<span class="string">"4"</span>);</span><br><span class="line">        configuration.set(<span class="string">"yarn.app.mapreduce.am.resource.mb"</span>,<span class="string">"8192"</span>);</span><br><span class="line">        configuration.set(<span class="string">"yarn.app.mapreduce.am.command-opts"</span>,<span class="string">"-Xmx6144m"</span>);</span><br><span class="line">        configuration.set(<span class="string">"yarn.app.mapreduce.am.resource.cpu-vcores"</span>,<span class="string">"3"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.task.io.sort.mb"</span>,<span class="string">"1024"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.job.reduce.slowstart.completedmaps"</span>,<span class="string">"1"</span>);</span><br><span class="line"></span><br><span class="line">        Job job = createSubmittableJob(configuration, args);</span><br><span class="line"></span><br><span class="line">        Long startTime = System.currentTimeMillis();</span><br><span class="line">        job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        Long endTime = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (job.isSuccessful())&#123;</span><br><span class="line">            <span class="keyword">long</span> costTime = (endTime - startTime) / <span class="number">1000</span>;</span><br><span class="line">            System.out.println(<span class="string">"MR任务执行时间："</span> + costTime + <span class="string">" s！"</span>);</span><br><span class="line">            System.out.println(<span class="string">"计算行数："</span> + job.getCounters().findCounter(RowCounterTest.RowCounterMapper.Counters.ROWS).getValue() + <span class="string">" 行！"</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"行数计算MR任务失败！"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Job <span class="title">createSubmittableJob</span><span class="params">(Configuration conf, String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        String tableName = args[<span class="number">0</span>];</span><br><span class="line">        Job job = <span class="keyword">new</span> Job(conf, <span class="string">"rowcounter_"</span> + tableName);</span><br><span class="line">        job.setJarByClass(RowCounterTest<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line">        scan.setCaching(<span class="number">500</span>);</span><br><span class="line">        scan.setCacheBlocks(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//添加扫描的列簇和列范围限制。</span></span><br><span class="line">        String family = StringUtils.substringBefore(args[<span class="number">1</span>], <span class="string">"_"</span>);</span><br><span class="line">        String qualifier = StringUtils.substringAfter(args[<span class="number">1</span>], <span class="string">"_"</span>);</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"null"</span>.equals(qualifier)) &#123;</span><br><span class="line">            scan.addFamily(Bytes.toBytes(family));</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(qualifier));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置扫描的时间戳范围限制。</span></span><br><span class="line">        <span class="keyword">long</span> startTime = Long.parseLong(StringUtils.substringBefore(args[<span class="number">2</span>], <span class="string">"_"</span>));</span><br><span class="line">        <span class="keyword">long</span> endTime = Long.parseLong(StringUtils.substringAfter(args[<span class="number">2</span>], <span class="string">"_"</span>));</span><br><span class="line">        scan.setTimeRange(startTime, endTime == <span class="number">0L</span> ? <span class="number">9223372036854775807L</span> : endTime);<span class="comment">//9223372036854775807L为long类型最大值。</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//这个过滤器返回它找到的行中的第一个cell，后续的其他列簇和列的cell就不用再扫描了，这么做是为了减少扫描时间。</span></span><br><span class="line">        scan.setFilter(<span class="keyword">new</span> FirstKeyOnlyFilter());</span><br><span class="line"></span><br><span class="line">        job.setOutputFormatClass(NullOutputFormat<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        TableMapReduceUtil.initTableMapperJob(tableName, scan, RowCounterTest.RowCounterMapper<span class="class">.<span class="keyword">class</span>, <span class="title">ImmutableBytesWritable</span>.<span class="title">class</span>, <span class="title">Result</span>.<span class="title">class</span>, <span class="title">job</span>)</span>;</span><br><span class="line">        job.setNumReduceTasks(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> job;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">RowCounterMapper</span> <span class="keyword">extends</span> <span class="title">TableMapper</span>&lt;<span class="title">ImmutableBytesWritable</span>, <span class="title">Result</span>&gt; </span>&#123;</span><br><span class="line">        RowCounterMapper() &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(ImmutableBytesWritable row, Result values, Mapper&lt;ImmutableBytesWritable, Result, ImmutableBytesWritable, Result&gt;.Context context)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">            context.getCounter(RowCounterTest.RowCounterMapper.Counters.ROWS).increment(<span class="number">1L</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//在Mapper中创建一个内部静态枚举类，该枚举类可以被job的所有map任务获取到，实现所有map累加。</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">enum</span> Counters &#123;</span><br><span class="line">            ROWS;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>MapReduce一般都是通过在Mapper类中创建内部枚举类来实现计数，具体实现方式见上述代码。</li>
+</ul>
+<h5 id="2-4-2-命令行语句"><a href="#2-4-2-命令行语句" class="headerlink" title="2.4.2 命令行语句"></a>2.4.2 命令行语句</h5><p>扫描列簇指定d，扫描时间范围指定为全表：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar RowCounterTest-1.0-SNAPSHOT.jar hb_ibd:HB_IBD_UNBOUNDER_TRADE_BRAND d_null 0_0</span><br></pre></td></tr></table></figure>
+
+<p>扫描列簇指定d，扫描时间范围指定为2022-07-09全天：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar RowCounterTest-1.0-SNAPSHOT.jar hb_ibd:HB_IBD_UNBOUNDER_TRADE_BRAND d_null 1657296001000_1657382399000</span><br></pre></td></tr></table></figure>
+
+<p>全表行数计算结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">[2022-07-10T16:32:35.688+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8766029101801_70452735 completed successfully</span><br><span class="line">[2022-07-10T16:32:35.771+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 35</span><br><span class="line">	File System Counters</span><br><span class="line">		FILE: Number of bytes read&#x3D;0</span><br><span class="line">		FILE: Number of bytes written&#x3D;355679</span><br><span class="line">		FILE: Number of read operations&#x3D;0</span><br><span class="line">		FILE: Number of large read operations&#x3D;0</span><br><span class="line">		FILE: Number of write operations&#x3D;0</span><br><span class="line">		HDFS: Number of bytes read&#x3D;101</span><br><span class="line">		HDFS: Number of bytes written&#x3D;0</span><br><span class="line">		HDFS: Number of read operations&#x3D;1</span><br><span class="line">		HDFS: Number of large read operations&#x3D;0</span><br><span class="line">		HDFS: Number of write operations&#x3D;0</span><br><span class="line">	Job Counters </span><br><span class="line">		Launched map tasks&#x3D;1</span><br><span class="line">		Other local map tasks&#x3D;1</span><br><span class="line">		Total time spent by all maps in occupied slots (ms)&#x3D;2372166</span><br><span class="line">		Total time spent by all reduces in occupied slots (ms)&#x3D;0</span><br><span class="line">		Total time spent by all map tasks (ms)&#x3D;395361</span><br><span class="line">		Total vcore-seconds taken by all map tasks&#x3D;790722</span><br><span class="line">		Total megabyte-seconds taken by all map tasks&#x3D;2429097984</span><br><span class="line">		Total gcore-seconds taken by all map tasks&#x3D;0</span><br><span class="line">	Map-Reduce Framework</span><br><span class="line">		Map input records&#x3D;59999731</span><br><span class="line">		Map output records&#x3D;0</span><br><span class="line">		Input split bytes&#x3D;101</span><br><span class="line">		Reduce shuffle bytes&#x3D;0</span><br><span class="line">		Reduce input records&#x3D;0</span><br><span class="line">		Reduce output records&#x3D;0</span><br><span class="line">		Spilled Records&#x3D;0</span><br><span class="line">		Failed Shuffles&#x3D;0</span><br><span class="line">		Merged Map outputs&#x3D;0</span><br><span class="line">		GC time elapsed (ms)&#x3D;3733</span><br><span class="line">		CPU time spent (ms)&#x3D;88380</span><br><span class="line">		Physical memory (bytes) snapshot&#x3D;1659187200</span><br><span class="line">		Virtual memory (bytes) snapshot&#x3D;9006567424</span><br><span class="line">		Total committed heap usage (bytes)&#x3D;2906652672</span><br><span class="line">	com.jd.ads.RowCounterTest$RowCounterMapper$Counters</span><br><span class="line">		ROWS&#x3D;59999731</span><br><span class="line">	File Input Format Counters </span><br><span class="line">		Bytes Read&#x3D;0</span><br><span class="line">	File Output Format Counters </span><br><span class="line">		Bytes Written&#x3D;0</span><br><span class="line">MR任务执行时间：415 s！</span><br><span class="line">计算行数：59999731 行！</span><br></pre></td></tr></table></figure>
+
+<p>2022-07-09全天行数计算结果日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">[2022-07-10T16:28:19.261+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8766029101801_70452892 completed successfully</span><br><span class="line">[2022-07-10T16:28:19.345+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 35</span><br><span class="line">	File System Counters</span><br><span class="line">		FILE: Number of bytes read&#x3D;0</span><br><span class="line">		FILE: Number of bytes written&#x3D;355771</span><br><span class="line">		FILE: Number of read operations&#x3D;0</span><br><span class="line">		FILE: Number of large read operations&#x3D;0</span><br><span class="line">		FILE: Number of write operations&#x3D;0</span><br><span class="line">		HDFS: Number of bytes read&#x3D;101</span><br><span class="line">		HDFS: Number of bytes written&#x3D;0</span><br><span class="line">		HDFS: Number of read operations&#x3D;1</span><br><span class="line">		HDFS: Number of large read operations&#x3D;0</span><br><span class="line">		HDFS: Number of write operations&#x3D;0</span><br><span class="line">	Job Counters </span><br><span class="line">		Launched map tasks&#x3D;1</span><br><span class="line">		Other local map tasks&#x3D;1</span><br><span class="line">		Total time spent by all maps in occupied slots (ms)&#x3D;110814</span><br><span class="line">		Total time spent by all reduces in occupied slots (ms)&#x3D;0</span><br><span class="line">		Total time spent by all map tasks (ms)&#x3D;18469</span><br><span class="line">		Total vcore-seconds taken by all map tasks&#x3D;36938</span><br><span class="line">		Total megabyte-seconds taken by all map tasks&#x3D;113473536</span><br><span class="line">		Total gcore-seconds taken by all map tasks&#x3D;0</span><br><span class="line">	Map-Reduce Framework</span><br><span class="line">		Map input records&#x3D;55895</span><br><span class="line">		Map output records&#x3D;0</span><br><span class="line">		Input split bytes&#x3D;101</span><br><span class="line">		Reduce shuffle bytes&#x3D;0</span><br><span class="line">		Reduce input records&#x3D;0</span><br><span class="line">		Reduce output records&#x3D;0</span><br><span class="line">		Spilled Records&#x3D;0</span><br><span class="line">		Failed Shuffles&#x3D;0</span><br><span class="line">		Merged Map outputs&#x3D;0</span><br><span class="line">		GC time elapsed (ms)&#x3D;839</span><br><span class="line">		CPU time spent (ms)&#x3D;7920</span><br><span class="line">		Physical memory (bytes) snapshot&#x3D;647380992</span><br><span class="line">		Virtual memory (bytes) snapshot&#x3D;8851468288</span><br><span class="line">		Total committed heap usage (bytes)&#x3D;2630877184</span><br><span class="line">	com.jd.ads.RowCounterTest$RowCounterMapper$Counters</span><br><span class="line">		ROWS&#x3D;55895</span><br><span class="line">	File Input Format Counters </span><br><span class="line">		Bytes Read&#x3D;0</span><br><span class="line">	File Output Format Counters </span><br><span class="line">		Bytes Written&#x3D;0</span><br><span class="line">MR任务执行时间：41 s！</span><br><span class="line">计算行数：55895 行！</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-使用Coprocessor来实现HBase行数计算"><a href="#3-使用Coprocessor来实现HBase行数计算" class="headerlink" title="3.使用Coprocessor来实现HBase行数计算"></a>3.使用Coprocessor来实现HBase行数计算</h3><p>相比于使用过滤器来进行scan提效，实际上使用协处理器来进行scan提效的效果要更好。</p>
+<p>hbase本身已经支持了包含相关简单聚合函数的协处理器org.apache.hadoop.hbase.coprocessor.AggregateImplementation，一般来说直接在代码中调用相关hbase api对表进行disable，然后<a href="https://www.csdn.net/tags/MtTaEgysMzY4Ny1ibG9n.html" target="_blank" rel="noopener">注册该coprocessor</a>再enable即可。但是京东的hbase管理部门对表的disable操作进行了限制，一般用户无权限对线上表进行该操作，也就无法自行对表进行协处理器注册操作。</p>
+<p>应用实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AgreementTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Configuration configuration = HBaseConfiguration.create();</span><br><span class="line"></span><br><span class="line">        configuration.set(<span class="string">"bdp.hbase.erp"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"bdp.hbase.accesskey"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"bdp.hbase.instance.name"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.zookeeper.quorum"</span>,<span class="string">"******"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.client.retries.number"</span>,<span class="string">"3"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.rpc.timeout"</span>,<span class="string">"3600000"</span>);</span><br><span class="line">        configuration.set(<span class="string">"hbase.client.operation.timeout"</span>,<span class="string">"3600000"</span>);</span><br><span class="line"></span><br><span class="line">        configuration.set(<span class="string">"mapreduce.map.memory.mb"</span>,<span class="string">"8192"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.map.java.opts"</span>,<span class="string">"-Xmx6144M"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.map.cpu.vcores"</span>,<span class="string">"2"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.reduce.memory.mb"</span>,<span class="string">"8192"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.reduce.java.opts"</span>,<span class="string">"-Xmx6144M"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.reduce.cpu.vcores"</span>,<span class="string">"4"</span>);</span><br><span class="line">        configuration.set(<span class="string">"yarn.app.mapreduce.am.resource.mb"</span>,<span class="string">"8192"</span>);</span><br><span class="line">        configuration.set(<span class="string">"yarn.app.mapreduce.am.command-opts"</span>,<span class="string">"-Xmx6144m"</span>);</span><br><span class="line">        configuration.set(<span class="string">"yarn.app.mapreduce.am.resource.cpu-vcores"</span>,<span class="string">"3"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.task.io.sort.mb"</span>,<span class="string">"1024"</span>);</span><br><span class="line">        configuration.set(<span class="string">"mapreduce.job.reduce.slowstart.completedmaps"</span>,<span class="string">"1"</span>);</span><br><span class="line"></span><br><span class="line">        TableName tableName = <span class="keyword">null</span>;</span><br><span class="line">        Admin admin = <span class="keyword">null</span>;</span><br><span class="line">        Connection connection = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            tableName = TableName.valueOf(<span class="string">"hb_ibd:HB_IBD_UNBOUNDER_TRADE_BRAND"</span>);</span><br><span class="line">            connection = ConnectionFactory.createConnection(configuration);</span><br><span class="line">            admin = connection.getAdmin();</span><br><span class="line"></span><br><span class="line">            admin.disableTable(tableName);</span><br><span class="line">            HTableDescriptor descriptor = admin.getTableDescriptor(tableName);</span><br><span class="line">            String coprocessorClass = <span class="string">"org.apache.hadoop.hbase.coprocessor.AggregateImplementation"</span>;</span><br><span class="line">            <span class="keyword">if</span> (! descriptor.hasCoprocessor(coprocessorClass)) &#123;</span><br><span class="line">                descriptor.addCoprocessor(coprocessorClass);</span><br><span class="line">            &#125;</span><br><span class="line">            admin.modifyTable(tableName, descriptor);</span><br><span class="line">            admin.enableTable(tableName);</span><br><span class="line"></span><br><span class="line">            Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line"></span><br><span class="line">            AggregationClient ac = <span class="keyword">new</span> AggregationClient(configuration);</span><br><span class="line">            <span class="keyword">long</span> rowcount = ac.rowCount(tableName, <span class="keyword">new</span> LongColumnInterpreter(), scan);</span><br><span class="line">            System.out.println(<span class="string">"行数计算结果："</span> + rowcount);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>命令行语句：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar AgreementTest-1.0-SNAPSHOT.jar</span><br></pre></td></tr></table></figure>
+
+<p>全表行数计算无权限报错日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-07T17:16:50.653+08:00] [INFO] hbase.client.HBaseAdmin.call(HBaseAdmin.java 1268) [main] : Started disable of hb_ibd:HB_IBD_PRO_ANALYSIS_FLOW_RECENT_NEW</span><br><span class="line">[2022-08-07T17:16:50.776+08:00] [INFO] hbase.client.HBaseAdmin.call(HBaseAdmin.java 1268) [main] : Started disable of hb_ibd:HB_IBD_PRO_ANALYSIS_FLOW_RECENT_NEW</span><br><span class="line">[2022-08-07T17:16:50.984+08:00] [INFO] hbase.client.HBaseAdmin.call(HBaseAdmin.java 1268) [main] : Started disable of hb_ibd:HB_IBD_PRO_ANALYSIS_FLOW_RECENT_NEW</span><br><span class="line">org.apache.hadoop.hbase.client.RetriesExhaustedException: Failed after attempts&#x3D;3, exceptions:</span><br><span class="line">Sun Aug 07 17:16:50 CST 2022, RpcRetryingCaller&#123;globalStartTime&#x3D;1659863810545, pause&#x3D;100, retries&#x3D;3, quotaRetries&#x3D;63&#125;, org.apache.hadoop.hbase.ipc.RemoteWithExtrasException(org.apache.hadoop.hbase.security.AccessDeniedException): org.apache.hadoop.hbase.security.AccessDeniedException: Insufficient permissions for you to disable table operation,hbase admin is needed.</span><br><span class="line">	at com.jd.hbase.coprocessor.auth.AclMasterObserver.checkDDLPermission(AclMasterObserver.java:260)</span><br><span class="line">	at com.jd.hbase.coprocessor.auth.AclMasterObserver.preDisableTable(AclMasterObserver.java:180)</span><br><span class="line">	at org.apache.hadoop.hbase.master.MasterCoprocessorHost$43.call(MasterCoprocessorHost.java:550)</span><br><span class="line">	at org.apache.hadoop.hbase.master.MasterCoprocessorHost.execOperation(MasterCoprocessorHost.java:1279)</span><br><span class="line">	at org.apache.hadoop.hbase.master.MasterCoprocessorHost.preDisableTable(MasterCoprocessorHost.java:546)</span><br><span class="line">	at org.apache.hadoop.hbase.master.HMaster.disableTable(HMaster.java:2090)</span><br><span class="line">	at org.apache.hadoop.hbase.master.MasterRpcServices.disableTable(MasterRpcServices.java:590)</span><br><span class="line">	at org.apache.hadoop.hbase.protobuf.generated.MasterProtos$MasterService$2.callBlockingMethod(MasterProtos.java:59511)</span><br><span class="line">	at org.apache.hadoop.hbase.ipc.RpcServer.call(RpcServer.java:2147)</span><br><span class="line">	at org.apache.hadoop.hbase.ipc.CallRunner.run(CallRunner.java:107)</span><br><span class="line">	at org.apache.hadoop.hbase.ipc.RpcExecutor$Handler.run(RpcExecutor.java:263)</span><br><span class="line">	at org.apache.hadoop.hbase.ipc.RpcExecutor$Handler.run(RpcExecutor.java:243)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/09/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_MapReduce%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3/" rel="next" title="数据开发之离线计算_MapReduce计算过程详解">
+                <i class="fa fa-chevron-left"></i> 数据开发之离线计算_MapReduce计算过程详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/21/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_HBase%E4%BE%9D%E8%B5%96jar%E5%8C%85%E6%BA%90%E7%A0%81%E4%BF%AE%E6%94%B9%E4%B8%8E%E6%9B%BF%E6%8D%A2/" rel="prev" title="HBase表数据倾斜治理_HBase依赖jar包源码修改与替换">
+                HBase表数据倾斜治理_HBase依赖jar包源码修改与替换 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-HBase行数计算"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理_HBase行数计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-主备一致性验证"><span class="nav-number">1.1.</span> <span class="nav-text">1.主备一致性验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用Filter来实现HBase行数计算"><span class="nav-number">1.2.</span> <span class="nav-text">2.使用Filter来实现HBase行数计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1基本原理"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1基本原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2优化策略"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2优化策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-HBase时间戳与TTL"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 HBase时间戳与TTL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4应用实例"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4应用实例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4-1-MapReduce实现scan扫描与行数计算"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">2.4.1 MapReduce实现scan扫描与行数计算</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4-2-命令行语句"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">2.4.2 命令行语句</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-使用Coprocessor来实现HBase行数计算"><span class="nav-number">1.3.</span> <span class="nav-text">3.使用Coprocessor来实现HBase行数计算</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

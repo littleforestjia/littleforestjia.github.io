@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="设计模式," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_观察者模式实现不同维度过滤类型解析1.观察者模式简介如我自己的博文【基础知识】_设计模式所述，观察者模式是定义对象间的一对多依赖关系，使得当一个被观察者对象状态发生改变时，多个观察者对象皆得到通知并被自动更新。 观察者模式最大的优点就是实现层和逻辑层的分离，抽象了更新接口，使得可以有各种各样不同的表示层作为具体观察者角色；且符合开闭原则（对拓展开放，对修改关闭）的要求。 2.使用场景">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_观察者模式实现不同维度过滤类型解析">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/14/Java%E6%9C%8D%E5%8A%A1_%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E7%BB%B4%E5%BA%A6%E8%BF%87%E6%BB%A4%E7%B1%BB%E5%9E%8B%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_观察者模式实现不同维度过滤类型解析1.观察者模式简介如我自己的博文【基础知识】_设计模式所述，观察者模式是定义对象间的一对多依赖关系，使得当一个被观察者对象状态发生改变时，多个观察者对象皆得到通知并被自动更新。 观察者模式最大的优点就是实现层和逻辑层的分离，抽象了更新接口，使得可以有各种各样不同的表示层作为具体观察者角色；且符合开闭原则（对拓展开放，对修改关闭）的要求。 2.使用场景">
+<meta property="article:published_time" content="2024-02-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:27:17.710Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="设计模式">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/14/Java服务_观察者模式实现不同维度过滤类型解析/"/>
+
+
+
+
+
+  <title>Java服务_观察者模式实现不同维度过滤类型解析 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/14/Java%E6%9C%8D%E5%8A%A1_%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E7%BB%B4%E5%BA%A6%E8%BF%87%E6%BB%A4%E7%B1%BB%E5%9E%8B%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_观察者模式实现不同维度过滤类型解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-14T00:00:00+08:00">
+                2024-02-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-观察者模式实现不同维度过滤类型解析"><a href="#Java服务-观察者模式实现不同维度过滤类型解析" class="headerlink" title="Java服务_观察者模式实现不同维度过滤类型解析"></a>Java服务_观察者模式实现不同维度过滤类型解析</h1><h3 id="1-观察者模式简介"><a href="#1-观察者模式简介" class="headerlink" title="1.观察者模式简介"></a>1.观察者模式简介</h3><p>如我自己的博文<a href="https://littleforestjia.github.io/2021/02/27/%E3%80%90%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E3%80%91_%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" target="_blank" rel="noopener">【基础知识】_设计模式</a>所述，观察者模式是定义对象间的一对多依赖关系，使得当一个被观察者对象状态发生改变时，多个观察者对象皆得到通知并被自动更新。</p>
+<p>观察者模式最大的优点就是实现层和逻辑层的分离，抽象了更新接口，使得可以有各种各样不同的表示层作为具体观察者角色；且符合开闭原则（对拓展开放，对修改关闭）的要求。</p>
+<h3 id="2-使用场景"><a href="#2-使用场景" class="headerlink" title="2.使用场景"></a>2.使用场景</h3><p>在指标服务中处理统一协议请求时，需要将不同过滤类型的过滤条件UCriterion解析为相同的DriveFilterBO对象。</p>
+<p>过滤条件抽象接口UCriterion如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UCriterion</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    String BLANK_PLACEHOLDER = <span class="string">"&amp;a@b#c%"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">toSqlString</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其有多个实现类，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleExpression</span> <span class="keyword">implements</span> <span class="title">UExpression</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">4855169404834444045L</span>;</span><br><span class="line">    <span class="keyword">private</span> String propertyName;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Object value;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String op;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InExpression</span> <span class="keyword">implements</span> <span class="title">UExpression</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">8692451650339719589L</span>;</span><br><span class="line">    <span class="keyword">private</span> String propertyName;</span><br><span class="line">    <span class="keyword">private</span> Object[] values;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String op = <span class="string">"in"</span>;</span><br><span class="line">    <span class="keyword">private</span> String type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤条件通用对象DriveFilterBO如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@NoArgsConstructor</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DriveFilterBO</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 维度ID</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Long dimensionDefId;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 数据操作符</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> DriveMathOperatorEnum mathOp;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 值列表</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; valueList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-使用观察者模式"><a href="#3-使用观察者模式" class="headerlink" title="3.使用观察者模式"></a>3.使用观察者模式</h3><h4 id="3-1-创建被观察者类"><a href="#3-1-创建被观察者类" class="headerlink" title="3.1 创建被观察者类"></a>3.1 创建被观察者类</h4><p>1）executorMap属性用于保存观察者实例列表，key为观察者类名简称，value为观察者对象，注意使用线程安全的map；</p>
+<p>2）attach()为添加观察者方法，应该以每个观察者对象为入参分别调用该方法一次；</p>
+<p>3）convert()为消息发送方法，此处逻辑为每次调用该方法时遍历所有观察者获取指定观察者对象，执行其convert()方法。</p>
+<p><strong>很明显，创建这个观察者模式就是为了将convert()方法抽象出来，对不同的UCriterion创建了不同的观察者来实现不同的解析逻辑。（此处使用观察者模式最大的优点就是扩展观察者非常方便，不用修改原逻辑，其实使用工厂模式也可以达到相同的目的）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UCriterionConverterManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(UCriterionConverterManager<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, AbstractUCriterionConverter&gt; executorMap = Collections.synchronizedMap(<span class="keyword">new</span> HashedMap());</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 观察这模式:添加一个观察者</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> converter 观察者实例对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attach</span><span class="params">(AbstractUCriterionConverter converter)</span> </span>&#123;</span><br><span class="line">        Class typeClz = converter.getTypeClz();</span><br><span class="line">        <span class="comment">//获取类名字符串</span></span><br><span class="line">        String simpleName = typeClz.getSimpleName();</span><br><span class="line">        executorMap.put(simpleName, converter);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对不同的过滤条件做统一的转换</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DriveFilterBO <span class="title">convert</span><span class="params">(UCriterion criterion)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (criterion == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"the input of criterion can not be null."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        String simpleName = criterion.getClass().getSimpleName();</span><br><span class="line">        <span class="keyword">if</span> (!executorMap.containsKey(simpleName)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"the executorMap of UCriterionConverterManager don't contain the adapter convert. clzType = "</span> + simpleName);</span><br><span class="line">        &#125;</span><br><span class="line">        AbstractUCriterionConverter converter = executorMap.get(simpleName);</span><br><span class="line">        <span class="keyword">return</span> converter.convert(criterion);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-创建观察者抽象类"><a href="#3-2-创建观察者抽象类" class="headerlink" title="3.2 创建观察者抽象类"></a>3.2 创建观察者抽象类</h4><p>1）在抽象观察者中创建抽象属性和方法；</p>
+<p>2）创建构造方法，在构造方法中调用attach()添加一个观察者方法，这一步结合观察者实现类中的构造方法来看很妙。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractUCriterionConverter</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">UCriterion</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 可以处理的类</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">final</span> Class&lt;T&gt; typeClz;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 观察者</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> UCriterionConverterManager manager;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 公用的维度类</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> UnifyDimDefService unifyDimDefService;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AbstractUCriterionConverter</span><span class="params">(Class&lt;T&gt; typeClz, UCriterionConverterManager manager, UnifyDimDefService unifyDimDefService)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.typeClz = typeClz;</span><br><span class="line">        <span class="keyword">this</span>.manager = manager;</span><br><span class="line">        <span class="keyword">this</span>.unifyDimDefService = unifyDimDefService;</span><br><span class="line">        <span class="keyword">this</span>.manager.attach(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> DriveFilterBO <span class="title">convert</span><span class="params">(T criterion)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Class&lt;T&gt; <span class="title">getTypeClz</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> typeClz;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-创建观察者实现子类"><a href="#3-3-创建观察者实现子类" class="headerlink" title="3.3 创建观察者实现子类"></a>3.3 创建观察者实现子类</h4><p>1）在不同观察者实现类中编写了个性化的convert()方法实现逻辑；</p>
+<p>2）<strong>此处将@Autowired加在构造方法上，非常巧妙，@Autowired加在方法上时会将方法入参对应的依赖对象注入该方法，并完成自动装配。</strong></p>
+<p>3）<strong>此处将@Autowired加在构造方法上，同时该实现类添加@Component注解实现单例模式，则只会在Spring容器启动时执行一次该构造方法，且该改造方法调用父类构造方法从而调用attach()添加自己作为一个观察者。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleExpressionConverter</span> <span class="keyword">extends</span> <span class="title">AbstractUCriterionConverter</span>&lt;<span class="title">SimpleExpression</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(SimpleExpressionConverter<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SimpleExpressionConverter</span><span class="params">(UCriterionConverterManager manager, UnifyDimDefService unifyDimDefService)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(SimpleExpression<span class="class">.<span class="keyword">class</span>, <span class="title">manager</span>, <span class="title">unifyDimDefService</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DriveFilterBO <span class="title">convert</span><span class="params">(SimpleExpression criterion)</span> </span>&#123;</span><br><span class="line">        DriveFilterBO filterBO = <span class="keyword">new</span> DriveFilterBO();</span><br><span class="line">        filterBO.setMathOp(DriveMathOperatorEnum.of(criterion.getOp()));</span><br><span class="line">        filterBO.setDimensionDefId(getDimIdByName(criterion.getPropertyName()));</span><br><span class="line">        List&lt;String&gt; valueList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        valueList.add(String.valueOf(criterion.getValue()));</span><br><span class="line">        filterBO.setValueList(valueList);</span><br><span class="line">        <span class="keyword">return</span> filterBO;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InExpressionConverter</span> <span class="keyword">extends</span> <span class="title">AbstractUCriterionConverter</span>&lt;<span class="title">InExpression</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(InExpressionConverter<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> DriveMathOperatorEnum opEnum = DriveMathOperatorEnum.IN;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">InExpressionConverter</span><span class="params">(UCriterionConverterManager manager, UnifyDimDefService unifyDimDefService)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(InExpression<span class="class">.<span class="keyword">class</span>, <span class="title">manager</span>, <span class="title">unifyDimDefService</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DriveFilterBO <span class="title">convert</span><span class="params">(InExpression criterion)</span> </span>&#123;</span><br><span class="line">        DriveFilterBO filterBO = <span class="keyword">new</span> DriveFilterBO();</span><br><span class="line">        filterBO.setMathOp(opEnum);</span><br><span class="line">        filterBO.setDimensionDefId(getDimIdByName(criterion.getPropertyName()));</span><br><span class="line">        List&lt;String&gt; valueList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Object[] values = criterion.getValues();</span><br><span class="line">        <span class="keyword">for</span> (Object item : values) &#123;</span><br><span class="line">            valueList.add(String.valueOf(item));</span><br><span class="line">        &#125;</span><br><span class="line">        filterBO.setValueList(valueList);</span><br><span class="line">        <span class="keyword">return</span> filterBO;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-被观察者实例发送消息"><a href="#3-4-被观察者实例发送消息" class="headerlink" title="3.4 被观察者实例发送消息"></a>3.4 被观察者实例发送消息</h4><p>使用被观察者实例的convert()消息发送方法处理不用的过滤条件UCriterion对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (UCriterion item : criterionList) &#123;</span><br><span class="line">  DriveFilterBO convert = uCriterionConverterManager.convert(item);</span><br><span class="line">  filterList.add(convert);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/13/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E5%B7%A5%E7%A8%8B%E6%9E%B6%E6%9E%84%E9%AB%98%E5%8F%AF%E7%94%A8%E8%AE%BE%E8%AE%A1%E6%B5%85%E6%9E%90/" rel="next" title="京东商智_工程架构高可用设计浅析">
+                <i class="fa fa-chevron-left"></i> 京东商智_工程架构高可用设计浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/" rel="prev" title="京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路">
+                京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-观察者模式实现不同维度过滤类型解析"><span class="nav-number">1.</span> <span class="nav-text">Java服务_观察者模式实现不同维度过滤类型解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-观察者模式简介"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.观察者模式简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用场景"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-使用观察者模式"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.使用观察者模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-创建被观察者类"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">3.1 创建被观察者类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-创建观察者抽象类"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">3.2 创建观察者抽象类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-创建观察者实现子类"><span class="nav-number">1.0.3.3.</span> <span class="nav-text">3.3 创建观察者实现子类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-被观察者实例发送消息"><span class="nav-number">1.0.3.4.</span> <span class="nav-text">3.4 被观察者实例发送消息</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

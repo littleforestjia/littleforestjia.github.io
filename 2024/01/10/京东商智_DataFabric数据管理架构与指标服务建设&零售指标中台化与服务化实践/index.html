@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="DataFabric,指标服务平台," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_DataFabric数据管理架构与指标服务建设&amp;零售指标中台化与服务化实践文章读后感与京东切入现状分析本文主要为对谈了多年的 Data Fabric，我们终于见到了国内最佳落地实践一文阅读后的总结精炼。个人任务DataFabric最主要的思想就是保证数据从生产最源头到数据产品最末端的元数据一致性，就是确保最源头数据的定义到数据应用产品端上数据的定义是关联的，而且这种关联应该是强制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_DataFabric数据管理架构与指标服务建设&amp;零售指标中台化与服务化实践">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_DataFabric数据管理架构与指标服务建设&amp;零售指标中台化与服务化实践文章读后感与京东切入现状分析本文主要为对谈了多年的 Data Fabric，我们终于见到了国内最佳落地实践一文阅读后的总结精炼。个人任务DataFabric最主要的思想就是保证数据从生产最源头到数据产品最末端的元数据一致性，就是确保最源头数据的定义到数据应用产品端上数据的定义是关联的，而且这种关联应该是强制">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/5.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/6.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/7.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/8.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/9.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/10.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/11.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/12.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/13.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/14.jpg">
+<meta property="article:published_time" content="2024-01-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:39:34.515Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="DataFabric">
+<meta property="article:tag" content="指标服务平台">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/10/京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践/"/>
+
+
+
+
+
+  <title>京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-10T00:00:00+08:00">
+                2024-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="京东商智-DataFabric数据管理架构与指标服务建设-amp-零售指标中台化与服务化实践"><a href="#京东商智-DataFabric数据管理架构与指标服务建设-amp-零售指标中台化与服务化实践" class="headerlink" title="京东商智_DataFabric数据管理架构与指标服务建设&amp;零售指标中台化与服务化实践"></a>京东商智_DataFabric数据管理架构与指标服务建设&amp;零售指标中台化与服务化实践</h1><h2 id="文章读后感与京东切入现状分析"><a href="#文章读后感与京东切入现状分析" class="headerlink" title="文章读后感与京东切入现状分析"></a>文章读后感与京东切入现状分析</h2><p><strong>本文主要为对<a href="https://mp.weixin.qq.com/s/PN5c-JVSEHTesSfgunzedg" target="_blank" rel="noopener">谈了多年的 Data Fabric，我们终于见到了国内最佳落地实践</a>一文阅读后的总结精炼。个人任务DataFabric最主要的思想就是保证数据从生产最源头到数据产品最末端的元数据一致性，就是确保最源头数据的定义到数据应用产品端上数据的定义是关联的，而且这种关联应该是强制的、精准的。比如数据产品使用者根据指标名可以准确找到这个指标的完整生产链路，业务来源表–&gt;数仓模型表–&gt;计算加速引擎表–&gt;查询语义逻辑表等等链路上的每个环节联动清晰。</strong></p>
+<p><strong>京东零售所开发的指标服务平台目前知识在查询语义逻辑层进行了重点建设，对数据应用产品上的指标维度等定义进行了统一规范的元数据管理。从最下层的查询语义逻辑层开始接入建设DataFabric固然是最快、最方便、最轻量的，但是再往后推就涉及到数仓元数据、在线引擎元数据等信息的统一化建设，这一块就有技术难度了，而且对于庞大的历史存量模型的规范化成本也非常高。所以京东现在应该也没有想出一台比较好的技术方案去推进数据资产层的DataFabric管理架构建设。</strong></p>
+<p><strong>目前京东在查询语义逻辑层的建设上主要有两大重点：指标服务平台和定义驱动生产。</strong></p>
+<p><strong>从本质上来看指标服务平台相当于只是在数据产品与数据服务之间加了一个协议层，数据产品在按照定义好的标准指标服务协议请求指标服务平台，然后指标服务平台再原封不动地掉用对应数据服务。乍一看对使用方没有任务好处，还增加了协议适配成本。但是在这一层上添加了一些监控、限流、规则预警、请求预热等指标服务统一层的功能，这些功能是非常好的，也是统一元数据带来的好处，如果用户能接入指标服务平台并能熟练使用这些功能那对于使用方来说是有百利而无一害的。</strong></p>
+<p><strong>定义驱动则是在指标服务平台之后再往下延伸了一层，用户只需要配置标准语义的指标维度与数据应用最外层物理表的绑定关系，那么就能自动帮用户把标准协议请求体转化为查询实际物理表的sql。乍一看定义驱动的作用是统一的数据服务自动接入，无需用户写服务代码了，但是更重要的是开始接入了物理模型的元数据定义了，将DataFabric管理架构往下走了一层了。那么基于这些元数据，就可以在这个层级上进行一些数据介质加速、预计算加速、查询sql优化了。</strong></p>
+<p><strong>如果要将DataFabric管理架构更深一步推进，就比较困难了，目前也没有看到上层领导对这一块有更深的推进意向，总而言之，京东目前采用的是一条从下到上的建设道路，那么注定是一步比一步难了。如果思路反过来，从上游开始进行标准的元数据建设，并强制所有下游后续在新业务上全部接入并扩充链路，那么一旦开头建设好了，后续的一系列架构建设也就水道渠成了。当然这只是我的想象，我是觉得从上游开始建，下游依赖这些源头元数据去扩充并假设对应层级服务会标准和方便很多，但是我也没见过有这么建成并且用的很好的标准化数据架构体系，可能这只是我的愚蠢想象。</strong></p>
+<h2 id="文章重点摘录"><a href="#文章重点摘录" class="headerlink" title="文章重点摘录"></a>文章重点摘录</h2><p>拥有 20 年数据管理技术与经验积累的Aloudata团队深刻理解Data Fabric理念的问题定义、价值主张和架构设想，结合自身深厚的数据工程架构实践经历，推出全新一代数据工程架构产品“NoETL”。</p>
+<h3 id="1-NoETL数据工程架构主要有4大特性："><a href="#1-NoETL数据工程架构主要有4大特性：" class="headerlink" title="1.NoETL数据工程架构主要有4大特性："></a>1.NoETL数据工程架构主要有4大特性：</h3><p><strong>No Pipelines：去管道，无需关心数据位置</strong></p>
+<p>Aloudata 通过数据虚拟化技术，实现多源异构数据查询和透明数据集成，大幅削减了数据搬运，控制了数据管道的无序增长。BI 分析师减少了对 ETL 工程师的单向依赖，不需要再关心数据实际存放位置，也不必再搭建复杂的 ETL 数据管道，直接通过 SQL 定义逻辑数据集就能够自助对全域数据进行准备和分析。</p>
+<p><strong>No Tasks：免运维，无需操心任务运维</strong></p>
+<p>无需 ETL 工程师配置 ETL 任务和运维 ETL 任务，Aloudata 能够通过对用数行为的收集和观察，实现数据生产链路的智能编排、运维和治理，针对重复、相似计算进行自动合并，针对无效、低频、低价值数据的生产任务进行降权或下线，“以销定产”，大幅节省管理投入。</p>
+<p><strong>No Cubes：自优化，无需担心查询性能</strong></p>
+<p>Aloudata 提供业界领先的语义化建模能力，结合数据虚拟化引擎，业务分析师也能自主完成逻辑数据集的准备与分享、指标口径的定义与管理，而无需依赖 ETL 工程师通过开发宽表与汇总表的形式交付数据集和指标，也无需 ETL 工程师依据数据分析场景制订针对性的数据加速方案，进行 Cube / 索引的人工构建。新一代 Aloudata NoETL 数据工程架构系统内置场景化的查询加速方案和查询加速策略，自动化完成逻辑数据集和指标的预计算和加速服务，从而改变数据生产与数据消费的协同关系，实现 Data Fabric 的“自助服务，而非专家服务”的价值主张，显著提升业务用数效率。</p>
+<p><strong>Active MetaData：从被动到主动，实现数据管理的“自动驾驶”</strong></p>
+<p>传统被动元数据仅收集技术元数据，依赖数据工程师手工录入维护数据背后的语义知识，被动等待被查阅使用。而主动元数据则采集一切与数据资产相关的元数据，并进行主动持续的分析和理解，自动填充数据描述和业务语义，进而在数据生产、消费、运维和管理的各个环境中提供智能建议，甚至直接应用自动化管理策略，从而实现更精细更智能的数据管理。</p>
+<h3 id="2-NoETL的3大引擎能力"><a href="#2-NoETL的3大引擎能力" class="headerlink" title="2.NoETL的3大引擎能力"></a>2.NoETL的3大引擎能力</h3><p><strong>2.1 数据虚拟化引擎</strong></p>
+<p>数据虚拟化引擎无需搬运数据、无需操心模型的物理实现，实现不同来源、不同格式数据的逻辑化集成整合，实现全域数据的动态集成、自动物化链路编排和智能查询路由。该引擎的关键技术特性包括：</p>
+<ul>
+<li><strong>逻辑数据集成整合：</strong>无需物理搬运数据，无需关心底层复杂性，逻辑化集成企业所有系统中的孤立数据，不受数据位置、格式或延迟限制；并支持通过标准 SQL 定义逻辑数据视图，支持多级视图嵌套，满足复杂场景数据整合诉求，实现企业多数据源的实时访问与融合分析，极大释放数据价值潜能。</li>
+<li><strong>自适应物化加速：</strong>基于对全域逻辑数据视图定义和用户查询行为的解析，构建全局算子图谱，并实现基于代价的投影构建规划，智能识别枢纽节点，并自动合并相似关系投影存储、下线低收益预计算任务和存储，获得比传统 ETL 方案至少 50% 的成本节约以及更快的数据时效。</li>
+<li><strong>增量数据更新</strong>：可基于上游数据变更和逻辑数据视图定义变更，自动对关系投影进行更新，而无需用户手动创建和触发 ETL 任务。通过上游数据更新事件触发或对元数据的变更监听，可自动推断增量变更，以及自动分区推导，完成大规模数据的下游数据增量更新，免除业务人员对数据更新的关注。</li>
+<li><strong>智能查询下推：</strong>基于底层数据库特性、数据规模、查询复杂度及查询性能要求，智能路由至物化加速结果或直接下推至底层查询引擎。</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/1.jpg" alt></p>
+<p><strong>2.2 数据语义引擎</strong></p>
+<p>数据语义引擎作为企业数据资产的语义结构化引擎，为企业面向数据消费与应用场景提供某一指标或数据集的定义并返回其数值，实现全域口径一致的数据服务。</p>
+<ul>
+<li><strong>强大的语义表达和分析能力</strong>：通过将企业中数据库、数据仓库或数据湖中的表、列等技术语言转换为业务用户可以理解的数据模型、维度、度量或指标。语义引擎提供超 10 大类的函数，不仅包括基础的文本函数、数学与三角函数、日期与时间函数、聚合函数、逻辑函数、窗口函数等，还包括高阶的数据分析函数，比如计算调节函数库、预聚合函数库、同环比函数库等。</li>
+<li><strong>语义查询加速能力</strong>：数据语义引擎基于用户定义的数据模型、指标、维度关系，从数据语义查询的场景出发构建和生成查询加速策略，包括查询 SQL 的生成与拆分、中间查询结果的二次计算、物化加速策略的生成与执行等。</li>
+<li><strong>多种语义服务能力</strong>：由于数据语义的消费场景复杂多样，比如有各类 BI 工具、Excel、数据大屏等，需要基于统一的数据模型提供多种不同形式的指标查询服务，如 Restful API、JDBC/ODBC、GraphQL、SDK 等，便于不同的应用或工具与语义引擎进行对接。</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/2.jpg" alt></p>
+<p><strong>2.3主动元数据引擎</strong></p>
+<p>主动元数据引擎作为全域元数据的统一接入、分析、挖掘和服务引擎，可收集一切与数据资产相关的元数据（如技术元数据、业务元数据、操作元数据和社交元数据等），并基于独有的算子级数据血缘解析技术和元数据语义挖掘技术，对所收集的元数据进行主动分析和挖掘，并在数据发现、生产、消费和管理等各环节提供全面准确的元数据及高置信智能建议，十倍提升数据生产和消费效率，从而让复杂数据链路看得清、管得住、治得动，实现更精细更智能的数据管理。</p>
+<p>该引擎的关键技术特性包括：</p>
+<ul>
+<li><strong>算子级血缘解析：</strong>基于语义分析技术实现对 SQL 脚本的算子级自动解析和算子级血缘图谱构建，实现了对全域字段计算语义的精准刻画，无论是数据的输入、输出、转换、计算还是存储，每一个环节都能被精准地追溯和刻画，让数据在整个生命周期中的流向和处理过程一目了然。</li>
+<li><strong>元数据语义挖掘：</strong>自抽取字段算子级加工口径，并能结合上下游元数据信息挖掘出数据背后的业务语义，自动生成数据的业务描述，而无需数据专家手工维护。同时，该技术还能够对元数据进行聚类、分类和关联分析，实现对全域数据的自动判重和自动编目，从而形成一张语义化的元数据图谱，促进组织内的数据知识流动、共享与沉淀。</li>
+<li><strong>主动元数据服务</strong>：基于对元数据的深入分析和挖掘，还可为用户提供高置信的建议或设计方案，如通过挖掘行为元数据为用户提供数据使用建议，通过分析链路冗余依赖提供链路时效优化建议，通过分析全链路历史变更提供异常根因诊断辅助等等，帮助用户更好地管理和使用数据资产。</li>
+<li><strong>反向元数据集成</strong>：提供各类元数据服务 API 及血缘可视化分析组件，可与客户的数据资产管理平台及数据工具无缝集成，无需改变用户现有使用习惯，实现了数据治理能力的透明化升级。 </li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/3.jpg" alt></p>
+<h3 id="3-NoETL对Data-Fabric思想的三大体现"><a href="#3-NoETL对Data-Fabric思想的三大体现" class="headerlink" title="3.NoETL对Data Fabric思想的三大体现"></a>3.NoETL对Data Fabric思想的三大体现</h3><p><strong>数据访问和整合</strong></p>
+<p>Data Fabric 强调的跨源异构数据的灵活访问和整合，在 Aloudata 的 NoETL 架构中通过数据虚拟化技术得到体现。数据虚拟化技术使得 Aloudata AIR 能够提供一个统一的数据访问层，实现了不同数据源之间的逻辑动态集成，而无需物理地移动数据。同时内置 MPP 引擎，通过 AI 增强的自适应加速能力，由系统自动化完成 ETL 数据物化链路编排和智能查询路由。这种方法不仅减少了数据搬运带来的成本和复杂性，而且还提升了数据访问的速度和灵活性。 </p>
+<p><strong>智能化的数据治理</strong></p>
+<p>Data Fabric 的另一个核心要素是智能化的数据治理。Aloudata BIG 通过其主动元数据平台和算子级血缘解析能力，提供了智能化的数据管理和治理解决方案。这个平台不仅可以自动化地收集和分析元数据，还能主动提出改进和优化的建议，从而简化了传统数据治理过程中的人工干预和复杂操作。 </p>
+<p><strong>自助服务和分析</strong></p>
+<p>Data Fabric 倡导自助服务和高效协作，这在 Aloudata CAN 中得到了充分体现。通过 Aloudata CAN，用户可以直接定义和管理指标，实现了从指标定义到生产的全自动化过程。这不仅提升了业务人员的自助服务能力，还实现了指标管理的一致性和复用性，降低了 IT 部门的工作负担。 </p>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/4.jpg" alt></p>
+<p><strong>解读：整体看下来，这个NoETL的建设分层与京东的建设分组其实差不多，”自动化指标平台”对应京东的”指标服务平台”，”逻辑数据平台”对应京东的”定义驱动生产”，”主动元数据平台”对应京东的”元数据中心”，其中的一些多源异构、自适应加速等功能京东也在建设，其中的细节、深度，谁建设地更好还真不一定，应该各有优缺点。</strong></p>
+<h2 id="京东零售指标中台化与服务化实践"><a href="#京东零售指标中台化与服务化实践" class="headerlink" title="京东零售指标中台化与服务化实践"></a>京东零售指标中台化与服务化实践</h2><h3 id="1-背景介绍："><a href="#1-背景介绍：" class="headerlink" title="1.背景介绍："></a>1.背景介绍：</h3><h4 id="1-1-数据应用场景下痛点："><a href="#1-1-数据应用场景下痛点：" class="headerlink" title="1.1 数据应用场景下痛点："></a>1.1 数据应用场景下痛点：</h4><p>指标中台化与服务化前的数据需求交付模式：</p>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/5.jpg" alt><strong>存在问题：</strong></p>
+<p>（1）依靠个人经验梳理指标口径，导致找指标难、多点提需开发。 </p>
+<p>（2）面向多团队开发标准不统一，研发人员水平差异，导致数据质量参差不齐，且无法被复用，致使浪费大量存算资源膨胀。</p>
+<p>（3）多团队各自建设，服务层缺乏统一可靠的高可用机制，可能会导致用户满意度下降，甚至衍生严重的业务损失，引发系统层面问题，具体表现包括：</p>
+<p>•限流、降级、熔断等机制不完善可能会导致雪崩、资源耗尽、资源公平性等问题；</p>
+<p>•缺少统一巡检机制可能会导致问题发现滞后、运维反应迟缓等问题；</p>
+<p>•查询性能无统一加速层会导致整体性能低下及系统吞吐率降低；</p>
+<p>•监控和预警不完善的隐患包括数据洞察能力弱、及时性差以及风险管理困难等问题；</p>
+<p>（4）缺乏统一查询语言，缺乏指标、维度粒度的安全保障，缺失能力复用，多端重复开发接入费时费力。</p>
+<p>•各端都需要分别对接多个团队的服务协议，与此同时还需要跨服务进行页面上多指标组装。例如之前在X项目时，对原开发模式只是针对大屏一个端的相关服务协议适配、指标组装等工作量就达到500+人日，非常耗费人力。</p>
+<h4 id="1-2-目标："><a href="#1-2-目标：" class="headerlink" title="1.2 目标："></a>1.2 目标：</h4><p>﻿<img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/6.jpg" alt></p>
+<p>﻿1、统一指标口径，实现可看清、可说清，并能系统化的保障存算资源的使用合理。</p>
+<p>2、释放研发资源，在不扩招的情况下满足各业务单元的看数用数需求，降低指标加工成本、消费成本。</p>
+<p>3、使指标在各数据应用平台开放共享变得简单，让指标安全放心的被使用且可以高效的流通起来。</p>
+<p>﻿</p>
+<h3 id="2-解决方案："><a href="#2-解决方案：" class="headerlink" title="2.解决方案："></a>2.解决方案：</h3><h4 id="2-1-整体介绍"><a href="#2-1-整体介绍" class="headerlink" title="2.1 整体介绍"></a>2.1 整体介绍</h4><p>﻿<img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/7.jpg" alt></p>
+<p>﻿由上图可以看到中台化与服务化发展的不同阶段：</p>
+<p>​    在指标中台化与服务化建设初期，主要目标是快速统一已有的多套数据服务，实现黄金眼和大屏的调用达成统一，快速降低开发成本。在资产层面进行标准化，通过中台化思想统一指标、维度的定义管理标准，并在服务化上是统一DSL，建设智能寻址能力，通过最优路径查询各数据引擎，并对结果按策略进行合并。构建基础的调用粒度鉴权、限流、熔断保障。</p>
+<p>​    随着中台化与服务化不断深入，与此同时，团队数据BP机制逐步建设完善，识别到生产消费链路更深层的痛点，着手丰富集成了指标、维度、权限、预警、巡检、目标等一站式服务化解决方案；在寻址能力上，基于日益增长的用户量（到目前为止日常的日均调用量达到4000w）及大促场景的保障上，在已有基础设施上完成更多能力项升级；在基础的寻址能力丰富支持了更多的业务场景，包括复合指标&amp;复合维度计算能力、属性伴随、动态修饰&amp;函数扩展、分时分页等，并实现了更精细化的【指标+维度】粒度的鉴权、寻址、编排。在高性能、高可用的保障上实现了离近在线一体化、智能预热、资源隔离、精准限流熔断等。在指标生产侧进一步释放人力，通过定义驱动生产实现标准指标定义即服务的生产能力，在整个过程中都会伴随数据加速、智能物化来解决数据存不存，存多久，存哪里，怎么存的问题。例如基于代价与消费行为的智能物化，基于统一的维度定义与维度来源派生维度宽表，通过资产模型做逻辑关联从而不断扩展维度。在数据回溯上包括口径回刷、刷岗等，通过定义驱动生产，在OLAP资源不增加的前提下相比于原来的hive回刷，时效从一天回一个月提升到了一天回27个月；在关联物化上依据逻辑表组织关系，按照代价和消费需要进行关联，对比于视图，后者无论是否当次需要关联都会发生。</p>
+<p>﻿</p>
+<h4 id="2-2-具体展开："><a href="#2-2-具体展开：" class="headerlink" title="2.2 具体展开："></a>2.2 具体展开：</h4><h5 id="2-2-1-统一查询语言，最佳查询策略、最优查询性能"><a href="#2-2-1-统一查询语言，最佳查询策略、最优查询性能" class="headerlink" title="2.2.1 统一查询语言，最佳查询策略、最优查询性能"></a>2.2.1 统一查询语言，最佳查询策略、最优查询性能</h5><p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/8.jpg" alt></p>
+<p>﻿###### 2.2.1.1 统一的DSL</p>
+<p>​    在查询语言层面，需要将自然语言分析需求转换为结构化的查询语言从而达到书同文、车同轨的目的，使得指标数据所见即所得，开箱即用。我们通过如下案例来说明语言抽象的思路，例如一个常见的分析需求：<em>「23年12月21日’小米’品牌在各店铺’成交金额’排名top5的情况」。</em></p>
+<p>如果将该需求进行结构化抽取，可以做如下解释：</p>
+<p>​    聚合条件：【按‘店铺’聚合】，筛选条件：【时间范围 = ‘2023-12-21’、品牌 = ‘小米’（id是8557）】 ，要查的指标 = 【成交金额】，排序 = 【按‘成交金额’降序】， 返回维度属性 = 【店铺】，分页 = 【第一页-5条】。</p>
+<p>​    通过这样的结构化思维的理解，则统一的指标查询语言可以由五要素组成：指标、聚合条件、筛选条件、排序分页、返回维度属性。基于此五要素，设计出统一查询DSL。如下结构体所示，语法规则设计类似Json语法风格。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"indicators"</span>: [</span><br><span class="line">      <span class="string">"ge_deal_standard_deal_ord_amt"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"attributes"</span>: [</span><br><span class="line">      <span class="string">"shop"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"criteria"</span>: &#123;</span><br><span class="line">      <span class="attr">"criterions"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"main_brand"</span>,</span><br><span class="line">          <span class="attr">"values"</span>: <span class="string">"8557"</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">          <span class="attr">"op"</span>: <span class="string">"="</span></span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"dt"</span>,</span><br><span class="line">          <span class="attr">"value"</span>: <span class="string">"2023-12-21"</span>,</span><br><span class="line">          <span class="attr">"type"</span>: <span class="string">"string"</span>,</span><br><span class="line">          <span class="attr">"op"</span>: <span class="string">"="</span></span><br><span class="line">        &#125;,</span><br><span class="line">        ...</span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">"orders"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="attr">"ascending"</span>: <span class="literal">false</span>,</span><br><span class="line">          <span class="attr">"propertyName"</span>: <span class="string">"ge_deal_standard_deal_ord_amt"</span></span><br><span class="line">        &#125;</span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">"maxResults"</span>: <span class="number">5</span>,</span><br><span class="line">      <span class="attr">"firstResult"</span>: <span class="number">0</span>,</span><br><span class="line">      <span class="attr">"group"</span>: [</span><br><span class="line">        <span class="string">"shop"</span></span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="2-2-1-2-智能寻址拆分"><a href="#2-2-1-2-智能寻址拆分" class="headerlink" title="2.2.1.2 智能寻址拆分"></a>2.2.1.2 智能寻址拆分</h6><p>​    在实际应用情况中，在简单的五要素基础上，真实业务场景还存在一些同环比、复合指标计算类似的分析及提数场景，则一次取数任务并不是提交一次引擎查询就可以满足需求。所以按照实际场景，查询引擎在处理一次取数任务时，会生成一个执行计划DAG，主要包含两层拆分原则：</p>
+<p><strong>语义拆分：</strong></p>
+<p>​    按照查询引擎提供的DSL语义进行第一层拆分，结合统一的包含“指标、维度、数据服务”的基础元数据中心，进行寻址物料的归堆分组，根据决策策略表进行拆分，包含取寻址最大必要集、在线转离线的策略以及可手动调配的权重等，一个Job（对应用户一次取数任务）会拆分为多个Task，每个Task表示一批逻辑的指标/维度查询。</p>
+<p><strong>引擎拆分：</strong></p>
+<p>​    按照指标维度所存在的数据服务（表引擎）进行第二层拆分，一个Task会拆分多个Query，每个Query表示一次面向引擎的查询，包括图4里当期查询、同期查询等并针对Task按照实际查询场景进行主从/并行的Query决策。</p>
+<p>﻿</p>
+<h6 id="2-2-1-3-数据多级加速"><a href="#2-2-1-3-数据多级加速" class="headerlink" title="2.2.1.3 数据多级加速"></a>2.2.1.3 数据多级加速</h6><p>​    所谓数据加速，就是如何能够让海量的数据更快地完成计算和查询组织，比如通过EasyBI的用户统计，有80%用户反馈数据都有就是跑不出来，或者商智里面对于大量的商家个性化数据分析不可能让用户在页面转圈，又比如大促大屏对于上百亿的数据计算需要在ms内完成都要求数据具备多级加速的能力。加速的方式主要包含两种：</p>
+<p>﻿<img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/9.jpg" alt></p>
+<p>﻿<strong>查询逻辑加速：</strong></p>
+<p>​    包含根据执行计划发起的主从/并行和点查/批查的查询，通过这个逻辑加速可以减少2/3（整体的统计，一批指标越多越明显）的冗余数据查询，从而提升整体TP99表现，同时在查询层通过动态获取集群CPU负载等情况可以用来进行自动切流、潮汐滚动等加速优化，比如在双流情况下，当其中一条流集群CPU负载超过预设的阈值时，启动自动切一部分流量到另一个流从而来前置降低集群负载避免影响查询速度。又如在近线的查询场景中（分页逻辑异步发起多次请求，用户预期分钟级响应内），通过获取集群CPU、负载的使用情况来动态调节请求的流速，从而通过最大化利用集群资源来实现查询提速。当然在查询加速上少不了缓存的介入，通过JIMDB+本地缓存的方式进行多级缓存的加速。</p>
+<p><strong>存储决策加速：</strong></p>
+<p>​    通过大促重保时间及活动日历等前置规则(RBO)自动进行预热任务的执行，保证在真正重保业务查询时能完全命中缓存。在预计算的精确性上，打破原有“高维全部走预计算，低维全部走明细”的思维，基于历史调用情况(HBO)分析进行精确的预计算，在预计算的性能提升上完成最后的一公里做到极致。大屏等重要看板通过在线的性能判断，进行拟合秒形式的离线对比场景支持，从而来提升存储效率，加快链路速度。在指标生产加工过程，通过关联后的决策表来判断是否通过OLAP等介质进行加速从而进一步提升查询速度。</p>
+<p>﻿</p>
+<h5 id="2-2-2-数据知识系统化，使资产放心好用、治理有依据"><a href="#2-2-2-数据知识系统化，使资产放心好用、治理有依据" class="headerlink" title="2.2.2 数据知识系统化，使资产放心好用、治理有依据"></a>2.2.2 数据知识系统化，使资产放心好用、治理有依据</h5><p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/10.jpg" alt></p>
+<p>﻿</p>
+<h6 id="2-2-2-1-数据知识系统化："><a href="#2-2-2-1-数据知识系统化：" class="headerlink" title="2.2.2.1 数据知识系统化："></a>2.2.2.1 数据知识系统化：</h6><p>​    在数据知识可视化上要做的事儿是如何将业务语言转化为机器语言，并根据设定的标准及规则进行执行，对此我们分别从指标维度体系化标准定义模型、指标维度的数据安全保障模型、指标消费应用管理模型三个层面进行了系统化设计，为自动化生产、消费及全链路血缘可视化做数据治理打好基础。</p>
+<p><strong>指标、维度体系化标准定义模型：</strong></p>
+<p>​    通过定义4w1h构造原子指标并结合标准维度定义的裁剪口径进行唯一的、标准的衍生指标定义。</p>
+<p>​    复合指标指建立在衍生指标之上，通过一定运算规则形成的计算指标集合（二次逻辑计算），如ARPU值、渗透率等；包括比率型、比例型、变化量型、变化率型、统计行（均值、分位数），复合指标采用了“积木化+服务化”双重解决方案，在既满足业务灵活场景下，又做到了复合指标的资产沉淀。</p>
+<p>​    又如以复合维度的模型为例在维度模型上结合较频繁变动的维度（维度的定义会周期性变动）调整项如何统一，对需求进行了抽象，设计复合维度模型，进一步扩充”指标-维度-修饰”的概念体系，既保证了维度口径定义的透明,又保证了逻辑一致且可被系统执行;一次定义,多处使用，结合上面提到的统一查询的服务化能力做到了真正的开放（日均调用量4000w）、共享（可复用，不用单独开发）。</p>
+<p><strong>指标、维度数据安全保障模型：</strong></p>
+<p>​    对人在数据应用产品上能看到什么样的数据范围需要有安全保障，避免数据泄露风险。对此通过把看数视角【维度+维度值】定义到数据角色里，可做到数据角色被多个人或者岗位所复用。在数据角色基础上抽取岗位的模型把人与角色关联起来，保证一个人可有多个身份切换不同视角进行灵活看数。在岗位下通过设计功能角色把资源（菜单）的权限进行管控，在资源下进行具体指标和维度组的关联，从而达到在基础的行列之外，提供了各种“视图”级别的权控，而每一个“视图”是展示的最小单元。而资源内的指标维度叉乘关系是数据权限全集的真子集从而达到快速分配权限的目的。</p>
+<p><strong>指标消费应用管理模型：</strong></p>
+<p>​    当一个指标被申请消费时，需要知道被用在来什么平台、什么端，应用场景是什么样的，从而来评估是否允许接入、是否需要重保、资源如何分配等。对此构建消费应用管理模型，从指标到资源、场景、应用端、应用平台的关系把消费血缘需要体现出的具体消费情况都能涵盖。</p>
+<p>﻿</p>
+<h6 id="2-2-2-2-资产放心好用："><a href="#2-2-2-2-资产放心好用：" class="headerlink" title="2.2.2.2 资产放心好用："></a>2.2.2.2 资产放心好用：</h6><p>​    在数据知识系统化的前提下，需要大量对外开放，基于三道防线保障了日常和大促的资产放心好用，为系统稳定运行保驾护航：</p>
+<p><strong>第一道防线：前置避免故障发生：</strong></p>
+<p>​    通过资源隔离来进行各平台、端甚至看板级别的隔离保障，保障的是一些非重保看板查询变慢或者阻塞不影响其他核心业务；压测相关是在平台层面上基于历史调用采集分析对现实场景的高度还原，进行全链路节点高保真压测，并且针对压测期间通过动态别名切换技术，来实现业务无损压测及数据产品无感知压测；在混沌工程演练上将核心的数据链路注入问题点，自动识别潜在风险，防患于未然。</p>
+<p><strong>第二道防线：巡检与监控，主动发现</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/11.jpg" alt></p>
+<p>​    在态势检测及预警上，结合调用情况对预计算、预热命中率等趋势预警，防止有些预计算未命中或者预热未覆盖到的情况；在数据SRE的体系建设上，对调用情况通过全链路的uuid进行串联，并进行可视化展示，提升数据可观测性，打破多系统监控数据孤岛，提升监控效率；巡检能力是通过日常的访问日志分析及梳理，以及各核心业务场景的输入，如上图所示，基于统一查询服务的巡检配置场景及对应告警规则，结合巡检自动化任务，可在任意时间按任意频次动态执行任务，防止数据空窗、跌0、异常波动等情况。先于用户无感的在系统层面发现问题；从发现、跟进、分析、解决、经验沉淀做到全流程自动化。在实战中巡检的问题主要分以下几类：</p>
+<p>（1）对于实时数据异常的巡检，第一时间发现后马上进行数据流切换，用户完全无感知；</p>
+<p>（2）BP的战报、日报通过巡检无需人工确认，自动将结果发送给对应业务，可以及时介入；</p>
+<p>（3）大促期间有很多指标数据有“异常”大波动（以23年618期间为例，巡检发现16个线上异常情况），产品研发收到巡检结果后第一时间进行业务分析，从经营状态角度确保数据在预期之内。﻿</p>
+<p><strong>第三道防线：应急预案</strong></p>
+<p>​    对于一些已发生的问题，一定要有应急预案才能真正做到临危不乱，服务化对于限流、熔断实现了精准靶向，可做到针对某一个页面的某个主题指标进行细粒度限流或者熔断处理，也可做到整体的看板或者集群粒度的处理，保证容灾的灵活性。同时对降级策略有更友好的设计，在降级后默认返回兜底0的基础上，通过缓存机制，可返回最后一次请求成功的结果，增加了系统灵活性及减少业务的损失。在应急预案上由于压力过大导致服务或容器出现异常时，会应急启动热备容器，让子弹飞一会儿，争取更多的修复及问题定位时间。</p>
+<p>﻿</p>
+<h6 id="2-2-2-3-存算成本集约化治理："><a href="#2-2-2-3-存算成本集约化治理：" class="headerlink" title="2.2.2.3 存算成本集约化治理："></a>2.2.2.3 存算成本集约化治理：</h6><p>​    指标体系开放，在生产、消费间进行系统化流转，基于指标体系及指标消费应用管理模型首次解决消费链路可追踪，结合指标的生产血缘，形成清晰的全链路血缘。</p>
+<p>打通全链路血缘的必要性主要基于以下三大视角：</p>
+<p>（1）用户视角：让用户从指标展示入口（标准化产品、数据工具）到口径与资产血缘清晰可见，知道数据从哪来、怎么来、怎么用。</p>
+<p>（2）治理视角：通过数据标准消费端反向治理，可清晰的知道某些模型或者表在消费侧的使用情况如何，访问少或功能相似的看板做整合，关停并转，实现了从消费价值来反推资产ROI。</p>
+<p>（3）监控视角：当大促期间发现某一数据任务延迟或者某一实时流积压时，可通过血缘关系快速确定应用上的影响范围，从而能快速介入进行分析并判断是否公告用户。</p>
+<p>﻿</p>
+<h3 id="3-最佳实践："><a href="#3-最佳实践：" class="headerlink" title="3.最佳实践："></a>3.最佳实践：</h3><h4 id="3-1-从数仓到看板应用自动化交付-构建指标生态"><a href="#3-1-从数仓到看板应用自动化交付-构建指标生态" class="headerlink" title="3.1 从数仓到看板应用自动化交付-构建指标生态"></a>3.1 从数仓到看板应用自动化交付-构建指标生态</h4><p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/12.jpg" alt></p>
+<p>​    上面介绍的系统处理过程这么的复杂，但是如上图所示对于搭建看板的角色来说，几乎不用感知，推动人人都是数据研发，上图内左图能够看到，生成的动态修饰，函数，指标，维度等等都能够快速的配置出来，基于统一的查询引擎的服务化能力可自动实现看板的查询。同时，指标体系以及对应的元数据都能够无感的透出，且自动采集消费数据反馈给生产物化的决策，让零售的指标自由的流通在底层到前台各个产品之中，形成指标生态体系。</p>
+<p>﻿</p>
+<h4 id="3-2-链路可观测、多端复用、口径统一"><a href="#3-2-链路可观测、多端复用、口径统一" class="headerlink" title="3.2 链路可观测、多端复用、口径统一"></a>3.2 链路可观测、多端复用、口径统一</h4><p>​    以零售通用域的“成交金额”指标为例：如下图所示，通过消费血缘我们可以看到此指标应用在了10+的数据平台和数据工具上，保障了多端看到的数据一致性。</p>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/13.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/14.jpg" alt></p>
+<h4 id="3-3-成本、效率、体验全方位升级"><a href="#3-3-成本、效率、体验全方位升级" class="headerlink" title="3.3.成本、效率、体验全方位升级"></a>3.3.成本、效率、体验全方位升级</h4><p>（1）降低成本：</p>
+<p>•彻底改变数据交付模式，基于统一服务的系统整合能力，节省了23440c的在线存储；</p>
+<p>•在战报、大屏、黄金眼等核心数据决策场景研发成本降低40%+，累计节省2000+人天；</p>
+<p>•数据资产与应用部大促备战人力下降14.6% ；</p>
+<p>（2）提高效率：</p>
+<p>•数据需求交付效率提升70%+，商智流量MVP需求为例，日常交付由14人日降为4人日；</p>
+<p>•应用资产治理后口径差异对比从天级缩短为分钟级；</p>
+<p>（3）优化体验：</p>
+<p>•支撑了5个BG数据需求并多次获得业务方肯定，并通过数据BP快速进行模式复制；</p>
+<p>•618&amp;双十一多次通过配置化能力进行敏捷交付，极致体验获得时尚、经分、市场部等老板的点赞；</p>
+<p>•618大促期间通过巡检及时发现并介入16个线上问题，将问题结束在“用户无感”阶段，避免客诉与风险持续扩大。</p>
+<p><strong>解读：除了监控、限流、熔断、复合指标维度、路由等基本功能，给我影响最深的三个可以基于指标服务平台也只能基于指标服务平台去建设的能力：预警、巡检、预热。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DataFabric/" rel="tag"><i class="fa fa-tag"></i> DataFabric</a>
+          
+            <a href="/tags/%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%B9%B3%E5%8F%B0/" rel="tag"><i class="fa fa-tag"></i> 指标服务平台</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/" rel="next" title="ClickHouse_clickhouse刷岗实战">
+                <i class="fa fa-chevron-left"></i> ClickHouse_clickhouse刷岗实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/" rel="prev" title="Java服务_ELK日志采集与可视化链路建设实战经验">
+                Java服务_ELK日志采集与可视化链路建设实战经验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#京东商智-DataFabric数据管理架构与指标服务建设-amp-零售指标中台化与服务化实践"><span class="nav-number">1.</span> <span class="nav-text">京东商智_DataFabric数据管理架构与指标服务建设&amp;零售指标中台化与服务化实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文章读后感与京东切入现状分析"><span class="nav-number">1.1.</span> <span class="nav-text">文章读后感与京东切入现状分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文章重点摘录"><span class="nav-number">1.2.</span> <span class="nav-text">文章重点摘录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-NoETL数据工程架构主要有4大特性："><span class="nav-number">1.2.1.</span> <span class="nav-text">1.NoETL数据工程架构主要有4大特性：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-NoETL的3大引擎能力"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.NoETL的3大引擎能力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-NoETL对Data-Fabric思想的三大体现"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.NoETL对Data Fabric思想的三大体现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#京东零售指标中台化与服务化实践"><span class="nav-number">1.3.</span> <span class="nav-text">京东零售指标中台化与服务化实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景介绍："><span class="nav-number">1.3.1.</span> <span class="nav-text">1.背景介绍：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-数据应用场景下痛点："><span class="nav-number">1.3.1.1.</span> <span class="nav-text">1.1 数据应用场景下痛点：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-目标："><span class="nav-number">1.3.1.2.</span> <span class="nav-text">1.2 目标：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-解决方案："><span class="nav-number">1.3.2.</span> <span class="nav-text">2.解决方案：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-整体介绍"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">2.1 整体介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-具体展开："><span class="nav-number">1.3.2.2.</span> <span class="nav-text">2.2 具体展开：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-统一查询语言，最佳查询策略、最优查询性能"><span class="nav-number">1.3.2.2.1.</span> <span class="nav-text">2.2.1 统一查询语言，最佳查询策略、最优查询性能</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#2-2-1-2-智能寻址拆分"><span class="nav-number">1.3.2.2.1.1.</span> <span class="nav-text">2.2.1.2 智能寻址拆分</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-2-1-3-数据多级加速"><span class="nav-number">1.3.2.2.1.2.</span> <span class="nav-text">2.2.1.3 数据多级加速</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-数据知识系统化，使资产放心好用、治理有依据"><span class="nav-number">1.3.2.2.2.</span> <span class="nav-text">2.2.2 数据知识系统化，使资产放心好用、治理有依据</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#2-2-2-1-数据知识系统化："><span class="nav-number">1.3.2.2.2.1.</span> <span class="nav-text">2.2.2.1 数据知识系统化：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-2-2-2-资产放心好用："><span class="nav-number">1.3.2.2.2.2.</span> <span class="nav-text">2.2.2.2 资产放心好用：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-2-2-3-存算成本集约化治理："><span class="nav-number">1.3.2.2.2.3.</span> <span class="nav-text">2.2.2.3 存算成本集约化治理：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-最佳实践："><span class="nav-number">1.3.3.</span> <span class="nav-text">3.最佳实践：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-从数仓到看板应用自动化交付-构建指标生态"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">3.1 从数仓到看板应用自动化交付-构建指标生态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-链路可观测、多端复用、口径统一"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">3.2 链路可观测、多端复用、口径统一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-成本、效率、体验全方位升级"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">3.3.成本、效率、体验全方位升级</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

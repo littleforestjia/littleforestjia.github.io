@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hive,ClickHouse,BitMap," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_BitMap在hive和ck中的存储与两者之间的传输BitMapbitmap（位图）是一种利用比特位来进行数据存储的结构，简单举例：存储1-8的整数，如果我们用整数数组的话，1个int型整数是4字节，至少需要4*8&#x3D;32个字节的存储空间，但是如果用bitmap的话，我们只需要1个字节（8bit），从低位到高位，每一位是否为1即可表示该数是否存在。 假设有这样一个需求：在20亿">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_BitMap在hive和ck中的存储与两者之间的传输">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_BitMap在hive和ck中的存储与两者之间的传输BitMapbitmap（位图）是一种利用比特位来进行数据存储的结构，简单举例：存储1-8的整数，如果我们用整数数组的话，1个int型整数是4字节，至少需要4*8&#x3D;32个字节的存储空间，但是如果用bitmap的话，我们只需要1个字节（8bit），从低位到高位，每一位是否为1即可表示该数是否存在。 假设有这样一个需求：在20亿">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/5.jpg">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:37:32.654Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Hive">
+<meta property="article:tag" content="ClickHouse">
+<meta property="article:tag" content="BitMap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap在hive和ck中的存储与两者之间的传输/"/>
+
+
+
+
+
+  <title>ClickHouse_BitMap在hive和ck中的存储与两者之间的传输 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_BitMap在hive和ck中的存储与两者之间的传输</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-01T00:00:00+08:00">
+                2024-01-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClickHouse-BitMap在hive和ck中的存储与两者之间的传输"><a href="#ClickHouse-BitMap在hive和ck中的存储与两者之间的传输" class="headerlink" title="ClickHouse_BitMap在hive和ck中的存储与两者之间的传输"></a>ClickHouse_BitMap在hive和ck中的存储与两者之间的传输</h1><h2 id="BitMap"><a href="#BitMap" class="headerlink" title="BitMap"></a>BitMap</h2><p>bitmap（位图）是一种利用比特位来进行数据存储的结构，简单举例：存储1-8的整数，如果我们用整数数组的话，1个int型整数是4字节，至少需要4*8=32个字节的存储空间，但是如果用bitmap的话，我们只需要1个字节（8bit），从低位到高位，每一位是否为1即可表示该数是否存在。</p>
+<p>假设有这样一个需求：在20亿个随机整数中找出某个数m是否存在其中，并假设32位操作系统，4G内存。如果每个数字用int存储，那就是20亿个int，因而占用的空间约为 (2000000000<em>4/1024/1024/1024)≈*</em>7.45<strong>G；如果按位存储就不一样了，20亿个数就是20亿位，占用空间约为 (2000000000/8/1024/1024/1024)≈</strong>0.233**G。高下立判，无需多言。</p>
+<p>显然，使用bitmap能够显著节省用户存储空间，但也有一些局限性：1.存储的数据不能过于稀疏，比如只有1和10000两个数，那也需要10000/8=1250个字节；不能表现数据是否重复，因为每一位只有0和1，只能表示该数存在或不存在。</p>
+<p>正因为上述特性，经常有一些面试中会考到bitmap的使用：1.给你40亿个不重复的整数，判断其中是否存在某个给定的整数，但是只有1G的内存；10亿个整数中出现重复的整数个数；10亿个数中只有1位为空，在内存只有几十兆的情况下找出为空的那个数。</p>
+<p>和bitmap原理类似的还有更复杂一点儿的布隆过滤器（BloomFilter）。</p>
+<p><a href="https://www.cnblogs.com/cjsblog/p/11613708.html" target="_blank" rel="noopener">bitmap简介与快速增删改查原理</a></p>
+<h2 id="RoaringBitmap"><a href="#RoaringBitmap" class="headerlink" title="RoaringBitmap"></a>RoaringBitmap</h2><p><img src="//littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/1.jpg" alt></p>
+<p>RoaringBitmap中每个32位的整形，高16位会被作为key存储到char[] keys中（可以按short[] keys来理解），低16位则被看做value，存储到Container[] values中的对应Container中。keys和values通过下标一一对应。size则标示了当前RoaringArray中包含的key-value pair的数量，即keys和values中有效数据的数量。</p>
+<p>keys数组永远保持有序，方便二分查找。</p>
+<p>下面介绍到的是RoaringBitmap的核心，三种Container。通过上面的介绍我们知道，每个32位整形的高16位已经作为key存储在RoaringArray中了，那么Container只需要处理低16位的数据：</p>
+<ul>
+<li>ArrayContainer可以看作一个有序数组；</li>
+<li>RunContainer常用于存储较为连续的数据；</li>
+<li>BitmapContainer就是利用Bitmap原理使用一个65536bit结构来存储数据，大小就是8kb。</li>
+</ul>
+<p>RoaringBitmap会基于存储数据情况根据优化策略自动进行三种Container之间的转换。</p>
+<p><a href="https://blog.csdn.net/yizishou/article/details/78342499" target="_blank" rel="noopener">RoaringBitmap数据结构及原理</a></p>
+<h2 id="BitMap与RoaringBitmap的区别"><a href="#BitMap与RoaringBitmap的区别" class="headerlink" title="BitMap与RoaringBitmap的区别"></a>BitMap与RoaringBitmap的区别</h2><p><strong>1.RoaringBitmap更加节省内存空间</strong></p>
+<p>如果要用BitMap存储两个元素，其中一个是1，另一个是1亿，那么这个BitMap需要的存储空间就是1亿bit，这样明显产生了大量的空间浪费。那么使用RoaringBitmap将每个元素的32位分成2^16个容器，只为用到的容器分配空间，解决了稀疏数据浪费空间的问题；同时还有三种Container根据稠密程度进行转化，节约容器占用存储。</p>
+<p><strong>2.RoaringBitmap性能更强</strong></p>
+<p>因为使用存储更少，计算时就不会开辟大量内存，提升计算速度；同时使用有序数组保存容器，进行增删改查等运算能根据二分法快速索引到目标元素。</p>
+<h2 id="Clickhouse中的bitmap类型创建方法"><a href="#Clickhouse中的bitmap类型创建方法" class="headerlink" title="Clickhouse中的bitmap类型创建方法"></a>Clickhouse中的bitmap类型创建方法</h2><p><strong>1.使用bitmapBuild将整形数组列物化为bitmap列</strong></p>
+<p>建表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> ge_order.spark_bitmap_test_1</span><br><span class="line">(</span><br><span class="line">    <span class="string">`dt`</span> LowCardinality(<span class="keyword">String</span>) <span class="keyword">COMMENT</span> <span class="string">'日期'</span>,</span><br><span class="line">    <span class="string">`dim_type`</span> Int32 <span class="keyword">COMMENT</span> <span class="string">'维度类型'</span>,</span><br><span class="line">    <span class="string">`dim_id`</span> Int32 <span class="keyword">COMMENT</span> <span class="string">'纬度值'</span>,</span><br><span class="line">    <span class="string">`encode`</span> <span class="built_in">Array</span>(UInt32) <span class="keyword">COMMENT</span> <span class="string">'编码'</span>,</span><br><span class="line">    <span class="string">`compare_encode`</span> AggregateFunction(groupBitmap, UInt32) <span class="keyword">MATERIALIZED</span> bitmapBuild(<span class="keyword">encode</span>)  <span class="comment">--物化列</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = AggregatingMergeTree</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> toYYYYMMDD(toDate(dt))</span><br><span class="line">PRIMARY <span class="keyword">KEY</span> (dim_type, dim_id)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> (dim_type, dim_id)</span><br><span class="line"><span class="keyword">SETTINGS</span> index_granularity = <span class="number">8192</span></span><br></pre></td></tr></table></figure>
+
+<p>此处compare_encode即为通过bitmapBuild(encode)获得的bitmap列，推数时直接推前4列即可：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> ge_order.spark_bitmap_test_1 </span><br><span class="line"><span class="keyword">values</span> (<span class="string">'2021-12-14'</span> , <span class="number">1</span> , <span class="number">2370</span> ,[<span class="number">3</span>,<span class="number">4</span>,<span class="number">100</span>,<span class="number">200</span>]);</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2.使用groupBitmap将明细列聚合为bitmap列</strong></p>
+<p>建明细表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   dt string 时间</span><br><span class="line">   brand  品牌  手机品牌</span><br><span class="line">   phone_model  手机型号</span><br><span class="line">   device_id String  设备号      </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>建bitmap表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">     dt  LowCardinality(String)   时间</span><br><span class="line">     dim_type  LowCardinality(String)  维度类型(1:品牌维度、2:手机型号维度)</span><br><span class="line">     dim_value LowCardinality(String) 每个dim_type维度下对应的品牌或者手机型号值</span><br><span class="line">     bitmap_dvid  AggregateFunction(groupBitmap, UInt32) 明细</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">bitmap</span>表 </span><br><span class="line"><span class="keyword">select</span> </span><br><span class="line">		dt , </span><br><span class="line">		<span class="number">1</span> , </span><br><span class="line">		brand , </span><br><span class="line">		groupBitmapState(toUInt32(dvid)) <span class="keyword">as</span> dvid </span><br><span class="line"><span class="keyword">from</span> 明细表 </span><br><span class="line"><span class="keyword">where</span> dt = 日期 </span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> brand</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="bitmap使用实例之hive缩减数据量级"><a href="#bitmap使用实例之hive缩减数据量级" class="headerlink" title="bitmap使用实例之hive缩减数据量级"></a>bitmap使用实例之hive缩减数据量级</h2><p><strong>离线流量计算任务优化，这是一个在hive上使用bitmap的案例</strong></p>
+<p><strong>1.背景</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/2.jpg" alt></p>
+<p>当前数据量巨大，导致一步到位的计算性能及其不稳定。采用预汇总方式减少数据量时需要保证后续去重指标的计算，所以只能以最细粒度进行预汇总，数据量减少效果微乎其微。为了分散计算压力，把整体的数据流维度横向、关联聚合过程纵向进行切割，每个调度任务承接一段计算任务。导致计算链路错综复杂，任务量巨大。</p>
+<p><strong>2.bitmap方案</strong></p>
+<p>主要利用bitmap两个优势：占用存储(内存)少、去重。</p>
+<p>以UV为例：</p>
+<ul>
+<li>占用存储(内存)少：brws_uniq_id为string类型，平均20个字符，转化为bitmap后存储为原来的20 * 8 = 160分之一</li>
+<li>去重：将数据信息压缩到bit中，0代表该值不存在，1存在。将去重指标的数据信息进行了保留，支持了再次上卷时的去重计算。</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/3.jpg" alt></p>
+<p><strong>3.具体实现</strong></p>
+<ul>
+<li>对string类型的brws_uniq_id取hash作为bitmap的key值；</li>
+<li>优化稀疏存储问题采用了RoaingBitmap压缩位图，</li>
+<li>防止hash碰撞，为brws_uniq_id生成Long类型的hash值，所以最终采用了Roaing64Bitmap。</li>
+<li>hive数仓中使用binary类型存储，在UDF/UDAF中将binary反序列化为Roaring64Bitmap，进行各种运算。如有需要再序列化为binary存储。</li>
+</ul>
+<p>聚合上卷生产：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">sys.path.append(os.getenv(<span class="string">'HIVE_TASK'</span>))</span><br><span class="line"><span class="keyword">from</span> HiveTask <span class="keyword">import</span> HiveTask</span><br><span class="line">ht = HiveTask()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dest_db = <span class="string">'app'</span></span><br><span class="line">dest_table_name = <span class="string">'app_sz_traffic_shop_src_log_shop_bit'</span></span><br><span class="line"></span><br><span class="line">dt = sys.argv[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">sql = <span class="string">"""</span></span><br><span class="line"><span class="string">    add jar hdfs://ns3/user/mart_sz/bi_sz/util/hive-bitmap-udf.jar;</span></span><br><span class="line"><span class="string">    CREATE TEMPORARY FUNCTION to_bitmap AS 'com.hive.bitmap.udf.ToBitmapUDAF';</span></span><br><span class="line"><span class="string">    CREATE TEMPORARY FUNCTION bitmap_union AS 'com.hive.bitmap.udf.BitmapUnionUDAF';</span></span><br><span class="line"><span class="string">    CREATE TEMPORARY FUNCTION bitmap_count AS 'com.hive.bitmap.udf.BitmapCountUDF';</span></span><br><span class="line"><span class="string">    CREATE TEMPORARY FUNCTION bitmap_and AS 'com.hive.bitmap.udf.BitmapAndUDF';</span></span><br><span class="line"><span class="string">    CREATE TEMPORARY FUNCTION bitmap_or AS 'com.hive.bitmap.udf.BitmapOrUDF';</span></span><br><span class="line"><span class="string">    CREATE TEMPORARY FUNCTION bitmap_xor AS 'com.hive.bitmap.udf.BitmapXorUDF';</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    INSERT OVERWRITE TABLE &#123;table&#125; partition(dt = '&#123;dt&#125;')</span></span><br><span class="line"><span class="string">    SELECT</span></span><br><span class="line"><span class="string">        shop_id,</span></span><br><span class="line"><span class="string">        chan_cd,</span></span><br><span class="line"><span class="string">        SUM(upv) AS pv,</span></span><br><span class="line"><span class="string">        SUM(tm_on_page) AS tm_on_page,</span></span><br><span class="line"><span class="string">        to_bitmap(hash(brws_uniq_id)) AS brwsBit,</span></span><br><span class="line"><span class="string">        to_bitmap(IF(upv = 1, hash(brws_uniq_id), NULL)) AS bncBrwsBit,</span></span><br><span class="line"><span class="string">        to_bitmap(IF(upv &gt; 1, hash(brws_uniq_id), NULL)) AS notBncBrwsBit</span></span><br><span class="line"><span class="string">    FROM</span></span><br><span class="line"><span class="string">        (</span></span><br><span class="line"><span class="string">            SELECT</span></span><br><span class="line"><span class="string">                shop_id,</span></span><br><span class="line"><span class="string">                chan_cd,</span></span><br><span class="line"><span class="string">                brws_uniq_id,</span></span><br><span class="line"><span class="string">                COUNT(1) AS upv,</span></span><br><span class="line"><span class="string">                SUM(</span></span><br><span class="line"><span class="string">                    CASE</span></span><br><span class="line"><span class="string">                        WHEN tm_on_page &gt; 0</span></span><br><span class="line"><span class="string">                            AND tm_on_page &lt; 1800</span></span><br><span class="line"><span class="string">                        THEN tm_on_page</span></span><br><span class="line"><span class="string">                        ELSE 0</span></span><br><span class="line"><span class="string">                    END) AS tm_on_page</span></span><br><span class="line"><span class="string">            FROM</span></span><br><span class="line"><span class="string">                adm.adm_s14_zs_all_chan_shop_traffics</span></span><br><span class="line"><span class="string">            WHERE</span></span><br><span class="line"><span class="string">                dt = '&#123;dt&#125;'</span></span><br><span class="line"><span class="string">            GROUP BY</span></span><br><span class="line"><span class="string">                shop_id,</span></span><br><span class="line"><span class="string">                chan_cd,</span></span><br><span class="line"><span class="string">                brws_uniq_id</span></span><br><span class="line"><span class="string">        )</span></span><br><span class="line"><span class="string">        ALL</span></span><br><span class="line"><span class="string">    GROUP BY</span></span><br><span class="line"><span class="string">        shop_id,</span></span><br><span class="line"><span class="string">        chan_cd</span></span><br><span class="line"><span class="string">"""</span>.format(table = dest_table_name, dt = dt)</span><br><span class="line"></span><br><span class="line">ht.exec_sql(schema_name = dest_db ,</span><br><span class="line">            table_name = dest_table_name ,</span><br><span class="line">            sql = sql ,</span><br><span class="line">            exec_engine=<span class="string">'spark'</span>,</span><br><span class="line">            spark_resource_level=<span class="string">'high'</span>,</span><br><span class="line">            merge_flag = <span class="literal">True</span>,</span><br><span class="line">            retry_with_hive=<span class="literal">False</span> )</span><br></pre></td></tr></table></figure>
+
+<p>预计算使用，<strong>bitmap数据结构上有交、并、异或、与非等各种运算函数</strong>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	汇总维度 * ，<span class="keyword">sum</span>(累加指标) ， countBitMap(unionBitMap(去重指标))</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app_sz_traffic_shop_src_log_bit</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	cust_type <span class="keyword">IN</span>(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	cust_type</span><br><span class="line"></span><br><span class="line"><span class="comment">--</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	汇总维度 * ， countBitMap(onceBitMap bncBrwsBit)</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app_sz_traffic_shop_src_log_bit</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><strong>4.实际收益</strong></p>
+<p>得益于bitmap的优势，可以把300w的brws_uniq_id信息压缩在一个字段中，并且支持后续汇总去重。所以以终为始的方式对数据进行深度预汇总，形成轻量级的预汇总层，将进入到应用层的数据量减少到可以合并计算的量级。</p>
+<p>目前店铺+平台粒度已上线稳定运行，数据量从10亿+ 减少到100W左右，执行时长1h左右；店铺+平台+渠道粒度，数据量从10亿+减少到1000W级别，执行时长2h左右。</p>
+<p>该链路上任务量从50+减少为5个，存储减少50%(150T左右)，时效提前1h。</p>
+<p><img src="//littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/4.jpg" alt></p>
+<p><strong>5.引入新问题</strong></p>
+<p>问题：数据倾斜</p>
+<p>由于某个汇总维度数据量过大时会导致单节点计算压力过大，普遍意义是指数据行数倾斜。该bitmap方案中会把大量的数据信息进行压缩存储到一个字段中，所以就有可能当信息量过大时造成单条数据过大，引发数据大小倾斜的问题。例如：京东大药房（1000015441）2022.12月每日uv从不足百万增长到2千万，月度uv高达5千万，单条数据大于200K，导致单个task的suffleRead量到达1G，执行时长从平均10min延长到1h。</p>
+<p>解决方案：数据分桶</p>
+<p>在汇总计算任务前添加分桶层，通过分桶层控制数据流走向，将大桶数据单独计算。例如：在三级来源加工链路中，轻量级预汇总层和最终汇总层间添加分桶打标层，默认为1桶，如果shopId+chanCd+fristSrc粒度下月至今总UV大于5千万分打标为2桶。下游分为2条数据流，根据配置参数分别接受各桶数据。这样可以通过自定义的分桶规则和识别策略，不断提高整条数据链路的稳定性。</p>
+<h2 id="bitmap使用实例之hive提升计算性能"><a href="#bitmap使用实例之hive提升计算性能" class="headerlink" title="bitmap使用实例之hive提升计算性能"></a>bitmap使用实例之hive提升计算性能</h2><p><strong>1.背景</strong></p>
+<p>在hive中使用Roaring64Bitmap实现精确去重功能 主要目的：<br> 1.提升 hive 中精确去重性能，代替hive 中的 count(distinct uuid)；<br> 2.节省 hive 存储 ，使用 bitmap 对数据压缩 ，减少了存储成本；<br> 3.提供在 hive 中 bitmap 的灵活运算 ，比如：交集、并集、差集运算 ，计算后的 bitmap 也可以直接写入 hive；</p>
+<p><strong>2.在hive中创建自定义 bitmap UDF</strong></p>
+<p><a href="https://github.com/lihuigang/hive-bitmap-udf" target="_blank" rel="noopener">bitmap UDF github地址</a></p>
+<p><a href="https://github.com/lihuigang/hive-bitmap-udf/releases/download/v1.0.2/hive-bitmap-udf.jar" target="_blank" rel="noopener">UDF下载地址</a></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">add jar hdfs://node:9000/hive-bitmap-udf.jar;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">FUNCTION</span> to_bitmap <span class="keyword">AS</span> <span class="string">'com.hive.bitmap.udf.ToBitmapUDAF'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">FUNCTION</span> bitmap_union <span class="keyword">AS</span> <span class="string">'com.hive.bitmap.udf.BitmapUnionUDAF'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">FUNCTION</span> bitmap_count <span class="keyword">AS</span> <span class="string">'com.hive.bitmap.udf.BitmapCountUDF'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">FUNCTION</span> bitmap_and <span class="keyword">AS</span> <span class="string">'com.hive.bitmap.udf.BitmapAndUDF'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">FUNCTION</span> bitmap_or <span class="keyword">AS</span> <span class="string">'com.hive.bitmap.udf.BitmapOrUDF'</span>;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TEMPORARY</span> <span class="keyword">FUNCTION</span> bitmap_xor <span class="keyword">AS</span> <span class="string">'com.hive.bitmap.udf.BitmapXorUDF'</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3.udf说明</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/5.jpg" alt></p>
+<p><strong>4.在 hive 中创建 bitmap 类型表,导入数据并查询</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> <span class="string">`hive_bitmap_table`</span></span><br><span class="line">( </span><br><span class="line">    k      <span class="built_in">int</span>      <span class="keyword">comment</span> <span class="string">'id'</span>,</span><br><span class="line">    <span class="keyword">bitmap</span> <span class="built_in">binary</span>   <span class="keyword">comment</span> <span class="string">'bitmap'</span></span><br><span class="line">) <span class="keyword">comment</span> <span class="string">'hive bitmap 类型表'</span> </span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span> ORC;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 数据写入</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">table</span>  hive_bitmap_table <span class="keyword">select</span>  <span class="number">1</span> <span class="keyword">as</span> <span class="keyword">id</span>,to_bitmap(<span class="number">1</span>) <span class="keyword">as</span> <span class="keyword">bitmap</span>;</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">table</span> hive_bitmap_table <span class="keyword">select</span>  <span class="number">2</span> <span class="keyword">as</span> <span class="keyword">id</span>,to_bitmap(<span class="number">2</span>) <span class="keyword">as</span> <span class="keyword">bitmap</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询</span></span><br><span class="line"><span class="keyword">select</span> bitmap_union(<span class="keyword">bitmap</span>) <span class="keyword">from</span> hive_bitmap_table;</span><br><span class="line"><span class="keyword">select</span> bitmap_count(bitmap_union(<span class="keyword">bitmap</span>)) <span class="keyword">from</span> hive_bitmap_table;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>5.在 hive 中使用 bitmap 实现精确去重</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> <span class="string">`hive_table`</span></span><br><span class="line">( </span><br><span class="line">    k      <span class="built_in">int</span>      <span class="keyword">comment</span> <span class="string">'id'</span>,</span><br><span class="line">    <span class="keyword">uuid</span>   <span class="built_in">bigint</span>   <span class="keyword">comment</span> <span class="string">'用户id'</span></span><br><span class="line">) <span class="keyword">comment</span> <span class="string">'hive 普通类型表'</span> </span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span> ORC;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 普通查询（计算去重人数）</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">count</span>(<span class="keyword">distinct</span> <span class="keyword">uuid</span>) <span class="keyword">from</span> hive_table;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- bitmap查询（计算去重人数）</span></span><br><span class="line"><span class="keyword">select</span> bitmap_count(to_bitmap(<span class="keyword">uuid</span>)) <span class="keyword">from</span> hive_table;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="bitmap使用实例之clickhouse提升计算性能"><a href="#bitmap使用实例之clickhouse提升计算性能" class="headerlink" title="bitmap使用实例之clickhouse提升计算性能"></a>bitmap使用实例之clickhouse提升计算性能</h2><p><strong>1.业务需求</strong></p>
+<p>在任意时间段, 求关注的人群基数（去重）。如果使用传统数仓按天分区明细做法，计算成本会非常高，而且无法做到在线查询出结果的。</p>
+<p><strong>2.创建业务宽表</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   dt string 时间</span><br><span class="line">   brand  品牌  手机品牌</span><br><span class="line">   phone_model  手机型号</span><br><span class="line">   device_id String  设备号      </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.创建bitmap表</strong></p>
+<p>简单分析下需求，我们要取品牌、型号、天维度下的人群基数，那么建立如下可进行自由分析的bitmap表：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">     dt  LowCardinality(String)   时间</span><br><span class="line">     dim_type  LowCardinality(String)  维度类型(1:品牌维度、2:手机型号维度)</span><br><span class="line">     dim_value LowCardinality(String) 每个dim_type维度下对应的品牌或者手机型号值</span><br><span class="line">     bitmap_dvid  AggregateFunction(groupBitmap, UInt32) 明细</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.写入数据</strong></p>
+<p>分别插入不同维度的bitmap</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--删除分区</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> <span class="keyword">bitmap</span>的表 <span class="keyword">on</span> cluster default_cluster <span class="keyword">drop</span> <span class="keyword">partition</span> 时间分区</span><br><span class="line"></span><br><span class="line"><span class="comment">--插入品牌维度数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">bitmap</span>表 </span><br><span class="line"><span class="keyword">select</span> </span><br><span class="line">    dt, </span><br><span class="line">    <span class="number">1</span>, </span><br><span class="line">    brand, </span><br><span class="line">    groupBitmapState(toUInt32(dvid)) <span class="keyword">as</span> dvid </span><br><span class="line"><span class="keyword">from</span> 宽表 <span class="keyword">where</span> dt = 日期 </span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> brand</span><br><span class="line"></span><br><span class="line"><span class="comment">--插入型号维度数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="keyword">bitmap</span>表 </span><br><span class="line"><span class="keyword">select</span> </span><br><span class="line">    dt, </span><br><span class="line">    <span class="number">2</span>, </span><br><span class="line">    phone_model, </span><br><span class="line">    groupBitmapState(toUInt32(dvid)) <span class="keyword">as</span> dvid </span><br><span class="line"><span class="keyword">from</span> 宽表 <span class="keyword">where</span> dt = 日期 </span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> phone_model</span><br></pre></td></tr></table></figure>
+
+<p><strong>5.查询新增、留存等聚合数据</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--查询iphone12品牌在当前周期（2021-07-01~2021-09-29）相比上周期(2021-05-01 ~ 2021-06-30)的留存人数</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	bitmapCardinality( bitmapAnd</span><br><span class="line">	(</span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			groupBitmapOrState(devid_bmp)</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			(</span><br><span class="line">				<span class="keyword">SELECT</span></span><br><span class="line">					devid_bmp</span><br><span class="line">				<span class="keyword">FROM</span></span><br><span class="line">					<span class="keyword">bitmap</span>表</span><br><span class="line">				<span class="keyword">WHERE</span></span><br><span class="line">					dt &gt;= <span class="string">'2021-07-01'</span></span><br><span class="line">					<span class="keyword">AND</span> dt &lt;= <span class="string">'2021-09-29'</span></span><br><span class="line">					<span class="keyword">AND</span> dim_type = <span class="number">1</span></span><br><span class="line">					<span class="keyword">AND</span> dim_value = <span class="string">'iphone12'</span></span><br><span class="line">			)</span><br><span class="line">			, <span class="comment">-- 当期周期关注过iphone12的人</span></span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			groupBitmapOrState(devid_bmp)</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			(</span><br><span class="line">				<span class="keyword">SELECT</span></span><br><span class="line">					devid_bmp</span><br><span class="line">				<span class="keyword">FROM</span></span><br><span class="line">					<span class="keyword">bitmap</span>表</span><br><span class="line">				<span class="keyword">WHERE</span></span><br><span class="line">					dt &gt;= <span class="string">'2021-05-01'</span></span><br><span class="line">					<span class="keyword">AND</span> dt &lt;= <span class="string">'2021-06-30'</span></span><br><span class="line">					<span class="keyword">AND</span> dim_type = <span class="number">1</span></span><br><span class="line">					<span class="keyword">AND</span> dim_value = <span class="string">'iphone12'</span></span><br><span class="line">			) <span class="comment">-- 上周期关注过iphone12的人</span></span><br><span class="line">	)</span><br><span class="line">	)</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.cnblogs.com/niutao/articles/15352224.html" target="_blank" rel="noopener">基于clickhouse的bitmap实现任意时间段的去重求基数操作</a></p>
+<h2 id="hive中的binary推送到clickhouse的bitmap"><a href="#hive中的binary推送到clickhouse的bitmap" class="headerlink" title="hive中的binary推送到clickhouse的bitmap"></a>hive中的binary推送到clickhouse的bitmap</h2><p>是CK的bitmap在Spark.sql中没有对应的类型，要将hive表的binary推送到ck的bitmap中，就需要保证两个不同架构（spark-scala&amp;CK-c++）的底层编码一致。</p>
+<p>对应的底层结构分析参考文档：<a href="https://www.cnblogs.com/niutao/p/15665790.html" target="_blank" rel="noopener">通过clickhouse源码了解hive/spark的roaringbitmap写入clickhouse的bitmap</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hive/" rel="tag"><i class="fa fa-tag"></i> Hive</a>
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+            <a href="/tags/BitMap/" rel="tag"><i class="fa fa-tag"></i> BitMap</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/" rel="next" title="数据开发之离线计算_Spark任务调优与RSS">
+                <i class="fa fa-chevron-left"></i> 数据开发之离线计算_Spark任务调优与RSS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/02/Java%E6%9C%8D%E5%8A%A1_CheckStyle%E7%AE%80%E4%BB%8B%E4%B8%8E%E4%BD%BF%E7%94%A8%E5%AE%9E%E4%BE%8B/" rel="prev" title="Java服务_CheckStyle简介与使用实例">
+                Java服务_CheckStyle简介与使用实例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClickHouse-BitMap在hive和ck中的存储与两者之间的传输"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_BitMap在hive和ck中的存储与两者之间的传输</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BitMap"><span class="nav-number">1.1.</span> <span class="nav-text">BitMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RoaringBitmap"><span class="nav-number">1.2.</span> <span class="nav-text">RoaringBitmap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BitMap与RoaringBitmap的区别"><span class="nav-number">1.3.</span> <span class="nav-text">BitMap与RoaringBitmap的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Clickhouse中的bitmap类型创建方法"><span class="nav-number">1.4.</span> <span class="nav-text">Clickhouse中的bitmap类型创建方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bitmap使用实例之hive缩减数据量级"><span class="nav-number">1.5.</span> <span class="nav-text">bitmap使用实例之hive缩减数据量级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bitmap使用实例之hive提升计算性能"><span class="nav-number">1.6.</span> <span class="nav-text">bitmap使用实例之hive提升计算性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bitmap使用实例之clickhouse提升计算性能"><span class="nav-number">1.7.</span> <span class="nav-text">bitmap使用实例之clickhouse提升计算性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hive中的binary推送到clickhouse的bitmap"><span class="nav-number">1.8.</span> <span class="nav-text">hive中的binary推送到clickhouse的bitmap</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

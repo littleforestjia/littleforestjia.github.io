@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Linux," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_Linux命令大全1.网络传输类1.1 ncnc是一个功能强大的网络工具，可以用于实现对本服务器上任意TCP&#x2F;UDP端口的监听，也可以用于连接其他服务器的TCP&#x2F;UDP端口，从而实现服务器节点之间的文件传输和接口连通性扫描。 参考文献1 参考文献2 参考文献3 1.2 lftpFTP服务是指在不同机器之间实现文件传输功能的服务，要实现该服务，首先需要安装vsftpd软件搭建一台ftp服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_Linux命令大全">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/10/06/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_Linux%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_Linux命令大全1.网络传输类1.1 ncnc是一个功能强大的网络工具，可以用于实现对本服务器上任意TCP&#x2F;UDP端口的监听，也可以用于连接其他服务器的TCP&#x2F;UDP端口，从而实现服务器节点之间的文件传输和接口连通性扫描。 参考文献1 参考文献2 参考文献3 1.2 lftpFTP服务是指在不同机器之间实现文件传输功能的服务，要实现该服务，首先需要安装vsftpd软件搭建一台ftp服务">
+<meta property="article:published_time" content="2022-10-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:39:51.591Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/10/06/京东商智_Linux命令大全/"/>
+
+
+
+
+
+  <title>京东商智_Linux命令大全 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/10/06/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_Linux%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_Linux命令大全</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-10-06T00:00:00+08:00">
+                2022-10-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="京东商智-Linux命令大全"><a href="#京东商智-Linux命令大全" class="headerlink" title="京东商智_Linux命令大全"></a>京东商智_Linux命令大全</h2><h3 id="1-网络传输类"><a href="#1-网络传输类" class="headerlink" title="1.网络传输类"></a>1.网络传输类</h3><h4 id="1-1-nc"><a href="#1-1-nc" class="headerlink" title="1.1 nc"></a>1.1 nc</h4><p>nc是一个功能强大的网络工具，可以用于实现对本服务器上任意TCP/UDP端口的监听，也可以用于连接其他服务器的TCP/UDP端口，从而实现服务器节点之间的文件传输和接口连通性扫描。</p>
+<p><a href="https://blog.csdn.net/mr_wanter/article/details/125076995" target="_blank" rel="noopener">参考文献1</a></p>
+<p><a href="https://blog.csdn.net/qingchenldl/article/details/79808199" target="_blank" rel="noopener">参考文献2</a></p>
+<p><a href="https://blog.csdn.net/qq_39698985/article/details/115016624" target="_blank" rel="noopener">参考文献3</a></p>
+<h4 id="1-2-lftp"><a href="#1-2-lftp" class="headerlink" title="1.2 lftp"></a>1.2 lftp</h4><p>FTP服务是指在不同机器之间实现文件传输功能的服务，要实现该服务，首先需要安装vsftpd软件搭建一台ftp服务器，这样其他机器才可以从这台ftp服务器上上传或下载文件。</p>
+<p>一般的使用场景就是在公司内部建设一个专门的文件服务器，将公司内的文档资料等都存放在该服务器上，所有的同事都可以去下载，起到集中存放文件的作用。</p>
+<p>使用lftp命令即可远程登录到ftp服务器上，并进行文件操作。</p>
+<p>一般我们不会单独使用使用lftp命令，而是与wget、wput等命令配合使用，实现快捷地文件上传、下载等操作。</p>
+<p>使用案例：</p>
+<blockquote>
+<p>先将原py脚本删除再上传新脚本。</p>
+<p>lftp ads_zs:<a href="mailto:YTVhZmFlNGQ2MTZjMGI5NzU0ZWE4NWFh@ads-ftp.jd.com">YTVhZmFlNGQ2MTZjMGI5NzU0ZWE4NWFh@ads-ftp.jd.com</a> -e “rm BLTaskCur.py; put BLTaskCur.py;bye”</p>
+</blockquote>
+<p><a href="https://www.jianshu.com/p/c1c9f9165510" target="_blank" rel="noopener">参考文献1</a></p>
+<p><a href="https://blog.csdn.net/qq_48391148/article/details/124081167" target="_blank" rel="noopener">参考文献2</a></p>
+<p><a href="https://blog.csdn.net/qq_37464878/article/details/121984306" target="_blank" rel="noopener">参考文献3</a></p>
+<h4 id="1-3-wget"><a href="#1-3-wget" class="headerlink" title="1.3 wget"></a>1.3 wget</h4><p>wget是一个从网络上自动下载文件的工具，支持http、https、ftp等多种数据传输协议。不仅能支持上节所述的从ftp服务器下载数据，也支持http、https等超文本传输协议。</p>
+<p>使用案例：</p>
+<blockquote>
+<p>从ftp服务器上下载脚本并重命名</p>
+<p>wget -T20 -t3 -w3 –random-wait <a href="ftp://mfs.jd.com:/mnt/mfs/ftp/ads_zs/GETaskCur.py">ftp://mfs.jd.com:/mnt/mfs/ftp/ads_zs/GETaskCur.py</a> -O GETask.py</p>
+</blockquote>
+<p><a href="https://blog.csdn.net/kirao/article/details/4805584" target="_blank" rel="noopener">参考文献1</a></p>
+<p><a href="http://t.zoukankan.com/duanguyuan-p-3403801.html" target="_blank" rel="noopener">参考文献2</a></p>
+<h4 id="1-4-curl"><a href="#1-4-curl" class="headerlink" title="1.4 curl"></a>1.4 curl</h4><p>curl是一个强大的命令行工具，作用是发出网络请求，然后从响应中得到和提取数据，先是在“标准输出”(stdout)上面。它支持多种协议，可以请求任何web服务器，如果使用熟练，完全可以取代Postman这一类图形界面工具。</p>
+<p><a href="https://www.ruanyifeng.com/blog/2011/09/curl.html" target="_blank" rel="noopener">参考文献1</a></p>
+<p><a href="https://www.ruanyifeng.com/blog/2019/09/curl-reference.html" target="_blank" rel="noopener">参考文献2</a></p>
+<h3 id="2-文件处理类"><a href="#2-文件处理类" class="headerlink" title="2.文件处理类"></a>2.文件处理类</h3><p>Linux下一切皆文件，对Linux的操作就是对文件的处理，那么有一系列的文件处理命令。</p>
+<h4 id="2-1-管道符“｜”"><a href="#2-1-管道符“｜”" class="headerlink" title="2.1 管道符“｜”"></a>2.1 管道符“｜”</h4><p>Linux提供了管道符将两个命令隔开，管道符号左边命令的输出会作为右边命令的输入。</p>
+<p><a href="https://blog.csdn.net/m0_66727391/article/details/124373805" target="_blank" rel="noopener">参考文献1</a></p>
+<h4 id="2-2-grep"><a href="#2-2-grep" class="headerlink" title="2.2 grep"></a>2.2 grep</h4><p>grep命令用于对目标文件进行过滤，将被匹配到的行打印到控制台。</p>
+<p><a href="https://blog.csdn.net/m0_66727391/article/details/124373805" target="_blank" rel="noopener">参考文献1</a></p>
+<h4 id="2-3-sed"><a href="#2-3-sed" class="headerlink" title="2.3 sed"></a>2.3 sed</h4><p>sed命令是一种针对目标文件数据行的流编辑器，一次处理一行内容并打印到控制台，不断重复直到文件末尾。</p>
+<p><a href="https://blog.csdn.net/m0_66727391/article/details/124373805" target="_blank" rel="noopener">参考文献1</a></p>
+<h4 id="2-4-awk"><a href="#2-4-awk" class="headerlink" title="2.4 awk"></a>2.4 awk</h4><p>awk命令把目标文件逐行读入，以空格作为默认分隔符对每行进行切分，再对切分的部分进行后续处理。</p>
+<p>使用案例：awk ‘{print $1}’ 用于将文件中每一行按空格分割并取第一个字段。</p>
+<blockquote>
+<p>列出hdfs目录中每个文件大小的数值</p>
+<p>hadoop fs -du -h hdfs://ns22017/user/ads_sz_load/hfile_convert/origin/archive/data/hb_ibd/HB_IBD_PRO_ANALYSIS_FLOW_RECENT_NEW |awk ‘{print $1}’</p>
+</blockquote>
+<p><a href="https://blog.csdn.net/m0_66727391/article/details/124373805" target="_blank" rel="noopener">参考文献1</a></p>
+<h4 id="2-5-wc"><a href="#2-5-wc" class="headerlink" title="2.5 wc"></a>2.5 wc</h4><p>wc命令用于统计目标文件中的字节数、字数、行数，其中字数是以空格作为默认分隔符进行切分统计的。</p>
+<p>使用案例：wc -c统计字节数，wc -l统计行数，wc -w统计字数。</p>
+<blockquote>
+<p>计算hdfs目录中文件个数：</p>
+<p>hadoop fs -ls hdfs://ns22017/user/ads_sz_load/hfile_convert/origin/archive/data/hb_ibd/HB_IBD_PRO_ANALYSIS_FLOW_RECENT_NEW | wc -l</p>
+</blockquote>
+<p><a href="https://blog.csdn.net/shift_wwx/article/details/80736335" target="_blank" rel="noopener">参考文献1</a></p>
+<h4 id="2-6-sort"><a href="#2-6-sort" class="headerlink" title="2.6 sort"></a>2.6 sort</h4><p>sort命令用于对目标文件中的行以字典序进行排序，并打印到控制台。</p>
+<p>使用案例：sort 用于将文件中每一行进行排序。</p>
+<blockquote>
+<p>将hdfs目录中每个文件大小的数值进行排序</p>
+<p>hadoop fs -du -h hdfs://ns22017/user/ads_sz_load/hfile_convert/origin/archive/data/hb_ibd/HB_IBD_PRO_ANALYSIS_FLOW_RECENT_NEW |awk ‘{print $1}’ |sort</p>
+</blockquote>
+<h3 id="3-状态查看类"><a href="#3-状态查看类" class="headerlink" title="3.状态查看类"></a>3.状态查看类</h3><h4 id="3-1-top"><a href="#3-1-top" class="headerlink" title="3.1 top"></a>3.1 top</h4><p>top命令是Linux下常用的性能分析工具，能够实时显示系统中各个进程的资源占用状况，类似于Windows的<br>任务管理器。第一行为负载均衡，第二行为进程统计，第三行为cpu占用情况，第四行为内存使用情况，第五行为交换分区使用情况，剩下的就是各个进程的详细监控数据。</p>
+<p>第一行的load average负载均衡字段，后面三个数分别是1分钟、5分钟、15分钟的负载值，该值是每<br>隔5秒钟检查一次活跃的进程数，然后按特定算法计算出的数值。如果这个数值除以逻辑CPU的数量，结果高<br>于5的时候就表明系统在超负荷运转了。</p>
+<p>逻辑cpu=物理CPU个数×CPU核数，如果CPU支持超线程技术，则逻辑cpu=物理CPU个数×CPU核数x2。</p>
+<h4 id="3-2-netstat"><a href="#3-2-netstat" class="headerlink" title="3.2 netstat"></a>3.2 netstat</h4><p>netstat命令用于查看各种网络相关信息，如网络连接、路由表、接口状态、pid、程序名等。</p>
+<p>使用案例：</p>
+<blockquote>
+<p>查看8094端口对应程序的运行情况</p>
+<p>netstat -tunlp | grep 8094</p>
+</blockquote>
+<h4 id="3-3-df-du"><a href="#3-3-df-du" class="headerlink" title="3.3 df/du"></a>3.3 df/du</h4><p>df用于查看整个磁盘情况，du用于查看指定文件夹占用磁盘情况。</p>
+<h4 id="3-4-free"><a href="#3-4-free" class="headerlink" title="3.4 free"></a>3.4 free</h4><p>free命令用于查看内存使用情况，比top命令多了一个buffers/cache标识内核使用的内存缓冲区情况。</p>
+<h4 id="3-5-ps"><a href="#3-5-ps" class="headerlink" title="3.5 ps"></a>3.5 ps</h4><p>ps命令用于显示当前进程的状态，也有点类似于 windows 的任务管理器。</p>
+<p>使用案例：</p>
+<blockquote>
+<p>查看case-server相关程序的进程pid</p>
+<p>ps -ef | prep case-server</p>
+</blockquote>
+<p><a href="https://www.runoob.com/linux/linux-comm-ps.html" target="_blank" rel="noopener">参考文献1</a></p>
+<h4 id="3-6-lsof"><a href="#3-6-lsof" class="headerlink" title="3.6 lsof"></a>3.6 lsof</h4><p>lsof命令用于查找进程打开了哪些文件以及与打开文件相关联的内容。</p>
+<p>使用案例：</p>
+<blockquote>
+<p>查看8094端口对应程序的程序名和进程pid</p>
+<p>lsof -i tcp:8094</p>
+</blockquote>
+<p><a href="https://blog.csdn.net/nyist_zxp/article/details/115340302" target="_blank" rel="noopener">参考文献1</a></p>
+<h3 id="4-文件查看类"><a href="#4-文件查看类" class="headerlink" title="4.文件查看类"></a>4.文件查看类</h3><h4 id="4-1-cat"><a href="#4-1-cat" class="headerlink" title="4.1 cat"></a>4.1 cat</h4><p>从第一行开始显示文件内容。</p>
+<h4 id="4-2-tac"><a href="#4-2-tac" class="headerlink" title="4.2 tac"></a>4.2 tac</h4><p>从最后一行开始显示文件内容。</p>
+<h4 id="4-3-more"><a href="#4-3-more" class="headerlink" title="4.3 more"></a>4.3 more</h4><p>一页一页的显示文件内容。</p>
+<p>Enter 向下1行；Ctrl+f 向下滚动一屏，空格键 向下滚动一屏；Ctrl+b 返回上一屏；= 输出当前行的行号；q退出more。</p>
+<h4 id="4-4-less"><a href="#4-4-less" class="headerlink" title="4.4 less"></a>4.4 less</h4><p>一页一页的显示文件内容，比more更强在于还可以往前翻页。</p>
+<p>Enter 向下移动一行；y 向上移动一行；空格键 向下滚动一屏；b 向上滚动一屏；g 跳到第一行；G 跳到最后一行；/pattern 搜索pattern；q 退出less。</p>
+<h4 id="4-5-head"><a href="#4-5-head" class="headerlink" title="4.5 head"></a>4.5 head</h4><p>只看头几行。</p>
+<h4 id="4-6-tail"><a href="#4-6-tail" class="headerlink" title="4.6 tail"></a>4.6 tail</h4><p>只看尾部几行，-f 还可以实时显示最新变化。</p>
+<p>使用案例：</p>
+<blockquote>
+<p>实时显示日志文件最新写入变化</p>
+<p>tailf 20220518_01.log</p>
+</blockquote>
+<h4 id="4-7-nl"><a href="#4-7-nl" class="headerlink" title="4.7 nl"></a>4.7 nl</h4><p>还可以显示行号。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/09/29/ClickHouse_MergeTree&ReplicatedMergeTree&Distributed%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" rel="next" title="ClickHouse_MergeTree&ReplicatedMergeTree&Distributed原理解析">
+                <i class="fa fa-chevron-left"></i> ClickHouse_MergeTree&ReplicatedMergeTree&Distributed原理解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/10/14/Java%E6%9C%8D%E5%8A%A1_ck%E6%9C%8D%E5%8A%A1%E5%BC%B9%E6%80%A7%E6%8E%A5%E5%8F%A3service%E5%B1%82%E5%92%8Cdao%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%981/" rel="prev" title="Java服务_ck服务弹性接口service层和dao层设计实战1">
+                Java服务_ck服务弹性接口service层和dao层设计实战1 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#京东商智-Linux命令大全"><span class="nav-number">1.</span> <span class="nav-text">京东商智_Linux命令大全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-网络传输类"><span class="nav-number">1.1.</span> <span class="nav-text">1.网络传输类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-nc"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 nc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-lftp"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 lftp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-wget"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 wget</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-curl"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 curl</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-文件处理类"><span class="nav-number">1.2.</span> <span class="nav-text">2.文件处理类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-管道符“｜”"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 管道符“｜”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-grep"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 grep</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-sed"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 sed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-awk"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 awk</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-wc"><span class="nav-number">1.2.5.</span> <span class="nav-text">2.5 wc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-sort"><span class="nav-number">1.2.6.</span> <span class="nav-text">2.6 sort</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-状态查看类"><span class="nav-number">1.3.</span> <span class="nav-text">3.状态查看类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-top"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 top</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-netstat"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 netstat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-df-du"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 df&#x2F;du</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-free"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 free</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-ps"><span class="nav-number">1.3.5.</span> <span class="nav-text">3.5 ps</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-6-lsof"><span class="nav-number">1.3.6.</span> <span class="nav-text">3.6 lsof</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-文件查看类"><span class="nav-number">1.4.</span> <span class="nav-text">4.文件查看类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-cat"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 cat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-tac"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 tac</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-more"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 more</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-less"><span class="nav-number">1.4.4.</span> <span class="nav-text">4.4 less</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-5-head"><span class="nav-number">1.4.5.</span> <span class="nav-text">4.5 head</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-6-tail"><span class="nav-number">1.4.6.</span> <span class="nav-text">4.6 tail</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-7-nl"><span class="nav-number">1.4.7.</span> <span class="nav-text">4.7 nl</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

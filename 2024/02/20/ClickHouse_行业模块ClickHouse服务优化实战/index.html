@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_行业模块ClickHouse服务优化实战1.行业底表基本数据统计1.1 典型二级类目数据量统计与超时请求统计2022-10-12至2022-11-15的总数据行数与对应的时间较长自定义请求，使用到的索引只有：secondIndId+terminal+shopType    二级类目 底表粒度 (sku+browerAcct) 聚合表粒度 (sku) 数据量缩减倍数 行业趋势">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_行业模块ClickHouse服务优化实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/20/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%9C%8D%E5%8A%A1%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_行业模块ClickHouse服务优化实战1.行业底表基本数据统计1.1 典型二级类目数据量统计与超时请求统计2022-10-12至2022-11-15的总数据行数与对应的时间较长自定义请求，使用到的索引只有：secondIndId+terminal+shopType    二级类目 底表粒度 (sku+browerAcct) 聚合表粒度 (sku) 数据量缩减倍数 行业趋势">
+<meta property="article:published_time" content="2024-02-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:35:14.988Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/20/ClickHouse_行业模块ClickHouse服务优化实战/"/>
+
+
+
+
+
+  <title>ClickHouse_行业模块ClickHouse服务优化实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/20/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%9C%8D%E5%8A%A1%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_行业模块ClickHouse服务优化实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-20T00:00:00+08:00">
+                2024-02-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="ClickHouse-行业模块ClickHouse服务优化实战"><a href="#ClickHouse-行业模块ClickHouse服务优化实战" class="headerlink" title="ClickHouse_行业模块ClickHouse服务优化实战"></a>ClickHouse_行业模块ClickHouse服务优化实战</h2><h2 id="1-行业底表基本数据统计"><a href="#1-行业底表基本数据统计" class="headerlink" title="1.行业底表基本数据统计"></a>1.行业底表基本数据统计</h2><h3 id="1-1-典型二级类目数据量统计与超时请求统计"><a href="#1-1-典型二级类目数据量统计与超时请求统计" class="headerlink" title="1.1 典型二级类目数据量统计与超时请求统计"></a>1.1 典型二级类目数据量统计与超时请求统计</h3><p>2022-10-12至2022-11-15的总数据行数与对应的时间较长自定义请求，使用到的索引只有：secondIndId+terminal+shopType</p>
+<table>
+<thead>
+<tr>
+<th>二级类目</th>
+<th>底表粒度 (sku+browerAcct)</th>
+<th>聚合表粒度 (sku)</th>
+<th>数据量缩减倍数</th>
+<th>行业趋势 groupby datetime</th>
+<th>品牌榜单top10 groupby brand</th>
+<th>店铺榜单top10 groupby shop</th>
+<th>商品榜单top200 groupby sku</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>女装1343</td>
+<td>542134328</td>
+<td>123311605</td>
+<td>4.39645829</td>
+<td>5.97s</td>
+<td>6.33s</td>
+<td>4.36s</td>
+<td>10.55s</td>
+</tr>
+<tr>
+<td>男装1342</td>
+<td>606898996</td>
+<td>153551059</td>
+<td>3.952424685</td>
+<td>5.21s</td>
+<td>7.144s</td>
+<td>5.1s</td>
+<td>13.12s</td>
+</tr>
+<tr>
+<td>饮料冲调1585</td>
+<td>396352751</td>
+<td>14614808</td>
+<td>27.11994239</td>
+<td>4.53s</td>
+<td>3.24s</td>
+<td>3s</td>
+<td>2.31s</td>
+</tr>
+<tr>
+<td>奶粉1523</td>
+<td>145654211</td>
+<td>3533643</td>
+<td>41.21927739</td>
+<td>2.56s</td>
+<td>1.47s</td>
+<td>4.23s</td>
+<td>4.97s</td>
+</tr>
+<tr>
+<td>灯饰照明9856</td>
+<td>143318024</td>
+<td>24340347</td>
+<td>5.888084669</td>
+<td>3.99s</td>
+<td>2.16s</td>
+<td>2.11s</td>
+<td>2.91s</td>
+</tr>
+<tr>
+<td>减肥塑身9193</td>
+<td>3648896</td>
+<td>384148</td>
+<td>9.498672387</td>
+<td>0.68s</td>
+<td>0.8s</td>
+<td>1.51s</td>
+<td>0.83s</td>
+</tr>
+<tr>
+<td>特医配方食品27992</td>
+<td>3659201</td>
+<td>154811</td>
+<td>23.63656975</td>
+<td>0.66s</td>
+<td>0.82s</td>
+<td>1.48s</td>
+<td>0.75s</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-top20数据量的二级类目"><a href="#1-2-top20数据量的二级类目" class="headerlink" title="1.2 top20数据量的二级类目"></a>1.2 top20数据量的二级类目</h3><table>
+<thead>
+<tr>
+<th>secondIndId</th>
+<th>count</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1342</td>
+<td>153551059</td>
+</tr>
+<tr>
+<td>1343</td>
+<td>123311605</td>
+</tr>
+<tr>
+<td>12099</td>
+<td>57374279</td>
+</tr>
+<tr>
+<td>9858</td>
+<td>55893288</td>
+</tr>
+<tr>
+<td>1345</td>
+<td>54457959</td>
+</tr>
+<tr>
+<td>11842</td>
+<td>49468349</td>
+</tr>
+<tr>
+<td>11730</td>
+<td>49372352</td>
+</tr>
+<tr>
+<td>830</td>
+<td>41721031</td>
+</tr>
+<tr>
+<td>6745</td>
+<td>40055769</td>
+</tr>
+<tr>
+<td>12102</td>
+<td>38226249</td>
+</tr>
+<tr>
+<td>11731</td>
+<td>37844022</td>
+</tr>
+<tr>
+<td>11158</td>
+<td>36543128</td>
+</tr>
+<tr>
+<td>729</td>
+<td>32773074</td>
+</tr>
+<tr>
+<td>9857</td>
+<td>32323407</td>
+</tr>
+<tr>
+<td>15249</td>
+<td>30765820</td>
+</tr>
+<tr>
+<td>1583</td>
+<td>29960139</td>
+</tr>
+<tr>
+<td>1584</td>
+<td>28067354</td>
+</tr>
+<tr>
+<td>12147</td>
+<td>26508877</td>
+</tr>
+<tr>
+<td>9856</td>
+<td>24340347</td>
+</tr>
+<tr>
+<td>1381</td>
+<td>23281586</td>
+</tr>
+</tbody></table>
+<h2 id="2-行业底表优化方案"><a href="#2-行业底表优化方案" class="headerlink" title="2.行业底表优化方案"></a>2.行业底表优化方案</h2><h3 id="2-1-物化视图与projection方案"><a href="#2-1-物化视图与projection方案" class="headerlink" title="2.1 物化视图与projection方案"></a>2.1 物化视图与projection方案</h3><p>针对不同请求接口具体分析请求超时原因，采用不同的优化方案：</p>
+<ul>
+<li>商品榜单：更改请求sql，改用二次聚合；</li>
+<li>店铺榜单：新建聚合到店铺粒度的物化视图，日店铺数量27w；</li>
+<li>品牌榜单：新建聚合到品牌粒度的物化视图，日品牌数量22w；</li>
+<li>行业趋势：新建聚合到三级类目粒度的物化视图。</li>
+</ul>
+<p><strong>创建测试聚合表</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3 <span class="keyword">on</span> cluster LFRH_CK_Pub_173</span><br><span class="line">(</span><br><span class="line">    <span class="string">`dateTime`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`skuId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`skuName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`sonBrandId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`sonBrandName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`terminalId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`shopType`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondIndId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`thirdIndId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`priceRangeId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondPriceRangeId`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`priceRangeName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`secondPriceRangeName`</span> <span class="keyword">String</span>,</span><br><span class="line">    <span class="string">`pv`</span> AggregateFunction(<span class="keyword">sum</span>, Int64),</span><br><span class="line">    <span class="string">`browseAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`dealAmt`</span> AggregateFunction(<span class="keyword">sum</span>, Float64),</span><br><span class="line">    <span class="string">`dealProNum`</span> AggregateFunction(<span class="keyword">sum</span>, Int64),</span><br><span class="line">    <span class="string">`dealAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`cartAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`followAcct`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`searchClickNum`</span> AggregateFunction(<span class="keyword">sum</span>, Int64),</span><br><span class="line">    <span class="string">`browseSku`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>)),</span><br><span class="line">    <span class="string">`dealSku`</span> AggregateFunction(uniq, Nullable(<span class="keyword">String</span>))</span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = ReplicatedMergeTree(<span class="string">'/ckpub173.olap.jd.com/tables/bc_online/ck_zh_industry_product_union_all_agg_jiazhengyang3/&#123;shard&#125;'</span>, <span class="string">'&#123;replica&#125;'</span>)</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> dateTime</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> (dateTime, secondIndId, thirdIndId, shopType, terminalId, priceRangeId, secondPriceRangeId)</span><br><span class="line"><span class="keyword">SETTINGS</span> index_granularity = <span class="number">8192</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3_d <span class="keyword">ON</span> CLUSTER LFRH_CK_Pub_173 <span class="keyword">as</span> bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3 <span class="keyword">ENGINE</span> = <span class="keyword">Distributed</span>(<span class="string">'LFRH_CK_Pub_173'</span>, <span class="string">'bc_online'</span>, <span class="string">'ck_zh_industry_product_union_all_agg_jiazhengyang3'</span>, <span class="keyword">rand</span>());</span><br></pre></td></tr></table></figure>
+
+<p><strong>创建三级类目粒度projection</strong></p>
+<p><strong>因为要基于该projection继续聚合，所以对去重指标只能使用uniqMerge()中间状态。</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3 <span class="keyword">on</span> cluster LFRH_CK_Pub_173 <span class="keyword">add</span> projection ck_zh_industry_product_union_all_agg_jiazhengyang3_shop_agg</span><br><span class="line">(</span><br><span class="line">  <span class="keyword">select</span></span><br><span class="line">  dateTime,</span><br><span class="line">  terminalId,</span><br><span class="line">  shopType,</span><br><span class="line">  secondIndId,</span><br><span class="line">  thirdIndId,</span><br><span class="line">  sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">	uniqMerge(dealSku) <span class="keyword">as</span> DealSkuNum,</span><br><span class="line">	uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">	uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">	sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">	sumMerge(searchClickNum) <span class="keyword">as</span> CateClickNum,</span><br><span class="line">	uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">	sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">	uniqMerge(browseSku) <span class="keyword">as</span> VisitedSkuNum,</span><br><span class="line">	uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">  <span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">  dateTime,</span><br><span class="line">  terminalId,</span><br><span class="line">  shopType,</span><br><span class="line">  secondIndId,</span><br><span class="line">  thirdIndId</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3 <span class="keyword">on</span></span><br><span class="line">cluster LFRH_CK_Pub_173 MATERIALIZE PROJECTION ck_zh_industry_product_union_all_agg_jiazhengyang3_shop_agg;</span><br><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3 <span class="keyword">on</span></span><br><span class="line">cluster LFRH_CK_Pub_173 <span class="keyword">DROP</span> PROJECTION ck_zh_industry_product_union_all_agg_jiazhengyang3_shop_agg;</span><br></pre></td></tr></table></figure>
+
+<p><strong>查询测试sql</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">		sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">		uniqMerge(dealSku) <span class="keyword">as</span> DealSkuNum,</span><br><span class="line">		uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">		uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">		sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">		sumMerge(searchClickNum) <span class="keyword">as</span> CateClickNum,</span><br><span class="line">		uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime,</span><br><span class="line">		sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">		uniqMerge(browseSku) <span class="keyword">as</span> VisitedSkuNum,</span><br><span class="line">		uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_product_union_all_agg_jiazhengyang3_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2023-04=3-23'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2023-04-22'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1342'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		dateTime;</span><br></pre></td></tr></table></figure>
+
+<p><strong>没创建projection的执行计划</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Expression ((Projection + Before ORDER BY))</span><br><span class="line">  MergingAggregated</span><br><span class="line">    SettingQuotaAndLimits (<span class="keyword">Set</span> limits <span class="keyword">and</span> <span class="keyword">quota</span> <span class="keyword">after</span> reading <span class="keyword">from</span> <span class="keyword">storage</span>)</span><br><span class="line">      <span class="keyword">Union</span></span><br><span class="line">        Aggregating</span><br><span class="line">          Expression (<span class="keyword">Before</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span>)</span><br><span class="line">            Filter (<span class="keyword">WHERE</span>)</span><br><span class="line">              SettingQuotaAndLimits (<span class="keyword">Set</span> limits <span class="keyword">and</span> <span class="keyword">quota</span> <span class="keyword">after</span> reading <span class="keyword">from</span> <span class="keyword">storage</span>)</span><br><span class="line">                ReadFromMergeTree</span><br><span class="line">        ReadFromRemote (<span class="keyword">Read</span> <span class="keyword">from</span> remote replica)</span><br></pre></td></tr></table></figure>
+
+<p><strong>创建了projection的执行计划</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Expression ((Projection + Before ORDER BY))</span><br><span class="line">  MergingAggregated</span><br><span class="line">    SettingQuotaAndLimits (<span class="keyword">Set</span> limits <span class="keyword">and</span> <span class="keyword">quota</span> <span class="keyword">after</span> reading <span class="keyword">from</span> <span class="keyword">storage</span>)</span><br><span class="line">      <span class="keyword">Union</span></span><br><span class="line">        SettingQuotaAndLimits (<span class="keyword">Set</span> limits <span class="keyword">and</span> <span class="keyword">quota</span> <span class="keyword">after</span> reading <span class="keyword">from</span> <span class="keyword">storage</span>)</span><br><span class="line">          ReadFromStorage (MergeTree(<span class="keyword">with</span> <span class="keyword">Aggregate</span> projection ck_zh_industry_product_union_all_agg_jiazhengyang3_shop_agg))</span><br><span class="line">        ReadFromRemote (<span class="keyword">Read</span> <span class="keyword">from</span> remote replica)</span><br></pre></td></tr></table></figure>
+
+<p><strong>查询ck query日志查看sql执行情况，读取数据量、是否使用projection等</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	*</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	<span class="string">`system`</span>.query_log_all</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	event_date = <span class="string">'2023-04-24'</span></span><br><span class="line"><span class="comment">--	and query_kind = 'Insert'</span></span><br><span class="line"><span class="comment">--	and `exception`&lt;&gt;''</span></span><br><span class="line">	<span class="keyword">and</span> <span class="keyword">query</span> <span class="keyword">like</span> <span class="string">'%select</span></span><br><span class="line"><span class="string">dateTime as DateTime,</span></span><br><span class="line"><span class="string">		sumMerge(pv) as PV,%'</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">	event_time <span class="keyword">desc</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看ck projection系统表</strong></p>
+<p>参考文献：<a href="https://blog.csdn.net/qq_21383435/article/details/122357463" target="_blank" rel="noopener">https://blog.csdn.net/qq_21383435/article/details/122357463</a></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="keyword">name</span>,</span><br><span class="line">    <span class="keyword">partition</span>,</span><br><span class="line">    formatReadableSize(bytes_on_disk) <span class="keyword">AS</span> <span class="keyword">bytes</span>,</span><br><span class="line">    formatReadableSize(parent_bytes_on_disk) <span class="keyword">AS</span> parent_bytes,</span><br><span class="line">    parent_rows,</span><br><span class="line">    <span class="keyword">rows</span> / parent_rows <span class="keyword">AS</span> ratio</span><br><span class="line"><span class="keyword">FROM</span> system.projection_parts</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看ck进程</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> <span class="keyword">processlist</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">from</span> system.processes</span><br></pre></td></tr></table></figure>
+
+<p><strong>结论</strong></p>
+<p>查询query日志查看sql执行情况</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>query_duration_ms</th>
+<th>read_rows</th>
+<th>read_bytes</th>
+<th>projections</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>QueryFinish</td>
+<td>2609</td>
+<td>20818506</td>
+<td>11747434199</td>
+<td>[‘bc_online.ck_zh_industry_product_union_all_agg_jiazhengyang3.ck_zh_industry_product_union_all_agg_jiazhengyang3_shop_agg’]</td>
+</tr>
+<tr>
+<td>QueryFinish</td>
+<td>1094</td>
+<td>116128739</td>
+<td>105200969395</td>
+<td>[]</td>
+</tr>
+</tbody></table>
+<p><strong>从日志可以看出使用projection扫描数据量少了，但是查询时间反而变长了，然后ck引擎根据扫描数据量来判断用不用projection，这样就用了projection导致最终呈现出来的查询时间变长了。</strong>所以不用projection这种方案。</p>
+<h3 id="2-2-个性化sql优化"><a href="#2-2-个性化sql优化" class="headerlink" title="2.2 个性化sql优化"></a>2.2 个性化sql优化</h3><p>相比于18集群，173集群已经重建了分片字段，之前使用dt，现在用skuid，查询并发读和效率已经提高了很多。</p>
+<p>针对不同请求接口具体分析请求超时原因，采用不同的优化方案：</p>
+<ul>
+<li>商品榜单：更改请求sql，改用本地聚合；</li>
+<li>品牌榜单：使用字典关联维表；</li>
+<li>店铺榜单：关联维表使用字典dictget函数；</li>
+<li>行业趋势：</li>
+</ul>
+<h4 id="1）行业概况商品榜单"><a href="#1）行业概况商品榜单" class="headerlink" title="1）行业概况商品榜单"></a>1）行业概况商品榜单</h4><p><strong>重建分区键之后，使用settings distributed_group_by_no_merge = 1直接进行本地聚合，不再在分布式表中聚合所有数据。</strong></p>
+<p>优化前7.3s</p>
+<p>优化后1.2s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> </span><br><span class="line">	UV,</span><br><span class="line">	PV,</span><br><span class="line">	<span class="keyword">if</span>(UV = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealUser / UV) <span class="keyword">as</span> DealRate,</span><br><span class="line">	SearchClickNum,</span><br><span class="line">	SonBrandName,</span><br><span class="line">	CartUser,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	SkuName,</span><br><span class="line">	SonBrandId,</span><br><span class="line">	rowNumberInAllBlocks()+ <span class="number">1</span> <span class="keyword">AS</span> RankRound,</span><br><span class="line">	SkuId,</span><br><span class="line">	ProFollowUser,</span><br><span class="line">	<span class="keyword">if</span>(DealUser = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealAmt / DealUser) <span class="keyword">as</span> DealCustPriceAvg</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		SkuId,</span><br><span class="line">		SkuName,</span><br><span class="line">		SonBrandId,</span><br><span class="line">		SonBrandName,</span><br><span class="line">		PV,</span><br><span class="line">		ProFollowUser,</span><br><span class="line">		DealUser,</span><br><span class="line">		DealProNum,</span><br><span class="line">		SearchClickNum,</span><br><span class="line">		UV,</span><br><span class="line">		DealAmt,</span><br><span class="line">		CartUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		(</span><br><span class="line">		<span class="keyword">select</span></span><br><span class="line">			skuId <span class="keyword">AS</span> SkuId,</span><br><span class="line">			<span class="keyword">any</span>(skuName) <span class="keyword">AS</span> SkuName,</span><br><span class="line">			<span class="keyword">any</span>(sonBrandId) <span class="keyword">AS</span> SonBrandId,</span><br><span class="line">			<span class="keyword">any</span>(sonBrandName) <span class="keyword">AS</span> SonBrandName ,</span><br><span class="line">			sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">			uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">			uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">			sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">			sumMerge(searchClickNum) <span class="keyword">as</span> SearchClickNum,</span><br><span class="line">			uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">			sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">			uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">		<span class="keyword">from</span></span><br><span class="line">			bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">		<span class="keyword">where</span></span><br><span class="line">			dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">			<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">			<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopId <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'10278978'</span>, <span class="string">'11810231'</span>, <span class="string">'11624131'</span>, <span class="string">'11574099'</span>, <span class="string">'11444736'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			skuId</span><br><span class="line">		<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">			DealAmt <span class="keyword">desc</span></span><br><span class="line">		<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">		<span class="number">200</span> <span class="keyword">settings</span> distributed_group_by_no_merge = <span class="number">1</span></span><br><span class="line">	)</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">		DealAmt <span class="keyword">desc</span></span><br><span class="line">	<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">	<span class="number">200</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2）行业概况品牌榜单"><a href="#2）行业概况品牌榜单" class="headerlink" title="2）行业概况品牌榜单"></a>2）行业概况品牌榜单</h4><p><strong>发现uniqMergeState好像不仅没有提升效率，反而还降低了效率，主要还是使用字典对效率提升很高。</strong></p>
+<p>优化前4.5s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	BrandName,</span><br><span class="line">	UV,</span><br><span class="line">	PV,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	rowNumberInAllBlocks()+ <span class="number">1</span> <span class="keyword">AS</span> RankRound,</span><br><span class="line">	BrandId</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		BrandId,</span><br><span class="line">		<span class="keyword">any</span>(BrandName) <span class="keyword">as</span> BrandName ,</span><br><span class="line">		sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">		sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">		uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">		sumMerge(dealAmt) <span class="keyword">as</span> DealAmt</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		(</span><br><span class="line">		<span class="keyword">select</span></span><br><span class="line">			sonBrandId <span class="keyword">AS</span> SonBrandId,</span><br><span class="line">			sonBrandName <span class="keyword">AS</span> SonBrandName ,</span><br><span class="line">			dealProNum,</span><br><span class="line">			pv,</span><br><span class="line">			browseAcct,</span><br><span class="line">			dealAmt</span><br><span class="line">		<span class="keyword">from</span></span><br><span class="line">			bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">		<span class="keyword">where</span></span><br><span class="line">			dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">			<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">			<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>) ) <span class="keyword">any</span></span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> (</span><br><span class="line">		<span class="keyword">select</span></span><br><span class="line">			brandId <span class="keyword">AS</span> SonBrandId,</span><br><span class="line">			mainBrandId <span class="keyword">AS</span> BrandId,</span><br><span class="line">			mainGroupName <span class="keyword">AS</span> BrandName</span><br><span class="line">		<span class="keyword">from</span></span><br><span class="line">			bc_online. mainbrand_dic )</span><br><span class="line">			<span class="keyword">using</span>(SonBrandId)</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		BrandId</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">		DealAmt <span class="keyword">desc</span></span><br><span class="line">	<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">	<span class="number">10</span> );</span><br></pre></td></tr></table></figure>
+
+<p>优化后1.6s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	BrandName,</span><br><span class="line">	UV,</span><br><span class="line">	PV,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	rowNumberInAllBlocks()+ <span class="number">1</span> <span class="keyword">AS</span> RankRound,</span><br><span class="line">	BrandId</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	dictGet(<span class="string">'bc_online.mainbrand_dic'</span>,</span><br><span class="line">	<span class="string">'mainGroupName'</span>,</span><br><span class="line">	sonBrandId) <span class="keyword">AS</span> BrandName,</span><br><span class="line">	uniqMerge(browseAcct) <span class="keyword">AS</span> UV,</span><br><span class="line">	sumMerge(pv) <span class="keyword">AS</span> PV,</span><br><span class="line">	sumMerge(dealAmt) <span class="keyword">AS</span> DealAmt,</span><br><span class="line">	sumMerge(dealProNum) <span class="keyword">AS</span> DealProNum,</span><br><span class="line">	dictGet(<span class="string">'bc_online.mainbrand_dic'</span>,</span><br><span class="line">	<span class="string">'mainBrandId'</span>,</span><br><span class="line">	sonBrandId) <span class="keyword">AS</span> BrandId</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	bc_online.ck_zh_industry_product_union_all_agg_d</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">	<span class="keyword">AND</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">	<span class="keyword">AND</span> secondIndId <span class="keyword">IN</span> (<span class="string">'1343'</span>)</span><br><span class="line">	<span class="keyword">AND</span> shopType <span class="keyword">IN</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	BrandId,</span><br><span class="line">	BrandName</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span></span><br><span class="line">	DealAmt <span class="keyword">DESC</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">10</span></span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3）行业概况店铺榜单"><a href="#3）行业概况店铺榜单" class="headerlink" title="3）行业概况店铺榜单"></a>3）行业概况店铺榜单</h4><p><strong>这是一个按成交金额排序的榜单，优化点主要是先只算成交金额一个指标的榜单，把前十店铺给先扒出来了，然后再算这是个店铺的所有指标，这样对效率的提升很大。</strong></p>
+<p>优化前3.4s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	UV,</span><br><span class="line">	ShopName,</span><br><span class="line">	DealSkuNum,</span><br><span class="line">	PV,</span><br><span class="line">	<span class="keyword">if</span>(UV = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealUser / UV) <span class="keyword">as</span> DealRate,</span><br><span class="line">	ShopFollowUser,</span><br><span class="line">	SearchClickNum,</span><br><span class="line">	VisitedSkuNum,</span><br><span class="line">	ShopType,</span><br><span class="line">	CartUser,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	rowNumberInAllBlocks()+ <span class="number">1</span> <span class="keyword">AS</span> RankRound,</span><br><span class="line">	ShopId,</span><br><span class="line">	ProFollowUser,</span><br><span class="line">	<span class="keyword">if</span>(DealUser = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealAmt / DealUser) <span class="keyword">as</span> DealCustPriceAvg</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shopId <span class="keyword">as</span> ShopId,</span><br><span class="line">		<span class="keyword">any</span>(shopName) <span class="keyword">AS</span> ShopName,</span><br><span class="line">		<span class="keyword">any</span>(shopType) <span class="keyword">AS</span> ShopType ,</span><br><span class="line">		sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">		uniqMerge(dealSku) <span class="keyword">as</span> DealSkuNum,</span><br><span class="line">		uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">		uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">		sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">		sumMerge(searchClickNum) <span class="keyword">as</span> SearchClickNum,</span><br><span class="line">		uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">		sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">		uniqMerge(browseSku) <span class="keyword">as</span> VisitedSkuNum,</span><br><span class="line">		uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopId <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'10278978'</span>, <span class="string">'11810231'</span>, <span class="string">'11624131'</span>, <span class="string">'11574099'</span>, <span class="string">'11444736'</span>)</span><br><span class="line">		<span class="keyword">and</span> toInt32(shopId) &gt; <span class="number">0</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		ShopId</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">		DealAmt <span class="keyword">desc</span></span><br><span class="line">	<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">	<span class="number">10</span> ) <span class="keyword">any</span></span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shopId <span class="keyword">as</span> ShopId,</span><br><span class="line">		uniqMerge(shopFollowAcct) <span class="keyword">as</span> ShopFollowUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_shop_follow_agg_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> shopId <span class="keyword">GLOBAL</span> <span class="keyword">IN</span> (</span><br><span class="line">		<span class="keyword">select</span></span><br><span class="line">			shopId</span><br><span class="line">		<span class="keyword">from</span></span><br><span class="line">			(</span><br><span class="line">			<span class="keyword">select</span></span><br><span class="line">				shopId ,</span><br><span class="line">				sumMerge(dealAmt) <span class="keyword">as</span> DealAmt</span><br><span class="line">			<span class="keyword">from</span></span><br><span class="line">				bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">			<span class="keyword">where</span></span><br><span class="line">				dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">				<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">				<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">					<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">						<span class="keyword">and</span> shopId <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'10278978'</span>, <span class="string">'11810231'</span>, <span class="string">'11624131'</span>, <span class="string">'11574099'</span>, <span class="string">'11444736'</span>)</span><br><span class="line">							<span class="keyword">and</span> toInt32(shopId) &gt; <span class="number">0</span></span><br><span class="line">						<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">							shopId</span><br><span class="line">						<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">							DealAmt <span class="keyword">desc</span></span><br><span class="line">						<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">						<span class="number">10</span> ))</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		shopId )</span><br><span class="line">		<span class="keyword">using</span> (ShopId)</span><br></pre></td></tr></table></figure>
+
+<p>优化后1.4s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	UV,</span><br><span class="line">	ShopName,</span><br><span class="line">	DealSkuNum,</span><br><span class="line">	PV,</span><br><span class="line">	<span class="keyword">if</span>(UV = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealUser / UV) <span class="keyword">as</span> DealRate,</span><br><span class="line">	ShopFollowUser,</span><br><span class="line">	SearchClickNum,</span><br><span class="line">	VisitedSkuNum,</span><br><span class="line">	ShopType,</span><br><span class="line">	CartUser,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	rowNumberInAllBlocks()+ <span class="number">1</span> <span class="keyword">AS</span> RankRound,</span><br><span class="line">	ShopId,</span><br><span class="line">	ProFollowUser,</span><br><span class="line">	<span class="keyword">if</span>(DealUser = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealAmt / DealUser) <span class="keyword">as</span> DealCustPriceAvg</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shopId <span class="keyword">as</span> ShopId,</span><br><span class="line">		<span class="keyword">any</span>(shopName) <span class="keyword">AS</span> ShopName,</span><br><span class="line">		<span class="keyword">any</span>(shopType) <span class="keyword">AS</span> ShopType ,</span><br><span class="line">		sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">		uniqMerge(dealSku) <span class="keyword">as</span> DealSkuNum,</span><br><span class="line">		uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">		uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">		sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">		sumMerge(searchClickNum) <span class="keyword">as</span> SearchClickNum,</span><br><span class="line">		uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">		sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">		uniqMerge(browseSku) <span class="keyword">as</span> VisitedSkuNum,</span><br><span class="line">		uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopId <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'10278978'</span>, <span class="string">'11810231'</span>, <span class="string">'11624131'</span>, <span class="string">'11574099'</span>, <span class="string">'11444736'</span>)</span><br><span class="line">		<span class="keyword">and</span> toInt32(shopId) &gt; <span class="number">0</span></span><br><span class="line">		<span class="keyword">and</span> shopId <span class="keyword">GLOBAL</span> <span class="keyword">IN</span> (</span><br><span class="line">		<span class="keyword">select</span></span><br><span class="line">			shopId</span><br><span class="line">		<span class="keyword">from</span></span><br><span class="line">			(</span><br><span class="line">			<span class="keyword">select</span></span><br><span class="line">				shopId ,</span><br><span class="line">				sumMerge(dealAmt) <span class="keyword">as</span> DealAmt</span><br><span class="line">			<span class="keyword">from</span></span><br><span class="line">				bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">			<span class="keyword">where</span></span><br><span class="line">				dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">				<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">				<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">					<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">						<span class="keyword">and</span> shopId <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'10278978'</span>, <span class="string">'11810231'</span>, <span class="string">'11624131'</span>, <span class="string">'11574099'</span>, <span class="string">'11444736'</span>)</span><br><span class="line">							<span class="keyword">and</span> toInt32(shopId) &gt; <span class="number">0</span></span><br><span class="line">						<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">							shopId</span><br><span class="line">						<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">							DealAmt <span class="keyword">desc</span></span><br><span class="line">						<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">						<span class="number">10</span> ))</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span> ShopId <span class="keyword">order</span> <span class="keyword">by</span> DealAmt <span class="keyword">desc</span> <span class="keyword">limit</span> <span class="number">0</span>,<span class="number">10</span> </span><br><span class="line">	) <span class="keyword">any</span></span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		shopId <span class="keyword">as</span> ShopId,</span><br><span class="line">		uniqMerge(shopFollowAcct) <span class="keyword">as</span> ShopFollowUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_shop_follow_agg_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> shopId <span class="keyword">GLOBAL</span> <span class="keyword">IN</span> (</span><br><span class="line">		<span class="keyword">select</span></span><br><span class="line">			shopId</span><br><span class="line">		<span class="keyword">from</span></span><br><span class="line">			(</span><br><span class="line">			<span class="keyword">select</span></span><br><span class="line">				shopId ,</span><br><span class="line">				sumMerge(dealAmt) <span class="keyword">as</span> DealAmt</span><br><span class="line">			<span class="keyword">from</span></span><br><span class="line">				bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">			<span class="keyword">where</span></span><br><span class="line">				dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">				<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">				<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">					<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">						<span class="keyword">and</span> shopId <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'10278978'</span>, <span class="string">'11810231'</span>, <span class="string">'11624131'</span>, <span class="string">'11574099'</span>, <span class="string">'11444736'</span>)</span><br><span class="line">							<span class="keyword">and</span> toInt32(shopId) &gt; <span class="number">0</span></span><br><span class="line">						<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">							shopId</span><br><span class="line">						<span class="keyword">order</span> <span class="keyword">by</span></span><br><span class="line">							DealAmt <span class="keyword">desc</span></span><br><span class="line">						<span class="keyword">limit</span> <span class="number">0</span>,</span><br><span class="line">						<span class="number">10</span> ))</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		shopId )</span><br><span class="line">		<span class="keyword">using</span> (ShopId);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="4）行业趋势"><a href="#4）行业趋势" class="headerlink" title="4）行业趋势"></a>4）行业趋势</h4><p><strong>把从同一张表里出的指标放到同一张表中去，就是纯sql结构优化。</strong></p>
+<p>优化前2.5s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	UV,</span><br><span class="line">	VisitedShopNum,</span><br><span class="line">	CateClickNum,</span><br><span class="line">	DealSkuNum,</span><br><span class="line">	PV,</span><br><span class="line">	<span class="keyword">if</span>(UV = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealUser / UV) <span class="keyword">as</span> DealRate,</span><br><span class="line">	BrandNum,</span><br><span class="line">	CateSearchNum,</span><br><span class="line">	DealNum,</span><br><span class="line">	VisitedSkuNum,</span><br><span class="line">	DealUser,</span><br><span class="line">	CartUser,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	DealShopNum,</span><br><span class="line">	DealBrandNum,</span><br><span class="line">	VisitedBrandNum,</span><br><span class="line">	<span class="keyword">if</span>(CateSearchNum = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	CateClickNum / CateSearchNum) <span class="keyword">as</span> SearchClickRate,</span><br><span class="line">	ShopNum,</span><br><span class="line">	ProFollowUser,</span><br><span class="line">	<span class="keyword">if</span>(DealUser = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealAmt / DealUser) <span class="keyword">as</span> DealCustPriceAvg,</span><br><span class="line">	a.DateTime <span class="keyword">as</span> DateTime</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">		uniqMerge(dealSku) <span class="keyword">as</span> DealSkuNum,</span><br><span class="line">		uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">		uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">		sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">		sumMerge(searchClickNum) <span class="keyword">as</span> CateClickNum,</span><br><span class="line">		uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime,</span><br><span class="line">		sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">		uniqMerge(browseSku) <span class="keyword">as</span> VisitedSkuNum,</span><br><span class="line">		uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		dateTime ) a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		<span class="keyword">sum</span>(catgSearchNum) <span class="keyword">as</span> CateSearchNum,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_search_click_num_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span> , <span class="string">'ALL'</span> )</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) d <span class="keyword">on</span></span><br><span class="line">	a.DateTime = d.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		uniq(shopId) <span class="keyword">as</span> ShopNum,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1,</span><br><span class="line">		uniq(sonBrandId) <span class="keyword">as</span> BrandNum</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_brand_shop_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) e <span class="keyword">on</span></span><br><span class="line">	a.DateTime = e.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		uniq(saleOrdId) <span class="keyword">as</span> DealNum,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_product_deal_detail_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) f <span class="keyword">on</span></span><br><span class="line">	a.DateTime = f.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1,</span><br><span class="line">		uniq(isDealShop) <span class="keyword">as</span> DealShopNum</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_brand_shop_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) g <span class="keyword">on</span></span><br><span class="line">	a.DateTime = g.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1,</span><br><span class="line">		uniq(isDealBrand) <span class="keyword">as</span> DealBrandNum</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_brand_shop_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) h <span class="keyword">on</span></span><br><span class="line">	a.DateTime = h.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1,</span><br><span class="line">		uniq(isVisitedShop) <span class="keyword">as</span> VisitedShopNum</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_brand_shop_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) i <span class="keyword">on</span></span><br><span class="line">	a.DateTime = i.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1,</span><br><span class="line">		uniq(isVisitedBrand) <span class="keyword">as</span> VisitedBrandNum</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_brand_shop_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) j <span class="keyword">on</span></span><br><span class="line">	a.DateTime = j.DateTime1;</span><br></pre></td></tr></table></figure>
+
+<p>优化后1.9s</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	UV,</span><br><span class="line">	VisitedShopNum,</span><br><span class="line">	CateClickNum,</span><br><span class="line">	DealSkuNum,</span><br><span class="line">	PV,</span><br><span class="line">	<span class="keyword">if</span>(UV = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealUser / UV) <span class="keyword">as</span> DealRate,</span><br><span class="line">	BrandNum,</span><br><span class="line">	CateSearchNum,</span><br><span class="line">	DealNum,</span><br><span class="line">	VisitedSkuNum,</span><br><span class="line">	DealUser,</span><br><span class="line">	CartUser,</span><br><span class="line">	DealAmt,</span><br><span class="line">	DealProNum,</span><br><span class="line">	DealShopNum,</span><br><span class="line">	DealBrandNum,</span><br><span class="line">	VisitedBrandNum,</span><br><span class="line">	<span class="keyword">if</span>(CateSearchNum = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	CateClickNum / CateSearchNum) <span class="keyword">as</span> SearchClickRate,</span><br><span class="line">	ShopNum,</span><br><span class="line">	ProFollowUser,</span><br><span class="line">	<span class="keyword">if</span>(DealUser = <span class="number">0</span>,</span><br><span class="line">	<span class="number">0</span>,</span><br><span class="line">	DealAmt / DealUser) <span class="keyword">as</span> DealCustPriceAvg,</span><br><span class="line">	a.DateTime <span class="keyword">as</span> DateTime</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		sumMerge(pv) <span class="keyword">as</span> PV,</span><br><span class="line">		uniqMerge(dealSku) <span class="keyword">as</span> DealSkuNum,</span><br><span class="line">		uniqMerge(followAcct) <span class="keyword">as</span> ProFollowUser,</span><br><span class="line">		uniqMerge(dealAcct) <span class="keyword">as</span> DealUser,</span><br><span class="line">		sumMerge(dealProNum) <span class="keyword">as</span> DealProNum,</span><br><span class="line">		sumMerge(searchClickNum) <span class="keyword">as</span> CateClickNum,</span><br><span class="line">		uniqMerge(browseAcct) <span class="keyword">as</span> UV,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime,</span><br><span class="line">		sumMerge(dealAmt) <span class="keyword">as</span> DealAmt,</span><br><span class="line">		uniqMerge(browseSku) <span class="keyword">as</span> VisitedSkuNum,</span><br><span class="line">		uniqMerge(cartAcct) <span class="keyword">as</span> CartUser</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_zh_industry_product_union_all_agg_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">		<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		dateTime ) a</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		<span class="keyword">sum</span>(catgSearchNum) <span class="keyword">as</span> CateSearchNum,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_search_click_num_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span> , <span class="string">'ALL'</span> )</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) d <span class="keyword">on</span></span><br><span class="line">	a.DateTime = d.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		uniq(shopId) <span class="keyword">as</span> ShopNum,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1,</span><br><span class="line">		uniq(sonBrandId) <span class="keyword">as</span> BrandNum,</span><br><span class="line">		uniq(isDealShop) <span class="keyword">as</span> DealShopNum,</span><br><span class="line">		uniq(isDealBrand) <span class="keyword">as</span> DealBrandNum,</span><br><span class="line">		uniq(isVisitedShop) <span class="keyword">as</span> VisitedShopNum,</span><br><span class="line">		uniq(isVisitedBrand) <span class="keyword">as</span> VisitedBrandNum</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_industry_catg_brand_shop_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) e <span class="keyword">on</span></span><br><span class="line">	a.DateTime = e.DateTime1</span><br><span class="line"><span class="keyword">left</span> <span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		uniq(saleOrdId) <span class="keyword">as</span> DealNum,</span><br><span class="line">		dateTime <span class="keyword">as</span> DateTime1</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		bc_online. ck_product_deal_detail_d</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		dateTime &gt;= <span class="string">'2022-10-12'</span></span><br><span class="line">		<span class="keyword">and</span> dateTime &lt;= <span class="string">'2022-11-15'</span></span><br><span class="line">		<span class="keyword">and</span> secondIndId <span class="keyword">in</span> (<span class="string">'1343'</span>)</span><br><span class="line">			<span class="keyword">and</span> shopType <span class="keyword">in</span> (<span class="string">'POP'</span>, <span class="string">'B2C'</span>)</span><br><span class="line">		<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">			dateTime ) f <span class="keyword">on</span></span><br><span class="line">	a.DateTime = f.DateTime1;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/" rel="next" title="京东商智_物理机cpu&load&memory监控参数说明">
+                <i class="fa fa-chevron-left"></i> 京东商智_物理机cpu&load&memory监控参数说明
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/21/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%98%8E%E7%BB%86%E6%95%B0%E6%8D%AE%E4%B8%8A%E5%8D%B7%E5%AE%9E%E6%88%98/" rel="prev" title="ClickHouse_行业模块ClickHouse明细数据上卷实战">
+                ClickHouse_行业模块ClickHouse明细数据上卷实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ClickHouse-行业模块ClickHouse服务优化实战"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_行业模块ClickHouse服务优化实战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-行业底表基本数据统计"><span class="nav-number">2.</span> <span class="nav-text">1.行业底表基本数据统计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-典型二级类目数据量统计与超时请求统计"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 典型二级类目数据量统计与超时请求统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-top20数据量的二级类目"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 top20数据量的二级类目</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-行业底表优化方案"><span class="nav-number">3.</span> <span class="nav-text">2.行业底表优化方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-物化视图与projection方案"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 物化视图与projection方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-个性化sql优化"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 个性化sql优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）行业概况商品榜单"><span class="nav-number">3.2.1.</span> <span class="nav-text">1）行业概况商品榜单</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）行业概况品牌榜单"><span class="nav-number">3.2.2.</span> <span class="nav-text">2）行业概况品牌榜单</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）行业概况店铺榜单"><span class="nav-number">3.2.3.</span> <span class="nav-text">3）行业概况店铺榜单</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4）行业趋势"><span class="nav-number">3.2.4.</span> <span class="nav-text">4）行业趋势</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spark," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据开发之离线计算_Spark任务调优与RSS1.Spark常用参数解释Spark的默认配置文件位于堡垒机上的这个位置: $SPARK_CONF_DIR&#x2F;spark-defaults.conf，用户可以自行查看和理解。默认值优先级最低，用户如果提交任务时或者代码里明确指定配置，则以用户配置为先。以下常用参数配置均可以通过--conf XXX&#x3D;Y方式使用:  2.Spark调优技巧2.1 并发相关参">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据开发之离线计算_Spark任务调优与RSS">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="数据开发之离线计算_Spark任务调优与RSS1.Spark常用参数解释Spark的默认配置文件位于堡垒机上的这个位置: $SPARK_CONF_DIR&#x2F;spark-defaults.conf，用户可以自行查看和理解。默认值优先级最低，用户如果提交任务时或者代码里明确指定配置，则以用户配置为先。以下常用参数配置均可以通过--conf XXX&#x3D;Y方式使用:  2.Spark调优技巧2.1 并发相关参">
+<meta property="og:image" content="http://littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/1.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/2.png">
+<meta property="og:image" content="http://littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/3.png">
+<meta property="article:published_time" content="2023-05-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:59:09.905Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2023/05/29/数据开发之离线计算_Spark任务调优与RSS/"/>
+
+
+
+
+
+  <title>数据开发之离线计算_Spark任务调优与RSS | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据开发之离线计算_Spark任务调优与RSS</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-05-29T00:00:00+08:00">
+                2023-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之离线计算</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据开发之离线计算-Spark任务调优与RSS"><a href="#数据开发之离线计算-Spark任务调优与RSS" class="headerlink" title="数据开发之离线计算_Spark任务调优与RSS"></a>数据开发之离线计算_Spark任务调优与RSS</h2><h3 id="1-Spark常用参数解释"><a href="#1-Spark常用参数解释" class="headerlink" title="1.Spark常用参数解释"></a>1.Spark常用参数解释</h3><p>Spark的默认配置文件位于堡垒机上的这个位置: $SPARK_CONF_DIR/spark-defaults.conf，用户可以自行查看和理解。默认值优先级最低，用户如果提交任务时或者代码里明确指定配置，则以用户配置为先。以下常用参数配置均可以通过<code>--conf XXX=Y</code>方式使用:</p>
+<p><img src="//littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/1.png" alt></p>
+<h3 id="2-Spark调优技巧"><a href="#2-Spark调优技巧" class="headerlink" title="2.Spark调优技巧"></a>2.Spark调优技巧</h3><h4 id="2-1-并发相关参数"><a href="#2-1-并发相关参数" class="headerlink" title="2.1 并发相关参数"></a>2.1 并发相关参数</h4><p>1.什么时候需要调整Spark任务并发？</p>
+<p>若一个stage内的所有task启动时间差很多，则说明并行度不够，想要提升任务执行时间就需要增加并发。</p>
+<p>2.如何提升当前任务的最大并发task个数？</p>
+<p>就是调节–conf spark.dynamicAllocation.maxExecutors=XXX（当前默认配置为100）。注意，提高executor个数会占用队列资源，请根据队列资源情况合理调整。</p>
+<p>3.shuffle stage的partition数量怎么确定？</p>
+<p>根据task执行情况来定，根据经验，一般保持每个task的 input + shuffle read 量在300-500M左右比较合适–conf spark.sql.shuffle.partitions=XXXX （注意：该值建议&lt; 10000，设置过大shuffle元信息过多，容易导致driver OOM）</p>
+<h4 id="2-2-任务申请内存"><a href="#2-2-任务申请内存" class="headerlink" title="2.2 任务申请内存"></a>2.2 任务申请内存</h4><p>1.如何计算每个task可用内存大小？</p>
+<p>平均每个task的可用内存大致可以认为是：spark.executor.memory * spark.task.cpus / spark.executor.cores。</p>
+<p>2.如何设置spark.executor.memory 和spark.executor.cores？</p>
+<p>一般来说，spark.executor.cores : spark.executor.memory比例保持在1:2比较合适，调整的时候建议保持spark.executor.cores不动（一般是4），只调节spark.executor.memory。<strong>若shuffle数据量很大，个别任务发生spill，则说明单个task需要更多的内存，这个时候可以同时调节这两个值，减少spark.executor.cores / 增加spark.executor.memory ，来提高平均每个task的可用内存。stage发生spill不是失败，只是task想要的内存量比较大，由于内存不足发生写磁盘，故发生spill任务一定会变慢。</strong></p>
+<h4 id="2-3-Fetch-failure如何定位"><a href="#2-3-Fetch-failure如何定位" class="headerlink" title="2.3 Fetch failure如何定位"></a>2.3 Fetch failure如何定位</h4><p>当日志中大量出现fetch failure报错，一般都是由于磁盘繁忙所致。可以在task的日志中找到打印fetch failure的相关行，会有ip:7337的fetch failure报错，然后访问对应IP物理机监控模块，查询该IP对应日志报错时段的磁盘指标，如磁盘使用率打满，就可以确定该IP对应节点磁盘繁忙，因此shuffle服务故障会发生fetch failure。处理方案就是挑磁盘不繁忙时候重试即可。</p>
+<h3 id="3-Spark-Shuffle参数调优"><a href="#3-Spark-Shuffle参数调优" class="headerlink" title="3.Spark Shuffle参数调优"></a>3.Spark Shuffle参数调优</h3><h4 id="3-1-Spark-Shuffle过程"><a href="#3-1-Spark-Shuffle过程" class="headerlink" title="3.1 Spark Shuffle过程"></a>3.1 Spark Shuffle过程</h4><p><img src="//littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/2.png" alt></p>
+<p>Spark 包含三种 shuffle writer，上图展示的是BypassMergeSortShuffleWriter，以此为例简单介绍 spark<br>shuffle。<strong>Shuffle Writer会将每个shuffle write task的数据，按照一定的规则进行划分，比如说hash（具体什么规则是通过rdd之间的transform进行设定的，也可以用户自行设定 rdd 的 Partitioner），并对应的写到临时文件中。在所有数据写完之后，会将这些临时文件合并成一个文件，并生成 index 文件用于索引每个reduce task数据所对应的部分。</strong><br><strong>当所有的shuffle write task完成后，会进入到shuffle read stage，并启动 shuffle read task。read task会读取之前所有write task所产生的shuffle数据中对应为自己的某一部分。</strong>如上图右边所示，每个read task内的数据来源与左边的write task颜色一致。</p>
+<h4 id="3-2-Spark-Shuffle缺点"><a href="#3-2-Spark-Shuffle缺点" class="headerlink" title="3.2 Spark Shuffle缺点"></a>3.2 Spark Shuffle缺点</h4><p><strong>从上述流程可以发现，对于一次shuffle read，需要读取前面m个write task所产生的对应自己的那一部分，所以一个read task 需要读取m个write task生成的临时文件，如果一次shuffle read包含r个read task，那么就需要读取m * r个block。</strong></p>
+<p><strong>假设一次shuffle的数据量是100GB，m和r都是1000，那么平均来说，一个block的大小是 100GB / (1000 * 1000) = 104 kb。总共需要100w次网络请求，每次需要读取104kb。这会带来大量的随机读，随机读小块数据，也会带来极低的shuffle read性能；更糟糕的是，如果shuffle read性能过低，很有可能触发FetchFailedException，从而导致shuffle失败，需要整个从shuffle write task开始重算，进一步增大了 shuffle 的时长。</strong></p>
+<h4 id="3-3-Remote-Shuffle-Service过程"><a href="#3-3-Remote-Shuffle-Service过程" class="headerlink" title="3.3 Remote Shuffle Service过程"></a>3.3 Remote Shuffle Service过程</h4><p>remote shuffle service被引进用来解决上述缺点，是一个只负责写不负责读的shuffle service，市面上有很多该类型的shuffle service，比如Facebook所做的Cosco，Linkedkin做的Magnet，Uber做的 Zeus。</p>
+<p><img src="//littleforestjia.github.io/2023/05/29/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Spark%E4%BB%BB%E5%8A%A1%E8%B0%83%E4%BC%98%E4%B8%8ERSS/3.png" alt></p>
+<p><strong>简单来说，就是把上述的spark shuffle过程进行改写：shuffle write的时候，将数据直接写到remote shuffle service上而不落盘；相同的reduce partition会被写到相同的shuffle service上，以此进行一个聚合，并写到 hdfs 上的文件中。shuffle read的时候，会直接读取 hdfs。通过 hdfs 上的 shuffle 数据备份，以此来消除 FetchFailedException的产生，避免shuffle write task的重算，也避免了小块数据的频繁读取。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" rel="tag"><i class="fa fa-tag"></i> Spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/05/24/Java%E6%9C%8D%E5%8A%A1_java%E4%B8%AD%E7%9A%84Lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8EStream%E6%B5%81%E5%87%BD%E6%95%B0%E6%80%BB%E7%BB%93/" rel="next" title="Java服务_java中的Lambda表达式与Stream流函数总结">
+                <i class="fa fa-chevron-left"></i> Java服务_java中的Lambda表达式与Stream流函数总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/" rel="prev" title="ClickHouse_BitMap在hive和ck中的存储与两者之间的传输">
+                ClickHouse_BitMap在hive和ck中的存储与两者之间的传输 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之离线计算-Spark任务调优与RSS"><span class="nav-number">1.</span> <span class="nav-text">数据开发之离线计算_Spark任务调优与RSS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Spark常用参数解释"><span class="nav-number">1.1.</span> <span class="nav-text">1.Spark常用参数解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Spark调优技巧"><span class="nav-number">1.2.</span> <span class="nav-text">2.Spark调优技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-并发相关参数"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 并发相关参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-任务申请内存"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 任务申请内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-Fetch-failure如何定位"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 Fetch failure如何定位</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Spark-Shuffle参数调优"><span class="nav-number">1.3.</span> <span class="nav-text">3.Spark Shuffle参数调优</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-Spark-Shuffle过程"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 Spark Shuffle过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Spark-Shuffle缺点"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 Spark Shuffle缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-Remote-Shuffle-Service过程"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 Remote Shuffle Service过程</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

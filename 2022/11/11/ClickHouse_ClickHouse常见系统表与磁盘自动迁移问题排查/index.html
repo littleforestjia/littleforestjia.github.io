@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查1.常见ClickHouse系统表及其字段1.1 system.clusterssystem.clusters表中记录了配置文件中所配置好的集群和服务器相关的信息，主要字段如下： 12345678910cluster (String) — 集群名称。shard_num (UInt32) — 集群分片数，从1开始。shard_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/11/11/ClickHouse_ClickHouse%E5%B8%B8%E8%A7%81%E7%B3%BB%E7%BB%9F%E8%A1%A8%E4%B8%8E%E7%A3%81%E7%9B%98%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查1.常见ClickHouse系统表及其字段1.1 system.clusterssystem.clusters表中记录了配置文件中所配置好的集群和服务器相关的信息，主要字段如下： 12345678910cluster (String) — 集群名称。shard_num (UInt32) — 集群分片数，从1开始。shard_">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/11/11/ClickHouse_ClickHouse%E5%B8%B8%E8%A7%81%E7%B3%BB%E7%BB%9F%E8%A1%A8%E4%B8%8E%E7%A3%81%E7%9B%98%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/1.png">
+<meta property="article:published_time" content="2022-11-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:55:35.173Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/11/11/ClickHouse_ClickHouse%E5%B8%B8%E8%A7%81%E7%B3%BB%E7%BB%9F%E8%A1%A8%E4%B8%8E%E7%A3%81%E7%9B%98%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/11/11/ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查/"/>
+
+
+
+
+
+  <title>ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/11/11/ClickHouse_ClickHouse%E5%B8%B8%E8%A7%81%E7%B3%BB%E7%BB%9F%E8%A1%A8%E4%B8%8E%E7%A3%81%E7%9B%98%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-11T00:00:00+08:00">
+                2022-11-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="ClickHouse-ClickHouse常见系统表与磁盘自动迁移问题排查"><a href="#ClickHouse-ClickHouse常见系统表与磁盘自动迁移问题排查" class="headerlink" title="ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查"></a>ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查</h2><h3 id="1-常见ClickHouse系统表及其字段"><a href="#1-常见ClickHouse系统表及其字段" class="headerlink" title="1.常见ClickHouse系统表及其字段"></a>1.常见ClickHouse系统表及其字段</h3><h4 id="1-1-system-clusters"><a href="#1-1-system-clusters" class="headerlink" title="1.1 system.clusters"></a>1.1 system.clusters</h4><p>system.clusters表中记录了配置文件中所配置好的集群和服务器相关的信息，主要字段如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cluster (String) — 集群名称。</span><br><span class="line">shard_num (UInt32) — 集群分片数，从1开始。</span><br><span class="line">shard_weight (UInt32) — 写入数据时分片的相对权重。</span><br><span class="line">replica_num (UInt32) — 分片的副本编号，从1开始。</span><br><span class="line">host_name (String) — 主机名，也可以在配置中指定。</span><br><span class="line">host_address (String) — 从DNS获得的主机IP地址。</span><br><span class="line">port (UInt16) — 用于连接到服务器的端口。</span><br><span class="line">user (String) — 用于连接到服务器的用户。</span><br><span class="line">errors_count (UInt32) — 此主机无法到达副本的次数。</span><br><span class="line">estimated_recovery_time (UInt32) — 副本错误计数归零剩下的秒数，它被认为是恢复正常。</span><br></pre></td></tr></table></figure>
+
+<p>表实例：</p>
+<table>
+<thead>
+<tr>
+<th><strong>cluster</strong></th>
+<th><strong>shard_num</strong></th>
+<th><strong>shard_weight</strong></th>
+<th><strong>replica_num</strong></th>
+<th><strong>host_name</strong></th>
+<th><strong>host_address</strong></th>
+<th><strong>port</strong></th>
+<th><strong>is_local</strong></th>
+<th><strong>user</strong></th>
+<th><strong>default_database</strong></th>
+<th><strong>errors_count</strong></th>
+<th><strong>slowdowns_count</strong></th>
+<th><strong>estimated_recovery_time</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>10.199.136.101</td>
+<td>10.199.136.101</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>10.199.136.5</td>
+<td>10.199.136.5</td>
+<td>9700</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+<td>10.199.136.52</td>
+<td>10.199.136.52</td>
+<td>9800</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>10.199.136.5</td>
+<td>10.199.136.5</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>10.199.136.52</td>
+<td>10.199.136.52</td>
+<td>9700</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>2</td>
+<td>1</td>
+<td>3</td>
+<td>10.199.136.101</td>
+<td>10.199.136.101</td>
+<td>9800</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>10.199.136.52</td>
+<td>10.199.136.52</td>
+<td>9600</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+<td>10.199.136.101</td>
+<td>10.199.136.101</td>
+<td>9700</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>ZYX_CK_Pub_08</strong></td>
+<td>3</td>
+<td>1</td>
+<td>3</td>
+<td>10.199.136.5</td>
+<td>10.199.136.5</td>
+<td>9800</td>
+<td>0</td>
+<td>default</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p><strong>从上图可以看出ZYX_CK_Pub_08是一个三副本集群，也可以看出每个分片编号和副本编号及其对应的ip和端口号。</strong></p>
+<h4 id="1-2-system-settings"><a href="#1-2-system-settings" class="headerlink" title="1.2 system.settings"></a>1.2 system.settings</h4><p>system.settings表中记录了该ClickHouse集群的配置文件中的配置信息，就比如hbase集群的core-default.xml、hbase-site.xml配置文件中的各种集群配置项，该表的主要字段如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">name (String) — 设置项名称。</span><br><span class="line">value (String) — 设置的值。</span><br><span class="line">changed (UInt8) — 显示设置是否从其默认值更改。</span><br><span class="line">description (String) — 设置项的简单描述。</span><br><span class="line">min (Nullable(String)) — 设置的最小值，如果通过约束设置的话。如果设置没有最小值，则为NULL。</span><br><span class="line">max (Nullable(String)) — 设置的最小值，如果通过约束设置的话。如果设置没有最小值，则为NULL。</span><br><span class="line">readonly (UInt8) — 显示当前用户是否可以更改设置：</span><br><span class="line">	0 — 当前用户可以更改设置。</span><br><span class="line">	1 — 当前用户无法更改设置。</span><br></pre></td></tr></table></figure>
+
+<p>表实例，此处只截取部分，一般这种集群配置项可以多达四五百项：</p>
+<table>
+<thead>
+<tr>
+<th><strong>name</strong></th>
+<th><strong>value</strong></th>
+<th><strong>changed</strong></th>
+<th><strong>description</strong></th>
+<th><strong>min</strong></th>
+<th><strong>max</strong></th>
+<th><strong>readonly</strong></th>
+<th><strong>type</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>min_compress_block_size</strong></td>
+<td>65536</td>
+<td>0</td>
+<td>The actual size of the block to compress, if the uncompressed data less than max_compress_block_size is no less than this value and no less than the volume of data for one mark.</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>max_compress_block_size</strong></td>
+<td>1048576</td>
+<td>0</td>
+<td>The maximum size of blocks of uncompressed data before compressing for writing to a table.</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>max_block_size</strong></td>
+<td>65505</td>
+<td>0</td>
+<td>Maximum block size for reading</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>max_insert_block_size</strong></td>
+<td>1048545</td>
+<td>0</td>
+<td>The maximum block size for insertion, if we control the creation of blocks for insertion.</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>min_insert_block_size_rows</strong></td>
+<td>1048545</td>
+<td>0</td>
+<td>Squash blocks passed to INSERT query to specified size in rows, if blocks are not big enough.</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>min_insert_block_size_bytes</strong></td>
+<td>268427520</td>
+<td>0</td>
+<td>Squash blocks passed to INSERT query to specified size in bytes, if blocks are not big enough.</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>min_insert_block_size_rows_for_materialized_views</strong></td>
+<td>0</td>
+<td>0</td>
+<td>Like min_insert_block_size_rows, but applied only during pushing to MATERIALIZED VIEW (default: min_insert_block_size_rows)</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>min_insert_block_size_bytes_for_materialized_views</strong></td>
+<td>0</td>
+<td>0</td>
+<td>Like min_insert_block_size_bytes, but applied only during pushing to MATERIALIZED VIEW (default: min_insert_block_size_bytes)</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+<tr>
+<td><strong>max_joined_block_size_rows</strong></td>
+<td>65505</td>
+<td>0</td>
+<td>Maximum block size for JOIN result (if join algorithm supports it). 0 means unlimited.</td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>UInt64</td>
+</tr>
+</tbody></table>
+<h4 id="1-3-system-parts"><a href="#1-3-system-parts" class="headerlink" title="1.3 system.parts"></a>1.3 system.parts</h4><p>system.parts表中记录了集群中所有MergeTree引擎表的分区信息，对于ClickHouse一个partition分区就是一个文件夹，也是ClickHouse中数据变更的最小存储单元，该表的主要字段如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">partition (String) – 分区的名称。要了解分区是什么，参考ALTER查询的描述。格式：</span><br><span class="line">	YYYYMM 按月自动分区。</span><br><span class="line">	any_string 当手动分区。</span><br><span class="line">name (String) – 数据片段的名称。</span><br><span class="line">active (UInt8) – 指示数据片段是否处于激活状态的标志。如果数据片段是激活的，则在表中可以使用它。否则它是被删除状态。未激活的数据片段在合并后仍然存在。</span><br><span class="line">marks (UInt64) – 标记的数量。要获得数据片段的大概行数，可以用索引粒度乘以标记（通常是8192）（这个提示不适用于自适应粒度）。</span><br><span class="line">rows (UInt64) – 行数。</span><br><span class="line">bytes_on_disk (UInt64) – 所有数据片段文件的总大小，单位字节。</span><br><span class="line">data_compressed_bytes (UInt64) – 数据片段占用压缩数据的总大小。所有的附属文件不包括在内（例如，标记文件）。</span><br><span class="line">data_uncompressed_bytes (UInt64) – 数据片段中未压缩数据的总大小。所有的附属文件不包括在内（例如，标记文件）。</span><br><span class="line">marks_bytes (UInt64) – 标记的文件的大小。</span><br><span class="line">modification_time (DateTime) – 修改包含数据片段的目录的时间。这通常对应于创建数据部分的时间。</span><br><span class="line">remove_time (DateTime) – 数据片段变为非激活状态的时间。</span><br><span class="line">refcount (UInt32) – 使用数据片段的位置数量。大于2的值表示数据部分用于查询或合并。</span><br><span class="line">min_date (Date) – 数据片段中日期键的最小值。</span><br><span class="line">max_date (Date) – 数据片段中日期键的最大值。</span><br><span class="line">min_time (DateTime) – 数据片段中日期和时间键的最小值。</span><br><span class="line">max_time(DateTime) – 数据片段中日期和时间键的最小值。</span><br><span class="line">partition_id (String) – 分区的ID。</span><br><span class="line">min_block_number (UInt64) – 合并后组成当前片段的最小数据块编号。</span><br><span class="line">max_block_number (UInt64) – 合并后组成当前片段的最大数据块编号。</span><br><span class="line">level (UInt32) – 合并树的深度。零意味着当前片段是通过插入创建的，而不是通过合并其他片段创建的。</span><br><span class="line">data_version (UInt64) – 用于确定应用于数据片段变化的数字（变化版本高于data_version)。</span><br><span class="line">primary_key_bytes_in_memory (UInt64) – 主键值使用的内存量（以字节为单位）。</span><br><span class="line">primary_key_bytes_in_memory_allocated (UInt64) – 为主键值保留的内存量（以字节为单位）。</span><br><span class="line">is_frozen (UInt8) – 表明存在分区数据备份的标志。1、备份存在。0，备份不存在。更多详细信息，请参考FREEZE PARTITION</span><br><span class="line">database (String) – 数据库名称</span><br><span class="line">table (String) – 表名</span><br><span class="line">engine (String) – 表引擎，没有参数。</span><br><span class="line">path (String) – 数据片段文件的文件夹绝对路径。</span><br><span class="line">disk (String) – 存储数据部分的磁盘的名称。</span><br><span class="line">hash_of_all_files (String) – sipHash128压缩文件。</span><br><span class="line">hash_of_uncompressed_files (String) – sipHash128的未压缩文件（带有标记文件、索引文件等）。</span><br><span class="line">uncompressed_hash_of_compressed_files (String) – sipHash128压缩文件中的数据，就好像它们是未压缩的一样。</span><br><span class="line">bytes (UInt64) – bytes_on_disk别名。</span><br><span class="line">marks_size (UInt64) – marks_bytes别名。</span><br></pre></td></tr></table></figure>
+
+<p>表实例：</p>
+<table>
+<thead>
+<tr>
+<th><strong>partition</strong></th>
+<th><strong>name</strong></th>
+<th><strong>uuid</strong></th>
+<th><strong>part_type</strong></th>
+<th><strong>active</strong></th>
+<th><strong>marks</strong></th>
+<th><strong>rows</strong></th>
+<th><strong>bytes_on_disk</strong></th>
+<th><strong>data_compressed_bytes</strong></th>
+<th><strong>data_uncompressed_bytes</strong></th>
+<th><strong>marks_bytes</strong></th>
+<th><strong>secondary_indices_compressed_bytes</strong></th>
+<th><strong>secondary_indices_uncompressed_bytes</strong></th>
+<th><strong>secondary_indices_marks_bytes</strong></th>
+<th><strong>modification_time</strong></th>
+<th><strong>remove_time</strong></th>
+<th><strong>refcount</strong></th>
+<th><strong>min_date</strong></th>
+<th><strong>max_date</strong></th>
+<th><strong>min_time</strong></th>
+<th><strong>max_time</strong></th>
+<th><strong>partition_id</strong></th>
+<th><strong>min_block_number</strong></th>
+<th><strong>max_block_number</strong></th>
+<th><strong>level</strong></th>
+<th><strong>data_version</strong></th>
+<th><strong>primary_key_bytes_in_memory</strong></th>
+<th><strong>primary_key_bytes_in_memory_allocated</strong></th>
+<th><strong>is_frozen</strong></th>
+<th><strong>database</strong></th>
+<th><strong>table</strong></th>
+<th><strong>engine</strong></th>
+<th><strong>disk_name</strong></th>
+<th><strong>path</strong></th>
+<th><strong>hash_of_all_files</strong></th>
+<th><strong>hash_of_uncompressed_files</strong></th>
+<th><strong>uncompressed_hash_of_compressed_files</strong></th>
+<th><strong>delete_ttl_info_min</strong></th>
+<th><strong>delete_ttl_info_max</strong></th>
+<th><strong>move_ttl_info.expression</strong></th>
+<th><strong>move_ttl_info.min</strong></th>
+<th><strong>move_ttl_info.max</strong></th>
+<th><strong>default_compression_codec</strong></th>
+<th><strong>recompression_ttl_info.expression</strong></th>
+<th><strong>recompression_ttl_info.min</strong></th>
+<th><strong>recompression_ttl_info.max</strong></th>
+<th><strong>group_by_ttl_info.expression</strong></th>
+<th><strong>group_by_ttl_info.min</strong></th>
+<th><strong>group_by_ttl_info.max</strong></th>
+<th><strong>rows_where_ttl_info.expression</strong></th>
+<th><strong>rows_where_ttl_info.min</strong></th>
+<th><strong>rows_where_ttl_info.max</strong></th>
+<th><strong>projections</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2022-10-04</strong></td>
+<td>0028c85aeceda9adb3d5f1cb7cd84356_1_29_2</td>
+<td>7c4c09c7-ee72-41c9-bb80-dff8a8856748</td>
+<td>Wide</td>
+<td>1</td>
+<td>178</td>
+<td>1441935</td>
+<td>206586355</td>
+<td>206541431</td>
+<td>341693021</td>
+<td>38448</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-10-05 09:43:36.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>0028c85aeceda9adb3d5f1cb7cd84356</td>
+<td>1</td>
+<td>29</td>
+<td>2</td>
+<td>1</td>
+<td>12096</td>
+<td>25088</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/0028c85aeceda9adb3d5f1cb7cd84356_1_29_2/</td>
+<td>64054bade4700f3b8cce14f7acf989ab</td>
+<td>e11aa9565de94329c556ff1fc92bedc3</td>
+<td>2ad5dca75e75069f6ff2c2ec303d0387</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-10-04</strong></td>
+<td>0028c85aeceda9adb3d5f1cb7cd84356_30_35_1</td>
+<td>7da68bd2-f7b0-4173-b549-6287feb95f15</td>
+<td>Wide</td>
+<td>1</td>
+<td>57</td>
+<td>452312</td>
+<td>61955957</td>
+<td>61941531</td>
+<td>102444781</td>
+<td>12312</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-10-05 09:43:38.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>0028c85aeceda9adb3d5f1cb7cd84356</td>
+<td>30</td>
+<td>35</td>
+<td>1</td>
+<td>30</td>
+<td>3863</td>
+<td>19712</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/0028c85aeceda9adb3d5f1cb7cd84356_30_35_1/</td>
+<td>f9d024fb18e4c17037cdff66b7aacfc9</td>
+<td>a49eab6675e11b7d8e04d7a806c10707</td>
+<td>08e65d2b8f9613883cb2e289fdbc555c</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-10-04</strong></td>
+<td>0028c85aeceda9adb3d5f1cb7cd84356_36_36_0</td>
+<td>10275fdf-9491-4b91-a4a2-e63d38505288</td>
+<td>Wide</td>
+<td>1</td>
+<td>11</td>
+<td>80825</td>
+<td>10929758</td>
+<td>10926905</td>
+<td>17213806</td>
+<td>2376</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-10-05 09:43:39.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>0028c85aeceda9adb3d5f1cb7cd84356</td>
+<td>36</td>
+<td>36</td>
+<td>0</td>
+<td>36</td>
+<td>755</td>
+<td>17088</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/0028c85aeceda9adb3d5f1cb7cd84356_36_36_0/</td>
+<td>7603db913ce9f461e12cfae91c787357</td>
+<td>a99b1c8484c16115393ffc2c2e13d949</td>
+<td>d7ee39c167442be26b38efa6e00b13ae</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-11-16</strong></td>
+<td>01cec265be808584624dfbb996210ddc_0_28_2</td>
+<td>d2f4468b-7529-4df7-b52a-52f6c99403f0</td>
+<td>Wide</td>
+<td>1</td>
+<td>205</td>
+<td>1667781</td>
+<td>222218419</td>
+<td>222166704</td>
+<td>389719346</td>
+<td>44280</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-11-17 09:44:40.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>01cec265be808584624dfbb996210ddc</td>
+<td>0</td>
+<td>28</td>
+<td>2</td>
+<td>0</td>
+<td>13919</td>
+<td>27136</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/01cec265be808584624dfbb996210ddc_0_28_2/</td>
+<td>9d8b76be597d753d1c3356c17df781fb</td>
+<td>24fbd9da0257de8e2922fb029cb84298</td>
+<td>909dd97ae772ffdcbcec6a5c5818830b</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-11-16</strong></td>
+<td>01cec265be808584624dfbb996210ddc_29_35_1</td>
+<td>77072487-2ad2-41d4-8b18-428485a97d3d</td>
+<td>Wide</td>
+<td>1</td>
+<td>80</td>
+<td>641196</td>
+<td>76781796</td>
+<td>76761559</td>
+<td>137624645</td>
+<td>17280</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-11-17 09:44:42.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>01cec265be808584624dfbb996210ddc</td>
+<td>29</td>
+<td>35</td>
+<td>1</td>
+<td>29</td>
+<td>5442</td>
+<td>20736</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/01cec265be808584624dfbb996210ddc_29_35_1/</td>
+<td>a9734f74cf97edcd91fbf55afacebeea</td>
+<td>243f9f307cc035c95e164462b920e095</td>
+<td>4a2a2498e76a90951d3913706aaf3f9a</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-11-16</strong></td>
+<td>01cec265be808584624dfbb996210ddc_36_38_1</td>
+<td>9fa94415-761b-4ff4-8307-375d206e751b</td>
+<td>Wide</td>
+<td>1</td>
+<td>28</td>
+<td>214776</td>
+<td>27538566</td>
+<td>27531444</td>
+<td>46496187</td>
+<td>6048</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-11-25 17:33:13.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>01cec265be808584624dfbb996210ddc</td>
+<td>36</td>
+<td>38</td>
+<td>1</td>
+<td>36</td>
+<td>1895</td>
+<td>18048</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/01cec265be808584624dfbb996210ddc_36_38_1/</td>
+<td>638561282f589bcf0ac84764bc411d69</td>
+<td>6e5965b7a49d44ccf399336c2ee908e2</td>
+<td>250d570e1da112583e661b2054aaba9a</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-10-22</strong></td>
+<td>056b70d640bb3c90db641200d3c92353_1_29_2</td>
+<td>5135e64c-48ff-431f-99d2-5191366a43e7</td>
+<td>Wide</td>
+<td>1</td>
+<td>165</td>
+<td>1340465</td>
+<td>202055226</td>
+<td>202013610</td>
+<td>326197596</td>
+<td>35640</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-10-23 09:44:34.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>056b70d640bb3c90db641200d3c92353</td>
+<td>1</td>
+<td>29</td>
+<td>2</td>
+<td>1</td>
+<td>11180</td>
+<td>25088</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/056b70d640bb3c90db641200d3c92353_1_29_2/</td>
+<td>bb68ec7de79c64862be7f07bea8f8622</td>
+<td>f65c0933777ba16673dbf7f57150f34f</td>
+<td>8d8115eae054fcfc28187c8411e9f61b</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-10-22</strong></td>
+<td>056b70d640bb3c90db641200d3c92353_30_47_2</td>
+<td>659f3239-e7ed-4f5a-92db-64a8de399b94</td>
+<td>Wide</td>
+<td>1</td>
+<td>118</td>
+<td>957120</td>
+<td>135204834</td>
+<td>135175059</td>
+<td>226764448</td>
+<td>25488</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-11-05 12:45:09.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>056b70d640bb3c90db641200d3c92353</td>
+<td>30</td>
+<td>47</td>
+<td>2</td>
+<td>30</td>
+<td>7988</td>
+<td>23040</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/056b70d640bb3c90db641200d3c92353_30_47_2/</td>
+<td>7166e86a330ba489e996410c7d0893ca</td>
+<td>6166eee467909edd86aacb39f9a358c8</td>
+<td>6d79ab0951823ac550e870232274a567</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td><strong>2022-08-10</strong></td>
+<td>07f198f3ed52cb396f1c8562a5fad39a_2_30_2</td>
+<td>00000000-0000-0000-0000-000000000000</td>
+<td>Wide</td>
+<td>1</td>
+<td>198</td>
+<td>1608217</td>
+<td>213424579</td>
+<td>213374665</td>
+<td>372204328</td>
+<td>42768</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2022-08-11 09:47:28.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1</td>
+<td>1970-01-01</td>
+<td>1970-01-01</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>07f198f3ed52cb396f1c8562a5fad39a</td>
+<td>2</td>
+<td>30</td>
+<td>2</td>
+<td>2</td>
+<td>13442</td>
+<td>18944</td>
+<td>0</td>
+<td>SZ</td>
+<td>.inner.ck_sz_flow_prod_traffics_sum_mv_unif</td>
+<td>ReplicatedAggregatingMergeTree</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/data/SZ/%2Einner%2Eck_sz_flow_prod_traffics_sum_mv_unif/07f198f3ed52cb396f1c8562a5fad39a_2_30_2/</td>
+<td>870092a0dbd0b64e0627fe1fe088bf2f</td>
+<td>cb90dbd5c5a566b2757fc54f5b4a5cec</td>
+<td>d04cf90866808d41292d607ef9076a57</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>1970-01-01 08:00:00.000</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>LZ4</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+</tbody></table>
+<h4 id="1-4-system-part-log"><a href="#1-4-system-part-log" class="headerlink" title="1.4 system.part_log"></a>1.4 system.part_log</h4><p>system.part_log表中记录了集群中所有MergeTree引擎表的分区的变更信息，如添加、合并、删除等变更操作的记录，该表的主要字段如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">event_type (Enum) — 数据片段发生的事件的类型。可以是以下值之一:</span><br><span class="line">	NEW_PART — 插入新的数据片段。</span><br><span class="line">	MERGE_PARTS — 合并数据片段。</span><br><span class="line">	DOWNLOAD_PART — 下载数据片段。</span><br><span class="line">	REMOVE_PART — 使用DETACH PARTITION删除或者卸载数据片段。</span><br><span class="line">	MUTATE_PART — 数据片段变化。</span><br><span class="line">	MOVE_PART — 将数据片段从一个磁盘移动到另一个磁盘。</span><br><span class="line">event_date (Date) — 事件日期</span><br><span class="line">event_time (DateTime) — 事件时间</span><br><span class="line">duration_ms (UInt64) — 持续时间。</span><br><span class="line">database (String) — 数据片段所在数据库名称</span><br><span class="line">table (String) — 数据片段所属表名称</span><br><span class="line">part_name (String) — 数据片段名称</span><br><span class="line">partition_id (String) — 数据片段插入的分区的ID。如果分区是通过tuple()进行的，则列接受&#39;all&#39;值。</span><br><span class="line">rows (UInt64) — 数据片段的行数</span><br><span class="line">size_in_bytes (UInt64) — 数据片段的大小，单位为字节</span><br><span class="line">merged_from (Array(String)) — 组成当前片段（合并后）的名称数组。</span><br><span class="line">bytes_uncompressed (UInt64) — 未压缩大小，单位为字节</span><br><span class="line">read_rows (UInt64) — 合并期间读取的行数。</span><br><span class="line">read_bytes (UInt64) — 合并期间读取的字节。</span><br><span class="line">error (UInt16) — 发生错误的代码号。</span><br><span class="line">exception (String) — 发生错误的文本消息。</span><br></pre></td></tr></table></figure>
+
+<p>表实例：</p>
+<table>
+<thead>
+<tr>
+<th><strong>query_id</strong></th>
+<th><strong>event_type</strong></th>
+<th><strong>event_date</strong></th>
+<th><strong>event_time</strong></th>
+<th><strong>event_time_microseconds</strong></th>
+<th><strong>duration_ms</strong></th>
+<th><strong>database</strong></th>
+<th><strong>table</strong></th>
+<th><strong>part_name</strong></th>
+<th><strong>partition_id</strong></th>
+<th><strong>disk_name</strong></th>
+<th><strong>path_on_disk</strong></th>
+<th><strong>rows</strong></th>
+<th><strong>size_in_bytes</strong></th>
+<th><strong>merged_from</strong></th>
+<th><strong>bytes_uncompressed</strong></th>
+<th><strong>read_rows</strong></th>
+<th><strong>read_bytes</strong></th>
+<th><strong>peak_memory_usage</strong></th>
+<th><strong>error</strong></th>
+<th><strong>exception</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>MergeParts</td>
+<td>2022-12-03</td>
+<td>2022-12-03 21:28:09.000</td>
+<td>2022-12-03 21:28:09.763102</td>
+<td>82500</td>
+<td>SZ</td>
+<td>ck_sz_flow_shop_traffics_lead_sku_det_unif</td>
+<td>536a49488b6d0bb380805a2c61dafed8_0_105_3</td>
+<td>536a49488b6d0bb380805a2c61dafed8</td>
+<td>disk6</td>
+<td>/data6/jdolap/clickhouse/data/data/SZ/ck_sz_flow_shop_traffics_lead_sku_det_unif/536a49488b6d0bb380805a2c61dafed8_0_105_3/</td>
+<td>26393496</td>
+<td>2958547224</td>
+<td>[‘536a49488b6d0bb380805a2c61dafed8_0_45_2’,’536a49488b6d0bb380805a2c61dafed8_46_88_2’,’536a49488b6d0bb380805a2c61dafed8_89_97_1’,’536a49488b6d0bb380805a2c61dafed8_98_105_1’]</td>
+<td>27896397760</td>
+<td>26393496</td>
+<td>18810910821</td>
+<td>220684242</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.560593</td>
+<td>13</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202007_0_0_0</td>
+<td>202007</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202007_0_0_0/</td>
+<td>34</td>
+<td>38200</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.574827</td>
+<td>12</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202005_0_0_0</td>
+<td>202005</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202005_0_0_0/</td>
+<td>45</td>
+<td>50337</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.590592</td>
+<td>12</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202003_0_0_0</td>
+<td>202003</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202003_0_0_0/</td>
+<td>31</td>
+<td>34890</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.608454</td>
+<td>13</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202009_0_0_0</td>
+<td>202009</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202009_0_0_0/</td>
+<td>25</td>
+<td>28267</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.626437</td>
+<td>13</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202004_0_0_0</td>
+<td>202004</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202004_0_0_0/</td>
+<td>28</td>
+<td>31578</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.628814</td>
+<td>16</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202008_0_0_0</td>
+<td>202008</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202008_0_0_0/</td>
+<td>38</td>
+<td>42609</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.649889</td>
+<td>18</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202001_0_0_0</td>
+<td>202001</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202001_0_0_0/</td>
+<td>31</td>
+<td>34887</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>DownloadPart</td>
+<td>2022-12-03</td>
+<td>2022-12-03 22:02:22.000</td>
+<td>2022-12-03 22:02:22.658375</td>
+<td>15</td>
+<td>tmp_smoke_test</td>
+<td>alerts_local01</td>
+<td>202011_0_0_0</td>
+<td>202011</td>
+<td>default</td>
+<td>/data4/jdolap/clickhouse/data/store/9d9/9d9eaca2-a132-44d3-a2d8-a9c6355fe8bb/202011_0_0_0/</td>
+<td>23</td>
+<td>26059</td>
+<td>[]</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="1-5-system-disks"><a href="#1-5-system-disks" class="headerlink" title="1.5 system.disks"></a>1.5 system.disks</h4><p>system.disks表中记录了服务器节点配置的磁盘信息，主要字段如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">name (String) — 服务器配置中磁盘的名称。</span><br><span class="line">path (String) — 指向文件系统中的挂载点的路径。</span><br><span class="line">free_space (UInt64) — 磁盘上的空闲空间（以字节为单位）。</span><br><span class="line">total_space (UInt64) — 磁盘容量（以字节为单位）。</span><br><span class="line">keep_free_space (UInt64) — 以字节为单位在磁盘上保持空闲的磁盘空间量。在磁盘配置的keep_free_space_bytes参数中定义。</span><br></pre></td></tr></table></figure>
+
+<p>表实例：</p>
+<table>
+<thead>
+<tr>
+<th><strong>name</strong></th>
+<th><strong>path</strong></th>
+<th><strong>free_space</strong></th>
+<th><strong>total_space</strong></th>
+<th><strong>keep_free_space</strong></th>
+<th><strong>type</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>default</strong></td>
+<td>/data2/jdolap/clickhouse/data/</td>
+<td>605149126656</td>
+<td>1948901576704</td>
+<td>0</td>
+<td>local</td>
+</tr>
+<tr>
+<td><strong>disk3</strong></td>
+<td>/data3/jdolap/clickhouse/data/</td>
+<td>630576390144</td>
+<td>1948901576704</td>
+<td>0</td>
+<td>local</td>
+</tr>
+<tr>
+<td><strong>disk6</strong></td>
+<td>/data6/jdolap/clickhouse/data2/</td>
+<td>746901942272</td>
+<td>1948901576704</td>
+<td>0</td>
+<td>local</td>
+</tr>
+<tr>
+<td><strong>disk7</strong></td>
+<td>/data7/jdolap/clickhouse/data2/</td>
+<td>648532381696</td>
+<td>1948901576704</td>
+<td>0</td>
+<td>local</td>
+</tr>
+</tbody></table>
+<h3 id="2-系统表应用实例"><a href="#2-系统表应用实例" class="headerlink" title="2.系统表应用实例"></a>2.系统表应用实例</h3><h4 id="2-1查询ClickHouse集群中某张表的总存储量"><a href="#2-1查询ClickHouse集群中某张表的总存储量" class="headerlink" title="2.1查询ClickHouse集群中某张表的总存储量"></a>2.1查询ClickHouse集群中某张表的总存储量</h4><p>clickhouse的系统表system.parts中记录了本节点中所有本地表磁盘使用情况。</p>
+<p>如果需要查看一个分布式表的整体磁盘使用情况，第一种方法是在每个节点上查询system.parts表然后手动汇总起来，这显然实际操作起来不现实；第二种方法就是基于system.parts创建一张分布式表，这样直接查询分布式表就可以得到任意一张分布式表或本地表的磁盘使用情况。</p>
+<p><strong>我们部门的ck运维为system.parts创建了一张名为system.parts_all的分布式表</strong>，使用以下语句即可查询由ck_sz_trade_featrue_shop_index_info组成的分布式表的总存储量，单位为GB：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	<span class="keyword">sum</span> (bytes_on_disk)/<span class="number">1024</span>/<span class="number">1024</span>/<span class="number">1024</span> </span><br><span class="line"><span class="keyword">from</span> </span><br><span class="line">	system.parts_all </span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	<span class="keyword">table</span> = <span class="string">'ck_sz_trade_featrue_shop_index_info'</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-ClickHouse磁盘使用率告警问题排查与解决"><a href="#2-2-ClickHouse磁盘使用率告警问题排查与解决" class="headerlink" title="2.2 ClickHouse磁盘使用率告警问题排查与解决"></a>2.2 ClickHouse磁盘使用率告警问题排查与解决</h4><p><strong>1.背景</strong></p>
+<p>在没有大量推数任务的情况下，ck集群突然出现了磁盘使用率告警：</p>
+<blockquote>
+<p>【严重】【自定义分组】 分组: HT0_CK_Pub_41, ip: 11.13.123.105, 【/data7】磁盘使用率已连续3次大于90.0%[当前值:96%]。报警时间: 2022-11-09 06:06:06</p>
+</blockquote>
+<p>经过查看节点磁盘监控发现，数据总量并没有凸增，但是磁盘data4和data0存储使用在下降，data6和data7在增加。</p>
+<p><strong>服务器的磁盘分区实际上就是将硬盘从物理上设置分隔，然后将不同的硬盘存储区域划分给不同的Linux系统目录使用。重新对一台服务的磁盘分区进行划分，其实就是修改该服务器的分区表，将不同的物理磁头、磁道、扇区划分给不同的磁盘分区。如下图磁盘使用率监控中的服务器为例，就是将整个服务器的硬盘按物理磁头、磁道、扇区分成了8个区域，这8个区域分别分配给/、/data1、/data2、/data3、/data4、/data5、/data6、/data7这8个系统目录。</strong></p>
+<p><img src="//littleforestjia.github.io/2022/11/11/ClickHouse_ClickHouse%E5%B8%B8%E8%A7%81%E7%B3%BB%E7%BB%9F%E8%A1%A8%E4%B8%8E%E7%A3%81%E7%9B%98%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/1.png" alt></p>
+<p><strong>2.排查</strong></p>
+<p><strong>经过排查发现是ClickHouse的多磁盘存储机制中的move_factor配置参数起作用了，导致data4和data0两个磁盘上的数据自动往后续磁盘上移动。详情可以查看参考资料，在配置文件中会为每个磁盘配置一个move_factor参数，默认为0.1，也就是当磁盘存储使用率达到90%时，会自动根据迁移策略将磁盘中的某些part迁移到下一个磁盘中。</strong></p>
+<p>通过system.part_log等系统表可以定位到是哪几张表、哪几个part在进行数据迁移，sql实例如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	parts.host_address,</span><br><span class="line">	parts.port,</span><br><span class="line">	parts.table,</span><br><span class="line">	parts.disk_name,</span><br><span class="line">	<span class="keyword">count</span>(<span class="number">1</span>),</span><br><span class="line">	<span class="keyword">sum</span>(parts.bytes_on_disk) <span class="keyword">as</span> bytes_on_disk,</span><br><span class="line">	<span class="keyword">sum</span>(parts.bytes_on_disk)/ <span class="keyword">any</span>(total_space) <span class="keyword">as</span> add_rate,</span><br><span class="line">	formatReadableSize(<span class="keyword">sum</span>(parts.bytes_on_disk)) <span class="keyword">as</span> bytes_on_disk_format,</span><br><span class="line">	formatReadableSize(<span class="keyword">any</span>(total_space)) <span class="keyword">as</span> total_space_format</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	(</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		<span class="keyword">database</span>,</span><br><span class="line">		<span class="keyword">table</span>,</span><br><span class="line">		partition_id</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		system.part_log_all t</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		event_date &lt;= toDate(<span class="string">'2022-11-09'</span>)</span><br><span class="line">		<span class="keyword">and</span> event_date &gt;= toDate(<span class="string">'2022-11-09'</span>)</span><br><span class="line">		<span class="keyword">and</span> t.database = <span class="string">'sz_activity'</span></span><br><span class="line">		<span class="keyword">and</span> event_type = <span class="string">'NewPart'</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span></span><br><span class="line">		<span class="keyword">database</span>,</span><br><span class="line">		<span class="keyword">table</span>,</span><br><span class="line">		partition_id</span><br><span class="line">) <span class="keyword">logs</span></span><br><span class="line"><span class="keyword">join</span> (</span><br><span class="line">	<span class="keyword">select</span></span><br><span class="line">		t1.host_address <span class="keyword">as</span> host_address,</span><br><span class="line">		t1.port <span class="keyword">as</span> port,</span><br><span class="line">		t.database <span class="keyword">as</span> <span class="keyword">database</span>,</span><br><span class="line">		t.table <span class="keyword">as</span> <span class="keyword">table</span>,</span><br><span class="line">		t.partition <span class="keyword">as</span> <span class="keyword">partition</span>,</span><br><span class="line">		t.partition_id <span class="keyword">as</span> partition_id,</span><br><span class="line">		t.name <span class="keyword">as</span> <span class="keyword">name</span>,</span><br><span class="line">		t.disk_name <span class="keyword">as</span> disk_name,</span><br><span class="line">		t.bytes_on_disk <span class="keyword">as</span> bytes_on_disk,</span><br><span class="line">		t2.total_space <span class="keyword">as</span> total_space</span><br><span class="line">	<span class="keyword">from</span></span><br><span class="line">		system.parts_all t</span><br><span class="line">	<span class="keyword">cross</span> <span class="keyword">join</span> system.clusters t1</span><br><span class="line">	<span class="keyword">join</span> system.disks t2 <span class="keyword">on</span></span><br><span class="line">		t.disk_name = t2.name</span><br><span class="line">	<span class="keyword">where</span></span><br><span class="line">		t1.is_local = <span class="number">1</span></span><br><span class="line">		<span class="keyword">and</span> t1.cluster = <span class="string">'HT0_CK_Pub_41'</span></span><br><span class="line">		<span class="keyword">and</span> t1.host_name = <span class="string">'11.13.123.105'</span></span><br><span class="line">		<span class="keyword">and</span> t.disk_name <span class="keyword">in</span> (<span class="string">'disk6'</span>, <span class="string">'disk7'</span>)</span><br><span class="line">			<span class="keyword">and</span> t.database = <span class="string">'sz_activity'</span></span><br><span class="line">			<span class="keyword">and</span> t.active = <span class="number">1</span></span><br><span class="line">			<span class="keyword">and</span> t.table = <span class="string">'ck_activity_detail_flow'</span></span><br><span class="line">) parts <span class="keyword">on</span></span><br><span class="line">	logs.partition_id = parts.partition_id</span><br><span class="line">	<span class="keyword">and</span> logs.table = parts.table</span><br><span class="line">	<span class="keyword">and</span> logs.database = parts.database</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">BY</span> </span><br><span class="line">	parts.host_address,</span><br><span class="line">	parts.port,</span><br><span class="line">	parts.table,</span><br><span class="line">	parts.disk_name;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.解决</strong></p>
+<p><strong>经过检查发现磁盘data4和data0的move_factor设置并不合理，先将该参数调整更小一些。然后将自动迁移到data6和data7上的part使用命令手动迁移回data4和data0。同时也尽可能删除了一些磁盘data4和data0上的无用数据。</strong></p>
+<p><strong>手动迁移磁盘的命令如下，其中disk_name可以通过执行<code>select * from system.disks</code>获取：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> xxx <span class="keyword">MOVE</span> PART <span class="string">'xxxxxxx'</span> <span class="keyword">TO</span> DISK <span class="string">'disk_name'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://blog.csdn.net/qq_21383435/article/details/121714597" target="_blank" rel="noopener">ClickHouse的系统表</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/580129534" target="_blank" rel="noopener">ClickHouse多磁盘存储与自动迁移</a></p>
+<p><a href="https://blog.csdn.net/w1234567465/article/details/119734829" target="_blank" rel="noopener">Linux系统分区原理</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/11/04/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" rel="next" title="HiveSQL实战积累_窗口函数">
+                <i class="fa fa-chevron-left"></i> HiveSQL实战积累_窗口函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/11/18/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Hdfs&Yarn&MapReuduce%E6%9E%B6%E6%9E%84%E5%85%B3%E7%B3%BB%E4%B8%8EMapReduce%E6%8E%A8%E6%B5%8B%E4%BB%BB%E5%8A%A1%E5%8E%9F%E7%90%86/" rel="prev" title="数据开发之离线计算_Hdfs&Yarn&MapReuduce架构关系与MapReduce推测任务原理">
+                数据开发之离线计算_Hdfs&Yarn&MapReuduce架构关系与MapReduce推测任务原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ClickHouse-ClickHouse常见系统表与磁盘自动迁移问题排查"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_ClickHouse常见系统表与磁盘自动迁移问题排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-常见ClickHouse系统表及其字段"><span class="nav-number">1.1.</span> <span class="nav-text">1.常见ClickHouse系统表及其字段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-system-clusters"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 system.clusters</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-system-settings"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 system.settings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-system-parts"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 system.parts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-system-part-log"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 system.part_log</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-system-disks"><span class="nav-number">1.1.5.</span> <span class="nav-text">1.5 system.disks</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-系统表应用实例"><span class="nav-number">1.2.</span> <span class="nav-text">2.系统表应用实例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1查询ClickHouse集群中某张表的总存储量"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1查询ClickHouse集群中某张表的总存储量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-ClickHouse磁盘使用率告警问题排查与解决"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 ClickHouse磁盘使用率告警问题排查与解决</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">1.3.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

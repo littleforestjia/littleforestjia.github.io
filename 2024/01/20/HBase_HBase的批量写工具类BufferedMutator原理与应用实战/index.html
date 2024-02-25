@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,BufferedMutator," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBase的批量写工具类BufferedMutator原理与应用实战1.背景如果未开启HBase客户端api的缓冲区，那么一次put就是一个RPC操作，将客户端数据传输到服务器再等待返回结果，这非常耗时，小数据量传输写入还好，如果数据量多，每一个put都建立一次RPC连接和数据传输非常耗时。为解决该问题，HBase客户端推出了缓冲区配置，设置HTable.setAutoFlush(fa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBase的批量写工具类BufferedMutator原理与应用实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/20/HBase_HBase%E7%9A%84%E6%89%B9%E9%87%8F%E5%86%99%E5%B7%A5%E5%85%B7%E7%B1%BBBufferedMutator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBase的批量写工具类BufferedMutator原理与应用实战1.背景如果未开启HBase客户端api的缓冲区，那么一次put就是一个RPC操作，将客户端数据传输到服务器再等待返回结果，这非常耗时，小数据量传输写入还好，如果数据量多，每一个put都建立一次RPC连接和数据传输非常耗时。为解决该问题，HBase客户端推出了缓冲区配置，设置HTable.setAutoFlush(fa">
+<meta property="article:published_time" content="2024-01-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:41:34.194Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="BufferedMutator">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/20/HBase_HBase的批量写工具类BufferedMutator原理与应用实战/"/>
+
+
+
+
+
+  <title>HBase_HBase的批量写工具类BufferedMutator原理与应用实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/20/HBase_HBase%E7%9A%84%E6%89%B9%E9%87%8F%E5%86%99%E5%B7%A5%E5%85%B7%E7%B1%BBBufferedMutator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBase的批量写工具类BufferedMutator原理与应用实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-20T00:00:00+08:00">
+                2024-01-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-HBase的批量写工具类BufferedMutator原理与应用实战"><a href="#HBase-HBase的批量写工具类BufferedMutator原理与应用实战" class="headerlink" title="HBase_HBase的批量写工具类BufferedMutator原理与应用实战"></a>HBase_HBase的批量写工具类BufferedMutator原理与应用实战</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>如果未开启HBase客户端api的缓冲区，那么一次put就是一个RPC操作，将客户端数据传输到服务器再等待返回结果，这非常耗时，小数据量传输写入还好，如果数据量多，每一个put都建立一次RPC连接和数据传输非常耗时。为解决该问题，HBase客户端推出了缓冲区配置，设置HTable.setAutoFlush(false)来开启缓冲区，只有当put到达一定容量后或者用户手动触发flush()时才会将缓冲区数据一次性提交到HBase服务器。但是HBase的api还是存在需要同步等待、最后关闭连接前手动触发flush()等问题。为了解决该问题，HBase推出了BufferedMutator，基本原理与缓冲区类似，可以避免频繁的RPC调用，还实现了异步提交、close()前自动flush()等功能。</p>
+<h3 id="2-BufferedMutator介绍"><a href="#2-BufferedMutator介绍" class="headerlink" title="2.BufferedMutator介绍"></a>2.BufferedMutator介绍</h3><h4 id="2-1-参数介绍"><a href="#2-1-参数介绍" class="headerlink" title="2.1 参数介绍"></a>2.1 参数介绍</h4><p>TableName(表名)</p>
+<p>writeBufferSize(写缓存大小)</p>
+<p>maxKeyValueSize(最大key-value大小)</p>
+<p>ExecutorService(执行线程池)</p>
+<p>ExceptionListener(监听BufferedMutator的异常)。</p>
+<h4 id="2-2-调用过程"><a href="#2-2-调用过程" class="headerlink" title="2.2 调用过程"></a>2.2 <strong>调用过程</strong></h4><p><strong>1.构建put或者List[put]</strong></p>
+<p><strong>2.调用BufferedMutator.mutate()方法</strong></p>
+<p><strong>3.刷写到hbase</strong></p>
+<p>主要有三种触发方式：</p>
+<p>1）显式调用BufferedMutator.flush()</p>
+<p>2）发送结束的时候调用BufferedMutator.close()</p>
+<p>3）它根据当前缓存大于了设置的写缓存大小，自动刷写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (undealtMutationCount.get() != <span class="number">0</span> &amp;&amp; currentWriteBufferSize.get() &gt; writeBufferSize) &#123;</span><br><span class="line">  backgroundFlushCommits(<span class="keyword">false</span>); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这三种触发方式最终都是调用的backgroundFlushCommits方法。</p>
+<h4 id="2-3-使用场景"><a href="#2-3-使用场景" class="headerlink" title="2.3 使用场景"></a>2.3 使用场景</h4><p>MapReduce Job的是BufferedMutator使用的典型场景。MapReduce作业需要批量写入，但是无法找到恰当的点执行flush。BufferedMutator接收MapReduce作业发送来的Put数据后，会根据writeBufferSize自动执行执行Batch Put操作，且会异步的提交Batch Put请求，这样MapReduce作业的执行也不会被打断，且MapReduce作业的每个线程将会拥有一个独立的BufferedMutator对象。</p>
+<p>一个独立的BufferedMutator也可以用在大容量的在线系统上来执行批量Put操作，但是这时需要注意一些极端情况比如JVM异常或机器故障，此时有可能造成数据丢失。</p>
+<h3 id="3-商智数仓出数到HBase工具实战"><a href="#3-商智数仓出数到HBase工具实战" class="headerlink" title="3.商智数仓出数到HBase工具实战"></a>3.商智数仓出数到HBase工具实战</h3><p>HBaseTableWriter类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HBaseTableWriter</span> <span class="keyword">extends</span> <span class="title">Thread</span> <span class="keyword">implements</span> <span class="title">ITableWriter</span> </span>&#123;</span><br><span class="line">	<span class="comment">/** HBase表操作对象 */</span></span><br><span class="line">	<span class="keyword">private</span> BufferedMutator table;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/** 数据处理完，是否停止线程 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> dieWhileDataOver;</span><br><span class="line">	<span class="comment">/** 数据缓冲区 */</span></span><br><span class="line">	<span class="keyword">private</span> Queue&lt;Put&gt; queue = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;Put&gt;();</span><br><span class="line"></span><br><span class="line">	<span class="comment">/** hbase表导入条数 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> hbaseWriteRowNum = <span class="number">0</span>;</span><br><span class="line">	<span class="comment">/** hbase表名称 */</span></span><br><span class="line">	<span class="keyword">private</span> String tableName;</span><br><span class="line">	<span class="comment">/** 是否启用线程 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> enableThread;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/** 缓存堆大小上限 */</span></span><br><span class="line">	<span class="keyword">private</span> AtomicLong heapLimitSize = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);<span class="comment">// 524288000;</span></span><br><span class="line">							     <span class="comment">// //500m</span></span><br><span class="line">	<span class="comment">/** 数据大小统计  */</span></span><br><span class="line">	<span class="keyword">private</span> AtomicLong putSize = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    DataPickerConfiguration dpConf;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">HBaseTableWriter</span><span class="params">(String tableName)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.tableName = tableName;</span><br><span class="line">        <span class="keyword">this</span>.dpConf = DataPickerConfiguration.getConfiguration();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 初始化各种类变量，如果必要启动线程</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        DataClient dataClient = ClientFactory.getDataClient(dpConf.getInstanceName(), dpConf.getAccessKey(), dpConf.getNamespace());</span><br><span class="line">        table = dataClient.getMutator(getTableName(), dpConf.getHbaseWriteBufferSize());</span><br><span class="line"></span><br><span class="line">		enableThread = DataPickerConfiguration.getConfiguration().isEnableMultiThread();</span><br><span class="line">		<span class="keyword">if</span> (enableThread) &#123;</span><br><span class="line">			<span class="keyword">this</span>.start();</span><br><span class="line">		&#125;</span><br><span class="line">		hbaseWriteRowNum = <span class="number">0</span>;</span><br><span class="line">		dieWhileDataOver = <span class="keyword">false</span>;</span><br><span class="line">		queue.clear();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 往Hbase写入行数据，如果多线程模式，则写入线程队列。否则直接操作HTABLE</span></span><br><span class="line"><span class="comment">	 * </span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> rowData</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@throws</span> java.io.IOException</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeRow</span><span class="params">(HBaseRowData rowData)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">		hbaseWriteRowNum++;</span><br><span class="line">		Put put = rowData.toPut();</span><br><span class="line">		<span class="comment">//put.setWriteToWAL(false);</span></span><br><span class="line">		<span class="keyword">if</span> (enableThread) &#123;</span><br><span class="line">			addPut(put);</span><br><span class="line">		&#125; <span class="keyword">else</span></span><br><span class="line">			getHTable().mutate(put);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getTableName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> tableName;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (enableThread) &#123;</span><br><span class="line">			<span class="keyword">this</span>.setDieWhileDataOver(<span class="keyword">true</span>);</span><br><span class="line">			<span class="keyword">this</span>.join();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//table.flushCommits();</span></span><br><span class="line">        table.close();</span><br><span class="line">        <span class="comment">//<span class="doctag">TODO:</span>table.close();</span></span><br><span class="line">		<span class="comment">//HBaseTabler tabler = new HBaseTabler(context);</span></span><br><span class="line">		<span class="comment">//tabler.flushTable(this.getTableName());</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 将put加入输出队列 </span></span><br><span class="line"><span class="comment">	 * 如果队列个数大于指定个数（500），则等待。小于时，则加入队列</span></span><br><span class="line"><span class="comment">	 * 解决在处理大数据表时，内存无限占用的问题（输出速度跟不上输入速度，造成队列太大）</span></span><br><span class="line"><span class="comment">	 * </span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@param</span> put</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addPut</span><span class="params">(Put put)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">			<span class="keyword">if</span> (heapLimitSize.get() &lt; <span class="number">104857600</span>) &#123;<span class="comment">// 352,986,752   100M</span></span><br><span class="line">				<span class="keyword">if</span> (!queue.offer(put)) &#123;</span><br><span class="line">					PickerLog.logError(Bytes.toStringBinary(put.getRow()) + <span class="string">"   addPut error occurs."</span>);</span><br><span class="line">				&#125;</span><br><span class="line">				heapLimitSize.addAndGet(put.heapSize());</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125; <span class="keyword">else</span></span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					Thread.sleep(<span class="number">100</span>);</span><br><span class="line">				&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">					e.printStackTrace();</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDieWhileDataOver</span><span class="params">(<span class="keyword">boolean</span> dieWhileDataOver)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.dieWhileDataOver = dieWhileDataOver;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 线程执行体， 一直取队列数据往HTable里面写入</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		List&lt;Throwable&gt; exceptions = <span class="keyword">new</span> ArrayList&lt;Throwable&gt;();</span><br><span class="line">		<span class="keyword">int</span> rowNum = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">int</span> rowFailed = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">while</span> (!Thread.currentThread().isInterrupted()) &#123;</span><br><span class="line">			Put put = queue.poll();</span><br><span class="line">			<span class="keyword">if</span> (put != <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					<span class="keyword">this</span>.getHTable().mutate(put);</span><br><span class="line">					rowNum++;</span><br><span class="line">					heapLimitSize.addAndGet(-put.heapSize());</span><br><span class="line">					putSize.addAndGet(put.heapSize());</span><br><span class="line">				&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">					rowFailed++;</span><br><span class="line">					<span class="keyword">if</span>(rowFailed &lt; <span class="number">100</span>)</span><br><span class="line">						exceptions.add(e);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">if</span> (dieWhileDataOver) &#123;</span><br><span class="line">					<span class="keyword">break</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		PickerMonitor.setDestTotal(hbaseWriteRowNum);</span><br><span class="line">		PickerMonitor.setDestSucc(rowNum);</span><br><span class="line">		PickerMonitor.setPutSize(putSize.get());</span><br><span class="line">		<span class="keyword">if</span> (exceptions.size() &gt; <span class="number">0</span>)&#123;</span><br><span class="line">			MultiException exp = <span class="keyword">new</span> MultiException(exceptions, hbaseWriteRowNum - rowNum, hbaseWriteRowNum);</span><br><span class="line">			PickerLog.logError(<span class="string">"error occurs while put table data: "</span>, exp);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> BufferedMutator <span class="title">getHTable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> table;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>HBaseClient获取BufferedMutator对象方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 获取异步写操作对象</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> tableName 表名称</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> writeBufferSize 写数缓冲大小</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> Mutator</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> BufferedMutator <span class="title">getMutator</span><span class="params">(String tableName, <span class="keyword">int</span> writeBufferSize)</span> <span class="keyword">throws</span> IOException</span>&#123;</span><br><span class="line">    tableName = addNamespace(tableName);</span><br><span class="line">    BufferedMutatorParams bufferedMutatorParams =</span><br><span class="line">            <span class="keyword">new</span> BufferedMutatorParams(TableName.valueOf(Bytes.toBytes(tableName)));</span><br><span class="line">    bufferedMutatorParams.writeBufferSize(writeBufferSize);</span><br><span class="line">    <span class="keyword">return</span> connection.getBufferedMutator(bufferedMutatorParams);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>线程队列缓冲区</strong></p>
+<p>注意，此Writer类中对于多线程写入场景，为了避免连接数膨胀和稳定性，基于ConcurrentLinkedQueue&lt;Put&gt;创建了一个线程队列缓冲区属性，所有写入线程都必须先将数据放入该队列中，然后统一使用一个线程去进行单线程写入。为了防止读取速度比写HBase速度快，造成内存膨胀超限，还设置了缓存队列最大长度，当队列超长需要阻塞等待，起到了削峰限流的作用。</p>
+<p>这种基于线程安全队列实现的缓冲区也可以用于限流、秒杀、锁等要求线程安全的场景。</p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://cloud.tencent.com/developer/article/1032502" target="_blank" rel="noopener">Hbase源码系列之BufferedMutator的Demo和源码解析</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/BufferedMutator/" rel="tag"><i class="fa fa-tag"></i> BufferedMutator</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/19/HBase_HBase%E7%9A%84runsql%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98%E4%B8%8Esql%E8%81%9A%E5%90%88%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/" rel="next" title="HBase_HBase的runsql协处理器实战与sql聚合计算原理">
+                <i class="fa fa-chevron-left"></i> HBase_HBase的runsql协处理器实战与sql聚合计算原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/21/HBase_HBase%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" rel="prev" title="HBase_HBase基础概念">
+                HBase_HBase基础概念 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-HBase的批量写工具类BufferedMutator原理与应用实战"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBase的批量写工具类BufferedMutator原理与应用实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-BufferedMutator介绍"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.BufferedMutator介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-参数介绍"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 参数介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-调用过程"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 调用过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-使用场景"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">2.3 使用场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-商智数仓出数到HBase工具实战"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.商智数仓出数到HBase工具实战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.0.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

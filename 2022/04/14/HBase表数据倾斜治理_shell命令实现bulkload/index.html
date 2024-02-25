@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,Bulkload," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase表数据倾斜治理_shell命令实现bulkloadBulkload原理HBase底层物理存储是以HFile文件的形式将数据存储在磁盘上的。 将数据加载到HBase表中最直接的方法可以使用HBase提供的shell api或者java api进行数据导入，这种采用HBase api的方式主要过程：预写日志，将数据的操作信息和数据信息写入WAL；将数据放入RegionServer的内存Mem">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase表数据倾斜治理_shell命令实现bulkload">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase表数据倾斜治理_shell命令实现bulkloadBulkload原理HBase底层物理存储是以HFile文件的形式将数据存储在磁盘上的。 将数据加载到HBase表中最直接的方法可以使用HBase提供的shell api或者java api进行数据导入，这种采用HBase api的方式主要过程：预写日志，将数据的操作信息和数据信息写入WAL；将数据放入RegionServer的内存Mem">
+<meta property="og:image" content="http://littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/1.jpg">
+<meta property="article:published_time" content="2022-04-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:54:02.779Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="Bulkload">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/04/14/HBase表数据倾斜治理_shell命令实现bulkload/"/>
+
+
+
+
+
+  <title>HBase表数据倾斜治理_shell命令实现bulkload | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase表数据倾斜治理_shell命令实现bulkload</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-04-14T00:00:00+08:00">
+                2022-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase表数据倾斜治理-shell命令实现bulkload"><a href="#HBase表数据倾斜治理-shell命令实现bulkload" class="headerlink" title="HBase表数据倾斜治理_shell命令实现bulkload"></a>HBase表数据倾斜治理_shell命令实现bulkload</h2><h3 id="Bulkload原理"><a href="#Bulkload原理" class="headerlink" title="Bulkload原理"></a>Bulkload原理</h3><p>HBase底层物理存储是以HFile文件的形式将数据存储在磁盘上的。</p>
+<p>将数据加载到HBase表中最直接的方法可以使用HBase提供的shell api或者java api进行数据导入，这种采用HBase api的方式主要过程：<strong>预写日志，将数据的操作信息和数据信息写入WAL；将数据放入RegionServer的内存MemStore中；再将数据flush到磁盘中形成HFile文件；当HFile文件较多还会进行compaction和split。</strong>这一系列过程很容易造成节点不稳定、极大消耗系统资源。</p>
+<p><strong>Bulkload不会预写日志，不会引起过量的flush、split和GC，主要分成两步：</strong></p>
+<ol>
+<li><strong>对外部或者HDFS上需要导入HBase的数据执行MR任务，将处理完成的数据直接按照HBase底层存储格式保存到HFile中。</strong></li>
+<li><strong>将目标HFile直接推送到HBase目录下。</strong></li>
+</ol>
+<p><strong>注意bulkload实际上所需要的物理存储为源数据的两倍，第一步MR任务完成后先将HFile存放在设置的输出目录上，第二步推送到HBase目录下时会将HFile移动到对应的hbase存储目录下。</strong></p>
+<h3 id="shell命令实现bulkload"><a href="#shell命令实现bulkload" class="headerlink" title="shell命令实现bulkload"></a>shell命令实现bulkload</h3><h4 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1.准备工作"></a>1.准备工作</h4><h5 id="1-1开启hadoop和hbase"><a href="#1-1开启hadoop和hbase" class="headerlink" title="1.1开启hadoop和hbase"></a>1.1开启hadoop和hbase</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hadoop\sbin&gt;start-all.cmd</span><br><span class="line">E:\HBase\hbase\bin&gt;start-hbase.cmd</span><br></pre></td></tr></table></figure>
+
+<p>开启hadoop之后可以在<a href="http://localhost:50070客户端界面查看HDFS文件目录。">http://localhost:50070客户端界面查看HDFS文件目录。</a></p>
+<p><img src="//littleforestjia.github.io/2022/04/14/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_shell%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0bulkload/1.jpg" alt></p>
+<h5 id="1-2创建一个csv数据文件"><a href="#1-2创建一个csv数据文件" class="headerlink" title="1.2创建一个csv数据文件"></a>1.2创建一个csv数据文件</h5><p>创建一个文件fellow.csv。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">38343,2022&#x2F;4&#x2F;24,jiazhengyang,男,正式</span><br><span class="line">374836,2022&#x2F;4&#x2F;4,zengqingfan,男,实习</span><br><span class="line">34783484,2022&#x2F;3&#x2F;18,lijun,男,正式</span><br><span class="line">37438,2022&#x2F;4&#x2F;11,lijiazheng,男,实习</span><br><span class="line">2384783,2022&#x2F;3&#x2F;16,qiuyuchen,男,正式</span><br></pre></td></tr></table></figure>
+
+<h5 id="1-3将文件上传到HDFS系统"><a href="#1-3将文件上传到HDFS系统" class="headerlink" title="1.3将文件上传到HDFS系统"></a>1.3将文件上传到HDFS系统</h5><p>需要先将文件从本地文件夹中上传到HDFS中，这样Bulkload的MR任务就可以直接从HDFS当中读取文件数据。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hbase\bin&gt;hdfs dfs -mkdir /fellowtest</span><br><span class="line">E:\HBase\hbase\bin&gt;hdfs dfs -put fellow.csv /fellowtest</span><br></pre></td></tr></table></figure>
+
+<h5 id="1-4创建HBase表"><a href="#1-4创建HBase表" class="headerlink" title="1.4创建HBase表"></a>1.4创建HBase表</h5><p>要先创建好HBase表和列簇，这样Bulkload才能将处理后的HFile文件与HBase表关联起来。</p>
+<p><strong>HBase的一个store对象中保存一个列簇数据。store越多集群内存中创建的memstore就越多，内存占用太高；只要一个store需要flush，同一张表的所有store都会flush，造成磁盘IO太频繁。所以列簇越少越好，一般只创建一个列簇。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hbase\bin&gt;hbase shell</span><br><span class="line">hbase(main):001:0&gt; create 'fellowshell','d'</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-执行MR任务生成HFile文件"><a href="#2-执行MR任务生成HFile文件" class="headerlink" title="2.执行MR任务生成HFile文件"></a>2.执行MR任务生成HFile文件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hbase\bin&gt;</span><br><span class="line">hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.separator="," -Dimporttsv.bulk.output=/fellowshellhfile -Dimporttsv.columns="HBASE_ROW_KEY,d:birthday,d:name,d:sex,d:work" fellowshell  /fellowtest/fellow.csv</span><br></pre></td></tr></table></figure>
+
+<p><strong>语法说明：</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase org.apache.hadoop.hbase.mapreduce.ImportTsv -Dimporttsv.separator=数据分隔符 -Dimporttsv.bulk.output=输出HFile目录 -Dimporttsv.columns=HBase表字段结构 HBase表名 输入HFile路径</span><br></pre></td></tr></table></figure>
+
+<p><strong>在windows系统中HBase表字段结构必须加双引号，且需要<a href="https://blog.csdn.net/u013378306/article/details/86697374" target="_blank" rel="noopener">开启用户创建符号表的权限</a>并<a href="https://www.656463.com/wenda/HDFSxrdzCreateSymbolicLinkcw1314_358" target="_blank" rel="noopener">以管理员模式运行命令提示符</a>。</strong></p>
+<h4 id="3-将Hfile文件推送到HBase目录当中"><a href="#3-将Hfile文件推送到HBase目录当中" class="headerlink" title="3.将Hfile文件推送到HBase目录当中"></a>3.将Hfile文件推送到HBase目录当中</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hbase\bin&gt;</span><br><span class="line">hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles /fellowshellhfile fellowshell</span><br></pre></td></tr></table></figure>
+
+<p><strong>语法说明：</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase org.apache.hadoop.hbase.mapreduce.LoadIncrementalHFiles 输出HFile目录 HBase表名</span><br></pre></td></tr></table></figure>
+
+<p>最后进入HBase shell中即可查看表中是否出现数据。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">E:\HBase\hbase\bin&gt;hbase shell</span><br><span class="line">hbase(main):006:0&gt; scan 'fellowshell'</span><br><span class="line">ROW                             COLUMN+CELL                                                                             </span><br><span class="line"> 2384783                        column=d:birthday, timestamp=1650797020232, value=2022/3/16                             </span><br><span class="line"> 2384783                        column=d:name, timestamp=1650797020232, value=qiuyuchen                                 </span><br><span class="line"> 2384783                        column=d:sex, timestamp=1650797020232, value=\xE7\x94\xB7                               </span><br><span class="line"> 2384783                        column=d:work, timestamp=1650797020232, value=\xE6\xAD\xA3\xE5\xBC\x8F                  </span><br><span class="line"> 34783484                       column=d:birthday, timestamp=1650797020232, value=2022/3/18                             </span><br><span class="line"> 34783484                       column=d:name, timestamp=1650797020232, value=lijun                                     </span><br><span class="line"> 34783484                       column=d:sex, timestamp=1650797020232, value=\xE7\x94\xB7                               </span><br><span class="line"> 34783484                       column=d:work, timestamp=1650797020232, value=\xE6\xAD\xA3\xE5\xBC\x8F                  </span><br><span class="line"> 37438                          column=d:birthday, timestamp=1650797020232, value=2022/4/11                             </span><br><span class="line"> 37438                          column=d:name, timestamp=1650797020232, value=lijiazheng                                </span><br><span class="line"> 37438                          column=d:sex, timestamp=1650797020232, value=\xE7\x94\xB7                               </span><br><span class="line"> 37438                          column=d:work, timestamp=1650797020232, value=\xE5\xAE\x9E\xE4\xB9\xA0                  </span><br><span class="line"> 374836                         column=d:birthday, timestamp=1650797020232, value=2022/4/4                              </span><br><span class="line"> 374836                         column=d:name, timestamp=1650797020232, value=zengqingfan                               </span><br><span class="line"> 374836                         column=d:sex, timestamp=1650797020232, value=\xE7\x94\xB7                               </span><br><span class="line"> 374836                         column=d:work, timestamp=1650797020232, value=\xE5\xAE\x9E\xE4\xB9\xA0                  </span><br><span class="line"> 38343                          column=d:birthday, timestamp=1650797020232, value=2022/4/24                             </span><br><span class="line"> 38343                          column=d:name, timestamp=1650797020232, value=jiazhengyang                              </span><br><span class="line"> 38343                          column=d:sex, timestamp=1650797020232, value=\xE7\x94\xB7                               </span><br><span class="line"> 38343                          column=d:work, timestamp=1650797020232, value=\xE6\xAD\xA3\xE5\xBC\x8F                  </span><br><span class="line">5 row(s) in 0.1110 seconds</span><br></pre></td></tr></table></figure>
+
+<p>可以看到数据bulkload成功。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/Bulkload/" rel="tag"><i class="fa fa-tag"></i> Bulkload</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/11/21/%E3%80%90%E9%9A%8F%E6%89%8B%E5%B0%8F%E8%AE%B0%E3%80%91_Windows_IntelliJ_IDEA%E5%BF%AB%E6%8D%B7%E9%94%AE%E5%90%88%E9%9B%86/" rel="next" title="【随手小记】_Windows_IntelliJ_IDEA快捷键合集">
+                <i class="fa fa-chevron-left"></i> 【随手小记】_Windows_IntelliJ_IDEA快捷键合集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/04/18/HBase%E8%A1%A8%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86_Scan%E8%AF%BB%E5%8F%96Hbase%E8%A1%A8%E4%B8%8EHbase%E8%A1%A8%E5%BF%AB%E7%85%A7/" rel="prev" title="HBase表数据倾斜治理_Scan读取Hbase表与Hbase表快照">
+                HBase表数据倾斜治理_Scan读取Hbase表与Hbase表快照 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase表数据倾斜治理-shell命令实现bulkload"><span class="nav-number">1.</span> <span class="nav-text">HBase表数据倾斜治理_shell命令实现bulkload</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bulkload原理"><span class="nav-number">1.1.</span> <span class="nav-text">Bulkload原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell命令实现bulkload"><span class="nav-number">1.2.</span> <span class="nav-text">shell命令实现bulkload</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-准备工作"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1开启hadoop和hbase"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.1开启hadoop和hbase</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-2创建一个csv数据文件"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">1.2创建一个csv数据文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-3将文件上传到HDFS系统"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">1.3将文件上传到HDFS系统</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-4创建HBase表"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">1.4创建HBase表</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-执行MR任务生成HFile文件"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.执行MR任务生成HFile文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-将Hfile文件推送到HBase目录当中"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.将Hfile文件推送到HBase目录当中</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

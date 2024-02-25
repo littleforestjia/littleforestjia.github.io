@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,Runsql,protobuf,Coprocessors,协处理器," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBase的runsql协处理器实战与sql聚合计算原理一、runsql客户端实战1.通过sql获取返回结果的统一方法在该方法内部解析处sql中的各个子句字段： 123456789101112131415161718192021222324252627282930313233343536public ResultSet getResultSet(String area) throws">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBase的runsql协处理器实战与sql聚合计算原理">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/19/HBase_HBase%E7%9A%84runsql%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98%E4%B8%8Esql%E8%81%9A%E5%90%88%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBase的runsql协处理器实战与sql聚合计算原理一、runsql客户端实战1.通过sql获取返回结果的统一方法在该方法内部解析处sql中的各个子句字段： 123456789101112131415161718192021222324252627282930313233343536public ResultSet getResultSet(String area) throws">
+<meta property="article:published_time" content="2024-01-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:41:22.645Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="Runsql">
+<meta property="article:tag" content="protobuf">
+<meta property="article:tag" content="Coprocessors">
+<meta property="article:tag" content="协处理器">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/19/HBase_HBase的runsql协处理器实战与sql聚合计算原理/"/>
+
+
+
+
+
+  <title>HBase_HBase的runsql协处理器实战与sql聚合计算原理 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/19/HBase_HBase%E7%9A%84runsql%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98%E4%B8%8Esql%E8%81%9A%E5%90%88%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBase的runsql协处理器实战与sql聚合计算原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-19T00:00:00+08:00">
+                2024-01-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-HBase的runsql协处理器实战与sql聚合计算原理"><a href="#HBase-HBase的runsql协处理器实战与sql聚合计算原理" class="headerlink" title="HBase_HBase的runsql协处理器实战与sql聚合计算原理"></a>HBase_HBase的runsql协处理器实战与sql聚合计算原理</h1><h2 id="一、runsql客户端实战"><a href="#一、runsql客户端实战" class="headerlink" title="一、runsql客户端实战"></a>一、runsql客户端实战</h2><h4 id="1-通过sql获取返回结果的统一方法"><a href="#1-通过sql获取返回结果的统一方法" class="headerlink" title="1.通过sql获取返回结果的统一方法"></a>1.通过sql获取返回结果的统一方法</h4><p>在该方法内部解析处sql中的各个子句字段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ResultSet <span class="title">getResultSet</span><span class="params">(String area)</span> <span class="keyword">throws</span> Throwable</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(sql==<span class="keyword">null</span>)&#123;</span><br><span class="line">		LOG.error(<span class="string">"havn't set the sql sentence,the sql is:"</span>+sql);</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"sql is "</span>+sql);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">if</span>(tableName==<span class="keyword">null</span>)&#123;</span><br><span class="line">			ParseElem(GetSqlElem(sql));</span><br><span class="line">		&#125;</span><br><span class="line">           <span class="keyword">if</span> (<span class="keyword">null</span> == area || area.trim().equals(<span class="string">""</span>))&#123;</span><br><span class="line">               client = ClientUtils.intance(tableName);</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               client = ClientUtils.intance(area,tableName);</span><br><span class="line">           &#125;</span><br><span class="line">		<span class="keyword">if</span>(!CONTAIN_START&amp;&amp;startKey!=<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>])&#123;</span><br><span class="line">			startKey=CoEngin.getNextByte(startKey);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(CONTAIN_END&amp;&amp;endKey!=<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>])&#123;</span><br><span class="line">			endKey=CoEngin.getNextByte(endKey);</span><br><span class="line">		&#125;</span><br><span class="line">           LOG.info(String.format(<span class="string">"Runsql execute startKey:[%s] endKey :[%s] sql:%s"</span>,startKeyStr,endKeyStr,sql));</span><br><span class="line">		<span class="keyword">if</span>(IS_AGG)&#123;</span><br><span class="line">			<span class="keyword">return</span> client.aggregateQuery(startKey, endKey, aggsel, tableName, where, groupby, having, orderby, TopN);</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			<span class="keyword">if</span>(orderby==<span class="keyword">null</span>&amp;&amp;(!HAS_CAL)&amp;&amp;(!IS_DISTINCT))&#123;</span><br><span class="line">				<span class="keyword">if</span>(where==<span class="keyword">null</span>)&#123;</span><br><span class="line">					<span class="keyword">return</span> client.scan(tableName, startKey, endKey,<span class="keyword">null</span>, select,TopN);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> client.simpleQuery(startKey, endKey, select, tableName, where, orderby, TopN);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">		LOG.error(<span class="string">"unsuccess result: "</span>+e);</span><br><span class="line">		<span class="keyword">throw</span> e;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-客户端调用协处理器方法"><a href="#2-客户端调用协处理器方法" class="headerlink" title="2.客户端调用协处理器方法"></a>2.客户端调用协处理器方法</h4><p>此处选择最复杂的aggregateQuery作为案例：</p>
+<p>1）按定义好的protobuf协议，组装好协处理器的Call对象实例；</p>
+<p>2）HBase提供的协处理器调用接口coprocessorService()有两个重载方法：一个不需要传入merger类对象，该方法会将不同RS节点上的处理结果以list的形式返回；一个需要传入merger类对象，会在返回结果时将所有RS节点上处理结果传输到一个节点上，按merger对象中的逻辑进行数据合并。如下代码中采用了第二种方法，创建了一个merger类，实现了不同RS节点处理结果的合并逻辑。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ResultSet <span class="title">aggregateQuery</span><span class="params">(<span class="keyword">final</span> <span class="keyword">byte</span>[] start, <span class="keyword">final</span> <span class="keyword">byte</span>[] end,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="keyword">final</span> AggSelect aggSelect, <span class="keyword">final</span> String fromTable,</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="keyword">final</span> Where whereCondition, // where</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="keyword">final</span> GroupBy groupbys, // group by</span></span></span><br><span class="line"><span class="function"><span class="params">		<span class="keyword">final</span> Having having, List&lt;OrderBy&gt; orderbys, <span class="keyword">final</span> <span class="keyword">int</span> top)</span></span></span><br><span class="line"><span class="function">		<span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">	MetaData tmeta = getMetaInfoFromCM(fromTable);</span><br><span class="line">	<span class="keyword">if</span> (tmeta == <span class="keyword">null</span>) &#123;</span><br><span class="line">		tmeta=getMetaInfo(fromTable);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (aggSelect.isDistinct()) &#123;<span class="comment">// add by xinrong for distinct</span></span><br><span class="line">		orderbys = <span class="keyword">new</span> ArrayList&lt;OrderBy&gt;();</span><br><span class="line">		<span class="keyword">for</span> (Aggregate col : aggSelect.getColumns()) &#123;</span><br><span class="line">			orderbys.add(asc(col));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">       <span class="keyword">final</span> List&lt;OrderBy&gt; finalOrderBys = <span class="keyword">null</span> == orderbys ? <span class="keyword">new</span> ArrayList&lt;OrderBy&gt;() : orderbys;</span><br><span class="line">	<span class="keyword">final</span> MetaData meta = tmeta;</span><br><span class="line">	<span class="keyword">if</span> (!validate(<span class="keyword">null</span>, aggSelect, whereCondition, groupbys, having,</span><br><span class="line">			orderbys, meta)) &#123;</span><br><span class="line">		LOG.error(<span class="string">"vadliation failed"</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">       Table table = <span class="keyword">null</span>;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           table = pool.getTable(fromTable);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       Batch.Call&lt;QueryProto.QueryService, QueryProto.ResultSet&gt; callable =</span><br><span class="line">               <span class="keyword">new</span> Batch.Call&lt;QueryProto.QueryService, QueryProto.ResultSet&gt;() &#123;</span><br><span class="line">                   ServerRpcController controller = <span class="keyword">new</span> ServerRpcController();</span><br><span class="line">                   BlockingRpcCallback&lt;QueryProto.ResultSet&gt; rpcCallback =</span><br><span class="line">                           <span class="keyword">new</span> BlockingRpcCallback&lt;QueryProto.ResultSet&gt;();</span><br><span class="line">                   <span class="comment">//下面重载 call 方法</span></span><br><span class="line">                   <span class="meta">@Override</span></span><br><span class="line">                   <span class="keyword">public</span> QueryProto.<span class="function">ResultSet <span class="title">call</span><span class="params">(QueryProto.QueryService instance)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                       QueryProto.AggregateRequest.Builder builder = QueryProto.AggregateRequest.newBuilder();</span><br><span class="line">                       builder.setStartKey(ByteString.copyFrom(start));</span><br><span class="line">                       builder.setEndKey(ByteString.copyFrom(end));</span><br><span class="line">                       builder.setAggSelect(aggSelect.getProto());</span><br><span class="line">                       builder.setTableName(fromTable);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                       <span class="keyword">if</span>(<span class="keyword">null</span> != whereCondition)</span><br><span class="line">                           builder.setWhere(whereCondition.getProto());</span><br><span class="line">                       <span class="keyword">if</span>(<span class="keyword">null</span> != groupbys)</span><br><span class="line">                           builder.setGroupBy(groupbys.getProto());</span><br><span class="line">                       <span class="keyword">if</span>(<span class="keyword">null</span> != having)</span><br><span class="line">                           builder.setHaving(having.getProto());</span><br><span class="line">                       <span class="keyword">if</span>(<span class="keyword">null</span> != finalOrderBys)</span><br><span class="line">                           <span class="keyword">for</span>(OrderBy orderBy : finalOrderBys) &#123;</span><br><span class="line">                               builder.addOrderbys(orderBy.getProto());</span><br><span class="line">                           &#125;</span><br><span class="line"></span><br><span class="line">                       builder.setMeta(meta.getProto());</span><br><span class="line"></span><br><span class="line">                       <span class="comment">//RPC 调用</span></span><br><span class="line">                       instance.aggregateQuery(controller, builder.build(), rpcCallback);</span><br><span class="line">                       <span class="keyword">if</span>(controller.failed())</span><br><span class="line">                           System.out.println(controller.errorText());</span><br><span class="line">                       <span class="keyword">return</span> rpcCallback.get();</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">class</span> <span class="title">Accumulator</span> <span class="keyword">implements</span> <span class="title">Batch</span>.<span class="title">Callback</span>&lt;<span class="title">QueryProto</span>.<span class="title">ResultSet</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">private</span> ResultSet finalRS;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Accumulator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			finalRS = <span class="keyword">new</span> ResultSet();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">byte</span>[] region, <span class="keyword">byte</span>[] row, QueryProto.ResultSet result)</span> </span>&#123;</span><br><span class="line">               ResultSet tempRS = <span class="keyword">new</span> ResultSet();</span><br><span class="line">               <span class="keyword">if</span> (result != <span class="keyword">null</span>)</span><br><span class="line">                   tempRS.setProto(result);</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; tempRS.size(); i++)</span><br><span class="line">				finalRS.accumulate(tempRS.get(i));</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="function"><span class="keyword">public</span> ResultSet <span class="title">getResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			<span class="keyword">return</span> finalRS;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	Accumulator accumulator = <span class="keyword">new</span> Accumulator();</span><br><span class="line"></span><br><span class="line">       table.coprocessorService(QueryProto.QueryService<span class="class">.<span class="keyword">class</span>, <span class="title">start</span>, <span class="title">end</span>, <span class="title">callable</span>, <span class="title">accumulator</span>)</span>;</span><br><span class="line">       ResultSet result = accumulator.getResult();</span><br><span class="line">	table.close();</span><br><span class="line">       doAverageAndCaculation(result, aggSelect);</span><br><span class="line">       <span class="keyword">return</span> doHavingAndOrderBy(result, having, finalOrderBys, top);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二、sql聚合计算原理"><a href="#二、sql聚合计算原理" class="headerlink" title="二、sql聚合计算原理"></a>二、sql聚合计算原理</h2><p>runsql协处理器中实现了select、where、aggSel、groupby、having、orderby、limit、distinct这些子句，也实现了sum、avg、count、max、min这些聚合函数。</p>
+<h4 id="1-使用RegionScanner读取目标列"><a href="#1-使用RegionScanner读取目标列" class="headerlink" title="1.使用RegionScanner读取目标列"></a>1.使用RegionScanner读取目标列</h4><p>使用RegionScanner根据Call对象中的startkey和endkey读取范围rowkey，解析传入的sql子句，过滤获取所有需要用到的列：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aggregateQuery</span><span class="params">(RpcController controller, QueryProto.AggregateRequest request, RpcCallback&lt;QueryProto.ResultSet&gt; done)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">byte</span>[] start = request.getStartKey().toByteArray();</span><br><span class="line">    <span class="keyword">byte</span>[] end = request.getEndKey().toByteArray();</span><br><span class="line"></span><br><span class="line">    AggSelect aggSelect = <span class="keyword">new</span> AggSelect();</span><br><span class="line">    aggSelect.setProto(request.getAggSelect());</span><br><span class="line">    Where whereCondition = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span>(request.getWhere().isInitialized()) &#123;</span><br><span class="line">        whereCondition = <span class="keyword">new</span> Where();</span><br><span class="line">        whereCondition.setProto(request.getWhere());</span><br><span class="line">    &#125;</span><br><span class="line">    GroupBy groupbys = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span>(request.getGroupBy().isInitialized()) &#123;</span><br><span class="line">        groupbys = <span class="keyword">new</span> GroupBy();</span><br><span class="line">        groupbys.setProto(request.getGroupBy());</span><br><span class="line">    &#125;</span><br><span class="line">    Having having = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span>(request.getHaving().isInitialized()) &#123;</span><br><span class="line">        having = <span class="keyword">new</span> Having();</span><br><span class="line">        having.setProto(request.getHaving());</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;OrderBy&gt; orderbys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span>(QueryProto.OrderBy orderByProto : request.getOrderbysList()) &#123;</span><br><span class="line">        OrderBy orderBy = <span class="keyword">new</span> OrderBy();</span><br><span class="line">        orderBy.setProto(orderByProto);</span><br><span class="line">        orderbys.add(orderBy);</span><br><span class="line">    &#125;</span><br><span class="line">    String fromTable = request.getTableName();</span><br><span class="line"></span><br><span class="line">    MetaData meta = <span class="keyword">new</span> MetaData();</span><br><span class="line">    meta.setProto(request.getMeta());</span><br><span class="line"></span><br><span class="line">    QueryProto.ResultSet response = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">long</span> time=System.currentTimeMillis();<span class="comment">////////////////////////////////////////</span></span><br><span class="line"></span><br><span class="line">    RegionScanner scanner = <span class="keyword">null</span>;</span><br><span class="line">    ResultSet rs = <span class="keyword">new</span> ResultSet();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line">        scan.setMaxVersions(<span class="number">1</span>);</span><br><span class="line">        scan.setStartRow(start);</span><br><span class="line">        scan.setStopRow(end);</span><br><span class="line">        <span class="comment">// prepare scan object</span></span><br><span class="line">        List&lt;String&gt; colNames = Parser.extractColumnNames(<span class="keyword">null</span>, aggSelect,  whereCondition,</span><br><span class="line">                groupbys, having, orderbys);</span><br><span class="line">        <span class="keyword">if</span>(colNames.size()==<span class="number">0</span>)&#123;</span><br><span class="line">            colNames.addAll(meta.getColumns());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; colNames.size(); ++i) &#123;</span><br><span class="line">                String tmp[] = colNames.get(i).split(<span class="string">":"</span>);</span><br><span class="line">                scan.addColumn(Bytes.toBytes(tmp[<span class="number">0</span>]), Bytes.toBytes(tmp[<span class="number">1</span>]));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">            StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">            sb.append(aggSelect).append(<span class="string">"\n"</span>);</span><br><span class="line">            sb.append(whereCondition).append(<span class="string">"\n"</span>);</span><br><span class="line">            sb.append(groupbys).append(<span class="string">"\n"</span>);</span><br><span class="line">            sb.append(having).append(<span class="string">"\n"</span>);</span><br><span class="line">            sb.append(orderbys).append(<span class="string">"\n"</span>);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"server error log: "</span> + aggSelect);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        scanner = env.getRegion().getScanner(scan);</span><br><span class="line">        IReader reader = <span class="keyword">new</span> RegionScannerReader(scanner, meta, <span class="keyword">null</span>,colNames);</span><br><span class="line">        internalAggQuery(aggSelect.getColumns(), fromTable, whereCondition, groupbys, having, orderbys, meta,</span><br><span class="line">                rs, reader,aggSelect.isDistinct());</span><br><span class="line">        response = rs.getProto();</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (scanner != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                scanner.close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                LOG.error(e.getMessage(),e);</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(LOG.isDebugEnabled())&#123;</span><br><span class="line">        LOG.debug(<span class="string">"query use time :"</span>+(System.currentTimeMillis()-time));<span class="comment">/////////////////////</span></span><br><span class="line">    &#125;</span><br><span class="line">    done.run(response); <span class="comment">//Protobuf 的返回</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-逐行进行数据处理"><a href="#2-逐行进行数据处理" class="headerlink" title="2.逐行进行数据处理"></a>2.逐行进行数据处理</h4><p><strong>对每一行数据按步骤进行聚合计算处理：</strong></p>
+<p><strong>1）添加聚合列，对于aggSel、orderby、having子句中，带有sum、count、max、min聚合函数的指标字段都需要新增一列，对于avg则需要新增一个sum列和一个count列；</strong></p>
+<p><strong>2）对于groupby子句，需要添加一个所有groupby字段值组成的一个用于去重的特殊agg标识列；</strong></p>
+<p><strong>3）对于distinct子句，也需要添加一个所有distinct字段值组成的一个用于去重的特殊distinct标识列；</strong></p>
+<p><strong>4）将该行数据添加到结果集中并进行计算，根据agg字段判断是否新增，不新增则对不同聚合函数进行合并计算，新增则根据orderby子句或distinct字段按二分法找到插入位置（协处理器方法的最后一个入参merger类对象中的不同RS计算结果merge方法，应该是与该处一样的处理逻辑）。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">internalAggQuery</span><span class="params">(List&lt;Aggregate&gt; aggColumns,</span></span></span><br><span class="line"><span class="function"><span class="params">                             String fromTable,</span></span></span><br><span class="line"><span class="function"><span class="params">                             Where whereCondition,</span></span></span><br><span class="line"><span class="function"><span class="params">                             GroupBy groupbys,</span></span></span><br><span class="line"><span class="function"><span class="params">                             Having having,</span></span></span><br><span class="line"><span class="function"><span class="params">                             List&lt;OrderBy&gt; orderbys,</span></span></span><br><span class="line"><span class="function"><span class="params">                             MetaData meta,</span></span></span><br><span class="line"><span class="function"><span class="params">                             ResultSet rs, IReader reader,<span class="keyword">boolean</span> isDistinct)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        Row currentRow = reader.next();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (currentRow == <span class="keyword">null</span>) <span class="keyword">break</span>;</span><br><span class="line">        <span class="comment">//process where condition</span></span><br><span class="line">        <span class="keyword">if</span> (Matcher.accept(whereCondition, currentRow)) &#123;</span><br><span class="line">            <span class="comment">//generate aggregate columns and put them into current row</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;aggColumns.size();++i) &#123;</span><br><span class="line">                Aggregate aggrgt = aggColumns.get(i);</span><br><span class="line">                generateAggregate(currentRow, aggrgt);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (orderbys.size() &gt; <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;orderbys.size();++i) &#123;</span><br><span class="line">                    <span class="comment">//generate aggregate column</span></span><br><span class="line">                    OrderBy ob = orderbys.get(i);</span><br><span class="line">                    <span class="keyword">if</span> (ob.getAggregate() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        generateAggregate(currentRow, ob.getAggregate());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            generateAggregateFromHaving(currentRow, having);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (groupbys != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">//splice group by columns</span></span><br><span class="line">                <span class="keyword">byte</span>[] buff = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>];</span><br><span class="line">                List&lt;String&gt; grpColumns = groupbys.getColumns();</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;grpColumns.size();++i) &#123;</span><br><span class="line">                    buff = Bytes.add(buff, currentRow.getColumn(grpColumns.get(i)).getValue());</span><br><span class="line">                &#125;</span><br><span class="line">                currentRow.addColumn(<span class="keyword">new</span> Column(Column.SPLICE_KEY_COL_NAME,</span><br><span class="line">                        buff, Column.DataType.AGGKEY));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//add by xinrong on 2012.11.5</span></span><br><span class="line">            <span class="keyword">if</span> (isDistinct) &#123;</span><br><span class="line">                <span class="comment">//splice orderby(the same as aggsel) column by columns</span></span><br><span class="line">                <span class="keyword">byte</span>[] buff = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>];</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;orderbys.size();++i) &#123;</span><br><span class="line">                    buff = Bytes.add(buff, currentRow.getColumn(orderbys.get(i).getAggregate().getFakeName()).getValue());</span><br><span class="line">                &#125;</span><br><span class="line">                currentRow.addColumn(<span class="keyword">new</span> Column(Column.DISTINCT_COL,</span><br><span class="line">                        buff, Column.DataType.DTCKEY));</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            rs.accumulate(currentRow);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3-添加聚合列"><a href="#3-添加聚合列" class="headerlink" title="3.添加聚合列"></a>3.添加聚合列</h4><p>对sum、count、max、min聚合函数字段新增一个对应结果存储列；对于avg函数字段新增两个结果暂存列，一个sum列和一个count列：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/***</span></span><br><span class="line"><span class="comment">  * 在当前行上加入聚合列</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> currentRow</span></span><br><span class="line"><span class="comment">  * <span class="doctag">@param</span> aggrgt</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">generateAggregate</span><span class="params">(Row currentRow, Aggregate aggrgt)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (currentRow == <span class="keyword">null</span> || aggrgt == <span class="keyword">null</span>) <span class="keyword">return</span> ;</span><br><span class="line">     Column original = currentRow.getColumn(aggrgt.getColName());</span><br><span class="line">     <span class="keyword">if</span> (original == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span>;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="comment">//generate aggregate columns</span></span><br><span class="line">     String fakeName = aggrgt.getFakeName();</span><br><span class="line">     <span class="keyword">if</span> (!currentRow.hasColumn(fakeName)) &#123;</span><br><span class="line">         <span class="keyword">if</span> (aggrgt.getType() == Expression.AGG_AVG ) &#123;</span><br><span class="line">             <span class="comment">//if this is an average column, we need to add a count column</span></span><br><span class="line">             <span class="comment">//and a sum column because avg=sum/count,</span></span><br><span class="line">             <span class="keyword">if</span> (!currentRow.hasColumn(Aggregate.PREFIX_SUM+aggrgt.getColName())) &#123;</span><br><span class="line">                 Column newAggCol=<span class="keyword">new</span> Column(Aggregate.PREFIX_SUM+aggrgt.getColName() ,</span><br><span class="line">                         original.getValue(), original.getType());</span><br><span class="line">                 newAggCol.setAggType(Aggregate.AGG_SUM);</span><br><span class="line">                 currentRow.addColumn(newAggCol);</span><br><span class="line">             &#125;</span><br><span class="line">             <span class="keyword">if</span> (!currentRow.hasColumn(Aggregate.PREFIX_COUNT)) &#123;</span><br><span class="line">                 Column newAggCol = <span class="keyword">new</span> Column(Aggregate.PREFIX_COUNT ,</span><br><span class="line">                         original.getValue(), original.getType());</span><br><span class="line">                 newAggCol.setAggType(Aggregate.AGG_COUNT);</span><br><span class="line">                 currentRow.addColumn(newAggCol);</span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">         Column newAggCol = <span class="keyword">new</span> Column(fakeName,</span><br><span class="line">                 original.getValue(), original.getType());</span><br><span class="line">         newAggCol.setAggType(aggrgt.getType());</span><br><span class="line">         currentRow.addColumn(newAggCol);</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="4-添加groupby标识列"><a href="#4-添加groupby标识列" class="headerlink" title="4.添加groupby标识列"></a>4.添加groupby标识列</h4><p>将所有groupby字段值组成的一个用于去重标识列：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (groupbys != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">//splice group by columns</span></span><br><span class="line">    <span class="keyword">byte</span>[] buff = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>];</span><br><span class="line">    List&lt;String&gt; grpColumns = groupbys.getColumns();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;grpColumns.size();++i) &#123;</span><br><span class="line">        buff = Bytes.add(buff, currentRow.getColumn(grpColumns.get(i)).getValue());</span><br><span class="line">    &#125;</span><br><span class="line">    currentRow.addColumn(<span class="keyword">new</span> Column(Column.SPLICE_KEY_COL_NAME,</span><br><span class="line">            buff, Column.DataType.AGGKEY));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="5-添加distinct标识列"><a href="#5-添加distinct标识列" class="headerlink" title="5.添加distinct标识列"></a>5.添加distinct标识列</h4><p>将所有distinct字段值组成的一个用于去重计数标识列：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (isDistinct) &#123;</span><br><span class="line">    <span class="comment">//splice orderby(the same as aggsel) column by columns</span></span><br><span class="line">    <span class="keyword">byte</span>[] buff = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;orderbys.size();++i) &#123;</span><br><span class="line">        buff = Bytes.add(buff, currentRow.getColumn(orderbys.get(i).getAggregate().getFakeName()).getValue());</span><br><span class="line">    &#125;</span><br><span class="line">    currentRow.addColumn(<span class="keyword">new</span> Column(Column.DISTINCT_COL,</span><br><span class="line">            buff, Column.DataType.DTCKEY));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="6-去重与聚合计算"><a href="#6-去重与聚合计算" class="headerlink" title="6.去重与聚合计算"></a>6.去重与聚合计算</h4><p>1）检查结果集中groupby去重标识列值是否已存在，已存在则需要将该行数据按照聚合计算逻辑merge到已存在行中；不存在则直接将该行插入到结果集中，对于存在orderby或distinct子句的查询则需要根据二分法找到插入位置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">accumulate_VersionID_1</span><span class="params">(Row currentRow)</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">	Column col = currentRow.getColumn(Column.SPLICE_KEY_COL_NAME);</span><br><span class="line">	<span class="keyword">if</span>(LOG.isDebugEnabled())&#123;</span><br><span class="line">		LOG.debug(<span class="string">"accumulate the row: "</span>+currentRow.getKeyString());</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (col!=<span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> hashKey =  Bytes.hashCode(MD5Key(col.getValue()));</span><br><span class="line">		<span class="comment">//find the value in the rows;</span></span><br><span class="line">		<span class="keyword">if</span>(LOG.isDebugEnabled())&#123;</span><br><span class="line">			LOG.debug(<span class="string">"current group by key: "</span> + hashKey);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (hasAggValue(hashKey)) &#123;</span><br><span class="line">			Integer pos = getAggValuePosition(hashKey);</span><br><span class="line">			<span class="comment">//fetch each aggregate column, do accumulation</span></span><br><span class="line">			Row saveTo = get(pos);</span><br><span class="line">			List&lt;String&gt; aggColumns = currentRow.getAggColumns();</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;aggColumns.size();++i) &#123;</span><br><span class="line">				String name = aggColumns.get(i);</span><br><span class="line">				saveTo.getColumn(name).accumulate(</span><br><span class="line">						currentRow.getColumn(name));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">if</span>(LOG.isDebugEnabled())&#123;</span><br><span class="line">				LOG.debug(<span class="string">"add a group by key: "</span> + hashKey);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">//create revert index and save column</span></span><br><span class="line">			aggvalue.put(hashKey, size());</span><br><span class="line">			add(currentRow);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">//no group by columns, aggregate all to one row;</span></span><br><span class="line">		<span class="keyword">if</span> (rows.size() == <span class="number">0</span>) &#123;</span><br><span class="line">			add(currentRow);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			List&lt;String&gt; aggColumns = currentRow.getAggColumns();</span><br><span class="line">			Row saveTo = rows.get(<span class="number">0</span>);</span><br><span class="line">			<span class="comment">//skip the non-aggregate columns</span></span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;aggColumns.size();++i) &#123;</span><br><span class="line">				String name = aggColumns.get(i);</span><br><span class="line">				<span class="keyword">if</span> (saveTo.getColumn(name)!=<span class="keyword">null</span>)</span><br><span class="line">					saveTo.getColumn(name).accumulate(</span><br><span class="line">						currentRow.getColumn(name));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">accumulate</span><span class="params">(Column col)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (col == <span class="keyword">null</span>) <span class="keyword">return</span> ;</span><br><span class="line">		<span class="keyword">switch</span> (aggType) &#123;</span><br><span class="line"><span class="comment">//			case Expression.AGG_AVG:</span></span><br><span class="line"><span class="comment">//				//do nothing</span></span><br><span class="line"><span class="comment">//				break;</span></span><br><span class="line">			<span class="keyword">case</span> Expression.AGG_COUNT:</span><br><span class="line">					value = internalAdd(value, col.getValue(), type);</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> Expression.AGG_MAX:</span><br><span class="line">				<span class="keyword">if</span> (Bytes.compareTo(value, col.getValue()) &lt; <span class="number">0</span>)</span><br><span class="line">					value = col.getValue();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> Expression.AGG_MIN:</span><br><span class="line">				<span class="keyword">if</span> ( Bytes.compareTo(value, col.getValue()) &gt; <span class="number">0</span>)</span><br><span class="line">					value = col.getValue();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> Expression.AGG_SUM:</span><br><span class="line">					value = internalAdd(value, col.getValue(), type);</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/Runsql/" rel="tag"><i class="fa fa-tag"></i> Runsql</a>
+          
+            <a href="/tags/protobuf/" rel="tag"><i class="fa fa-tag"></i> protobuf</a>
+          
+            <a href="/tags/Coprocessors/" rel="tag"><i class="fa fa-tag"></i> Coprocessors</a>
+          
+            <a href="/tags/%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i> 协处理器</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/18/HBase_HBase%E7%9A%84Rowkey%E5%8D%8F%E8%AE%AE%E4%B8%8E%E8%8E%B7%E5%8F%96%E7%B4%A7%E6%8E%A5%E7%9D%80%E7%9A%84%E5%AD%97%E5%85%B8%E5%BA%8F%E6%9B%B4%E5%A4%A7%E7%9A%84Byte%E6%95%B0%E7%BB%84/" rel="next" title="HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组">
+                <i class="fa fa-chevron-left"></i> HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/20/HBase_HBase%E7%9A%84%E6%89%B9%E9%87%8F%E5%86%99%E5%B7%A5%E5%85%B7%E7%B1%BBBufferedMutator%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/" rel="prev" title="HBase_HBase的批量写工具类BufferedMutator原理与应用实战">
+                HBase_HBase的批量写工具类BufferedMutator原理与应用实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-HBase的runsql协处理器实战与sql聚合计算原理"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBase的runsql协处理器实战与sql聚合计算原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、runsql客户端实战"><span class="nav-number">1.1.</span> <span class="nav-text">一、runsql客户端实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-通过sql获取返回结果的统一方法"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">1.通过sql获取返回结果的统一方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-客户端调用协处理器方法"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">2.客户端调用协处理器方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、sql聚合计算原理"><span class="nav-number">1.2.</span> <span class="nav-text">二、sql聚合计算原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-使用RegionScanner读取目标列"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">1.使用RegionScanner读取目标列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-逐行进行数据处理"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">2.逐行进行数据处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-添加聚合列"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">3.添加聚合列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-添加groupby标识列"><span class="nav-number">1.2.0.4.</span> <span class="nav-text">4.添加groupby标识列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-添加distinct标识列"><span class="nav-number">1.2.0.5.</span> <span class="nav-text">5.添加distinct标识列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-去重与聚合计算"><span class="nav-number">1.2.0.6.</span> <span class="nav-text">6.去重与聚合计算</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

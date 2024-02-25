@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse,刷岗," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_clickhouse流量商详明细刷岗实战一、背景当前流量商详明细数据周期需具备近27个月，目前受明细数据量、资源、任务时效等限制暂未实现近27个月全周期的得岗位更新，明细数据只做了部分数据周期的岗位更新。 二、当前线上逻辑   刷岗+预计算 天数 刷岗范围    明细刷岗 42天 以最新岗位刷近15天，同比18天，农历同比3天，复合同比3天，复合农历同比3天   天预计算 4">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_clickhouse流量商详明细刷岗实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_clickhouse流量商详明细刷岗实战一、背景当前流量商详明细数据周期需具备近27个月，目前受明细数据量、资源、任务时效等限制暂未实现近27个月全周期的得岗位更新，明细数据只做了部分数据周期的岗位更新。 二、当前线上逻辑   刷岗+预计算 天数 刷岗范围    明细刷岗 42天 以最新岗位刷近15天，同比18天，农历同比3天，复合同比3天，复合农历同比3天   天预计算 4">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/5.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/6.jpg">
+<meta property="article:published_time" content="2024-01-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:38:59.353Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta property="article:tag" content="刷岗">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse流量商详明细刷岗实战/"/>
+
+
+
+
+
+  <title>ClickHouse_clickhouse流量商详明细刷岗实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_clickhouse流量商详明细刷岗实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-07T00:00:00+08:00">
+                2024-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClickHouse-clickhouse流量商详明细刷岗实战"><a href="#ClickHouse-clickhouse流量商详明细刷岗实战" class="headerlink" title="ClickHouse_clickhouse流量商详明细刷岗实战"></a>ClickHouse_clickhouse流量商详明细刷岗实战</h1><h2 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h2><p>当前流量商详明细数据周期需具备近27个月，目前受明细数据量、资源、任务时效等限制暂未实现近27个月全周期的得岗位更新，明细数据只做了部分数据周期的岗位更新。</p>
+<h2 id="二、当前线上逻辑"><a href="#二、当前线上逻辑" class="headerlink" title="二、当前线上逻辑"></a>二、当前线上逻辑</h2><table>
+<thead>
+<tr>
+<th><strong>刷岗+预计算</strong></th>
+<th><strong>天数</strong></th>
+<th><strong>刷岗范围</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>明细刷岗</td>
+<td>42天</td>
+<td>以最新岗位刷近15天，同比18天，农历同比3天，复合同比3天，复合农历同比3天</td>
+</tr>
+<tr>
+<td>天预计算</td>
+<td>42天</td>
+<td>近15天，同比18天，农历同比3天，复合同比3天，复合农历同比3天</td>
+</tr>
+</tbody></table>
+<p><strong>线上版本刷岗实现过程：</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/1.jpg" alt></p>
+<p>商详明细需要具备近27个月数据，并按照sku散列同步到clickhouse中。</p>
+<p><strong>step1.</strong>  从hive获取刷岗日期范围的sku信息，关联活跃商品表取最新部门等岗位维表，按sku散列同步到clickhosue中</p>
+<p><strong>step2</strong>.  在clickhouse中，基础明细和岗位字典按照sku进行本地关联刷岗，刷t+1之前42天的日期；t+1数据在adm层商详快照出数后开始刷，即带岗明细数据</p>
+<p><strong>step3</strong>.  将带岗明细中间表分别按照浏览器标识和用户pin落两张线上明细表，分别用于后续uv和去重用户数指标预计算。（<strong>注：此处是读分布式表写本地表，读时使用在中间表中另外添加的hash列做过滤。</strong>）</p>
+<p><img src="//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/2.jpg" alt></p>
+<p><strong>相关数据量级统计：</strong></p>
+<p>流量商详基础明细数据量级： 5亿～6亿/天      近27个月数据量约：4050亿+</p>
+<p>流量商详明细42天去重sku量级约： 4亿3千多万</p>
+<p>当前流量商详近27个月基础明细sku 去重量约：34亿     （在商品活跃表中只能关联出来20亿，其余约14亿不再商品活跃表中）  每天更新sku的delt量约2千多万（大促定岗前）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">count</span>(*) <span class="keyword">from</span> </span><br><span class="line">(</span><br><span class="line">       <span class="keyword">SELECT</span></span><br><span class="line">            sku_id</span><br><span class="line">        <span class="keyword">FROM</span></span><br><span class="line">            app.app_jdr_app_jdr_app_m27_traffic_sku_result_a_d_d</span><br><span class="line">        <span class="keyword">WHERE</span></span><br><span class="line">            dt = <span class="string">'2023-10-25'</span></span><br><span class="line">        <span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">            sku_id</span><br><span class="line">       )</span><br><span class="line">       d</span><br><span class="line">    <span class="keyword">JOIN</span> </span><br><span class="line">(<span class="keyword">select</span> item_sku_id <span class="keyword">from</span>  gdm.gdm_m03_item_sku_act  <span class="keyword">where</span> dt = <span class="string">'2023-10-25'</span> )g <span class="keyword">on</span> d.sku_id =g.item_sku_id</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>当前线上刷岗瓶颈点分析：（当前无法实现近27个月数据量级的全量更新）</strong></p>
+<ol>
+<li>基于近27个月sku属性维表量较大，约36亿，无法加载到集群节点内存中(依赖字典刷岗)</li>
+<li>数据基于sku散落更新42天岗位后，重新按照browser_uniq_id进行散落(基于查询性能考虑)加工出一张明细表供服务查询，涉及shuffle较慢，42天数据约需27min完成。 </li>
+</ol>
+<h2 id="三、基于增量刷岗的新方案"><a href="#三、基于增量刷岗的新方案" class="headerlink" title="三、基于增量刷岗的新方案"></a>三、基于增量刷岗的新方案</h2><p>以下流量商详明细增量刷岗都是基于增量去做，增量维表数据的加工链路如下：</p>
+<p><img src="//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/3.jpg" alt></p>
+<p>增量维表加工逻辑：</p>
+<p>增量维表依赖m03活跃商品表和供应链中台m03活跃商品表，商品表目前每天时效02:07 ，增量维表完成时间预计在02:45左右。</p>
+<h3 id="方案一：基于增量的update"><a href="#方案一：基于增量的update" class="headerlink" title="方案一：基于增量的update"></a>方案一：基于增量的update</h3><p>直接在商详明细表的基础上利用clickhouse update特性进行增量明细数据的岗位更新操作</p>
+<p><img src="//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/4.jpg" alt></p>
+<p>每天基于商详明细sku属性变更的delta量, 利用Clickhouse Update功能+Join Engine Table能力，每天更新的数据量都是基于T+2和T3的delta量去做更新。<strong>注意：此处用于做diff的t+2活跃商品表和t+3活跃商品表是已经与t+1最新岗位维表进行join过的sku维表了。</strong></p>
+<h4 id="1-join引擎"><a href="#1-join引擎" class="headerlink" title="1.join引擎"></a>1.join引擎</h4><p>JOIN ENGINE TABLE： <a href="https://clickhouse.com/docs/en/engines/table-engines/special/join" target="_blank" rel="noopener">https://clickhouse.com/docs/en/engines/table-engines/special/join</a></p>
+<p><strong>1）普通mergetree引擎表和join引擎表都可以用joinget()函数来简化join操作写法；</strong></p>
+<p><strong>2）使用joinget可以直接关联维表实现删除明细表中维度字段在维表中存在的数据，但是dectget()不支持这种使用方式；</strong></p>
+<p><strong>3）join引擎也是将数据存储在内存中，所以关联速度也是非常快的；</strong></p>
+<p><strong>4）字典表支持reload全量更新，但是join引擎不支持，只能delete再insert，也不能删除表再重建，因为删表并不会立即释放内存。</strong></p>
+<h4 id="2-刷岗步骤"><a href="#2-刷岗步骤" class="headerlink" title="2.刷岗步骤"></a>2.刷岗步骤</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">创建JOIN TABLE:</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> app.my_join_table</span><br><span class="line">(</span><br><span class="line">            sku_id Int64,</span><br><span class="line">            sale_mode <span class="keyword">String</span>,</span><br><span class="line">            brand_cd <span class="keyword">String</span>,</span><br><span class="line">            main_brand_cd <span class="keyword">String</span>,</span><br><span class="line">            shop_id <span class="keyword">String</span>,</span><br><span class="line">            item_first_cate_cd <span class="keyword">String</span>,</span><br><span class="line">            item_second_cate_cd <span class="keyword">String</span>,</span><br><span class="line">            item_third_cate_cd <span class="keyword">String</span>,</span><br><span class="line">            item_last_cate_cd <span class="keyword">String</span>,</span><br><span class="line">            oper_erp_acct <span class="keyword">String</span>,</span><br><span class="line">            purchaser_control_erp_acct <span class="keyword">String</span>,</span><br><span class="line">            purchaser_erp_acct <span class="keyword">String</span>,</span><br><span class="line">            cate_bu_id <span class="keyword">String</span>,</span><br><span class="line">            cate_dept_id_1 <span class="keyword">String</span>,</span><br><span class="line">            cate_dept_id_2 <span class="keyword">String</span>,</span><br><span class="line">            cate_dept_id_3 <span class="keyword">String</span>,</span><br><span class="line">            cate_dept_id_4 <span class="keyword">String</span>,</span><br><span class="line">            pur_sale_control_separate_flag <span class="keyword">String</span>,</span><br><span class="line">            spu_id <span class="keyword">String</span>,</span><br><span class="line">            flag <span class="keyword">String</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = <span class="keyword">Join</span>(<span class="keyword">ANY</span>, <span class="keyword">LEFT</span>, sku_id) </span><br><span class="line"></span><br><span class="line">利用JoinTable进行岗位的增量更新：</span><br><span class="line"></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> app.app_d14_traffic_plat_item_di_new_opt_aggr_new <span class="keyword">on</span> cluster XXXX</span><br><span class="line"><span class="keyword">update</span></span><br><span class="line">	cate_bu_id = joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_bu_id'</span>, sku_id)</span><br><span class="line">	cate_dept_id_1=joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_1'</span>, sku_id)</span><br><span class="line">	cate_dept_id_2=joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_2'</span>, sku_id)</span><br><span class="line">	cate_dept_id_3=joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_3'</span>, sku_id)</span><br><span class="line">	cate_dept_id_4=joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_4'</span>, sku_id)</span><br><span class="line">	oper_erp_acct=joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'oper_erp_acct'</span>, sku_id)</span><br><span class="line"><span class="keyword">where</span></span><br><span class="line">	dt = <span class="string">'2023-08-05'</span></span><br><span class="line">	<span class="keyword">and</span> joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'flag'</span>, sku_id) = <span class="number">1</span> <span class="comment">--圈范围，只需更新增量部分即可</span></span><br></pre></td></tr></table></figure>
+
+<p>此方案中<strong>clickhouse 表的索引列不支持更新（无法进行索引创建），通过增加跳数索引。查询时会带来很大的性能损耗。（StarRocks支持Primary Key的更新，本质上就是Delete + Insert的策略）</strong></p>
+<p>正常建表，部门id等常用的过滤维度字段肯定都会放在索引字段中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ENGINE = ReplicatedMergeTree('/clickhouse/tables/app/app_d14_traffic_plat_item_di_new_opt_aggr_dict_cate_temp/&#123;shard&#125;', '&#123;replica&#125;')</span><br><span class="line">PARTITION BY dt</span><br><span class="line">ORDER BY (cate_bu_id, cate_dept_id_1, cate_dept_id_2, cate_dept_id_3, oper_erp_acct, bs)</span><br><span class="line">SETTINGS index_granularity = 8192</span><br></pre></td></tr></table></figure>
+
+<p>那么为了优化性能有两种方案：</p>
+<p>1.使用update 特性，更新维度不能作为索引排序key，建表时可考虑使用跳数索引 （单纯使用跳数索引性能不达标，不采用该方案）</p>
+<p>2.基于update更新岗位后，重新创建一张带索引明细的表，进行ck2ck 的操作，将更新岗位的数据重新同步到带索引的表中。</p>
+<h4 id="3-新建带索引明细的表整体性能评估"><a href="#3-新建带索引明细的表整体性能评估" class="headerlink" title="3.新建带索引明细的表整体性能评估"></a>3.新建带索引明细的表整体性能评估</h4><p>1.update 更新27个月岗位耗时约40min；</p>
+<p>2.ck2ck 将更新后的数据同步至带索引的表按天每天耗时约5s左右，27个月耗时 67min；</p>
+<p>完成整体刷岗耗时约100min左右，约1小时40分钟。</p>
+<h3 id="方案二：基于增量明细的先删后写"><a href="#方案二：基于增量明细的先删后写" class="headerlink" title="方案二：基于增量明细的先删后写"></a>方案二：基于增量明细的先删后写</h3><p>在基础明细表上边删除增量变化的明细数据，然后再将更新岗位后的明细数据写入到基础明细表中。流程如下：</p>
+<p><img src="//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/5.jpg" alt></p>
+<p>注意：上图中的uuid就是浏览器设备号，此处只是在图中画出了这条链路，以pin为分片键的那张表也需要delete和insert一遍，或者从设备号分片表中shuffle过去。</p>
+<h4 id="1-刷岗步骤："><a href="#1-刷岗步骤：" class="headerlink" title="1.刷岗步骤："></a>1.刷岗步骤：</h4><p><strong>step1：删除增量</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> app.app_d14_traffic_plat_item_di_new_opt_aggr_update  <span class="keyword">DELETE</span> <span class="keyword">WHERE</span> dt&gt;=<span class="string">'2023-11-07'</span> <span class="keyword">and</span> dt&lt;=<span class="string">'2023-11-11'</span> </span><br><span class="line"><span class="keyword">and</span> (</span><br><span class="line">    joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'flag'</span>, item_sku_id) = <span class="string">'1'</span>   <span class="comment">--圈类目运营增量明细</span></span><br><span class="line">    <span class="keyword">or</span>  </span><br><span class="line">    joinGet(<span class="string">'app.buyer_join_table'</span>, <span class="string">'buyer_erp_acct'</span>, item_sku_id,toString(pur_channel_id))=<span class="string">'1'</span>  <span class="comment">--圈买手增量明细</span></span><br><span class="line">    <span class="keyword">or</span> </span><br><span class="line">    joinGet(<span class="string">'app.saler_join_table'</span>, <span class="string">'saler_erp_acct'</span>, item_sku_id,toString(third_place_cd))=<span class="string">'1'</span>  <span class="comment">--圈场销售增量明细</span></span><br><span class="line">    ) </span><br><span class="line"><span class="keyword">SETTINGS</span> mutations_sync = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>SETTING mutations_sync = 1: 当设置为 1 时，表示执行的数据变更操作将是同步的。也就是说，SQL 语句将会等待直到变更操作完成才返回结果。这意味着执行操作的客户端将会阻塞，直到操作彻底完成（包括所有的数据重新合并等）。</strong></p>
+<p><strong>step2：写入更新岗位后的增量明细</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span></span><br><span class="line"><span class="keyword">INTO</span></span><br><span class="line">    app.app_d14_traffic_plat_item_di_new_opt_aggr_update</span><br><span class="line">    (</span><br><span class="line">        mins,</span><br><span class="line">        <span class="keyword">hours</span>,</span><br><span class="line">        <span class="keyword">week</span>,</span><br><span class="line">        <span class="keyword">MONTH</span>,</span><br><span class="line">        browser_uniq_id,</span><br><span class="line">        user_log_acct,</span><br><span class="line">        item_rt,</span><br><span class="line">        item_pv,</span><br><span class="line">        sale_mode,</span><br><span class="line">        sale_mode_cd_2,</span><br><span class="line">        item_sku_id,</span><br><span class="line">        sku_name,</span><br><span class="line">        shadow_sku_flag,</span><br><span class="line">        spu_id,</span><br><span class="line">        spu_name,</span><br><span class="line">        vender_id,</span><br><span class="line">        vender_name,</span><br><span class="line">        shop_id,</span><br><span class="line">        shop_name,</span><br><span class="line">        itm_frst_catg_cd,</span><br><span class="line">        itm_frst_catg_name,</span><br><span class="line">        itm_scnd_catg_cd,</span><br><span class="line">        itm_scnd_catg_name,</span><br><span class="line">        itm_thrd_catg_cd,</span><br><span class="line">        itm_thrd_catg_name,</span><br><span class="line">        itm_fourth_catg_cd,</span><br><span class="line">        itm_fourth_catg_name,</span><br><span class="line">        brand_cd,</span><br><span class="line">        brandname,</span><br><span class="line">        sub_brand_cd,</span><br><span class="line">        sub_brandname,</span><br><span class="line">        blacklist_flag,</span><br><span class="line">        cate_bu_id,</span><br><span class="line">        cate_bu_name,</span><br><span class="line">        cate_dept_id_1,</span><br><span class="line">        cate_dept_name_1,</span><br><span class="line">        cate_dept_id_2,</span><br><span class="line">        cate_dept_name_2,</span><br><span class="line">        cate_dept_id_3,</span><br><span class="line">        cate_dept_name_3,</span><br><span class="line">        cate_dept_id_4,</span><br><span class="line">        cate_dept_name_4,</span><br><span class="line">        page_third_chan_cd,</span><br><span class="line">        page_third_chan_desc,</span><br><span class="line">        oper_erp_acct,</span><br><span class="line">        oper_erp_name,</span><br><span class="line">        dt,</span><br><span class="line">        stat_tm,</span><br><span class="line">        browser_uniq_id_hash,</span><br><span class="line">        bs,</span><br><span class="line">        bs_name,</span><br><span class="line">        chan_first_cate_cd,</span><br><span class="line">        chan_second_cate_cd,</span><br><span class="line">        chan_third_cate_cd,</span><br><span class="line">        chan_fourth_cate_cd,</span><br><span class="line">        chan_first_cate_desc,</span><br><span class="line">        chan_second_cate_desc,</span><br><span class="line">        chan_third_cate_desc,</span><br><span class="line">        chan_fourth_cate_desc,</span><br><span class="line">        first_place_cd,</span><br><span class="line">        second_place_cd,</span><br><span class="line">        third_place_cd,</span><br><span class="line">        dt_browser_uniq_id,</span><br><span class="line">        sku_flag,</span><br><span class="line">        purchaser_control_erp_acct,</span><br><span class="line">        purchaser_erp_acct,</span><br><span class="line">        bs_browser_uniq_id,</span><br><span class="line">        daojia_item_flag,</span><br><span class="line">        corp_type_cd_1,</span><br><span class="line">        corp_type_cd_2,</span><br><span class="line">        platform_cate_1,</span><br><span class="line">        platform_cate_2,</span><br><span class="line">        platform_cate_3,</span><br><span class="line">        buyer_erp_acct,</span><br><span class="line">        place_saler_erp_acct,</span><br><span class="line">        pur_channel_id</span><br><span class="line">    )</span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    mins,</span><br><span class="line">    <span class="keyword">hours</span>,</span><br><span class="line">    <span class="keyword">week</span>,</span><br><span class="line">    <span class="keyword">MONTH</span>,</span><br><span class="line">    browser_uniq_id,</span><br><span class="line">    user_log_acct,</span><br><span class="line">    item_rt,</span><br><span class="line">    item_pv,</span><br><span class="line">    sale_mode,</span><br><span class="line">    sale_mode_cd_2,</span><br><span class="line">    <span class="keyword">CAST</span>(sku_id <span class="keyword">AS</span> <span class="keyword">String</span>) <span class="keyword">AS</span> item_sku_id,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> sku_name,</span><br><span class="line">    shadow_sku_flag,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'spu_id'</span>, toString(sku_id)) = <span class="string">''</span>, spu_id, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'spu_id'</span>, toString(sku_id))) <span class="keyword">AS</span> spu_id,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> spu_name,</span><br><span class="line">    vender_id,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> vender_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'shop_id'</span>, toString(sku_id)) = <span class="string">''</span>, shop_id, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'shop_id'</span>, toString(sku_id))) <span class="keyword">AS</span> shop_id,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> shop_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_first_cate_cd'</span>, toString(sku_id)) = <span class="string">''</span>, item_first_cate_cd, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_first_cate_cd'</span>, toString(sku_id))) <span class="keyword">AS</span> itm_frst_catg_cd,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> itm_frst_catg_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_second_cate_cd'</span>, toString(sku_id)) = <span class="string">''</span>, item_second_cate_cd, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_second_cate_cd'</span>, toString(sku_id))) <span class="keyword">AS</span> itm_scnd_catg_cd,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> itm_scnd_catg_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_third_cate_cd'</span>, toString(sku_id)) = <span class="string">''</span>, item_third_cate_cd, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_third_cate_cd'</span>, toString(sku_id))) <span class="keyword">AS</span> itm_thrd_catg_cd,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> itm_thrd_catg_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_last_cate_cd'</span>, toString(sku_id)) = <span class="string">''</span>, item_last_cate_cd, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'item_last_cate_cd'</span>, toString(sku_id))) <span class="keyword">AS</span> itm_fourth_catg_cd,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> itm_fourth_catg_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'main_brand_cd'</span>, toString(sku_id)) = <span class="string">''</span>, main_brand_cd, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'main_brand_cd'</span>, toString(sku_id))) <span class="keyword">AS</span> brand_cd1,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> brandname,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'brand_cd'</span>, toString(sku_id)) = <span class="string">''</span>, brand_cd, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'brand_cd'</span>, toString(sku_id))) <span class="keyword">AS</span> sub_brand_cd1,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> sub_brandname,</span><br><span class="line">    <span class="keyword">CAST</span>(blacklist_flag <span class="keyword">AS</span> <span class="built_in">INT</span>) <span class="keyword">AS</span> blacklist_flag,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_bu_id'</span>, toString(sku_id)) = <span class="string">''</span>, cate_bu_id, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_bu_id'</span>, toString(sku_id))) cate_bu_id,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> cate_bu_name,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_1'</span>, toString(sku_id)) = <span class="string">''</span>, cate_dept_id_1, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_1'</span>, toString(sku_id))) <span class="keyword">AS</span> cate_dept_id_1,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> cate_dept_name_1,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_2'</span>, toString(sku_id)) = <span class="string">''</span>, cate_dept_id_2, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_2'</span>, toString(sku_id))) <span class="keyword">AS</span> cate_dept_id_2,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> cate_dept_name_2,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_3'</span>, toString(sku_id)) = <span class="string">''</span>, cate_dept_id_3, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_3'</span>, toString(sku_id))) <span class="keyword">AS</span> cate_dept_id_3,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> cate_dept_name_3,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_4'</span>, toString(sku_id)) = <span class="string">''</span>, cate_dept_id_4, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'cate_dept_id_4'</span>, toString(sku_id))) <span class="keyword">AS</span> cate_dept_id_4,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> cate_dept_name_4,</span><br><span class="line">    page_third_chan_cd,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> page_third_chan_desc,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'oper_erp_acct'</span>, toString(sku_id)) = <span class="string">''</span>, oper_erp_acct, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'oper_erp_acct'</span>, toString(sku_id))) <span class="keyword">AS</span> oper_erp_acct,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> oper_erp_name,</span><br><span class="line">    dt,</span><br><span class="line">    stat_tm,</span><br><span class="line">    <span class="number">0</span> <span class="keyword">AS</span> browser_uniq_id_hash,</span><br><span class="line">    bs,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> bs_name,</span><br><span class="line">    chan_first_cate_cd,</span><br><span class="line">    chan_second_cate_cd,</span><br><span class="line">    chan_third_cate_cd,</span><br><span class="line">    chan_fourth_cate_cd,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> chan_first_cate_desc,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> chan_second_cate_desc,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> chan_third_cate_desc,</span><br><span class="line">    <span class="string">''</span> <span class="keyword">AS</span> chan_fourth_cate_desc,</span><br><span class="line">    first_place_cd,</span><br><span class="line">    second_place_cd,</span><br><span class="line">    third_place_cd,</span><br><span class="line">    dt_browser_uniq_id,</span><br><span class="line">    <span class="keyword">CAST</span>(</span><br><span class="line">        <span class="keyword">CASE</span></span><br><span class="line">            <span class="keyword">WHEN</span> sku_flag <span class="keyword">IN</span>(<span class="string">''</span>, <span class="literal">NULL</span>)</span><br><span class="line">            <span class="keyword">THEN</span> <span class="string">'0'</span></span><br><span class="line">            <span class="keyword">ELSE</span> sku_flag</span><br><span class="line">        <span class="keyword">END</span> <span class="keyword">AS</span> <span class="built_in">INT</span>) sku_flag,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'purchaser_control_erp_acct'</span>, toString(sku_id)) = <span class="string">''</span>, purchaser_control_erp_acct, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'purchaser_control_erp_acct'</span>, toString(sku_id))) <span class="keyword">AS</span> purchaser_control_erp_acct,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'purchaser_erp_acct'</span>, toString(sku_id)) = <span class="string">''</span>, purchaser_erp_acct, joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'purchaser_erp_acct'</span>, toString(sku_id))) <span class="keyword">AS</span> purchaser_erp_acct,</span><br><span class="line">    bs_browser_uniq_id,</span><br><span class="line">    daojia_item_flag,</span><br><span class="line">    corp_type_cd_1,</span><br><span class="line">    corp_type_cd_2,</span><br><span class="line">    platform_cate_1,</span><br><span class="line">    platform_cate_2,</span><br><span class="line">    platform_cate_3,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.buyer_join_table'</span>, <span class="string">'buyer_erp_acct'</span>, toString(sku_id), pur_channel_id) = <span class="string">''</span>, buyer_erp_acct, joinGet(<span class="string">'app.buyer_join_table'</span>, <span class="string">'buyer_erp_acct'</span>, toString(sku_id), pur_channel_id)) <span class="keyword">AS</span> buyer_erp_acct,</span><br><span class="line">    <span class="keyword">IF</span>(joinGet(<span class="string">'app.saler_join_table'</span>, <span class="string">'saler_erp_acct'</span>, toString(sku_id), toInt32(third_place_cd)) = <span class="string">''</span>, place_saler_erp_acct, joinGet(<span class="string">'app.saler_join_table'</span>, <span class="string">'saler_erp_acct'</span>, toString(sku_id), toInt32(third_place_cd))) <span class="keyword">AS</span> place_saler_erp_acct,</span><br><span class="line">    pur_channel_id</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    app.app_d14_traffic_plat_item_di_new_opt_aggr_new_d</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    dt &gt;= <span class="string">'2023-10-13'</span></span><br><span class="line">    <span class="keyword">AND</span> dt &lt;= <span class="string">'2023-10-17'</span></span><br><span class="line">    <span class="keyword">AND</span> hash_browser_uniq_id = <span class="string">'50'</span></span><br><span class="line">    <span class="keyword">AND</span></span><br><span class="line">    (</span><br><span class="line">        joinGet(<span class="string">'app.my_join_table'</span>, <span class="string">'flag'</span>, toString(sku_id)) = <span class="string">'1'</span></span><br><span class="line">        <span class="keyword">OR</span> joinGet(<span class="string">'app.buyer_join_table'</span>, <span class="string">'flag'</span>, toString(sku_id), pur_channel_id) = <span class="string">'1'</span></span><br><span class="line">        <span class="keyword">OR</span> joinGet(<span class="string">'app.saler_join_table'</span>, <span class="string">'flag'</span>, toString(sku_id), toInt32(third_place_cd)) = <span class="string">'1'</span></span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">SETTINGS</span> max_insert_threads = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>SETTING max_insert_threads = 1: 当设置为 1 时，表示在执行插入操作时，系统将仅使用一个线程来进行数据插入。这意味着数据插入将被序列化，一次只有一个插入操作被执行。对于小型系统或者当你不希望插入操作占用过多系统资源时，这可以是一个合适的设置。</strong></p>
+<p><strong>step3:岗位更新前后数据条数校验（数据质量保证）</strong></p>
+<p><strong>最后条数校验不通过的话，则重新删一次，插入一次，不涉及整个分区的增删操作。</strong></p>
+<h4 id="2-性能验证："><a href="#2-性能验证：" class="headerlink" title="2.性能验证："></a>2.性能验证：</h4><p>测试集群pub135  集群规模  节点规格：</p>
+<table>
+<thead>
+<tr>
+<th>容器个数</th>
+<th>CPU核数</th>
+<th>内存</th>
+<th>存储</th>
+<th>CK部署</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>150</td>
+<td>32C</td>
+<td>64G</td>
+<td>1T</td>
+<td>75shard 2 replica</td>
+</tr>
+</tbody></table>
+<p>定岗前8月29日sku增量 2千多万   涉及月增量明细约5亿8千多万</p>
+<p>删除一个月中增量+重新写入更新增量： 120s左右（单分片按月增量数据量大约百万级别）</p>
+<p>耗时：在数据条件具备的情况下完成27个月数据的增量刷岗耗时约 27*120s   约54分钟</p>
+<table>
+<thead>
+<tr>
+<th>收益预估</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>成本降低</td>
+<td>1、服务器资源成本：hive&amp;spark资源利用减少2、人力成本：每次大动作全量刷岗，需要人力介入从adm至app长链路进行刷岗，整体周期较长</td>
+</tr>
+<tr>
+<td>效率提升</td>
+<td>1、刷岗期间计算资源满负荷，导致集市资源紧张，数据分析和计算任务任务时间耗时长。</td>
+</tr>
+</tbody></table>
+<h3 id="3-预知存在问题点"><a href="#3-预知存在问题点" class="headerlink" title="3.预知存在问题点"></a>3.预知存在问题点</h3><p>1.初始化全量数据依赖维表，数据量较大约20亿，无法使用增量方式更新</p>
+<p>目前解决方案：需要按月拆分维表，对明细数据进行按月的方式初始化（与当前线上方式一样采用按月方式进行初始化）</p>
+<p><img src="//littleforestjia.github.io/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/6.jpg" alt></p>
+<p>2.若增量维表数据突然变大，节点内存无法承受</p>
+<p>目前方案验证采用抽样方式，选取采样日期中较大量级的增量去验证，无法具有包含兼容所有可能性，不排除可能存在增量维表数据突然翻倍的可能性，导致节点无法全量加载。</p>
+<p>解决方案：将增量维表进行拆分，如将增量维表数据拆分成两部分分别加载到集群维表中（按照skuid hash 取模进行数据分组）然后分两次加载分别进行岗位的更新，带来影响是时间成本翻倍。</p>
+<p>3.整个刷岗都是依赖以sku散列的基础表做数据的重分布，无法从根本上解决数据shuffle所带来的数据传输所带来的性能开销。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+            <a href="/tags/%E5%88%B7%E5%B2%97/" rel="tag"><i class="fa fa-tag"></i> 刷岗</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/06/ClickHouse_ClickHouse%E8%B7%A8%E9%9B%86%E7%BE%A4%E8%BF%81%E7%A7%BB%E6%95%B0%E6%8D%AE%E8%A1%A8%E5%B7%A5%E5%85%B7/" rel="next" title="ClickHouse_ClickHouse跨集群迁移数据表工具">
+                <i class="fa fa-chevron-left"></i> ClickHouse_ClickHouse跨集群迁移数据表工具
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/08/ClickHouse_ClickHouse%E6%95%B0%E6%8D%AE%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86/" rel="prev" title="ClickHouse_ClickHouse数据生命周期管理">
+                ClickHouse_ClickHouse数据生命周期管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClickHouse-clickhouse流量商详明细刷岗实战"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_clickhouse流量商详明细刷岗实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、背景"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、当前线上逻辑"><span class="nav-number">1.2.</span> <span class="nav-text">二、当前线上逻辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、基于增量刷岗的新方案"><span class="nav-number">1.3.</span> <span class="nav-text">三、基于增量刷岗的新方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方案一：基于增量的update"><span class="nav-number">1.3.1.</span> <span class="nav-text">方案一：基于增量的update</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-join引擎"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">1.join引擎</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-刷岗步骤"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">2.刷岗步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-新建带索引明细的表整体性能评估"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">3.新建带索引明细的表整体性能评估</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案二：基于增量明细的先删后写"><span class="nav-number">1.3.2.</span> <span class="nav-text">方案二：基于增量明细的先删后写</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-刷岗步骤："><span class="nav-number">1.3.2.1.</span> <span class="nav-text">1.刷岗步骤：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-性能验证："><span class="nav-number">1.3.2.2.</span> <span class="nav-text">2.性能验证：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-预知存在问题点"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.预知存在问题点</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

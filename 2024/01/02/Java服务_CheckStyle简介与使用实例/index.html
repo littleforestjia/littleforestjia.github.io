@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,CheckStyle,Maven," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_CheckStyle简介与使用实例CheckStyle是一个帮助java开发人员遵守某些编写规范的工具，它能够自动化代码规范检查过程，从而使得开发人员从这项重要但是细致枯燥的工作中解脱出来。 checkstyle配置有两种配置方式，一种为安装插件，这种方式只能在本地运行代码是生效进行检查；第二种是添加maven依赖配置，这种在任意地方打包运行代码时都需要进行检查，推荐使用这种。Ide">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_CheckStyle简介与使用实例">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/02/Java%E6%9C%8D%E5%8A%A1_CheckStyle%E7%AE%80%E4%BB%8B%E4%B8%8E%E4%BD%BF%E7%94%A8%E5%AE%9E%E4%BE%8B/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_CheckStyle简介与使用实例CheckStyle是一个帮助java开发人员遵守某些编写规范的工具，它能够自动化代码规范检查过程，从而使得开发人员从这项重要但是细致枯燥的工作中解脱出来。 checkstyle配置有两种配置方式，一种为安装插件，这种方式只能在本地运行代码是生效进行检查；第二种是添加maven依赖配置，这种在任意地方打包运行代码时都需要进行检查，推荐使用这种。Ide">
+<meta property="article:published_time" content="2024-01-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:37:44.048Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="CheckStyle">
+<meta property="article:tag" content="Maven">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/02/Java服务_CheckStyle简介与使用实例/"/>
+
+
+
+
+
+  <title>Java服务_CheckStyle简介与使用实例 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/02/Java%E6%9C%8D%E5%8A%A1_CheckStyle%E7%AE%80%E4%BB%8B%E4%B8%8E%E4%BD%BF%E7%94%A8%E5%AE%9E%E4%BE%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_CheckStyle简介与使用实例</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-02T00:00:00+08:00">
+                2024-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-CheckStyle简介与使用实例"><a href="#Java服务-CheckStyle简介与使用实例" class="headerlink" title="Java服务_CheckStyle简介与使用实例"></a>Java服务_CheckStyle简介与使用实例</h1><p>CheckStyle是一个帮助java开发人员遵守某些编写规范的工具，它能够自动化代码规范检查过程，从而使得开发人员从这项重要但是细致枯燥的工作中解脱出来。</p>
+<p>checkstyle配置有两种配置方式，一种为安装插件，这种方式只能在本地运行代码是生效进行检查；第二种是添加maven依赖配置，这种在任意地方打包运行代码时都需要进行检查，推荐使用这种。<a href="https://blog.csdn.net/m0_58969296/article/details/128054864" target="_blank" rel="noopener">Idea如何配置CheckStyle</a></p>
+<p><strong>1.添加checkstyle.xml文件</strong></p>
+<p>checkstyle.xml中有各种各样的检测规则，不通过则无法将代码成功打包，每个配置项对应的具体检查项目可以参考<a href="https://blog.csdn.net/rothschild666/article/details/106794374/" target="_blank" rel="noopener">Checkstyle全局配置中style_template.xml创建方法</a>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">module</span> <span class="meta-keyword">PUBLIC</span></span></span><br><span class="line"><span class="meta">        <span class="meta-string">"-//Puppy Crawl//DTD Check Configuration 1.3//EN"</span></span></span><br><span class="line"><span class="meta">        <span class="meta-string">"http://www.puppycrawl.com/dtds/configuration_1_3.dtd"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"Checker"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"FileTabCharacter"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RegexpMultiline"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"[\r]?\n[\r]?\n[\r]?\n"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"message"</span> <span class="attr">value</span>=<span class="string">"Multiple consecutive blank lines"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RegexpMultiline"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"[\r]?\n[\r]?\n\Z"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"message"</span> <span class="attr">value</span>=<span class="string">"Blank line before end of file"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RegexpMultiline"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"Preconditions\.checkNotNull"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"message"</span> <span class="attr">value</span>=<span class="string">"Use of checkNotNull"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RegexpMultiline"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"^[ \t]*import org.testng.Assert;$"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"message"</span> <span class="attr">value</span>=<span class="string">"org.testng.Assert should only be used with static imports"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RegexpMultiline"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"^[ \t]*import org.jetbrains.annotations.NotNull;$"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"message"</span> <span class="attr">value</span>=<span class="string">"Not null is the default for the codebase and should not be annotated"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RegexpMultiline"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"^[ \t]*import org.jetbrains.annotations.Nullable;$"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"message"</span> <span class="attr">value</span>=<span class="string">"Use javax.annotation.Nullable instead of org.jetbrains.annotations.Nullable"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"TreeWalker"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"EmptyBlock"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"option"</span> <span class="attr">value</span>=<span class="string">"text"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"tokens"</span> <span class="attr">value</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">                LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF,</span></span></span><br><span class="line"><span class="tag"><span class="string">                LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"EmptyStatement"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"EmptyForInitializerPad"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"EmptyForIteratorPad"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"option"</span> <span class="attr">value</span>=<span class="string">"space"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"MethodParamPad"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"allowLineBreaks"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"option"</span> <span class="attr">value</span>=<span class="string">"nospace"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"ParenPad"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"TypecastParenPad"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"LeftCurly"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"option"</span> <span class="attr">value</span>=<span class="string">"eol"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"tokens"</span> <span class="attr">value</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">                 LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR,</span></span></span><br><span class="line"><span class="tag"><span class="string">                 LITERAL_IF, LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"GenericWhitespace"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"WhitespaceAfter"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"NoWhitespaceBefore"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"UpperEll"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"DefaultComesLast"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"ArrayTypeStyle"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"MultipleVariableDeclarations"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"ModifierOrder"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"OneStatementPerLine"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"StringLiteralEquality"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"EqualsHashCode"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"InnerAssignment"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"MemberName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"LocalVariableName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"LocalFinalVariableName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"TypeName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"PackageName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"ParameterName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"StaticVariableName"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"ClassTypeParameterName"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"^[A-Z][0-9]?$"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"MethodTypeParameterName"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"format"</span> <span class="attr">value</span>=<span class="string">"^[a-zA-Z0-9]+$"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"AvoidStarImport"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"RedundantImport"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"UnusedImports"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"ImportOrder"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"groups"</span> <span class="attr">value</span>=<span class="string">"*,javax,java"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"separated"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"option"</span> <span class="attr">value</span>=<span class="string">"bottom"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sortStaticImportsAlphabetically"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span> <span class="attr">name</span>=<span class="string">"WhitespaceAround"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"allowEmptyConstructors"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"allowEmptyMethods"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"ignoreEnhancedForColon"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"tokens"</span> <span class="attr">value</span>=<span class="string">"</span></span></span><br><span class="line"><span class="tag"><span class="string">                ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN,</span></span></span><br><span class="line"><span class="tag"><span class="string">                BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, EQUAL, GE, GT, LAND, LE,</span></span></span><br><span class="line"><span class="tag"><span class="string">                LITERAL_ASSERT, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE,</span></span></span><br><span class="line"><span class="tag"><span class="string">                LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN,</span></span></span><br><span class="line"><span class="tag"><span class="string">                LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE,</span></span></span><br><span class="line"><span class="tag"><span class="string">                LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL,</span></span></span><br><span class="line"><span class="tag"><span class="string">                PLUS, PLUS_ASSIGN, QUESTION, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN,</span></span></span><br><span class="line"><span class="tag"><span class="string">                STAR, STAR_ASSIGN, TYPE_EXTENSION_AND"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2.在maven配置文件中添加checkstyle插件依赖</strong></p>
+<p>配置插件在项目编译、打包时进行检查：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-checkstyle-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.17<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!--此处是checkstyle.xml文件放置位置，可根据实际位置进行修改--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">configLocation</span>&gt;</span>src/checkstyle/checkstyle.xml<span class="tag">&lt;/<span class="name">configLocation</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">encoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">encoding</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">skip</span>&gt;</span>false<span class="tag">&lt;/<span class="name">skip</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">failOnViolation</span>&gt;</span>true<span class="tag">&lt;/<span class="name">failOnViolation</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">failsOnError</span>&gt;</span>true<span class="tag">&lt;/<span class="name">failsOnError</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">consoleOutput</span>&gt;</span>true<span class="tag">&lt;/<span class="name">consoleOutput</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">includeTestSourceDirectory</span>&gt;</span>true<span class="tag">&lt;/<span class="name">includeTestSourceDirectory</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">executions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">id</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">phase</span>&gt;</span>validate<span class="tag">&lt;/<span class="name">phase</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">goals</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">goal</span>&gt;</span>check<span class="tag">&lt;/<span class="name">goal</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">goals</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">execution</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">executions</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.puppycrawl.tools<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>checkstyle<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">version</span>&gt;</span>6.15<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3.check不通过case日志</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">#16 [compiler 2&#x2F;2] RUN --mount&#x3D;type&#x3D;secret,id&#x3D;security-signature,target&#x3D;&#x2F;opt&#x2F;local&#x2F;sign&#x2F;signer.jks,required&#x3D;true,mode&#x3D;0400,uid&#x3D;1000,gid&#x3D;1000 --mount&#x3D;type&#x3D;bind,from&#x3D;git,src&#x3D;&#x2F;workspace&#x2F;source,rw&#x3D;true,target&#x3D;&#x2F;source --mount&#x3D;type&#x3D;bind,from&#x3D;cache,src&#x3D;&#x2F;workspace&#x2F;cache,rw&#x3D;true,target&#x3D;&#x2F;root&#x2F;.m2&#x2F;repository&#x2F; cd &#x2F;source&#x2F; &amp;&amp; sh compile-1688468468.sh &amp;&amp; artifact_path&#x3D;&#96;find &#x2F;source&#x2F;core&#x2F;target -type f -maxdepth 1 -name &quot;*.zip&quot;|head -1&#96;; if [ &quot;$artifact_path&quot; !&#x3D; &quot;&quot; ]; then mkdir -p &#x2F;workspace&#x2F;result-zip&#x2F; ;mv $&#123;artifact_path&#125; &#x2F;workspace&#x2F;result-zip&#x2F;&#x2F;sv-arch-data-asset-drive-20230704.190108.673-9e7918d2.zip; else echo &quot;zip file not found&quot; &amp;&amp; exit 1; fi &amp;&amp; cp -r &#x2F;root&#x2F;.m2&#x2F;repository&#x2F; &#x2F;workspace&#x2F;cache &amp;&amp; echo 1688468468</span><br><span class="line">#16 15.82 [INFO] Starting audit...</span><br><span class="line">#16 15.82 [ERROR] &#x2F;source&#x2F;core&#x2F;src&#x2F;main&#x2F;java&#x2F;com&#x2F;jd&#x2F;bdaa&#x2F;arch&#x2F;helper&#x2F;drive&#x2F;meta&#x2F;update&#x2F;DriveLogicTableHelper.java:74:15: Unused import - com.jd.bdaa.arch.common.util.JsonUtil.toJsonString. [UnusedImports]</span><br><span class="line">#16 15.82 Audit done.</span><br><span class="line">#16 15.82 [INFO] ------------------------------------------------------------------------</span><br><span class="line">#16 15.82 [INFO] Reactor Summary:</span><br><span class="line">#16 15.82 [INFO] </span><br><span class="line">#16 15.82 [INFO] meta-data-center ................................... SUCCESS [  1.024 s]</span><br><span class="line">#16 15.82 [INFO] common ............................................. SUCCESS [  1.471 s]</span><br><span class="line">#16 15.82 [INFO] provider ........................................... SUCCESS [  2.908 s]</span><br><span class="line">#16 15.82 [INFO] core ............................................... FAILURE [  8.943 s]</span><br><span class="line">#16 15.82 [INFO] ------------------------------------------------------------------------</span><br><span class="line">#16 15.82 [INFO] BUILD FAILURE</span><br><span class="line">#16 15.82 [INFO] ------------------------------------------------------------------------</span><br><span class="line">#16 15.82 [INFO] Total time: 14.806 s (Wall Clock)</span><br><span class="line">#16 15.82 [INFO] Finished at: 2023-07-04T11:01:35+00:00</span><br><span class="line">#16 16.06 [INFO] Final Memory: 57M&#x2F;3968M</span><br><span class="line">#16 16.06 [INFO] ------------------------------------------------------------------------</span><br><span class="line">#16 16.06 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-checkstyle-plugin:2.17:check (validate) on project meta-data-center-core: Failed during checkstyle execution: There is 1 error reported by Checkstyle 6.15 with src&#x2F;checkstyle&#x2F;checkstyle.xml ruleset. -&gt; [Help 1]</span><br><span class="line">#16 16.06 [ERROR] </span><br><span class="line">#16 16.06 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.</span><br><span class="line">#16 16.06 [ERROR] Re-run Maven using the -X switch to enable full debug logging.</span><br><span class="line">#16 16.06 [ERROR] </span><br><span class="line">#16 16.06 [ERROR] For more information about the errors and possible solutions, please read the following articles:</span><br><span class="line">#16 16.06 [ERROR] [Help 1] http:&#x2F;&#x2F;cwiki.apache.org&#x2F;confluence&#x2F;display&#x2F;MAVEN&#x2F;MojoExecutionException</span><br><span class="line">#16 16.06 [ERROR] </span><br><span class="line">#16 16.06 [ERROR] After correcting the problems, you can resume the build with the command</span><br><span class="line">#16 16.06 [ERROR]   mvn &lt;goals&gt; -rf :meta-data-center-core</span><br><span class="line">#16 16.16 zip file not found</span><br><span class="line">#16 ERROR: process &quot;&#x2F;bin&#x2F;sh -c cd &#x2F;source&#x2F; &amp;&amp; sh compile-1688468468.sh &amp;&amp; artifact_path&#x3D;&#96;find &#x2F;source&#x2F;core&#x2F;target -type f -maxdepth 1 -name \&quot;*.zip\&quot;|head -1&#96;; if [ \&quot;$artifact_path\&quot; !&#x3D; \&quot;\&quot; ]; then mkdir -p &#x2F;workspace&#x2F;result-zip&#x2F; ;mv $&#123;artifact_path&#125; &#x2F;workspace&#x2F;result-zip&#x2F;&#x2F;sv-arch-data-asset-drive-20230704.190108.673-9e7918d2.zip; else echo \&quot;zip file not found\&quot; &amp;&amp; exit 1; fi &amp;&amp; cp -r &#x2F;root&#x2F;.m2&#x2F;repository&#x2F; &#x2F;workspace&#x2F;cache &amp;&amp; echo 1688468468&quot; did not complete successfully: exit code: 1</span><br><span class="line">time&#x3D;&quot;2023-07-04T19:01:36+08:00&quot; level&#x3D;debug msg&#x3D;&quot;stopping session&quot; spanID&#x3D;c4ab0fc4fe816012 traceID&#x3D;2ddd84b5c89aaa61a3455edf7eda9d18</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/CheckStyle/" rel="tag"><i class="fa fa-tag"></i> CheckStyle</a>
+          
+            <a href="/tags/Maven/" rel="tag"><i class="fa fa-tag"></i> Maven</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/01/ClickHouse_BitMap%E5%9C%A8hive%E5%92%8Cck%E4%B8%AD%E7%9A%84%E5%AD%98%E5%82%A8%E4%B8%8E%E4%B8%A4%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E4%BC%A0%E8%BE%93/" rel="next" title="ClickHouse_BitMap在hive和ck中的存储与两者之间的传输">
+                <i class="fa fa-chevron-left"></i> ClickHouse_BitMap在hive和ck中的存储与两者之间的传输
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/03/ClickHouse_ClickHouse%E6%8C%89%E6%9C%AC%E5%9C%B0%E8%A1%A8%E6%8E%A8%E6%95%B0%E7%BB%84%E4%BB%B6%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BB%A3%E7%A0%81%E5%AE%9E%E6%88%98/" rel="prev" title="ClickHouse_ClickHouse按本地表推数组件原理与代码实战">
+                ClickHouse_ClickHouse按本地表推数组件原理与代码实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-CheckStyle简介与使用实例"><span class="nav-number">1.</span> <span class="nav-text">Java服务_CheckStyle简介与使用实例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

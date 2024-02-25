@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,倾斜治理," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBase倾斜治理专利与实战代码一、专利撰写一种多维度组合rowkey的HBase表数据倾斜治理方法技术领域本发明属于HBase数据库技术领域，具体涉及一种针对由聚集维度组成rowkey的HBase表的数据倾斜治理方法。 背景技术HBase是一种非关系型数据库，适合于存储非结构化数据，具有高可靠性、高性能、面向列、可伸缩、分布式等特点。HBase数据库构建于Hadoop分布式文件系统之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBase倾斜治理专利与实战代码">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBase倾斜治理专利与实战代码一、专利撰写一种多维度组合rowkey的HBase表数据倾斜治理方法技术领域本发明属于HBase数据库技术领域，具体涉及一种针对由聚集维度组成rowkey的HBase表的数据倾斜治理方法。 背景技术HBase是一种非关系型数据库，适合于存储非结构化数据，具有高可靠性、高性能、面向列、可伸缩、分布式等特点。HBase数据库构建于Hadoop分布式文件系统之">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/3.jpg">
+<meta property="article:published_time" content="2024-01-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:41:56.770Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="倾斜治理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/22/HBase_HBase倾斜治理专利与实战代码/"/>
+
+
+
+
+
+  <title>HBase_HBase倾斜治理专利与实战代码 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBase倾斜治理专利与实战代码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-22T00:00:00+08:00">
+                2024-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-HBase倾斜治理专利与实战代码"><a href="#HBase-HBase倾斜治理专利与实战代码" class="headerlink" title="HBase_HBase倾斜治理专利与实战代码"></a>HBase_HBase倾斜治理专利与实战代码</h1><h2 id="一、专利撰写"><a href="#一、专利撰写" class="headerlink" title="一、专利撰写"></a>一、专利撰写</h2><h3 id="一种多维度组合rowkey的HBase表数据倾斜治理方法"><a href="#一种多维度组合rowkey的HBase表数据倾斜治理方法" class="headerlink" title="一种多维度组合rowkey的HBase表数据倾斜治理方法"></a>一种多维度组合rowkey的HBase表数据倾斜治理方法</h3><h4 id="技术领域"><a href="#技术领域" class="headerlink" title="技术领域"></a>技术领域</h4><p>本发明属于HBase数据库技术领域，具体涉及一种针对由聚集维度组成rowkey的HBase表的数据倾斜治理方法。</p>
+<h4 id="背景技术"><a href="#背景技术" class="headerlink" title="背景技术"></a>背景技术</h4><p>HBase是一种非关系型数据库，适合于存储非结构化数据，具有高可靠性、高性能、面向列、可伸缩、分布式等特点。HBase数据库构建于Hadoop分布式文件系统之上，通过底层HDFS的副本机制实现数据的冗余存储，在物理存储上以列簇的形式实现KV数据的存储，具有极其出色的读写性能。</p>
+<p>数据应用平台为了使用更加灵活的聚合维度组合方式进行批量数据查询，使用不同聚合维度范围从大到小的拼接的方式组成rowkey，在此基础之上使用rowkey前缀查询即可实现查询不同维度的批量数据。比如一张HBase表中存储了SKU商品数据，使用商品的一级类目id+二级类目id+三级类目id作为rowkey，在进行数据查询时，只输入一级类目id维度即可高效快速地查询出该一级类目id下的所有SKU商品数据，输入一级类目id+二级类目id维度组合即可高效快速地查询出该二级类目组合下的所有SKU商品数据，输入一级类目id+二级类目id+三级类目id维度组合即可高效快速地查询出该三级类目组合下的所有SKU商品数据。</p>
+<p>数据应用平台使用上述灵活的聚合维度组合拼接rowkey，配合rowkey前缀查询可以高效定位目标数据，避免了将HBase全表数据全量读取到内存再进行过滤，实现了高效查询、资源占用少、响应速度快等优点。但是这种携带业务逻辑的rowkey设计则会导致rowkey的不均匀分布，无论是采用HexStringSplit还是UniformSplit等预分区算法，当组成rowkey的首个业务维度值分布较为集中时，一定会造成HBase表的分区倾斜，大量数据集中在单个RegionServer上，导致单个节点存储和查询压力过大，夜间生产推数时效延迟。</p>
+<p>鉴于上述HBase数据库存储现状，有必要针对数据倾斜和热点问题加以治理，因此设计一种针对由业务维度组成rowkey的HBase表数据倾斜治理方法，显得十分迫切和重要。</p>
+<h4 id="发明内容"><a href="#发明内容" class="headerlink" title="发明内容"></a>发明内容</h4><p>本发明的目的是克服现有技术的不足，提供一种针对由业务维度组成rowkey的HBase表数据倾斜治理方法，该方法能够解决HBase表的数据倾斜和热点问题，避免HBase集群出现单个节点存储和访问压力过大。</p>
+<p>为了克服现有技术问题，本发明是通过以下技术方案实现的：</p>
+<p>1）一种针对由业务维度组成rowkey的HBase表数据倾斜治理方法，特征在于利用Export工具扫描所述原数据倾斜HBase表生成快照，并将快照文件转存在可读取的HDFS分布式文件系统目录上。</p>
+<p>2）按上述技术方案，所述倾斜治理工具主要包含快照读取模块与数据重推模块，HBase倾斜数据读取与治理后数据重写分两步独立进行。</p>
+<p>3）按上述技术方案，所述快照读取模块采用MapReduce计算模型读取原数据倾斜HBase表快照，采用字节码预分区算法对单个region的rowkey范围进行均等拆分，实现多个map并行读取单个region。</p>
+<p>4）按上述技术方案，所述快照读取模块按照业务字段数据类型元数据对表中字节码数据进行反序列化解码，对不同数据类型的数据使用不同的解码算法，得到具有完整业务含义的原始数据。</p>
+<p>5）按上述技术方案，所述快照读取模块使用水平制表符作为业务原始数据行的列分隔符，以字符串的心事保存到Text中间存储文件中。</p>
+<p>6）按上述技术方案，所述快照读取模块以Bzip2压缩格式对Text中间存储文件进行压缩。</p>
+<p>7）按上述技术方案，所述快照读取模块在倾斜数据读取解析过程中统计元HBase表数据总行数。</p>
+<p>8）按上述技术方案，所述数据重推模块采用MapReduce计算模型读取Bzip2压缩格式的Text中间存储文件，对单个文件按照数据量均分为多份，使用多个map并发读取。</p>
+<p>9）按上述技术方案，所述数据重推模块对组成rowkey的首个业务维度字段原始数据进行反转散列。</p>
+<p>10）按上述技术方案，所述数据重推模块将反转散列后的rowkey与其他原始业务字段数据进行编码后存储到hfile中，以BulkLoad形式将hfile直接推送到HBase目录中。</p>
+<p>11）按上述技术方案，所述数据重推模块在数据重推过程中统计治理后数据总行数，并随机挑选一个rowkey获取行数据，验证倾斜治理前后数据总量一致性和正确性。</p>
+<p>本发明提供的HBase表数据倾斜治理方法与现有技术相比，具有以下有益技术效果：将原数据倾斜HBase表直接底层hfile层面生成快照保存到HDFS目录上，再使用快照读取模块读取倾斜数据，避免直接全表扫描线上HBase集群，造成RegionServer压力过大；采用字节码预分区算法对每个region的rowkey范围进行预拆分，实现多个map并行读取单个region，成倍缩减了快照读取时间；按照HBase原数据字段类型将表中字节码数据进行反序列化，保证数据正确性，避免编码方式错误造成乱码导致数据失真；Bzip2压缩格式存储Text中间文件，占用HDFS存储资源缩减至十分之一；将数据推入HBase新表时，将组成rowkey的首个业务字段进行反转再拼接rowkey，将不同业务字段值尽可能散列开来，避免聚集，同时还能实现灵活的业务维度组合精确快速查询；比对倾斜治理前后HBase表中数据总行数与随机数据行值，确保了倾斜治理前后数据总量一致性与数据正确性。</p>
+<h4 id="附图说明"><a href="#附图说明" class="headerlink" title="附图说明"></a>附图说明</h4><p>图1为本发明的整体流程示意图。</p>
+<p>图2为本发明所述的一个HBase表倾斜治理前region数据分布图。</p>
+<p>图3为本发明所述的一个HBase表倾斜治理后region数据分布图。</p>
+<p>图1:</p>
+<p><img src="//littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/1.jpg" alt></p>
+<p>图2:</p>
+<p><img src="//littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/2.jpg" alt></p>
+<p>图3:</p>
+<p><img src="//littleforestjia.github.io/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/3.jpg" alt></p>
+<h2 id="二、实战代码"><a href="#二、实战代码" class="headerlink" title="二、实战代码"></a>二、实战代码</h2><h3 id="1-HBaseSnapshotRead快照读取模块"><a href="#1-HBaseSnapshotRead快照读取模块" class="headerlink" title="1.HBaseSnapshotRead快照读取模块"></a>1.HBaseSnapshotRead快照读取模块</h3><p>主程序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetHbaseTool</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(GetHbaseTool<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> OptionsProcessor optionsProcessor = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">1</span>;</span><br><span class="line">        config(args);</span><br><span class="line">        System.out.println(<span class="string">"get hbase !"</span>);</span><br><span class="line">        res = ToolRunner.run(<span class="keyword">new</span> Configuration(), <span class="keyword">new</span> GetHbaseTool(), args);</span><br><span class="line">        System.exit(res);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">        String hdfsUrl = optionsProcessor.getHdfsUrl();</span><br><span class="line">        <span class="comment">//String hdfsUrl = "hdfs://ns22017"</span></span><br><span class="line"></span><br><span class="line">        JobConf conf = <span class="keyword">new</span> JobConf();</span><br><span class="line">        logger.warn(<span class="string">"fs.defaultFS:"</span> + hdfsUrl);</span><br><span class="line">        conf.set(<span class="string">"fs.defaultFS"</span>, hdfsUrl);</span><br><span class="line">        conf.setInt(<span class="string">"mapreduce.map.cpu.vcores"</span>, <span class="number">2</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.map.memory.mb"</span>, <span class="string">"4096"</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.map.java.opts"</span>, <span class="string">"-Xmx3g"</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.task.timeout"</span>, <span class="string">"1800000"</span>);</span><br><span class="line"></span><br><span class="line">        Scan scan = <span class="keyword">new</span> Scan();</span><br><span class="line">        scan.setCaching(Integer.parseInt(<span class="string">"5000"</span>));</span><br><span class="line">        scan.setCacheBlocks(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        String startRow = <span class="string">""</span>;</span><br><span class="line">        String stopRow = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotEmpty(startRow)) &#123;</span><br><span class="line">            scan.setStartRow(startRow.getBytes());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isNotEmpty(stopRow)) &#123;</span><br><span class="line">            scan.setStopRow(stopRow.getBytes());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String hbaseSplit = optionsProcessor.getSplitAlgorithm();</span><br><span class="line">        <span class="comment">//String hbaseSplit = "UniformSplit";</span></span><br><span class="line">        String snapshotName = optionsProcessor.getSnapshotName();</span><br><span class="line">        <span class="comment">//String snapshotName = "sanpshot_HB_IBD_SHOP_DIAGNOSIS_INDICATOR_MARKETINGTOOLS";</span></span><br><span class="line">        Integer numSplitsPerRegion = optionsProcessor.getNumSplitsPerRegion();</span><br><span class="line">        <span class="comment">//Integer numSplitsPerRegion = "3";</span></span><br><span class="line">        String hbaseRootDir = optionsProcessor.getHbaseRootDir();</span><br><span class="line">        <span class="comment">//String hbaseRootDir = "hdfs://ns22017/user/ads_sz_load/hfile_convert/origin";</span></span><br><span class="line">        String outputPath = optionsProcessor.getOutputPath();</span><br><span class="line">        <span class="comment">//String outputPath = "/user/ads_sz_load/hbasetohive/result/";</span></span><br><span class="line">        String tmpPath = optionsProcessor.getTmpPath();</span><br><span class="line">        <span class="comment">//String tmpPath = "/user/ads_sz_load/hbasetohive/tmp/snapshot"</span></span><br><span class="line">        String firstRowKeyType = optionsProcessor.getFirstRowKeyType();</span><br><span class="line">        <span class="comment">//String firstRowKeyType = "long";</span></span><br><span class="line">        String compressionAlgorithm = optionsProcessor.getCompressionAlgorithm();</span><br><span class="line">        <span class="comment">//String firstRowKeyType = "null";</span></span><br><span class="line"></span><br><span class="line">        conf.setFloat(<span class="string">"hbase.tablesnapshotinputformat.locality.cutoff.multiplier"</span>, Float.parseFloat(<span class="string">"0.8f"</span>));</span><br><span class="line">        conf.setInt(<span class="string">"hbase.snapshot.thread.pool.max"</span>, <span class="number">8</span>);</span><br><span class="line">        conf.setInt(<span class="string">"hbase.snapshot.thread.pool"</span>,  <span class="number">8</span>);</span><br><span class="line">        conf.set(<span class="string">"hbase.rootdir"</span>, hbaseRootDir);</span><br><span class="line">        conf.set(<span class="string">"first.rowkey.type"</span>, firstRowKeyType);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        String outputStr = hdfsUrl + outputPath;</span><br><span class="line">        String tmpStr = hdfsUrl + tmpPath;</span><br><span class="line">        Path outPath = <span class="keyword">new</span> Path(outputStr);</span><br><span class="line">        Path tmp = <span class="keyword">new</span> Path(tmpStr);</span><br><span class="line">        logger.info(<span class="string">"outPath:"</span> + outputStr);</span><br><span class="line">        logger.info(<span class="string">"tmpPath:"</span> + tmpStr);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            FileSystem fileSystem = FileSystem.get(conf);</span><br><span class="line">            <span class="keyword">if</span> (fileSystem.exists(outPath)) &#123;</span><br><span class="line">                fileSystem.delete(outPath, <span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            fileSystem.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e1) &#123;</span><br><span class="line">            e1.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Job job = Job.getInstance(conf, <span class="string">"GetHbaseTool"</span>);</span><br><span class="line">        job.setJarByClass(GetHbaseTool<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        RegionSplitter.SplitAlgorithm split = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"HexStringSplit"</span>.equals(hbaseSplit)) &#123;</span><br><span class="line">            split = <span class="keyword">new</span> RegionHexStringExtendSplitter();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"UniformSplit"</span>.equals(hbaseSplit)) &#123;</span><br><span class="line">            split = <span class="keyword">new</span> RegionSplitter.UniformSplit();</span><br><span class="line">        &#125;</span><br><span class="line">        logger.info(<span class="string">"SplitAlgorithm:"</span> + split.getClass().getName());</span><br><span class="line">        job.setNumReduceTasks(<span class="number">0</span>);</span><br><span class="line">        logger.info(<span class="string">"reduce size:"</span> + job.getNumReduceTasks());</span><br><span class="line">        <span class="keyword">long</span> start_time = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        Class&lt;? extends TableMapper&gt; mapper;</span><br><span class="line">        Class&lt;?&gt; outputKeyClass;</span><br><span class="line">        Class&lt;?&gt; outputValueClass;</span><br><span class="line"></span><br><span class="line">        mapper = ReverseRowkeyMapper<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        outputKeyClass = Text<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        outputValueClass = Text<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        logger.info(<span class="string">"format:"</span> + mapper.getSimpleName());</span><br><span class="line">        FileOutputFormat.setOutputPath(job, outPath);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置输出文件压缩</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"Gzip"</span>.equals(compressionAlgorithm)) &#123;</span><br><span class="line">            FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line">            FileOutputFormat.setOutputCompressorClass(job, GzipCodec<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"Bzip2"</span>.equals(compressionAlgorithm)) &#123;</span><br><span class="line">            FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line">            FileOutputFormat.setOutputCompressorClass(job, BZip2Codec<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"ZSTD"</span>.equals(compressionAlgorithm)) &#123;</span><br><span class="line">            FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line">            FileOutputFormat.setOutputCompressorClass(job, ZStandardCodec<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ParallelizeTableMapReduceUtil.initTableSnapshotMapperJob(</span><br><span class="line">                snapshotName, <span class="comment">// The name of the snapshot (of a table) to read from</span></span><br><span class="line">                scan, <span class="comment">// Scan instance to control CF and attribute selection</span></span><br><span class="line">                mapper, <span class="comment">// mapper</span></span><br><span class="line">                outputKeyClass,             <span class="comment">// mapper output key</span></span><br><span class="line">                outputValueClass,             <span class="comment">// mapper output value.</span></span><br><span class="line">                job, <span class="comment">// The current job to adjust</span></span><br><span class="line">                <span class="keyword">false</span>, <span class="comment">// upload HBase jars and jars for any of the configured job classes via the distributed cache (tmpjars)</span></span><br><span class="line">                tmp, <span class="comment">// a temporary directory to copy the snapshot files into</span></span><br><span class="line">                split, <span class="comment">// splitAlgo algorithm to split, current split algorithms support RegionSplitter.UniformSplit() and RegionSplitter.HexStringSplit()</span></span><br><span class="line">                numSplitsPerRegion <span class="comment">// how many input splits to generate per one region</span></span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> b = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">long</span> end_time = System.currentTimeMillis();</span><br><span class="line">        logger.info(<span class="string">"start:"</span> + start_time);</span><br><span class="line">        logger.info(<span class="string">"end:"</span> + end_time);</span><br><span class="line">        logger.info(<span class="string">"spent time:"</span> + (end_time - start_time) / <span class="number">1000</span>);</span><br><span class="line">        <span class="keyword">return</span> b ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">config</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        optionsProcessor = OptionsProcessor.getOptionsProcessor();</span><br><span class="line">        optionsProcessor.processOptions(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>数据读取与转换mapper</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReverseRowkeyMapper</span> <span class="keyword">extends</span> <span class="title">TableMapper</span>&lt;<span class="title">Text</span>, <span class="title">Text</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String firstRowkeyType;</span><br><span class="line">    <span class="keyword">private</span> Text writeKey = <span class="keyword">new</span> Text();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        Configuration configuration = context.getConfiguration();</span><br><span class="line">        firstRowkeyType = configuration.get(<span class="string">"first.rowkey.type"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(ImmutableBytesWritable key, Result value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != value) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">byte</span>[] rowkey = reverseFirstField(key.get(), firstRowkeyType);</span><br><span class="line">            String res = <span class="string">""</span>;</span><br><span class="line">            <span class="keyword">for</span> (Cell cell : value.listCells()) &#123;</span><br><span class="line">                String colName = Bytes.toString(cell.getQualifierArray(), cell.getQualifierOffset(), cell.getQualifierLength());</span><br><span class="line">                <span class="comment">//String colValue = Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()).replaceAll("\\n|\\r|\\t|\1|\\\\N", " ");//hbase工具类解码</span></span><br><span class="line">                <span class="keyword">byte</span>[] colValue = <span class="keyword">new</span> <span class="keyword">byte</span>[cell.getValueLength()];</span><br><span class="line">                System.arraycopy(cell.getValueArray(), cell.getValueOffset(), colValue, <span class="number">0</span>, cell.getValueLength());</span><br><span class="line"></span><br><span class="line">                res += colName + <span class="string">":"</span>;</span><br><span class="line">                res += StringHexUtils.bytesToHexString(colValue) + <span class="string">"\t"</span>;<span class="comment">//16进制字符串格式解码</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//writeKey.set(new Text(Bytes.toString(rowkey)));//hbase工具类解码</span></span><br><span class="line">            writeKey.set(<span class="keyword">new</span> Text(StringHexUtils.bytesToHexString(rowkey)));<span class="comment">//16进制字符串格式解码</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">//mapper输出中key和value之间的默认分隔符就是"\t"</span></span><br><span class="line">            context.write(writeKey, <span class="keyword">new</span> Text(res));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//对组成rowkey的首个字段进行reverse。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] reverseFirstField(<span class="keyword">byte</span>[] rowkey, String firstRowkeyType) &#123;</span><br><span class="line">        <span class="keyword">int</span> firstFieldLenth = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(firstRowkeyType.toUpperCase().equals(<span class="string">"STRING"</span>))&#123;  <span class="comment">//string方式需要单独解析 暂时不实现</span></span><br><span class="line">            <span class="keyword">return</span> rowkey;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(firstRowkeyType.toUpperCase().equals(<span class="string">"INT"</span>))&#123;  <span class="comment">//暂时只处理int和long型</span></span><br><span class="line">            firstFieldLenth =<span class="number">4</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(firstRowkeyType.toUpperCase().equals(<span class="string">"LONG"</span>))&#123;</span><br><span class="line">            firstFieldLenth =<span class="number">8</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> rowkey;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] reverseField = <span class="keyword">new</span> <span class="keyword">byte</span>[firstFieldLenth];</span><br><span class="line">        System.arraycopy(rowkey, <span class="number">0</span>, reverseField, <span class="number">0</span>, firstFieldLenth);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (firstFieldLenth == <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> reverseInt = Integer.reverse(Bytes.toInt(reverseField));</span><br><span class="line">            reverseField = Bytes.toBytes(reverseInt);</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">long</span> reverseLong = Long.reverse(Bytes.toLong(reverseField));</span><br><span class="line">            reverseField = Bytes.toBytes(reverseLong);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.arraycopy(reverseField, <span class="number">0</span>, rowkey, <span class="number">0</span>, firstFieldLenth);</span><br><span class="line">        <span class="keyword">return</span> rowkey;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并发读取工具类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ParallelizeTableMapReduceUtil</span> <span class="keyword">extends</span> <span class="title">TableMapReduceUtil</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Sets up the job for reading from a table snapshot. It bypasses hbase servers</span></span><br><span class="line"><span class="comment">     * and read directly from snapshot files.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> snapshotName       The name of the snapshot (of a table) to read from.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> scan               The scan instance with the columns, time range etc.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mapper             The mapper class to use.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> outputKeyClass     The class of the output key.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> outputValueClass   The class of the output value.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> job                The current job to adjust.  Make sure the passed job is</span></span><br><span class="line"><span class="comment">     *                           carrying all necessary HBase configuration.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> addDependencyJars  upload HBase jars and jars for any of the configured</span></span><br><span class="line"><span class="comment">     *                           job classes via the distributed cache (tmpjars).</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> tmpRestoreDir      a temporary directory to copy the snapshot files into. Current user should</span></span><br><span class="line"><span class="comment">     *                           have write permissions to this directory, and this should not be a subdirectory of rootdir.</span></span><br><span class="line"><span class="comment">     *                           After the job is finished, restore directory can be deleted.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> splitAlgo          algorithm to split</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> numSplitsPerRegion how many input splits to generate per one region</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException When setting up the details fails.</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@see</span> ParallelizeTableSnapshotInputFormat</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">initTableSnapshotMapperJob</span><span class="params">(String snapshotName, Scan scan,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                  Class&lt;? extends TableMapper&gt; mapper,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                  Class&lt;?&gt; outputKeyClass,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                  Class&lt;?&gt; outputValueClass, Job job,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                  <span class="keyword">boolean</span> addDependencyJars, Path tmpRestoreDir,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                  RegionSplitter.SplitAlgorithm splitAlgo,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                  <span class="keyword">int</span> numSplitsPerRegion)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        ParallelizeTableSnapshotInputFormat.setInput(job, snapshotName, tmpRestoreDir, splitAlgo,</span><br><span class="line">                numSplitsPerRegion);</span><br><span class="line">        initTableMapperJob(snapshotName, scan, mapper, outputKeyClass,</span><br><span class="line">                outputValueClass, job, addDependencyJars, <span class="keyword">false</span>, ParallelizeTableSnapshotInputFormat<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        resetCacheConfig(job.getConfiguration());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并发读取InputFormat类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ParallelizeTableSnapshotInputFormat</span> <span class="keyword">extends</span> <span class="title">TableSnapshotInputFormat</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(JobContext job)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        List&lt;InputSplit&gt; results = <span class="keyword">new</span> ArrayList&lt;InputSplit&gt;();</span><br><span class="line">        <span class="keyword">for</span> (ParallelizeTableSnapshotInputFormatImpl.InputSplit split : ParallelizeTableSnapshotInputFormatImpl.getSplits(job.getConfiguration())) &#123;</span><br><span class="line">            results.add(<span class="keyword">new</span> TableSnapshotRegionSplit(split));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> results;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并发读取InputFormatImpl类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ParallelizeTableSnapshotInputFormatImpl</span> <span class="keyword">extends</span> <span class="title">TableSnapshotInputFormatImpl</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Log LOG = LogFactory.getLog(ParallelizeTableSnapshotInputFormatImpl<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String SNAPSHOT_NAME_KEY = <span class="string">"hbase.TableSnapshotInputFormat.snapshot.name"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">getSnapshotName</span><span class="params">(Configuration conf)</span> </span>&#123;</span><br><span class="line">        String snapshotName = conf.get(SNAPSHOT_NAME_KEY);</span><br><span class="line">        <span class="keyword">if</span> (snapshotName == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Snapshot name must be provided"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> snapshotName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(Configuration conf)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        String snapshotName = getSnapshotName(conf);</span><br><span class="line"></span><br><span class="line">        Path rootDir = FSUtils.getRootDir(conf);</span><br><span class="line">        FileSystem fs = rootDir.getFileSystem(conf);</span><br><span class="line"></span><br><span class="line">        SnapshotManifest manifest = getSnapshotManifest(conf, snapshotName, rootDir, fs);</span><br><span class="line"></span><br><span class="line">        List&lt;HRegionInfo&gt; regionInfos = getRegionInfosFromManifest(manifest);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> mapred does not support scan as input API. Work around for now.</span></span><br><span class="line">        Scan scan = extractScanFromConf(conf);</span><br><span class="line">        <span class="comment">// the temp dir where the snapshot is restored</span></span><br><span class="line">        Path restoreDir = <span class="keyword">new</span> Path(conf.get(RESTORE_DIR_KEY));</span><br><span class="line"></span><br><span class="line">        RegionSplitter.SplitAlgorithm splitAlgo = getSplitAlgo(conf);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> numSplits = conf.getInt(NUM_SPLITS_PER_REGION, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> getSplits(scan, manifest, regionInfos, restoreDir, conf, splitAlgo, numSplits);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;InputSplit&gt; <span class="title">getSplits</span><span class="params">(Scan scan, SnapshotManifest manifest,</span></span></span><br><span class="line"><span class="function"><span class="params">                                             List&lt;HRegionInfo&gt; regionManifests, Path restoreDir,</span></span></span><br><span class="line"><span class="function"><span class="params">                                             Configuration conf, RegionSplitter.SplitAlgorithm sa, <span class="keyword">int</span> numSplits)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="comment">// load table descriptor</span></span><br><span class="line">        HTableDescriptor htd = manifest.getTableDescriptor();</span><br><span class="line"></span><br><span class="line">        Path tableDir = FSUtils.getTableDir(restoreDir, htd.getTableName());</span><br><span class="line"></span><br><span class="line">        <span class="comment">///// added</span></span><br><span class="line">        Map&lt;String, Future&lt;HDFSBlocksDistribution&gt;&gt; blockDistributions = getHDFSBlockDistributionForAllRegions(conf, htd, tableDir, regionManifests);</span><br><span class="line">        HDFSBlocksDistribution blockDistribution;</span><br><span class="line">        <span class="comment">/////</span></span><br><span class="line">        List&lt;InputSplit&gt; splits = <span class="keyword">new</span> ArrayList&lt;InputSplit&gt;();</span><br><span class="line">        <span class="keyword">for</span> (HRegionInfo hri : regionManifests) &#123;</span><br><span class="line">            <span class="comment">// load region descriptor</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                blockDistribution = blockDistributions.get(hri.getEncodedName()).get();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException | ExecutionException e) &#123;</span><br><span class="line">                blockDistribution = <span class="keyword">new</span> HDFSBlocksDistribution();</span><br><span class="line">                LOG.error(e.getMessage());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (blockDistribution == <span class="keyword">null</span>) &#123;</span><br><span class="line">                blockDistribution = <span class="keyword">new</span> HDFSBlocksDistribution();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (numSplits &gt; <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">byte</span>[][] sp = sa.split(hri.getStartKey(), hri.getEndKey(), numSplits, <span class="keyword">true</span>);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sp.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (CellUtil.overlappingKeys(scan.getStartRow(), scan.getStopRow(), sp[i],</span><br><span class="line">                            sp[i + <span class="number">1</span>])) &#123;</span><br><span class="line">                        <span class="comment">// compute HDFS locations from snapshot files (which will get the locations for</span></span><br><span class="line">                        <span class="comment">// referred hfiles)</span></span><br><span class="line">                        <span class="comment">//List&lt;String&gt; hosts = getBestLocations(conf, HRegion.computeHDFSBlocksDistribution(conf, htd, hri, tableDir));</span></span><br><span class="line">                        List&lt;String&gt; hosts = getBestLocations(conf, blockDistribution);<span class="comment">//added</span></span><br><span class="line">                        <span class="keyword">int</span> len = Math.min(<span class="number">3</span>, hosts.size());</span><br><span class="line">                        hosts = hosts.subList(<span class="number">0</span>, len);</span><br><span class="line">                        Scan boundedScan = <span class="keyword">new</span> Scan(scan);</span><br><span class="line">                        <span class="keyword">if</span> (scan.getStartRow().length == <span class="number">0</span>) &#123;</span><br><span class="line">                            boundedScan.withStartRow(sp[i]);</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            boundedScan.withStartRow(</span><br><span class="line">                                    Bytes.compareTo(scan.getStartRow(), sp[i]) &gt; <span class="number">0</span> ? scan.getStartRow() : sp[i]);</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">if</span> (scan.getStopRow().length == <span class="number">0</span>) &#123;</span><br><span class="line">                            boundedScan.withStopRow(sp[i + <span class="number">1</span>]);</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            boundedScan.withStopRow(</span><br><span class="line">                                    Bytes.compareTo(scan.getStopRow(), sp[i + <span class="number">1</span>]) &lt; <span class="number">0</span> ? scan.getStopRow() : sp[i + <span class="number">1</span>]);</span><br><span class="line">                        &#125;</span><br><span class="line">                        splits.add(<span class="keyword">new</span> InputSplit(htd, hri, hosts, boundedScan, restoreDir));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (CellUtil.overlappingKeys(scan.getStartRow(), scan.getStopRow(), hri.getStartKey(),</span><br><span class="line">                        hri.getEndKey())) &#123;</span><br><span class="line">                    <span class="comment">// compute HDFS locations from snapshot files (which will get the locations for</span></span><br><span class="line">                    <span class="comment">// referred hfiles)</span></span><br><span class="line">                    <span class="comment">//List&lt;String&gt; hosts = getBestLocations(conf, HRegion.computeHDFSBlocksDistribution(conf, htd, hri, tableDir));</span></span><br><span class="line">                    List&lt;String&gt; hosts = getBestLocations(conf, blockDistribution);<span class="comment">//added</span></span><br><span class="line">                    <span class="keyword">int</span> len = Math.min(<span class="number">3</span>, hosts.size());</span><br><span class="line">                    hosts = hosts.subList(<span class="number">0</span>, len);</span><br><span class="line">                    splits.add(<span class="keyword">new</span> InputSplit(htd, hri, hosts, scan, restoreDir));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> splits;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * added</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> conf</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> htd</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> tableDir</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> regionManifests</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, Future&lt;HDFSBlocksDistribution&gt;&gt; getHDFSBlockDistributionForAllRegions(</span><br><span class="line">            <span class="keyword">final</span> Configuration conf, <span class="keyword">final</span> HTableDescriptor htd, <span class="keyword">final</span> Path tableDir,</span><br><span class="line">            List&lt;HRegionInfo&gt; regionManifests) &#123;</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Future&lt;HDFSBlocksDistribution&gt;&gt; distribution = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> nrThreads = conf.getInt(<span class="string">"hbase.snapshot.thread.pool"</span>, <span class="number">8</span>);</span><br><span class="line">        ExecutorService executor = Executors.newFixedThreadPool(nrThreads);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">final</span> HRegionInfo hri : regionManifests) &#123;</span><br><span class="line">            distribution.put(hri.getEncodedName(), executor.submit(</span><br><span class="line">                    <span class="keyword">new</span> Callable&lt;HDFSBlocksDistribution&gt;() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="function"><span class="keyword">public</span> HDFSBlocksDistribution <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                            <span class="keyword">return</span> HRegion.computeHDFSBlocksDistribution(conf, htd, hri, tableDir);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> distribution;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-HBaseBulkload数据重推模块"><a href="#2-HBaseBulkload数据重推模块" class="headerlink" title="2.HBaseBulkload数据重推模块"></a>2.HBaseBulkload数据重推模块</h3><p>主程序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoadHbaseTool</span> <span class="keyword">extends</span> <span class="title">Configured</span> <span class="keyword">implements</span> <span class="title">Tool</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(LoadHbaseTool<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> OptionsProcessor optionsProcessor = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">1</span>;</span><br><span class="line">        config(args);</span><br><span class="line">        System.out.println(<span class="string">"load hbase !"</span>);</span><br><span class="line">        res = ToolRunner.run(<span class="keyword">new</span> Configuration(), <span class="keyword">new</span> LoadHbaseTool(), args);</span><br><span class="line">        System.exit(res);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">        String hdfsUrl = optionsProcessor.getHdfsUrl();</span><br><span class="line">        <span class="comment">//String hdfsUrl = "hdfs://ns22017";</span></span><br><span class="line"></span><br><span class="line">        Configuration conf = HBaseConfiguration.create();</span><br><span class="line">        conf.set(<span class="string">"fs.defaultFS"</span>, hdfsUrl);</span><br><span class="line">        conf.setInt(<span class="string">"mapreduce.map.cpu.vcores"</span>, <span class="number">2</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.map.memory.mb"</span>, <span class="string">"4096"</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.map.java.opts"</span>, <span class="string">"-Xmx3072M"</span>);</span><br><span class="line">        conf.setInt(<span class="string">"mapreduce.reduce.cpu.vcores"</span>, <span class="number">2</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.reduce.memory.mb"</span>, <span class="string">"4096"</span>);</span><br><span class="line">        conf.set(<span class="string">"mapreduce.reduce.java.opts"</span>, <span class="string">"-Xmx3072M"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//重要：Text文件输入分片大小</span></span><br><span class="line">        Long minsize = <span class="number">1024000000L</span>;</span><br><span class="line">        conf.setLong(<span class="string">"mapreduce.input.fileinputformat.split.minsize"</span>, minsize);</span><br><span class="line"></span><br><span class="line">        String erp = optionsProcessor.getErp();</span><br><span class="line">        <span class="comment">// String erp = "shaoxiankai";</span></span><br><span class="line">        String instanceName = optionsProcessor.getInstanceName();</span><br><span class="line">        <span class="comment">//String instanceName = "SL1000000003145";</span></span><br><span class="line">        String accesskey = optionsProcessor.getAccesskey();</span><br><span class="line">        <span class="comment">//String accesskey = "MZYH5UIKEY3BUI5Y2N6AJ5YXCA";</span></span><br><span class="line">        String input = optionsProcessor.getInputPath();</span><br><span class="line">        <span class="comment">//String input = "hdfs://ns22017/user/ads_sz_load/hbasetohive/result";</span></span><br><span class="line">        String output = optionsProcessor.getOutputPath();</span><br><span class="line">        <span class="comment">//String output = "hdfs://ns22017/user/ads_sz_load/hivetohbase/result";</span></span><br><span class="line">        String tableName = optionsProcessor.getTableName();</span><br><span class="line">        <span class="comment">//String tableName = "ibd_test:HB_IBD_SHOP_DIAGNOSIS_INDICATOR_TEST";</span></span><br><span class="line"></span><br><span class="line">        conf.set(<span class="string">"bdp.hbase.erp"</span>, erp);</span><br><span class="line">        conf.set(<span class="string">"bdp.hbase.instance.name"</span>, instanceName);</span><br><span class="line">        conf.set(<span class="string">"bdp.hbase.accesskey"</span>, accesskey);</span><br><span class="line">        conf.setInt(<span class="string">"hbase.client.operation.timeout"</span>, <span class="number">600000</span>);</span><br><span class="line">        conf.setInt(<span class="string">"hbase.rpc.timeout"</span>, <span class="number">300000</span>);</span><br><span class="line">        <span class="comment">//todo 这个参数啥作用？</span></span><br><span class="line">        conf.set(<span class="string">"hbase.hregion.max.filesize"</span>,String.valueOf(<span class="number">20</span> * <span class="number">10</span> * <span class="number">1024</span> * <span class="number">1024</span> * <span class="number">1024L</span>));</span><br><span class="line">        conf.setInt(<span class="string">"hbase.mapreduce.bulkload.max.hfiles.perRegion.perFamily"</span>, <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">        Job job = Job.getInstance(conf, <span class="string">"LoadHbaseTool"</span>);</span><br><span class="line">        job.setJarByClass(LoadHbaseTool<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        job.setMapperClass(LoadHbaseMapper<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        job.setMapOutputValueClass(Put<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        job.setMapOutputKeyClass(ImmutableBytesWritable<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        job.setOutputFormatClass(HFileOutputFormat2<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">        String inputPathStrs[] = input.split(<span class="string">"\\,"</span>);</span><br><span class="line">        Path paths[] = <span class="keyword">new</span> Path[inputPathStrs.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; inputPathStrs.length; i++) &#123;</span><br><span class="line">            Path onePath = <span class="keyword">new</span> Path(inputPathStrs[i]);</span><br><span class="line">            paths[i] = onePath;</span><br><span class="line">        &#125;</span><br><span class="line">        Path outPath = <span class="keyword">new</span> Path(output);</span><br><span class="line">        logger.info(<span class="string">"inPath:"</span> + input);</span><br><span class="line">        logger.info(<span class="string">"outPath:"</span> + output);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            FileSystem fileSystem = FileSystem.get(conf);</span><br><span class="line">            <span class="keyword">if</span> (fileSystem.exists(outPath)) &#123;</span><br><span class="line">                fileSystem.delete(outPath, <span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            fileSystem.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e1) &#123;</span><br><span class="line">            e1.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        FileInputFormat.setInputPaths(job, paths);</span><br><span class="line">        FileOutputFormat.setOutputPath(job, outPath);</span><br><span class="line"></span><br><span class="line">        Connection conn = ConnectionFactory.createConnection(conf);</span><br><span class="line">        Admin admin = conn.getAdmin();</span><br><span class="line"></span><br><span class="line">        TableName hbTableName = TableName.valueOf(tableName);</span><br><span class="line">        Table realTable = conn.getTable(hbTableName);</span><br><span class="line">        RegionLocator regionLocator = conn.getRegionLocator(hbTableName);</span><br><span class="line"></span><br><span class="line">        HFileOutputFormat2.configureIncrementalLoad(job, realTable, regionLocator);</span><br><span class="line"></span><br><span class="line">        Date date = <span class="keyword">new</span> Date();</span><br><span class="line">        logger.info(<span class="string">"mr start:"</span> + date.toString());</span><br><span class="line">        <span class="keyword">boolean</span> result = job.waitForCompletion(<span class="keyword">true</span>);</span><br><span class="line">        logger.info(<span class="string">"mr end:"</span> + date.toString() + result);</span><br><span class="line">        Counters counters = job.getCounters();</span><br><span class="line">        <span class="keyword">for</span> (TaskCounter e : TaskCounter.values()) &#123;</span><br><span class="line">            logger.info(<span class="string">"job finished,"</span> + e.name() + <span class="string">":"</span> + counters.findCounter(e).getValue());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!result) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//        将HFile文件导入HBase</span></span><br><span class="line"><span class="comment">//         bulk load start</span></span><br><span class="line"><span class="comment">//         导入之前，测试mr把以下注释掉。 导入hbase则打开。需要报备。</span></span><br><span class="line">        logger.info(<span class="string">"LoadIncrementalHFiles start:"</span> + date.toString());</span><br><span class="line">        LoadIncrementalHFiles loader = <span class="keyword">new</span> LoadIncrementalHFiles(conf);</span><br><span class="line">        loader.doBulkLoad(outPath, admin, realTable, regionLocator);</span><br><span class="line">        logger.info(<span class="string">"LoadIncrementalHFiles end:"</span> + date.toString());</span><br><span class="line"></span><br><span class="line">        conn.close();</span><br><span class="line">        <span class="keyword">return</span> result ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">config</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        optionsProcessor = OptionsProcessor.getOptionsProcessor();</span><br><span class="line">        optionsProcessor.processOptions(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>数据转换mapper</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoadHbaseMapper</span> <span class="keyword">extends</span> <span class="title">Mapper</span>&lt;<span class="title">LongWritable</span>, <span class="title">Text</span>, <span class="title">ImmutableBytesWritable</span>, <span class="title">Put</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ImmutableBytesWritable writeKey = <span class="keyword">new</span> ImmutableBytesWritable();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">setup</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.setup(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">map</span><span class="params">(LongWritable key, Text value, Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != value) &#123;</span><br><span class="line">            String line = value.toString();</span><br><span class="line">            String[] items = line.split(<span class="string">"\t"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (items.length == <span class="number">0</span> || StringUtils.isBlank(items[<span class="number">0</span>].trim())) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">byte</span>[] rowkey = StringHexUtils.HexStringToBytes(items[<span class="number">0</span>]);</span><br><span class="line">                Put put = <span class="keyword">new</span> Put(rowkey);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; items.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line"></span><br><span class="line">                    put.addColumn(Bytes.toBytes(<span class="string">"d"</span>), Bytes.toBytes(items[i].split(<span class="string">":"</span>)[<span class="number">0</span>]), StringHexUtils.HexStringToBytes(items[i].split(<span class="string">":"</span>)[<span class="number">1</span>]));</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                writeKey.set(rowkey);</span><br><span class="line">                context.write(writeKey, put);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> 倾斜治理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/21/HBase_HBase%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/" rel="next" title="HBase_HBase基础概念">
+                <i class="fa fa-chevron-left"></i> HBase_HBase基础概念
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/" rel="prev" title="HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战">
+                HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-HBase倾斜治理专利与实战代码"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBase倾斜治理专利与实战代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、专利撰写"><span class="nav-number">1.1.</span> <span class="nav-text">一、专利撰写</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一种多维度组合rowkey的HBase表数据倾斜治理方法"><span class="nav-number">1.1.1.</span> <span class="nav-text">一种多维度组合rowkey的HBase表数据倾斜治理方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技术领域"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">技术领域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#背景技术"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">背景技术</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发明内容"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">发明内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#附图说明"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">附图说明</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、实战代码"><span class="nav-number">1.2.</span> <span class="nav-text">二、实战代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-HBaseSnapshotRead快照读取模块"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.HBaseSnapshotRead快照读取模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-HBaseBulkload数据重推模块"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.HBaseBulkload数据重推模块</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

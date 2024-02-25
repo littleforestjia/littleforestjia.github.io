@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,PerformanceEvaluation," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战1.背景由于数据产品业务需求增长迅速，各种各样的看数需求和面板被提出，同时低频使用的页面关停并转又不能被各级领导写到汇报ppt中去，那么存量加增量数据看版所需要的HBase存储资源自然就迅速增长。但是在降本增效和技术升级的大背景下，平台也不再对HBase物理集群进行扩容支持，并不断推动物理集群的迁移和下线，推">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战1.背景由于数据产品业务需求增长迅速，各种各样的看数需求和面板被提出，同时低频使用的页面关停并转又不能被各级领导写到汇报ppt中去，那么存量加增量数据看版所需要的HBase存储资源自然就迅速增长。但是在降本增效和技术升级的大背景下，平台也不再对HBase物理集群进行扩容支持，并不断推动物理集群的迁移和下线，推">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/2.jpg">
+<meta property="article:published_time" content="2024-01-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:42:07.574Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="PerformanceEvaluation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/23/HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战/"/>
+
+
+
+
+
+  <title>HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-23T00:00:00+08:00">
+                2024-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-HBase自带压测工具PerformanceEvaluation改造与应用实战"><a href="#HBase-HBase自带压测工具PerformanceEvaluation改造与应用实战" class="headerlink" title="HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战"></a>HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>由于数据产品业务需求增长迅速，各种各样的看数需求和面板被提出，同时低频使用的页面关停并转又不能被各级领导写到汇报ppt中去，那么存量加增量数据看版所需要的HBase存储资源自然就迅速增长。但是在降本增效和技术升级的大背景下，平台也不再对HBase物理集群进行扩容支持，并不断推动物理集群的迁移和下线，推动使用存算分离的HBase容器集群，支持更加快捷的动态扩缩容和灵活的计算存储资源比例。但是部门领导对于存算分离HBase集群的性能存疑，但是想要使用业务请求数据进行压测需要相同的集群规模和等量业务历史数据，数据回溯耗时较长且直接申请与线上集群相同规划的大集群不太现实。那么就需要寻找一种不依赖业务数据的测试方式，能够测试出不同规格或者不同实现架构HBase集群的性能差异，这时我查询资料发现了HBase开源代码中自带了一个压测工具PerformanceEvaluation。</p>
+<h3 id="2-PerformanceEvaluation原理"><a href="#2-PerformanceEvaluation原理" class="headerlink" title="2.PerformanceEvaluation原理"></a>2.PerformanceEvaluation原理</h3><p>在HBase中，自带了一个benchmark工具PerformanceEvaluation，可以非常方便地对HBase的Put、Get、Scan等API进行性能测试，并提供了非常丰富的参数来模拟各种场景。PerformanceEvaluation的全名是org.apache.hadoop.hbase.PerformanceEvaluation，已经集成在了bin/hbase工具集中，在安装好HBase的机器上，在HBase的安装路径的bin目录下执行hbase pe，加上相应参数，即可运行PE工具。执行命令格式和相关参数如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">[root@xxxxxx ~]# hbase pe</span><br><span class="line">Usage: java org.apache.hadoop.hbase.PerformanceEvaluation \</span><br><span class="line">  &lt;OPTIONS&gt; [-D&lt;property=value&gt;]* &lt;command&gt; &lt;nclients&gt;</span><br><span class="line"></span><br><span class="line">General Options:</span><br><span class="line"> nomapred        采用MapReduce的方式启动多线程测试还是通过多线程的方式，如果没有安装MapReduce，或者不想用MapReduce，通常我们采用多线程的方式，因此一般在命令中加上--nomapred来表示不使用MapReduce。  </span><br><span class="line"> rows            每个客户端(线程)运行的行。默认值：一百万。注意这里的行数是指单线程的行数，如果rows=100， 线程数为10，那么在写测试中，写入HBase的将是 100 x 10 行  </span><br><span class="line"> size            总大小,单位GiB。与--rows互斥。默认值：1.0。  </span><br><span class="line"> sampleRate      样本比例:对总行数的一部分样本执行测试。只有randomRead支持。默认值：1.0  </span><br><span class="line"> traceRate       启用HTrace跨度。每N行启动一次跟踪。默认值：0  </span><br><span class="line"> table           测试表的名字，如果不设，默认为TestTable。  </span><br><span class="line"> multiGet        如果&gt; 0，则在执行RandomRead时，执行多次获取而不是单次获取。默认值：0  </span><br><span class="line"> compress        要使用的压缩类型（GZ，LZO，...）。默认值：'无'  </span><br><span class="line"> flushCommits    该参数用于确定测试是否应该刷新表。默认值：false  </span><br><span class="line"> writeToWAL      在puts上设置writeToWAL。默认值：True  </span><br><span class="line"> autoFlush       默认为false，即PE默认用的是BufferedMutator，BufferedMutator会把数据攒在内存里，达到一定的大小再向服务器发送，如果想明确测单行Put的写入性能，建议设置为true。个人觉得PE中引入autoFlush会影响统计的准确性，因为在没有攒够足够的数据时，put操作会立马返回，根本没产生RPC，但是相应的时间和次数也会被统计在最终结果里。  </span><br><span class="line"> oneCon          多线程运行测试时，底层使用一个还是多个链接。这个参数默认值为false，每个thread都会启一个Connection，建议把这个参数设为True  </span><br><span class="line"> presplit        表的预分裂region个数，在做性能测试时一定要设置region个数，不然所有的读写会落在一个region上，严重影响性能  </span><br><span class="line"> inmemory        试图尽可能保持CF内存的HFile。不保证始终从内存中提供读取。默认值：false  </span><br><span class="line"> usetags         与KV一起写标签。与HFile V3配合使用。默认值：false  </span><br><span class="line"> numoftags       指定所需的标签号。仅当usetags为true时才有效。  </span><br><span class="line"> filterAll       通过不将任何内容返回给客户端，帮助过滤掉服务器端的所有行。通过在内部使用FilterAllFilter,帮助检查服务器端性能。  </span><br><span class="line"> latency         设置为报告操作延迟。默认值：False  </span><br><span class="line"> bloomFilter     Bloom 过滤器类型，[NONE，ROW，ROWCOL]之一  </span><br><span class="line"> valueSize       写入HBase的value的size，单位是Byte，大家可以根据自己实际的场景设置这个Value的大小。默认值：1024  </span><br><span class="line"> valueRandom     设置是否应该在0和'valueSize'之间改变值大小;设置读取大小的统计信息：默认值: Not set.  </span><br><span class="line"> valueZipf       设置是否应该以zipf格式改变0和'valueSize'之间的值大小, 默认值: Not set.  </span><br><span class="line"> period          报告每个'period'行：默认值：opts.perClientRunRows / 10  </span><br><span class="line"> multiGet        批处理组合成N组。只有randomRead支持。默认值: disabled  </span><br><span class="line"> replicas        启用区域副本测试。默认值：1。  </span><br><span class="line"> splitPolicy     为表指定自定义RegionSplitPolicy。  </span><br><span class="line"> randomSleep     在每次获得0和输入值之前进行随机睡眠。默认值：0  </span><br><span class="line"></span><br><span class="line"> Note: -D properties will be applied to the conf used.   </span><br><span class="line">  For example:   </span><br><span class="line">   -Dmapreduce.output.fileoutputformat.compress=true  </span><br><span class="line">   -Dmapreduce.task.timeout=60000  </span><br><span class="line"></span><br><span class="line">Command:  </span><br><span class="line"> filterScan      使用过滤器运行扫描测试，根据它的值查找特定行（确保使用--rows = 20）   </span><br><span class="line"> randomRead      运行随机读取测试  </span><br><span class="line"> randomSeekScan  运行随机搜索和扫描100测试  </span><br><span class="line"> randomWrite     运行随机写测试  </span><br><span class="line"> scan            运行扫描测试（每行读取）  </span><br><span class="line"> scanRange10     使用开始和停止行（最多10行）运行随机搜索扫描  </span><br><span class="line"> scanRange100    使用开始和停止行运行随机搜索扫描（最多100行）  </span><br><span class="line"> scanRange1000   使用开始和停止行（最多1000行）运行随机搜索扫描  </span><br><span class="line"> scanRange10000  使用开始和停止行运行随机搜索扫描（最多10000行）  </span><br><span class="line"> sequentialRead  运行顺序读取测试  </span><br><span class="line"> sequentialWrite 运行顺序写入测试  </span><br><span class="line"></span><br><span class="line">Args:  </span><br><span class="line"> nclients        整数。必须要有该参数。客户端总数（和HRegionServers）  </span><br><span class="line">running: 1 &lt;= value &lt;= 500  </span><br><span class="line">Examples:  </span><br><span class="line"> 运行一个单独的客户端:  </span><br><span class="line"><span class="meta"> $</span><span class="bash"> bin/hbase org.apache.hadoop.hbase.PerformanceEvaluation sequentialWrite 1</span></span><br></pre></td></tr></table></figure>
+
+<p>其中几个比较重要的全局参数如下：</p>
+<ul>
+<li>nomapred：采用MapReduce的方式启动多线程测试还是通过多线程的方式，如果没有安装MapReduce，或者不想用MapReduce，通常我们采用多线程的方式，因此一般在命令中加上–nomapred来表示不使用MapReduce。</li>
+<li>oneCon：多线程运行测试时，底层使用一个还是多个连接。这个参数默认值为false，每个thread都会启一个Connection，建议把这个参数设为True，至于原因，后面的章节会讲。</li>
+<li>valueSize：写入HBase的value的size，单位是Byte，大家可以根据自己实际的场景设置这个Value的大小。</li>
+<li>blockEncoding：PE工具会自动建表，这个参数用来指定表的block encoding。关于encoding后面会有专门的文章介绍，这里不再讲。</li>
+<li>table：测试表的名字，如果不设，默认为TestTable。</li>
+<li>rows：总共测试的行数。注意这里的行数是指单线程的行数，如果rows=100， 线程数为10，那么在写测试中，写入HBase的将是 100 x 10 行。</li>
+<li>size：总测试的数据大小，单位为GB，这个参数与上面的size是互斥的，不要两个参数一起设。在使用randomReads和randomSeekScans测试时，这个size可以用来指定读取的数据范围。这个值在Read时非常重要，如果设的不好，会产生很多返回值为空的读，影响测试结果，下面会详细介绍。</li>
+<li>compress：设置表的compress算法，根据自己选择，默认是None,即不做压缩。</li>
+<li>presplit：表的预分裂region个数，在做性能测试时一定要设置region个数，不然所有的读写会落在一个region上，严重影响性能</li>
+<li>autoFlush：默认为false，即PE默认用的是BufferedMutator，BufferedMutator会把数据攒在内存里，达到一定的大小再向服务器发送，如果想明确测单行Put的写入性能，建议设置为true。个人觉得PE中引入autoFlush会影响统计的准确性，因为在没有攒够足够的数据时，put操作会立马返回，根本没产生RPC，但是相应的时间和次数也会被统计在最终结果里。</li>
+</ul>
+<h3 id="3-PerformanceEvaluation源码改写与实战"><a href="#3-PerformanceEvaluation源码改写与实战" class="headerlink" title="3.PerformanceEvaluation源码改写与实战"></a>3.PerformanceEvaluation源码改写与实战</h3><p>我们部门是HBase集群的使用方，只能使用平台封装好的基本api进行调用，并没有到集群节点上直接执行CMD命令的权限；并且原版PerformanceEvaluation参数和功能较复杂，我们这里只是想看看HBase容器集群的极限读写QPS能不能满足要求，与物理集群有多大区别，我并不想去研究这么多配置参数并全部使用。</p>
+<p><strong>那么既然它是官方支持的封装工具，而HBase本身也是开源的，那问题就能好解了，直接扒工具源码，自己大概复刻一个简易版本就行了。这里也体现处理平时遇到问题或者疑问多看开源工程源码的好处了，有这种熟悉度和自信，之前其实我还是挺常看源码的，尤其是HBase源码，还进行过一些改造和使用，遇到疑问或者想参考解决方案看开源项目源码也是非常好的。就是最近业务需求比较紧也比较繁杂，搞得没太多时间和沉得下来的心思来看，这一点确实要反思一下自己。</strong></p>
+<p><strong>看了一下源码，其实这个PerformanceEvaluation工具本质就是自己伪造一些数据，然后开多线程按目标qps去请求集群就好了，如从0-10000的顺序rowkey写入、0-10000的随机rowkey写入、先从0-10000的顺序rowkey写入再顺序读出、先从0-10000的顺序rowkey写入再随机读出等等。</strong></p>
+<p>1.测试参数初始化类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestOptions</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String RANDOM_SEEK_SCAN = <span class="string">"randomSeekScan"</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String RANDOM_READ = <span class="string">"randomRead"</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> String PE_COMMAND_SHORTNAME = <span class="string">"pe"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(PerformanceEvaluationJava<span class="class">.<span class="keyword">class</span>.<span class="title">getName</span>())</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Gson GSON = GsonUtil.createGson().create();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String TABLE_NAME = <span class="string">"TestTable"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FAMILY_NAME_BASE = <span class="string">"info"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span>[] FAMILY_ZERO = Bytes.toBytes(<span class="string">"info0"</span>);</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span>[] COLUMN_ZERO = Bytes.toBytes(<span class="string">""</span> + <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_VALUE_LENGTH = <span class="number">500</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ROW_LENGTH = <span class="number">26</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ONE_GB = <span class="number">1000</span> * <span class="number">10</span> * <span class="number">500</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_ROWS_PER_GB = ONE_GB / DEFAULT_VALUE_LENGTH;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TAG_LENGTH = <span class="number">256</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> DecimalFormat FMT = <span class="keyword">new</span> DecimalFormat(<span class="string">"0.##"</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MathContext CXT = MathContext.DECIMAL64;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> BigDecimal MS_PER_SEC = BigDecimal.valueOf(<span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> BigDecimal BYTES_PER_MB = BigDecimal.valueOf(<span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> startRow = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">float</span> size = <span class="number">1.0f</span>;</span><br><span class="line">    <span class="keyword">int</span> perClientRunRows = DEFAULT_ROWS_PER_GB;</span><br><span class="line">    <span class="keyword">int</span> totalRows = DEFAULT_ROWS_PER_GB;</span><br><span class="line">    <span class="keyword">int</span> period = (<span class="keyword">this</span>.perClientRunRows / <span class="number">100</span>) == <span class="number">0</span>? perClientRunRows: perClientRunRows / <span class="number">100</span>;</span><br><span class="line">    <span class="keyword">int</span> valueSize = DEFAULT_VALUE_LENGTH;</span><br><span class="line">    <span class="keyword">long</span> bufferSize = <span class="number">10L</span>;</span><br><span class="line">    String tableName;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestOptions</span><span class="params">(String tableName, <span class="keyword">int</span> threadNum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.tableName = tableName;</span><br><span class="line">        <span class="keyword">this</span>.totalRows = threadNum * DEFAULT_ROWS_PER_GB;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.指标统计工具类，后续会有一篇博文专门记录java中的指标统计工具：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@InterfaceAudience</span>.Private</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">HistogramUtils</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">HistogramUtils</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> DecimalFormat DOUBLE_FORMAT = <span class="keyword">new</span> DecimalFormat(<span class="string">"#0.00"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Histogram <span class="title">newHistogram</span><span class="params">(Reservoir sample)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Constructor&lt;?&gt; ctor =</span><br><span class="line">                    Histogram<span class="class">.<span class="keyword">class</span>.<span class="title">getDeclaredConstructor</span>(<span class="title">Reservoir</span>.<span class="title">class</span>)</span>;</span><br><span class="line">            ctor.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">            <span class="keyword">return</span> (Histogram) ctor.newInstance(sample);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getShortHistogramReport</span><span class="params">(<span class="keyword">final</span> Histogram hist)</span> </span>&#123;</span><br><span class="line">        Snapshot sn = hist.getSnapshot();</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"mean="</span> + DOUBLE_FORMAT.format(sn.getMean()) +</span><br><span class="line">                <span class="string">", min="</span> + DOUBLE_FORMAT.format(sn.getMin()) +</span><br><span class="line">                <span class="string">", max="</span> + DOUBLE_FORMAT.format(sn.getMax()) +</span><br><span class="line">                <span class="string">", stdDev="</span> + DOUBLE_FORMAT.format(sn.getStdDev()) +</span><br><span class="line">                <span class="string">", 95th="</span> + DOUBLE_FORMAT.format(sn.get95thPercentile()) +</span><br><span class="line">                <span class="string">", 99th="</span> + DOUBLE_FORMAT.format(sn.get99thPercentile());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.计算结果类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RunResult</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">RunResult</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RunResult</span><span class="params">(<span class="keyword">long</span> duration, Histogram hist)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.duration = duration;</span><br><span class="line">        <span class="keyword">this</span>.hist = hist;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">long</span> duration;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Histogram hist;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Long.toString(duration);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(RunResult o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Long.compare(<span class="keyword">this</span>.duration, o.duration);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>4.测试实例抽象类，主要封装了一些测试实例的公共方法，如触发开始、记录状态、计时等功能，上述提到的如从0-10000的顺序rowkey写入、0-10000的随机rowkey写入等就是测试实例的实现类型，都需要实现该抽象类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBase</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ROW_LENGTH = <span class="number">26</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FAMILY_NAME_BASE = <span class="string">"d"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String COLUMN_ZERO = <span class="string">"d0"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">final</span> TestOptions opts;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Status status;</span><br><span class="line">    <span class="keyword">protected</span> Connection connection;</span><br><span class="line">    <span class="keyword">protected</span> Table table;</span><br><span class="line">    <span class="keyword">protected</span> Histogram latencyHistogram;</span><br><span class="line">    <span class="keyword">protected</span> Histogram valueSizeHistogram;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Random randomSeed = <span class="keyword">new</span> Random(System.currentTimeMillis());</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">nextRandomSeed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> randomSeed.nextLong();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">final</span> Random rand = <span class="keyword">new</span> Random(nextRandomSeed());</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TestBase</span><span class="params">(<span class="keyword">final</span> Connection con, <span class="keyword">final</span> TestOptions options, <span class="keyword">final</span> Status status)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.connection = con;</span><br><span class="line">        <span class="keyword">this</span>.opts = options;</span><br><span class="line">        <span class="keyword">this</span>.status = status;</span><br><span class="line">        <span class="keyword">this</span>.table = connection.getTable(TableName.valueOf(opts.tableName));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">testSetup</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="comment">// test metrics</span></span><br><span class="line">        latencyHistogram = HistogramUtils.newHistogram(<span class="keyword">new</span> UniformReservoir(<span class="number">1024</span> * <span class="number">500</span>));</span><br><span class="line">        valueSizeHistogram = HistogramUtils.newHistogram(<span class="keyword">new</span> UniformReservoir(<span class="number">1024</span> * <span class="number">500</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getStartRow</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> opts.startRow;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getLastRow</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> getStartRow() + opts.perClientRunRows;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">generateStatus</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> sr, <span class="keyword">final</span> <span class="keyword">int</span> i, <span class="keyword">final</span> <span class="keyword">int</span> lr)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sr + <span class="string">"/"</span> + i + <span class="string">"/"</span> + lr + <span class="string">", latency "</span> +</span><br><span class="line">                HistogramUtils.getShortHistogramReport(<span class="keyword">this</span>.latencyHistogram) + <span class="string">", value size "</span> +</span><br><span class="line">                HistogramUtils.getShortHistogramReport(<span class="keyword">this</span>.valueSizeHistogram);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">testTimed</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">testRow</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> i, <span class="keyword">final</span> <span class="keyword">long</span> startTime)</span> <span class="keyword">throws</span> IOException, InterruptedException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>5.测试实例实现类，如下分别是随机写、顺序写、顺序读的实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RandomdReadTest</span> <span class="keyword">extends</span> <span class="title">TestBase</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RandomdReadTest</span><span class="params">(Connection con, TestOptions options, Status status)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(con, options, status);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">testRow</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">long</span> startTime)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        Get get = <span class="keyword">new</span> Get(getRandomRow(<span class="keyword">this</span>.rand, opts.totalRows));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] familyName = Bytes.toBytes(FAMILY_NAME_BASE);</span><br><span class="line">        <span class="keyword">byte</span> [] qualifier = Bytes.toBytes(COLUMN_ZERO);</span><br><span class="line">        get.addColumn(familyName, qualifier);</span><br><span class="line">        table.get(get);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">byte</span>[] generateRow(<span class="keyword">final</span> <span class="keyword">int</span> i) &#123;</span><br><span class="line">        <span class="keyword">return</span> format(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span> [] format(<span class="keyword">final</span> <span class="keyword">int</span> number) &#123;</span><br><span class="line">        <span class="keyword">byte</span> [] b = <span class="keyword">new</span> <span class="keyword">byte</span>[ROW_LENGTH];</span><br><span class="line">        <span class="keyword">int</span> d = Math.abs(number);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = b.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            b[i] = (<span class="keyword">byte</span>)((d % <span class="number">10</span>) + <span class="string">'0'</span>);</span><br><span class="line">            d /= <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">byte</span> [] getRandomRow(<span class="keyword">final</span> Random random, <span class="keyword">final</span> <span class="keyword">int</span> totalRows) &#123;</span><br><span class="line">        <span class="keyword">return</span> format(generateRandomRow(random, totalRows));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">generateRandomRow</span><span class="params">(<span class="keyword">final</span> Random random, <span class="keyword">final</span> <span class="keyword">int</span> totalRows)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> random.nextInt(Integer.MAX_VALUE) % totalRows;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SequentialReadTest</span> <span class="keyword">extends</span> <span class="title">TestBase</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SequentialReadTest</span><span class="params">(Connection con, TestOptions options, Status status)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(con, options, status);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">testRow</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">long</span> startTime)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] row = generateRow(i);</span><br><span class="line">        Get get = <span class="keyword">new</span> Get(row);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] familyName = Bytes.toBytes(FAMILY_NAME_BASE);</span><br><span class="line">        <span class="keyword">byte</span> [] qualifier = Bytes.toBytes(COLUMN_ZERO);</span><br><span class="line">        get.addColumn(familyName, qualifier);</span><br><span class="line">        table.get(get);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">byte</span>[] generateRow(<span class="keyword">final</span> <span class="keyword">int</span> i) &#123;</span><br><span class="line">        <span class="keyword">return</span> format(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span> [] format(<span class="keyword">final</span> <span class="keyword">int</span> number) &#123;</span><br><span class="line">        <span class="keyword">byte</span> [] b = <span class="keyword">new</span> <span class="keyword">byte</span>[ROW_LENGTH];</span><br><span class="line">        <span class="keyword">int</span> d = Math.abs(number);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = b.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            b[i] = (<span class="keyword">byte</span>)((d % <span class="number">10</span>) + <span class="string">'0'</span>);</span><br><span class="line">            d /= <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SequentialWriteTest</span> <span class="keyword">extends</span> <span class="title">TestBase</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SequentialWriteTest</span><span class="params">(Connection con, TestOptions options, Status status)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(con, options, status);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">testRow</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">long</span> startTime)</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] row = generateRow(i);</span><br><span class="line">        Put put = <span class="keyword">new</span> Put(row);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span>[] familyName = Bytes.toBytes(FAMILY_NAME_BASE);</span><br><span class="line">        <span class="keyword">byte</span> [] qualifier = Bytes.toBytes(COLUMN_ZERO);</span><br><span class="line">        <span class="keyword">byte</span>[] value = generateData(<span class="keyword">this</span>.rand, opts.valueSize);</span><br><span class="line">        put.addColumn(familyName, qualifier, value);</span><br><span class="line">        <span class="comment">//this.valueSizeHistogram.update(value.length);</span></span><br><span class="line"></span><br><span class="line">        put.setDurability(Durability.SYNC_WAL);</span><br><span class="line">        table.put(put);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">byte</span>[] generateRow(<span class="keyword">final</span> <span class="keyword">int</span> i) &#123;</span><br><span class="line">        <span class="keyword">return</span> format(i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span> [] format(<span class="keyword">final</span> <span class="keyword">int</span> number) &#123;</span><br><span class="line">        <span class="keyword">byte</span> [] b = <span class="keyword">new</span> <span class="keyword">byte</span>[ROW_LENGTH];</span><br><span class="line">        <span class="keyword">int</span> d = Math.abs(number);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = b.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            b[i] = (<span class="keyword">byte</span>)((d % <span class="number">10</span>) + <span class="string">'0'</span>);</span><br><span class="line">            d /= <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Generated random value to insert into a table cell.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] generateData(<span class="keyword">final</span> Random r, <span class="keyword">int</span> length) &#123;</span><br><span class="line">        <span class="keyword">byte</span> [] b = <span class="keyword">new</span> <span class="keyword">byte</span> [length];</span><br><span class="line">        <span class="keyword">int</span> i;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; (length-<span class="number">8</span>); i += <span class="number">8</span>) &#123;</span><br><span class="line">            b[i] = (<span class="keyword">byte</span>) (<span class="number">65</span> + r.nextInt(<span class="number">26</span>));</span><br><span class="line">            b[i+<span class="number">1</span>] = b[i];</span><br><span class="line">            b[i+<span class="number">2</span>] = b[i];</span><br><span class="line">            b[i+<span class="number">3</span>] = b[i];</span><br><span class="line">            b[i+<span class="number">4</span>] = b[i];</span><br><span class="line">            b[i+<span class="number">5</span>] = b[i];</span><br><span class="line">            b[i+<span class="number">6</span>] = b[i];</span><br><span class="line">            b[i+<span class="number">7</span>] = b[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">byte</span> a = (<span class="keyword">byte</span>) (<span class="number">65</span> + r.nextInt(<span class="number">26</span>));</span><br><span class="line">        <span class="keyword">for</span>(; i &lt; length; i++) &#123;</span><br><span class="line">            b[i] = a;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>6.最后是启动类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PerformanceEvaluationJava</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOG = LoggerFactory.getLogger(PerformanceEvaluationJava<span class="class">.<span class="keyword">class</span>.<span class="title">getName</span>())</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> threadNum = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">        HBaseConfiguration config = <span class="keyword">new</span> HBaseConfiguration();</span><br><span class="line">        config.set(<span class="string">"bdp.hbase.accesskey"</span>, <span class="string">"NA4CH6B7RFYAJLV3ZMMAHDFGO4"</span>);</span><br><span class="line">        config.set(<span class="string">"bdp.hbase.instance.name"</span>, <span class="string">"CL1000000005186"</span>);</span><br><span class="line">        <span class="comment">//config.set("fs.defaultFS", inputRootPath);</span></span><br><span class="line">        <span class="comment">//config.setLong("hbase.rpc.timeout", 3600000);</span></span><br><span class="line">        config.setBoolean(<span class="string">"hbase.policy.http.client.v2.enabled"</span>, <span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">        Future&lt;RunResult&gt;[] threads = <span class="keyword">new</span> Future[threadNum];</span><br><span class="line">        RunResult[] results = <span class="keyword">new</span> RunResult[threadNum];</span><br><span class="line">        ExecutorService pool = Executors.newFixedThreadPool(threadNum,</span><br><span class="line">                <span class="keyword">new</span> ThreadFactoryBuilder().setNameFormat(<span class="string">"TestClient-%s"</span>).build());</span><br><span class="line">        <span class="keyword">final</span> Connection[] cons = <span class="keyword">new</span> Connection[threadNum];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threadNum; i++) &#123;</span><br><span class="line">            cons[i] = ConnectionFactory.createConnection(config);</span><br><span class="line">        &#125;</span><br><span class="line">        LOG.info(<span class="string">"Created "</span> + threadNum + <span class="string">" connections for "</span> + threadNum + <span class="string">" threads"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threads.length; i++) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> index = i;</span><br><span class="line">            threads[i] = pool.submit(<span class="keyword">new</span> Callable&lt;RunResult&gt;() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> RunResult <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                    TestOptions threadOpts = <span class="keyword">new</span> TestOptions(<span class="string">"sz_ela:HB_IBD_SHOP_VIEW_INSHOP_NEW"</span>, threadNum);</span><br><span class="line">                    <span class="keyword">final</span> Connection con = cons[index % cons.length];</span><br><span class="line">                    <span class="keyword">if</span> (threadOpts.startRow == <span class="number">0</span>) threadOpts.startRow = index * threadOpts.perClientRunRows;</span><br><span class="line">                    TestBase t = <span class="keyword">new</span> SequentialWriteTest(con, threadOpts, <span class="keyword">new</span> Status() &#123;</span><br><span class="line">                        <span class="meta">@Override</span></span><br><span class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setStatus</span><span class="params">(<span class="keyword">final</span> String msg)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                            LOG.info(msg);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;);</span><br><span class="line">                    t.testSetup();</span><br><span class="line">                    <span class="keyword">final</span> <span class="keyword">long</span> startTime = System.nanoTime();</span><br><span class="line">                    t.testTimed();</span><br><span class="line">                    t.testTakedown();</span><br><span class="line">                    <span class="keyword">long</span> totalElapsedTime = (System.nanoTime() - startTime) / <span class="number">1000000</span>;</span><br><span class="line">                    LOG.info(<span class="string">"Finished "</span> + Thread.currentThread().getName() + <span class="string">" in "</span> + totalElapsedTime + <span class="string">"ms at offset "</span></span><br><span class="line">                            + threadOpts.startRow + <span class="string">" for "</span> + threadOpts.perClientRunRows + <span class="string">" rows"</span>);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">new</span> RunResult(totalElapsedTime, t.latencyHistogram);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool.shutdown();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threads.length; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                results[i] = threads[i].get();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ExecutionException | InterruptedException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IOException(e.getCause());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        LOG.info(<span class="string">"[test] Summary of timings (ms): "</span></span><br><span class="line">                + Arrays.toString(results));</span><br><span class="line">        Arrays.sort(results);</span><br><span class="line">        <span class="keyword">long</span> total = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">float</span> avgLatency = <span class="number">0</span> ;</span><br><span class="line">        <span class="keyword">float</span> avgTPS = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (RunResult result : results) &#123;</span><br><span class="line">            total += result.duration;</span><br><span class="line">            avgLatency += result.hist.getSnapshot().getMean();</span><br><span class="line">            avgTPS += TestOptions.DEFAULT_ROWS_PER_GB * <span class="number">1.0f</span> / result.duration;</span><br><span class="line">        &#125;</span><br><span class="line">        avgTPS *= <span class="number">1000</span>; <span class="comment">// ms to second</span></span><br><span class="line">        avgLatency = avgLatency / results.length;</span><br><span class="line">        LOG.info(<span class="string">"[test] duration  "</span> + <span class="string">"\tMin: "</span> + results[<span class="number">0</span>] + <span class="string">"ms"</span> + <span class="string">"\tMax: "</span> + results[results.length - <span class="number">1</span>] + <span class="string">"ms"</span> + <span class="string">"\tAvg: "</span> + (total / results.length) + <span class="string">"ms"</span>);</span><br><span class="line">        LOG.info(<span class="string">"[ Avg latency (us)]\t"</span> + Math.round(avgLatency));</span><br><span class="line">        LOG.info(<span class="string">"[ Avg TPS/QPS]\t"</span> + Math.round(avgTPS) + <span class="string">"\t row per second"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threadNum; i++) &#123;</span><br><span class="line">            cons[i].close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="4-测试结果"><a href="#4-测试结果" class="headerlink" title="4.测试结果"></a>4.测试结果</h3><table>
+<thead>
+<tr>
+<th>测试场景</th>
+<th>单线程数据量</th>
+<th>并发线程数</th>
+<th>min(ms)</th>
+<th>max(ms)</th>
+<th>tp95(ms)</th>
+<th>tp99(ms)</th>
+<th>avg(ms)</th>
+<th>TPS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>容器集群顺序写</td>
+<td>10000</td>
+<td>40</td>
+<td>1.00</td>
+<td>1207.00</td>
+<td>1.00</td>
+<td>101.00</td>
+<td>2</td>
+<td>16758</td>
+</tr>
+<tr>
+<td>物理集群顺序写</td>
+<td>10000</td>
+<td>40</td>
+<td>1.00</td>
+<td>664.00</td>
+<td>2.00</td>
+<td>5.00</td>
+<td>2</td>
+<td>17311</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>容器集群随机读</td>
+<td>10000</td>
+<td>20</td>
+<td>1.00</td>
+<td>959.00</td>
+<td>1.00</td>
+<td>1.00</td>
+<td>1</td>
+<td>16535</td>
+</tr>
+<tr>
+<td>物理集群随机读</td>
+<td>10000</td>
+<td>20</td>
+<td>1.00</td>
+<td>559.00</td>
+<td>1.00</td>
+<td>2.00</td>
+<td>1</td>
+<td>16720</td>
+</tr>
+</tbody></table>
+<p><strong>在配额放开到一致的情况下，存算分离容器集群与物理集群读写性能相近，均能达到17000QPS。而且QPS达到峰值之后，CPU也远没有达到性能瓶颈，可见限制HBase集群QPS的并不是CPU计算能力。</strong></p>
+<p>物理集群40并发顺序写场景下cpu使用率如下，从日常34%升高至48%：</p>
+<p><img src="//littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/1.jpg" alt></p>
+<p>容器集群40并发顺序写场景下cpu使用率如下，从日常0%升高至6%：</p>
+<p><img src="//littleforestjia.github.io/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/2.jpg" alt></p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://www.cnblogs.com/caoweixiong/p/13633501.html" target="_blank" rel="noopener">HBase——PerformanceEvaluation（压测工具）</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/PerformanceEvaluation/" rel="tag"><i class="fa fa-tag"></i> PerformanceEvaluation</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/22/HBase_HBase%E5%80%BE%E6%96%9C%E6%B2%BB%E7%90%86%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/" rel="next" title="HBase_HBase倾斜治理专利与实战代码">
+                <i class="fa fa-chevron-left"></i> HBase_HBase倾斜治理专利与实战代码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/" rel="prev" title="HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码">
+                HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-HBase自带压测工具PerformanceEvaluation改造与应用实战"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-PerformanceEvaluation原理"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.PerformanceEvaluation原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-PerformanceEvaluation源码改写与实战"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.PerformanceEvaluation源码改写与实战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-测试结果"><span class="nav-number">1.0.4.</span> <span class="nav-text">4.测试结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.0.5.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

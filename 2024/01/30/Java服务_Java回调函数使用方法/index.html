@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_Java回调函数使用方法1.背景在java工程代码中，如果我们想要对在不同场景下执行不同操作的同类操作进行抽象，那么我们通常会创建一个接口来抽象，然后对这个接口创建不同的实现类，在不同常见下创建不同实现类的对象，调用其中的具体实现方法。这种写法相对比较冗余，有几个场景就得提前创建几个实现类和实现方法，那么借助回调函数的思想，可以在实际调用时再创建匿名内部类实现抽象方法，就显得更加轻量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_Java回调函数使用方法">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/30/Java%E6%9C%8D%E5%8A%A1_Java%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_Java回调函数使用方法1.背景在java工程代码中，如果我们想要对在不同场景下执行不同操作的同类操作进行抽象，那么我们通常会创建一个接口来抽象，然后对这个接口创建不同的实现类，在不同常见下创建不同实现类的对象，调用其中的具体实现方法。这种写法相对比较冗余，有几个场景就得提前创建几个实现类和实现方法，那么借助回调函数的思想，可以在实际调用时再创建匿名内部类实现抽象方法，就显得更加轻量">
+<meta property="article:published_time" content="2024-01-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:43:39.770Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/30/Java服务_Java回调函数使用方法/"/>
+
+
+
+
+
+  <title>Java服务_Java回调函数使用方法 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/30/Java%E6%9C%8D%E5%8A%A1_Java%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_Java回调函数使用方法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-30T00:00:00+08:00">
+                2024-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-Java回调函数使用方法"><a href="#Java服务-Java回调函数使用方法" class="headerlink" title="Java服务_Java回调函数使用方法"></a>Java服务_Java回调函数使用方法</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>在java工程代码中，如果我们想要对在不同场景下执行不同操作的同类操作进行抽象，那么我们通常会创建一个接口来抽象，然后对这个接口创建不同的实现类，在不同常见下创建不同实现类的对象，调用其中的具体实现方法。这种写法相对比较冗余，有几个场景就得提前创建几个实现类和实现方法，那么借助回调函数的思想，可以在实际调用时再创建匿名内部类实现抽象方法，就显得更加轻量便捷。</p>
+<p>如上述场景所说，被抽象出来的接口为A，想要调用A方法的是调用方B。原本是A自己创建实现类，B来直接调用，使用回调函数后，变成了B自己实现A接口的方法并执行。看上去回调接口A中的方法如同占位符号，具体实现代码由调用者传递执行，所以把A中方法叫做回调函数。</p>
+<p>从上述背景与实现方法描述也可以看出，回调函数并不是绝对必需的，它只是提供了一种灵活的机制来处理一些特定场景，在这些场景下不使用回调函数仍然可以实现相同功能。也要注意，使用回调也可能导致代码变得复杂，可读性变差，特别是在回调链很长时，这些时候通常会用”回调地狱”这样的术语来形容。</p>
+<h3 id="2-常见使用场景"><a href="#2-常见使用场景" class="headerlink" title="2.常见使用场景"></a>2.常见使用场景</h3><h4 id="2-1-匿名内部类减轻业务实现"><a href="#2-1-匿名内部类减轻业务实现" class="headerlink" title="2.1 匿名内部类减轻业务实现"></a>2.1 匿名内部类减轻业务实现</h4><p>首先创建一个回调接口和回调方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CallBack</span> </span>&#123;  </span><br><span class="line">    <span class="comment">//执行回调操作的方法   </span></span><br><span class="line">    <span class="function"><span class="keyword">void</span>  <span class="title">execute</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建一个调用方法并以回调接口为参数类型：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Tools</span></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testtime</span><span class="params">(Callback callback)</span></span>&#123;</span><br><span class="line">		<span class="keyword">long</span> begin = System.currentTimeMillis();</span><br><span class="line">		callback.excute();</span><br><span class="line">		<span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">		System.out.println(<span class="string">"[回调执行用时]:"</span>  + (end - begin));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后就可以在各个调用方直接创建匿名内部类实现回调接口并调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Executer</span></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executerA</span><span class="params">()</span></span>&#123;</span><br><span class="line">    tools t = <span class="keyword">new</span> tools();</span><br><span class="line">		t.testtime(<span class="keyword">new</span> Callback() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">		  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">excute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			  System.out.println(<span class="string">"执行方法A"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">          </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executerB</span><span class="params">()</span></span>&#123;</span><br><span class="line">    tools t = <span class="keyword">new</span> tools();</span><br><span class="line">		t.testtime(<span class="keyword">new</span> Callback() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">		  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">excute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			  System.out.println(<span class="string">"执行方法B"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-2-异步回调函数"><a href="#2-2-异步回调函数" class="headerlink" title="2.2 异步回调函数"></a>2.2 异步回调函数</h4><p>异步回调通常用于回调函数逻辑较为复杂耗时，但是调用方的后续执行逻辑并不强依赖于回调逻辑的场景，调用方在调用回调函数时新建一个线程去执行回调逻辑，不必等待回调逻辑执行完成，直接执行调用方的后续代码。</p>
+<p>首先创建一个回调接口和回调方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CallBack</span> </span>&#123;  </span><br><span class="line">    <span class="comment">//执行回调操作的方法   </span></span><br><span class="line">    <span class="function"><span class="keyword">void</span>  <span class="title">execute</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建一个调用方法，以回调接口为参数类型，并创建一个新线程执行回调方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Tools</span></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testtime</span><span class="params">(Callback callback)</span></span>&#123;</span><br><span class="line">		<span class="keyword">long</span> begin = System.currentTimeMillis();</span><br><span class="line">    <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">      <span class="keyword">long</span> begin1 = System.currentTimeMillis();</span><br><span class="line">      callback.excute();</span><br><span class="line">      <span class="keyword">long</span> end1 = System.currentTimeMillis();</span><br><span class="line">      System.out.println(<span class="string">"[回调执行用时]:"</span>  + (end1 - begin1));</span><br><span class="line">    &#125;).start();</span><br><span class="line">		<span class="keyword">long</span> end = System.currentTimeMillis();</span><br><span class="line">		System.out.println(<span class="string">"[回调方法启动用时，并不是回调方法执行总用时]:"</span>  + (end - begin));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后就可以在各个调用方直接创建匿名内部类实现回调接口并调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Executer</span></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executerA</span><span class="params">()</span></span>&#123;</span><br><span class="line">    tools t = <span class="keyword">new</span> tools();</span><br><span class="line">		t.testtime(<span class="keyword">new</span> Callback() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">		  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">excute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			  System.out.println(<span class="string">"执行方法A"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">          </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executerB</span><span class="params">()</span></span>&#123;</span><br><span class="line">    tools t = <span class="keyword">new</span> tools();</span><br><span class="line">		t.testtime(<span class="keyword">new</span> Callback()&#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">		  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">excute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			  System.out.println(<span class="string">"执行方法B"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="3-回调函数掌握测试"><a href="#3-回调函数掌握测试" class="headerlink" title="3.回调函数掌握测试"></a>3.回调函数掌握测试</h3><p>如下是一个按钮监听的业务场景，未使用回调函数时，业务代码如下，如果你能够正确地将回调函数代码添加上去，实现按钮点击监听逻辑，那说明你基本掌握了回调函数的用法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ButtonListener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">listener</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClickButton</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">click</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"点击成功"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ButtonMain1205</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ClickButton clickButton = <span class="keyword">new</span> ClickButton();</span><br><span class="line">        clickButton.click();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>答案揭晓如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ButtonListener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">listen</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClickButton</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">click</span><span class="params">(ButtonListener listener)</span></span>&#123;</span><br><span class="line">        listener.listen()</span><br><span class="line">        System.out.println(<span class="string">"点击成功"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ButtonMain1205</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ClickButton clickButton = <span class="keyword">new</span> ClickButton();</span><br><span class="line">        clickButton.click(<span class="keyword">new</span> ButtonListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">		        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">listen</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			          System.out.println(<span class="string">"执行监听逻辑"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">		    &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/29/ClickHouse2HBase%E7%BB%84%E4%BB%B6_JavaSql%E4%B8%AD%E7%9A%84PreparedStatement%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/" rel="next" title="ClickHouse2HBase组件_JavaSql中的PreparedStatement原理与应用实战">
+                <i class="fa fa-chevron-left"></i> ClickHouse2HBase组件_JavaSql中的PreparedStatement原理与应用实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/31/HBase_Java%E7%A6%BB%E7%BA%BF%E8%84%9A%E6%9C%AC%E6%88%96%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1%E4%B8%AD%E4%BD%BF%E7%94%A8Queue%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E5%92%8C%E5%89%8A%E5%B3%B0%E5%AE%9E%E6%88%98/" rel="prev" title="HBase_Java离线脚本或单机部署服务中使用Queue队列实现限流和削峰实战">
+                HBase_Java离线脚本或单机部署服务中使用Queue队列实现限流和削峰实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-Java回调函数使用方法"><span class="nav-number">1.</span> <span class="nav-text">Java服务_Java回调函数使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-常见使用场景"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.常见使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-匿名内部类减轻业务实现"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 匿名内部类减轻业务实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-异步回调函数"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 异步回调函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-回调函数掌握测试"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.回调函数掌握测试</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

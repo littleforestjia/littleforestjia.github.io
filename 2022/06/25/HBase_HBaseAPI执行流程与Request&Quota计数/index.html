@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBaseAPI执行流程与Request&amp;Quota计数1.API汇总1.1客户端的HTable类与服务端的RSRpcServices类HBase client提供的java api主要在HTable类中： 123456Result get(Get get);Result[] get(List&lt;Get&gt; gets);void put(Put put);void pu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBaseAPI执行流程与Request&amp;Quota计数">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/06/25/HBase_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBaseAPI执行流程与Request&amp;Quota计数1.API汇总1.1客户端的HTable类与服务端的RSRpcServices类HBase client提供的java api主要在HTable类中： 123456Result get(Get get);Result[] get(List&lt;Get&gt; gets);void put(Put put);void pu">
+<meta property="article:published_time" content="2022-06-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:56:07.001Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/06/25/HBase_HBaseAPI执行流程与Request&Quota计数/"/>
+
+
+
+
+
+  <title>HBase_HBaseAPI执行流程与Request&Quota计数 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/06/25/HBase_HBaseAPI%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E4%B8%8ERequest&Quota%E8%AE%A1%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBaseAPI执行流程与Request&Quota计数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-25T00:00:00+08:00">
+                2022-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HBase-HBaseAPI执行流程与Request-amp-Quota计数"><a href="#HBase-HBaseAPI执行流程与Request-amp-Quota计数" class="headerlink" title="HBase_HBaseAPI执行流程与Request&amp;Quota计数"></a>HBase_HBaseAPI执行流程与Request&amp;Quota计数</h2><h3 id="1-API汇总"><a href="#1-API汇总" class="headerlink" title="1.API汇总"></a>1.API汇总</h3><h4 id="1-1客户端的HTable类与服务端的RSRpcServices类"><a href="#1-1客户端的HTable类与服务端的RSRpcServices类" class="headerlink" title="1.1客户端的HTable类与服务端的RSRpcServices类"></a>1.1客户端的HTable类与服务端的RSRpcServices类</h4><p>HBase client提供的java api主要在HTable类中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Result <span class="title">get</span><span class="params">(Get get)</span></span>;</span><br><span class="line">Result[] get(List&lt;Get&gt; gets);</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">put</span><span class="params">(Put put)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">put</span><span class="params">(List&lt;Put&gt; puts)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(<span class="keyword">final</span> Delete delete)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(List&lt;Delete&gt; deletes)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>HTable类中操作数据的方法本质都是通过RPC远程调用RegionServer上的数据操作方法。RS上的数据操作方法主要在BlockingInterface接口中定义，在RSRpcServices类中实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">GetResponse <span class="title">get</span><span class="params">(RpcController var1, GetRequest var2)</span></span>;</span><br><span class="line"><span class="function">MultiResponse <span class="title">multi</span><span class="params">(RpcController var1, MultiRequest var2)</span></span>;</span><br><span class="line"><span class="function">MutateResponse <span class="title">mutate</span><span class="params">(RpcController var1, MutateRequest var2)</span></span>;</span><br><span class="line"><span class="function">ScanResponse <span class="title">scan</span><span class="params">(RpcController var1, ScanRequest var2)</span></span>;</span><br><span class="line"><span class="function">BulkLoadHFileResponse <span class="title">bulkLoadHFile</span><span class="params">(RpcController var1, BulkLoadHFileRequest var2)</span></span>;</span><br><span class="line"><span class="function">CoprocessorServiceResponse <span class="title">execService</span><span class="params">(RpcController var1, CoprocessorServiceRequest var2)</span></span>;</span><br><span class="line"><span class="function">CoprocessorServiceResponse <span class="title">execRegionServerService</span><span class="params">(RpcController var1, CoprocessorServiceRequest var2)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2-HTable类的主要属性"><a href="#1-2-HTable类的主要属性" class="headerlink" title="1.2 HTable类的主要属性"></a>1.2 HTable类的主要属性</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//client通过这个对象连接regionserver</span></span><br><span class="line"><span class="keyword">protected</span> ClusterConnection connection;</span><br><span class="line"></span><br><span class="line"><span class="comment">//线程池，其中一个线程负责连接一个regionserver</span></span><br><span class="line"><span class="keyword">private</span> ExecutorService pool;</span><br><span class="line"></span><br><span class="line"><span class="comment">//异步任务提交器</span></span><br><span class="line"><span class="keyword">protected</span> AsyncProcess multiAp;</span><br><span class="line"></span><br><span class="line"><span class="comment">//rpc工厂类</span></span><br><span class="line"><span class="keyword">private</span> RpcRetryingCallerFactory rpcCallerFactory;</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-3-Request计数原理"><a href="#1-3-Request计数原理" class="headerlink" title="1.3 Request计数原理"></a>1.3 Request计数原理</h4><p><strong>Request计数是指RSRpcServices类中的requestCount属性，是以regionserver为计数单元的，也就是计算单个regionserver上的request数。</strong></p>
+<h4 id="1-4-Quota计数原理"><a href="#1-4-Quota计数原理" class="headerlink" title="1.4 Quota计数原理"></a>1.4 Quota计数原理</h4><p><strong>同样通过Quota命令设置的请求量配额也是节点粒度的，是针对单个regionserver上的user/table/namespace，而不是整个表或整个实例。比如说设置某个实例的访问次数quota为10req/s，那就表示存储了该实例所包含的每个regionserver节点，每秒最多接受10个请求。</strong></p>
+<p>master在启动时会初始化MasterQuotaManager，负责quota表的管理，根据用户命令在quota表中增删改查配额信息。regionserver在启动时会初始化RegionServerQuotaManager，负责维护一份quota表的缓存，并定期从master中获取quota表信息更新该缓存。</p>
+<p>RSRpcServices中被rpc调用的get/multi/mutate/scan等数据操作方法执行前会调用RegionServerQuotaManager的checkQuota方法，根据用户请求解析出user/table/namespace等信息，根据这些信息获取相应的配额信息，并进行计数和判断。</p>
+<h3 id="2-put"><a href="#2-put" class="headerlink" title="2.put"></a>2.put</h3><h4 id="2-1-put流程源码"><a href="#2-1-put流程源码" class="headerlink" title="2.1 put流程源码"></a>2.1 put流程源码</h4><p>源码调用逻辑过多，省略展示。</p>
+<p>客户端操作：</p>
+<ul>
+<li>把put操作添加到本地writeAsyncBuffer队列里面，符合条件（自动flush或者超过了阀值writeBufferSize）就通过AsyncProcess异步批量提交。</li>
+<li>在提交之前，我们要根据每个rowkey找到它们归属的region，这个定位的过程是通过HConnection的locateRegion方法获得的，然后再把这些rowkey按照region分组。<strong>用一个<code>Map&lt;ServerName, MultiAction&lt;Row&gt;&gt;</code>类型的对象保存所有put数据，按照regionserver进行分组，要打到不同节点的数据存储在不同的键值对中。而<code>MultiAction&lt;Row&gt;</code>中又使用一个<code>Map&lt;regionName, List&lt;Action&lt;R&gt;&gt;&gt; actions</code>对象存储所有put数据，按照region进行分组。之所以这样分是因为一张表的不同region可能存储在同一个regionserver节点上。</strong></li>
+<li><strong>通过多线程并发地为每个不同的regionserver构造一个rpc连接，每个线程异步执行一个<code>MultiServerCallable&lt;Row&gt;</code>任务。任务中的call()方法通过this.getStub().multi()方法rpc远程调服务端的数据操作方法。</strong></li>
+</ul>
+<p>服务端操作也就是执行RSRpcServices.multi()方法。</p>
+<h4 id="2-2-request-amp-quota计数"><a href="#2-2-request-amp-quota计数" class="headerlink" title="2.2 request&amp;quota计数"></a>2.2 request&amp;quota计数</h4><ul>
+<li><p><strong>通过requestCount.add()方法进行request计数，可以发现multi()方法中每一行put数据request计数就加一。一共有多少行put打到该regionserver上，request计数就加多少。</strong></p>
+</li>
+<li><p><strong>通过checkQuota()方法进行quota计数，可以发现multi()方法每访问一个region，quota访问次数就加一。打到该regionserver上的批量put一共打到多少个region上，quota访问次数就加多少。如果quota计数超出访问次数配额则抛出异常停止执行。</strong></p>
+</li>
+<li><p><strong>通过checkQuota()方法进行数据大小预估，批量put操作预估write流量为Put 个数 * 100字节。如果该次quota访问的数据大小超出访问流量配额则抛出异常停止执行。</strong></p>
+</li>
+</ul>
+<h4 id="2-3-put-List-流程"><a href="#2-3-put-List-流程" class="headerlink" title="2.3 put(List)流程"></a>2.3 put(List)流程</h4><p>查看源码可以发现put(List)与put流程并没有区别，同样是将put操作一个个添加到本地writeAsyncBuffer队列当中，符合条件就通过AsyncProcess异步批量提交。<strong>所以用put(List)来代替put()并不会起到提高写入速度的作用。</strong></p>
+<h3 id="3-get"><a href="#3-get" class="headerlink" title="3.get"></a>3.get</h3><h4 id="3-1-get流程源码"><a href="#3-1-get流程源码" class="headerlink" title="3.1 get流程源码"></a>3.1 get流程源码</h4><p>HTable.get()源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Result <span class="title">get</span><span class="params">(<span class="keyword">final</span> Get get, <span class="keyword">boolean</span> checkExistenceOnly)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    RegionServerCallable&lt;Result&gt; callable = <span class="keyword">new</span> RegionServerCallable&lt;Result&gt;(<span class="keyword">this</span>.connection, <span class="keyword">this</span>.getName(), get.getRow()) &#123;</span><br><span class="line">      <span class="function"><span class="keyword">public</span> Result <span class="title">call</span><span class="params">(<span class="keyword">int</span> callTimeout)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        GetRequest request = RequestConverter.buildGetRequest(<span class="keyword">this</span>.getLocation().getRegionInfo().getRegionName(), get);</span><br><span class="line">        PayloadCarryingRpcController controller = HTable.<span class="keyword">this</span>.rpcControllerFactory.newController();</span><br><span class="line">        controller.setPriority(<span class="keyword">this</span>.tableName);</span><br><span class="line">        controller.setCallTimeout(callTimeout);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          GetResponse response = <span class="keyword">this</span>.getStub().get(controller, request);</span><br><span class="line">          <span class="keyword">return</span> response == <span class="keyword">null</span> ? <span class="keyword">null</span> : ProtobufUtil.toResult(response.getResult());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ServiceException var5) &#123;</span><br><span class="line">          <span class="keyword">throw</span> ProtobufUtil.getRemoteException(var5);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> (Result)<span class="keyword">this</span>.rpcCallerFactory.newCaller(<span class="keyword">this</span>.rpcTimeout).callWithRetries(callable, <span class="keyword">this</span>.operationTimeout);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>客户端操作：</p>
+<p>直接新建一个callable任务对象，创建一个rpc连接交给服务端执行，通过this.getStub().get()执行数据操作方法。</p>
+<p>服务端操作也就是执行RSRpcServices.get()方法。</p>
+<h4 id="3-2-request-amp-quota计数"><a href="#3-2-request-amp-quota计数" class="headerlink" title="3.2 request&amp;quota计数"></a>3.2 request&amp;quota计数</h4><ul>
+<li><p>通过requestCount.increment()方法加一。</p>
+</li>
+<li><p>通过checkQuota()方法进行quota访问次数加一。如果quota计数超出访问次数配额则抛出异常停止执行。</p>
+</li>
+<li><p>通过checkQuota()方法数据大小预估，单个get操作预估read流量为100字节。如果该次quota访问的数据大小超出访问流量配额则抛出异常停止执行。</p>
+</li>
+</ul>
+<h4 id="3-3-get-List-流程"><a href="#3-3-get-List-流程" class="headerlink" title="3.3 get(List)流程"></a>3.3 get(List)流程</h4><p><strong>查看源码可以发现get(List)与put流程惊人相似，只不过没有本地缓存队列。</strong></p>
+<p><strong>get(List)也是在客户端按照不同regionserver和region分好组，然后使用AsyncProcess.sendMultiAction() 方法进行rpc调用。为每个regionserver创建一个rpc连接，通过this.getStub().multi()执行数据操作。</strong></p>
+<p><strong>所以get(List)的request&amp;quota计数逻辑与put相同。</strong></p>
+<h3 id="4-delete"><a href="#4-delete" class="headerlink" title="4.delete"></a>4.delete</h3><h4 id="4-1-delete流程源码"><a href="#4-1-delete流程源码" class="headerlink" title="4.1 delete流程源码"></a>4.1 delete流程源码</h4><p>HTable.delete()源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">(<span class="keyword">final</span> Delete delete)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    RegionServerCallable&lt;Boolean&gt; callable = <span class="keyword">new</span> RegionServerCallable&lt;Boolean&gt;(<span class="keyword">this</span>.connection, <span class="keyword">this</span>.tableName, delete.getRow()) &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">(<span class="keyword">int</span> callTimeout)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">            PayloadCarryingRpcController controller = HTable.<span class="keyword">this</span>.rpcControllerFactory.newController();</span><br><span class="line">            controller.setPriority(<span class="keyword">this</span>.tableName);</span><br><span class="line">            controller.setCallTimeout(callTimeout);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                MutateRequest request = RequestConverter.buildMutateRequest(<span class="keyword">this</span>.getLocation().getRegionInfo().getRegionName(), delete);</span><br><span class="line">                MutateResponse response = <span class="keyword">this</span>.getStub().mutate(controller, request);</span><br><span class="line">                <span class="keyword">return</span> response.getProcessed();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ServiceException var5) &#123;</span><br><span class="line">                <span class="keyword">throw</span> ProtobufUtil.getRemoteException(var5);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">this</span>.rpcCallerFactory.newCaller(<span class="keyword">this</span>.rpcTimeout).callWithRetries(callable, <span class="keyword">this</span>.operationTimeout);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>客户端操作：</p>
+<p>直接新建一个callable任务对象，创建一个rpc连接交给服务端执行，通过this.getStub().mutate()执行数据操作方法。</p>
+<p>服务端操作也就是执行RSRpcServices.mutate()方法。</p>
+<h4 id="4-2-request-amp-quota计数"><a href="#4-2-request-amp-quota计数" class="headerlink" title="4.2 request&amp;quota计数"></a>4.2 request&amp;quota计数</h4><ul>
+<li><p>通过requestCount.increment()方法加一。</p>
+</li>
+<li><p>通过checkQuota()方法进行quota访问次数加一。如果quota计数超出访问次数配额则抛出异常停止执行。</p>
+</li>
+<li><p>通过checkQuota()方法数据大小预估，单个delete操作预估write流量为100字节。如果该次quota访问的数据大小超出访问流量配额则抛出异常停止执行。</p>
+</li>
+</ul>
+<h4 id="4-3-delete-List-流程"><a href="#4-3-delete-List-流程" class="headerlink" title="4.3 delete(List)流程"></a>4.3 delete(List)流程</h4><p><strong>查看源码可以发现delete(List)与get(List)流程流程一模一样，所以request&amp;quota计数逻辑也一模一样。</strong></p>
+<h3 id="5-scan的request-amp-quota计数"><a href="#5-scan的request-amp-quota计数" class="headerlink" title="5.scan的request&amp;quota计数"></a>5.scan的request&amp;quota计数</h3><p>scan流程源码不在赘述，相关源码解析随处可见。</p>
+<p><strong>scan会按照setCaching的大小进行分步获取，每当读取完上次获取的数据则通过next创建一个rpc调用服务端的RSRpcServices.scan()方法。</strong></p>
+<p><strong>则每次服务端的scan()方法中：</strong></p>
+<ul>
+<li>通过requestCount.increment()方法加一。</li>
+<li>通过checkQuota()方法进行quota访问次数加一。如果quota计数超出访问次数配额则抛出异常停止执行。</li>
+<li>通过checkQuota()方法数据大小预估，单个next操作预估read流量为1000字节。如果该次quota访问的数据大小超出访问流量配额则抛出异常停止执行。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/06/15/Java%E6%9C%8D%E5%8A%A1_xml%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0Quartz%E6%89%A7%E8%A1%8Cjar%E5%8C%85%E6%96%B9%E6%B3%95/" rel="next" title="Java服务_xml配置实现Quartz执行jar包方法">
+                <i class="fa fa-chevron-left"></i> Java服务_xml配置实现Quartz执行jar包方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/03/HBase_HBaseConnection&Filter&Coprocessors&SQL/" rel="prev" title="HBase_HBaseConnection&Filter&Coprocessors&SQL">
+                HBase_HBaseConnection&Filter&Coprocessors&SQL <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HBase-HBaseAPI执行流程与Request-amp-Quota计数"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBaseAPI执行流程与Request&amp;Quota计数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-API汇总"><span class="nav-number">1.1.</span> <span class="nav-text">1.API汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1客户端的HTable类与服务端的RSRpcServices类"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1客户端的HTable类与服务端的RSRpcServices类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-HTable类的主要属性"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 HTable类的主要属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-Request计数原理"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 Request计数原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-Quota计数原理"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 Quota计数原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-put"><span class="nav-number">1.2.</span> <span class="nav-text">2.put</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-put流程源码"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 put流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-request-amp-quota计数"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-put-List-流程"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 put(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-get"><span class="nav-number">1.3.</span> <span class="nav-text">3.get</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-get流程源码"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 get流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-request-amp-quota计数"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-get-List-流程"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 get(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-delete"><span class="nav-number">1.4.</span> <span class="nav-text">4.delete</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-delete流程源码"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 delete流程源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-request-amp-quota计数"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 request&amp;quota计数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-delete-List-流程"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3 delete(List)流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-scan的request-amp-quota计数"><span class="nav-number">1.5.</span> <span class="nav-text">5.scan的request&amp;quota计数</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

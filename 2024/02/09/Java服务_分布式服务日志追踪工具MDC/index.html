@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,MDC," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_分布式服务日志追踪工具MDC1.情景介绍MDC 是解决分布式服务日志追踪方案中的有效工具。比如现在有个分布式的项目：alearner-api、alearner-service，该项目使用了阿里开源的框架dubbo，alearner-api作为consumer端，是和前端浏览器直接交互的模块，alearner-service作为provide端，是为consumer端提供一系列数据支持">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_分布式服务日志追踪工具MDC">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/09/Java%E6%9C%8D%E5%8A%A1_%E5%88%86%E5%B8%83%E5%BC%8F%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97%E8%BF%BD%E8%B8%AA%E5%B7%A5%E5%85%B7MDC/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_分布式服务日志追踪工具MDC1.情景介绍MDC 是解决分布式服务日志追踪方案中的有效工具。比如现在有个分布式的项目：alearner-api、alearner-service，该项目使用了阿里开源的框架dubbo，alearner-api作为consumer端，是和前端浏览器直接交互的模块，alearner-service作为provide端，是为consumer端提供一系列数据支持">
+<meta property="article:published_time" content="2024-02-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:19:58.016Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Spring">
+<meta property="article:tag" content="MDC">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/09/Java服务_分布式服务日志追踪工具MDC/"/>
+
+
+
+
+
+  <title>Java服务_分布式服务日志追踪工具MDC | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/09/Java%E6%9C%8D%E5%8A%A1_%E5%88%86%E5%B8%83%E5%BC%8F%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97%E8%BF%BD%E8%B8%AA%E5%B7%A5%E5%85%B7MDC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_分布式服务日志追踪工具MDC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-09T00:00:00+08:00">
+                2024-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-分布式服务日志追踪工具MDC"><a href="#Java服务-分布式服务日志追踪工具MDC" class="headerlink" title="Java服务_分布式服务日志追踪工具MDC"></a>Java服务_分布式服务日志追踪工具MDC</h1><h3 id="1-情景介绍"><a href="#1-情景介绍" class="headerlink" title="1.情景介绍"></a>1.情景介绍</h3><p>MDC 是解决分布式服务日志追踪方案中的有效工具。比如现在有个分布式的项目：alearner-api、alearner-service，该项目使用了阿里开源的框架dubbo，alearner-api作为consumer端，是和前端浏览器直接交互的模块，alearner-service作为provide端，是为consumer端提供一系列数据支持的模块。且consumer端和provide端均有多个实例部署在不同的主机上。基于以上情景，将会出现以下问题： 对于某一个固定的前端请求，在整个项目大流量访问的情况下，无法在后端的日志中精确的锁定该请求所涉及的日志，即无法快速准确的锁定该请求在consumer端和provide端的业务流程以及consumer端和provider端的对应逻辑。</p>
+<p>映射的诊断上下文（简称MDC）就是用于区分来自不同源的交叉日志输出的工具。当服务器几乎同时处理多个客户端时，日志输出通常是交错的。 MDC基于每个线程进行管理。子线程自动继承其父级的映射诊断上下文的副本。</p>
+<h3 id="2-MDC介绍"><a href="#2-MDC介绍" class="headerlink" title="2.MDC介绍"></a>2.MDC介绍</h3><p>Mapped Diagnostic Context(MDC)，以下是MDC类的注释，可以详细的说明该类的作用和应用场景：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* This class hides and serves as a substitute for the underlying logging</span></span><br><span class="line"><span class="comment">* system's MDC implementation.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* 该类隐藏并用作底层日志记录系统的MDC实现的替代。</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* &lt;p&gt;</span></span><br><span class="line"><span class="comment">* If the underlying logging system offers MDC functionality, then SLF4J's MDC,</span></span><br><span class="line"><span class="comment">* i.e. this class, will delegate to the underlying system's MDC. Note that at</span></span><br><span class="line"><span class="comment">* this time, only two logging systems, namely log4j and logback, offer MDC</span></span><br><span class="line"><span class="comment">* functionality. For java.util.logging which does not support MDC,</span></span><br><span class="line"><span class="comment">* &#123;@link BasicMDCAdapter&#125; will be used. For other systems, i.e. slf4j-simple</span></span><br><span class="line"><span class="comment">* and slf4j-nop, &#123;@link NOPMDCAdapter&#125; will be used.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* 如果底层日志系统提供MDC功能，那么SLF4J的MDC，即这个类，将委托给底层系统的MDC。这次值得注意的</span></span><br><span class="line"><span class="comment">* 是，只有log4j和logback两个日志系统，提供MDC功能。对于不支持MDC的java.util.logging，将使用</span></span><br><span class="line"><span class="comment">* BasicMDCAdapter。对于其他系统，即slf4j-simple和slf4j-nop，NOPMDCAdapter</span></span><br><span class="line"><span class="comment">* 将被使用。</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* &lt;p&gt;</span></span><br><span class="line"><span class="comment">* Thus, as a SLF4J user, you can take advantage of MDC in the presence of log4j,</span></span><br><span class="line"><span class="comment">* logback, or java.util.logging, but without forcing these systems as</span></span><br><span class="line"><span class="comment">* dependencies upon your users.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* 因此，作为SLF4J用户，您可以在存在log4j，logback或java.util.logging的情况下利用MDC，</span></span><br><span class="line"><span class="comment">* 但不必将这些系统强制为依赖于您的用户。</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* &lt;p&gt;</span></span><br><span class="line"><span class="comment">* For more information on MDC please see the &lt;a</span></span><br><span class="line"><span class="comment">* href="http://logback.qos.ch/manual/mdc.html"&gt;chapter on MDC&lt;/a&gt; in the</span></span><br><span class="line"><span class="comment">* logback manual.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* &lt;p&gt;</span></span><br><span class="line"><span class="comment">* Please note that all methods in this class are static.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* 请注意，此类中的所有方法都是静态的。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>MDC类中的主要方法如下：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>名称</th>
+<th>返回值</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>MDC()</td>
+<td></td>
+<td>无参构造</td>
+</tr>
+<tr>
+<td>2</td>
+<td>mdcAdapter</td>
+<td>MDCAdapter</td>
+<td>MDC适配器接口</td>
+</tr>
+<tr>
+<td>3</td>
+<td>MDCCloseable</td>
+<td>static class</td>
+<td>静态内部类</td>
+</tr>
+<tr>
+<td>4</td>
+<td>put(String,String)</td>
+<td>void</td>
+<td>向MDC中存放键值对</td>
+</tr>
+<tr>
+<td>5</td>
+<td>putCloseable(String,String)</td>
+<td>MDC.MDCCloseable</td>
+<td>创建一个特定key值的MDCCloseable对象，并将key、val存放入MDC，当对象调用close()方法时MDC删除该key对应的键值对</td>
+</tr>
+<tr>
+<td>6</td>
+<td>get(String)</td>
+<td>String</td>
+<td>获取某一特定key的值</td>
+</tr>
+<tr>
+<td>7</td>
+<td>remove(String)</td>
+<td>void</td>
+<td>移除某一特定key的键值对</td>
+</tr>
+<tr>
+<td>8</td>
+<td>clear()</td>
+<td>void</td>
+<td>清空所有储存的键值对</td>
+</tr>
+<tr>
+<td>9</td>
+<td>getCopyOfContextMap()</td>
+<td>Map&lt;String, String&gt;</td>
+<td>获取MDC中所有的键值对</td>
+</tr>
+<tr>
+<td>10</td>
+<td>setContextMap(Map&lt;String, String&gt;)</td>
+<td>void</td>
+<td>设置MDC的键值对</td>
+</tr>
+<tr>
+<td>11</td>
+<td>getMDCAdapter()</td>
+<td>MDCAdapter</td>
+<td>获得MDC的适配器</td>
+</tr>
+</tbody></table>
+<h3 id="3-ThreadLocal"><a href="#3-ThreadLocal" class="headerlink" title="3.ThreadLocal"></a>3.ThreadLocal</h3><p>MDC的本质是使用ThreadLocal来实现的，ThreadLoal变量，它的基本原理是，同一个ThreadLocal所包含的对象（对ThreadLocal&lt; String &gt;而言即为String类型变量），在不同的Thread中有不同的副本（实际是不同的实例）。这里有几点需要注意：</p>
+<p>1）ThreadLocal类型的变量本质是一个被多线程线程共享的入口变量；</p>
+<p>2）同一个ThreadLocal变量在不同线程中被使用时，实际上会创建一个独属于该线程的ThreadLocal对象；</p>
+<p>3）ThreadLocal类内有一个静态内部类ThreadLocalMap，每个线程调用ThreadLocal变量时实际上是访问<br>该Map中独属于该线程的entry；</p>
+<p>4）这个entry的key就是独属于该线程的ThreadLocal对象，线程通过本线程的ThreadLocal对象就可以拿到<br>这个entry，并将数据存储到该entry的value当中；</p>
+<p>5）如果想要使一个线程在ThreadLocal中存储多个数据，可以创建多个ThreadLocal变量供一个线程使用；<br>也可以在一个ThreadLocal的属于自己的entry中存放一个复杂类型的对象，比如Map、List等。</p>
+<p>ThreadLocal也存在两个问题：</p>
+<p>1）线程复用脏读问题，比如线程池重用Thread对象，那么对应的ThreadLocal中残留的数据可能被脏读，所以最好在使用完毕之后显示手动删除存入ThreadLocal中的数据；</p>
+<p>2）内存泄漏问题，ThreadLocalMap的entry中的key都是ThreadLocal对象，而ThreadLocal对象是弱引<br>用，entry中的value又是强引用，所以当ThreadLocal被垃圾回收时，value不会被释放，同理最好在使用完毕之后显示手动删除存入ThreadLocal中的数据。</p>
+<p>总的来说，<strong>ThreadLocal 适用于每个线程需要自己独立的实例且该实例需要在多个方法中被使用，也即变量在线程间隔离而在方法或类间共享的场景。</strong>另外，在分布式日志追踪这个场景下，并非必须使用 ThreadLocal ，其它方式完全可以实现同样的效果，只是 ThreadLocal 使得实现更简洁。</p>
+<h3 id="4-MDC的使用"><a href="#4-MDC的使用" class="headerlink" title="4.MDC的使用"></a>4.MDC的使用</h3><p>作为区分来自不同源的交叉日志输出的工具。以某一请求唯一标识uuid为例，我们将从系统接受前端请求设置MDC、MDC在多线程边界的处理、MDC在类似于RPC协议（Dubbo）上游的传输、MDC在RPC协议下游的接收四个方面作出介绍。</p>
+<h4 id="4-1-MDC的获取与设置"><a href="#4-1-MDC的获取与设置" class="headerlink" title="4.1 MDC的获取与设置"></a>4.1 MDC的获取与设置</h4><p>追踪某一特定请求的业务日志，自然是在请求之前就把uuid获取并且设置到，通常情况下，可以使用Filter或者Interceptor在请求之前完成对uuid的设置。</p>
+<p>请求唯一标识uuid为例，我们将从系统接受前端请求设置MDC、MDC在类似于RPC协议（Dubbo）上游的传输、MDC在RPC协议下游的接收、MDC在多线程边界的处理四个方面以及这三个方面中需要注意的问题作出介绍。</p>
+<p><strong>设置日志格式</strong></p>
+<p>在application.yml中增加如下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">logging:</span><br><span class="line">  pattern:</span><br><span class="line">    level: &#39; %X&#123;uuid:-uuid&#125; %X&#123;user:-user&#125; %5p&#39;</span><br></pre></td></tr></table></figure>
+
+<p><strong>获取并设置</strong></p>
+<p><strong>情景一：前端在request的header里添加uuid字段</strong></p>
+<p>1）使用Filter</p>
+<p>获取uuid，为MDC设置uuid，请求结束后清空MDC均在<strong>doFilter</strong>方法中。特别注意，<strong>每次请求之后一定要清空MDC，即MDC.clear()</strong>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException &#123;</span><br><span class="line">    LOGGER.info(&quot;Set MDC &quot;);</span><br><span class="line">    HttpServletRequest httpServletRequest &#x3D; (HttpServletRequest) servletRequest;</span><br><span class="line">    &#x2F;&#x2F; 获取MDC</span><br><span class="line">    String uuid &#x3D; httpServletRequest.getHeader(REQUEST_ID);</span><br><span class="line">    &#x2F;&#x2F; 设置MDC</span><br><span class="line">    MDC.put(REQUEST_ID,uuid);</span><br><span class="line">    try&#123;</span><br><span class="line">        filterChain.doFilter(servletRequest, servletResponse);</span><br><span class="line">    &#125;finally &#123;</span><br><span class="line">        &#x2F;&#x2F; 一次请求之后，清空MDC</span><br><span class="line">        MDC.clear();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2）使用Interceptor</p>
+<p>获取uuid和设置MDC都在preHandle方法里，清空MDC在postHandle方法里。Interceptor的preHandle、postHandle、afterCompletion的生效时间和顺序自行Google。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class MdcInterceptor extends HandlerInterceptorAdapter &#123;</span><br><span class="line"></span><br><span class="line">    private static final String REQUEST_ID &#x3D; &quot;uuid&quot;;</span><br><span class="line"></span><br><span class="line">    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;</span><br><span class="line">        &#x2F;&#x2F; 获取uuid</span><br><span class="line">        String uuid &#x3D; request.getHeader(REQUEST_ID);</span><br><span class="line">        &#x2F;&#x2F; 设置MDC</span><br><span class="line">        MDC.put(REQUEST_ID,uuid);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception &#123;</span><br><span class="line">        &#x2F;&#x2F; 请求结束后，清空MDC</span><br><span class="line">        MDC.clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>情景二：客户端程序为每个请求主动生成uuid，并将uuid添加到response的header里</strong></p>
+<p>情景一有一个缺陷，就是不通过前端访问某一接口，而是直接通过链接访问该接口，那么前端便不会传输uuid字段。该种场景便解决了这个问题。</p>
+<p>首先，我们在后端生成uuid：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 获取uuid</span><br><span class="line">String uuid&#x3D; UUID.randomUUID().toString();</span><br></pre></td></tr></table></figure>
+
+<p>之后MDC设置完成uuid之后，将uuid字段放入response的header里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">response.addHeader(&quot;uuid&quot;,uuid);</span><br></pre></td></tr></table></figure>
+
+<p>其他步骤同情景一类似，通过这样，我们便可以为任何途径进来的请求赋予一个uuid。</p>
+<h4 id="4-2-MDC在多线程边界的处理"><a href="#4-2-MDC在多线程边界的处理" class="headerlink" title="4.2 MDC在多线程边界的处理"></a>4.2 MDC在多线程边界的处理</h4><p>前文我们提到，MDC数据的存储是通过ThreadLocal实现的，ThreadLocal之和当前线程相关。也就是意味着，当我们使用多线程的时候，由主线程切换到其他线程时，MDC的数据是不能主动跨线程的。因为ThreadLocal是只存在于单个线程中，所以我们在使用多线程时，应该在主线程切换到其他线程的边界传输我们MDC的值并在新的线程内重新赋值。</p>
+<p>下面我们借助一个例子来说明：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultithreadMdc</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(MultithreadMdc<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Map <span class="title">UpperCaseStrList</span><span class="params">(Map&lt;String, String&gt; map)</span> </span>&#123;</span><br><span class="line">        LOGGER.info(<span class="string">"UpperCaseStrList Method start"</span>);</span><br><span class="line">        LOGGER.info(<span class="string">"map = &#123;&#125;"</span>, map);</span><br><span class="line">        Map&lt;String, Future&gt; res = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        map.forEach((k, v) -&gt; &#123;</span><br><span class="line">            res.put(k, executorService.submit(<span class="keyword">new</span> StringCallable(v)));</span><br><span class="line">        &#125;);</span><br><span class="line">        LOGGER.info(<span class="string">"res = &#123;&#125;"</span>, res);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">StringCallable</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Object</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> String str;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, String&gt; mdcMap;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">StringCallable</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.str = str;</span><br><span class="line">            mdcMap = MDC.getCopyOfContextMap();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Object <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            LOGGER.info(<span class="string">"call method start"</span>);</span><br><span class="line">            LOGGER.info(<span class="string">"before setContextMap in this thread , Map of MDC is &#123;&#125;"</span>, MDC.getCopyOfContextMap());</span><br><span class="line">            LOGGER.info(<span class="string">"***************************"</span>);</span><br><span class="line">            MDC.setContextMap(mdcMap);</span><br><span class="line">            LOGGER.info(<span class="string">"after setContextMap in this thread , Map of MDC is &#123;&#125;"</span>, MDC.getCopyOfContextMap());</span><br><span class="line">            String res = str.toUpperCase();</span><br><span class="line">            LOGGER.info(<span class="string">"str = &#123;&#125; , toUpperCase , res = &#123;&#125;"</span>, str, res);</span><br><span class="line">            LOGGER.info(<span class="string">"after MDC clear in this thread , Map of MDC is &#123;&#125;"</span>, MDC.getCopyOfContextMap());</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述MultithreadMdc 类中，方法UpperCaseStrList中使用了多线程，其主线程与其他线程的边界为内部类StringCallable，笔者在多线程传输MDC的方法为：</p>
+<ol>
+<li><p>自定义类的私有变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private final Map&lt;String, String&gt; mdcMap;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在类的构造函数初始化mdcMap的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public StringCallable(String str) &#123;</span><br><span class="line">            ······(其他初始化过程)</span><br><span class="line">            mdcMap &#x3D; MDC.getCopyOfContextMap();</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在新线程一开始便设置MDC在新线程的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public Object call() throws Exception &#123;</span><br><span class="line">            MDC.setContextMap(mdcMap);</span><br><span class="line">            ······(其他业务逻辑)</span><br><span class="line">            return res;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>在第三步过程中，假如系统要进行相关RPC的调用，MDC在RPC协议间的传输在某种方法下(比如使用RpcContext传输)也需要在多线程的边界进行，<strong>因为RpcContext和MDC一样，同样是依赖于ThreadLocal实现的</strong>。具体传输方法请看下一小节（MDC在RPC协议上游的传输）的情景二。</p>
+<h4 id="4-3-MDC在RPC协议上游的传输"><a href="#4-3-MDC在RPC协议上游的传输" class="headerlink" title="4.3 MDC在RPC协议上游的传输"></a>4.3 MDC在RPC协议上游的传输</h4><p>MDC中的数据在RPC协议上的传输，笔者认为有两种方法：</p>
+<p><strong>DTO属性</strong></p>
+<p>在数据传输的过程中，通过DTO（数据传输对象）将MDC的值传过去，例如一个DTO为RpcParam，其定义如下，我们可以将MDC.getCopyOfContextMap()的值 通过set方法放入HeaderParam的mdc变量里传输</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcParam</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> HeaderParam headerParam;</span><br><span class="line">    <span class="keyword">private</span> Map Body;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//There is Getter and Setter Code</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HeaderParam</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String id;</span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String,String&gt; mdc;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//There is Getter and Setter Code</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>RpcContext</strong></p>
+<p>对于不用rpc协议，<strong>RpcContext的实现略有不同，本质同样是依赖于ThreadLocal进行线程数据隔离与方法共享</strong>。以Dubbo为例，我们可以在系统的边界使用RpcContext来承载MDC数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RpcContext.getContext().setAttachment(&quot;uuid&quot;,uuid);</span><br></pre></td></tr></table></figure>
+
+<p>值得注意的是，假如rpc请求是在多线程中请求，即系统边界是在多线程里，那么我们仅仅使用上述的代码是足够的。但是，当我们的客户端程序是单线程的，一定要在一次请求之后或者下一次请求之前清空RpcContext，重新设置，防止数据污染。</p>
+<p>清空RpcContext：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RpcContext.getContext().clearAttachments();</span><br></pre></td></tr></table></figure>
+
+<p>注意：当系统进行RPC调用的步骤是在多线程中时，对应的MDC放到RpcContext的传输需要放在多线程中，以上节的<a href="https://github.com/SDUmzg/Alearner/blob/master/mdc-learning/src/main/java/com/alearner/mdc/MultithreadMdc.java" target="_blank" rel="noopener">MultithreadMdc.java</a>举例，对应的第三步传输的代码为</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            MDC.setContextMap(mdcMap);</span><br><span class="line">            ······(其他业务逻辑)</span><br><span class="line">            RpcContext.getContext().setAttachment(<span class="string">"uuid"</span>,MDC.get(<span class="string">"uuid"</span>));</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-4-MDC在RPC协议下游的接收"><a href="#4-4-MDC在RPC协议下游的接收" class="headerlink" title="4.4 MDC在RPC协议下游的接收"></a>4.4 MDC在RPC协议下游的接收</h3><p>根据MDC在RPC协议上游的传输的两种方法，对应的MDC接收有以下两种：</p>
+<p><strong>DTO属性</strong></p>
+<p>下游获取到RpcParam后，使用get取得HeaderParam成员变量，进而在使用get方法获取HeaderParam的mdc变量，最后使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MDC.setContextMap(mdc);</span><br></pre></td></tr></table></figure>
+
+<p><strong>RpcContext</strong></p>
+<p>使用RpcContext来获取：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RpcContext.getContext().getAttachment(&quot;uuid&quot;);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="http://alearner.top/index.php/2018/08/28/mdc-mapped-diagnostic-context/" target="_blank" rel="noopener">MDC - Mapped Diagnostic Context 上下文诊断映射</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
+          
+            <a href="/tags/MDC/" rel="tag"><i class="fa fa-tag"></i> MDC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/" rel="next" title="Java服务_SV服务缓存全量更新和增量更新方案">
+                <i class="fa fa-chevron-left"></i> Java服务_SV服务缓存全量更新和增量更新方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/10/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E5%88%86%E6%97%B6%E7%B4%AF%E8%AE%A1%E8%B6%8B%E5%8A%BF%E5%9B%BE%E7%9A%84%E5%A4%9A%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88%E4%B8%8E%E6%AF%94%E8%BE%83/" rel="prev" title="HiveSQL实战积累_分时累计趋势图的多种实现方案与比较">
+                HiveSQL实战积累_分时累计趋势图的多种实现方案与比较 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-分布式服务日志追踪工具MDC"><span class="nav-number">1.</span> <span class="nav-text">Java服务_分布式服务日志追踪工具MDC</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-情景介绍"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.情景介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-MDC介绍"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.MDC介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-ThreadLocal"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.ThreadLocal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-MDC的使用"><span class="nav-number">1.0.4.</span> <span class="nav-text">4.MDC的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-MDC的获取与设置"><span class="nav-number">1.0.4.1.</span> <span class="nav-text">4.1 MDC的获取与设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-MDC在多线程边界的处理"><span class="nav-number">1.0.4.2.</span> <span class="nav-text">4.2 MDC在多线程边界的处理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-MDC在RPC协议上游的传输"><span class="nav-number">1.0.4.3.</span> <span class="nav-text">4.3 MDC在RPC协议上游的传输</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-MDC在RPC协议下游的接收"><span class="nav-number">1.0.5.</span> <span class="nav-text">4.4 MDC在RPC协议下游的接收</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.0.6.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

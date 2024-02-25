@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse,刷岗," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_clickhouse刷岗实战关键命令123456789101112131415161718192021222324252627282930INSERT    INTO    ge_order.%s(     dateTime,     skuId,     spuId,     saleOrdId,     cateDept0,     cateDept1    )    S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_clickhouse刷岗实战">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_clickhouse刷岗实战关键命令123456789101112131415161718192021222324252627282930INSERT    INTO    ge_order.%s(     dateTime,     skuId,     spuId,     saleOrdId,     cateDept0,     cateDept1    )    S">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/3.jpg">
+<meta property="article:published_time" content="2024-01-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:39:23.174Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta property="article:tag" content="刷岗">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse刷岗实战/"/>
+
+
+
+
+
+  <title>ClickHouse_clickhouse刷岗实战 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_clickhouse刷岗实战</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-09T00:00:00+08:00">
+                2024-01-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClickHouse-clickhouse刷岗实战"><a href="#ClickHouse-clickhouse刷岗实战" class="headerlink" title="ClickHouse_clickhouse刷岗实战"></a>ClickHouse_clickhouse刷岗实战</h1><h2 id="关键命令"><a href="#关键命令" class="headerlink" title="关键命令"></a>关键命令</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span></span><br><span class="line">    <span class="keyword">INTO</span></span><br><span class="line">    ge_order.%s(</span><br><span class="line">     dateTime,</span><br><span class="line">     skuId,</span><br><span class="line">     spuId,</span><br><span class="line">     saleOrdId,</span><br><span class="line">     cateDept0,</span><br><span class="line">     cateDept1</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">SELECT</span></span><br><span class="line">         dateTime,</span><br><span class="line">         skuId,</span><br><span class="line">         spuId,</span><br><span class="line">         saleOrdId,</span><br><span class="line">         multiIf(sjFlagx=<span class="string">'0'</span>,multiIf(ordType &lt;&gt; <span class="string">'10'</span>,<span class="keyword">ifNull</span>(dictGet(<span class="string">'ge_order.site_sku_info_dict'</span>,<span class="string">'cateDept0'</span>,skuId),<span class="string">'0'</span>),ordType=<span class="string">'10'</span> <span class="keyword">and</span> healthFlag = <span class="string">'0'</span>,<span class="string">'6210'</span>,ordType=<span class="string">'10'</span> <span class="keyword">and</span> healthFlag = <span class="string">'1'</span>,<span class="string">'3984'</span>,<span class="string">'0'</span>),sjFlagx=<span class="string">'1'</span>,<span class="string">'6210'</span>,sjFlagx=<span class="string">'2'</span>,dictGet(<span class="string">'ge_order.site_global_sku_info_dict'</span>,<span class="string">'cateDept0'</span>,skuId),sjFlagx=<span class="string">'3'</span>,<span class="string">'1727'</span>,sjFlagx=<span class="string">'4'</span>,<span class="string">'4903'</span>,sjFlagx=<span class="string">'5'</span>,<span class="string">'1727'</span>,<span class="string">'0'</span>) <span class="keyword">as</span> cateDept0,</span><br><span class="line">         multiIf(sjFlagx=<span class="string">'0'</span>,multiIf(ordType &lt;&gt; <span class="string">'10'</span>,<span class="keyword">ifNull</span>(dictGet(<span class="string">'ge_order.site_sku_info_dict'</span>,<span class="string">'cateDept1'</span>,skuId),<span class="string">'0'</span>),ordType=<span class="string">'10'</span> <span class="keyword">and</span> healthFlag = <span class="string">'0'</span>,<span class="string">'8709'</span>,ordType=<span class="string">'10'</span> <span class="keyword">and</span> healthFlag = <span class="string">'1'</span>,<span class="string">'6381'</span>,<span class="string">'0'</span>),sjFlagx=<span class="string">'1'</span>,<span class="string">'6316'</span>,sjFlagx=<span class="string">'2'</span>,dictGet(<span class="string">'ge_order.site_global_sku_info_dict'</span>,<span class="string">'cateDept1'</span>,skuId),sjFlagx=<span class="string">'3'</span>,<span class="string">'4384'</span>,sjFlagx=<span class="string">'4'</span>,<span class="string">'32'</span>,sjFlagx=<span class="string">'5'</span>,<span class="string">'88888888'</span>,<span class="string">'0'</span>) <span class="keyword">as</span> cateDept1</span><br><span class="line">    <span class="keyword">FROM</span></span><br><span class="line">         (</span><br><span class="line">            <span class="keyword">SELECT</span></span><br><span class="line">                 dateTime,</span><br><span class="line">                 skuId,</span><br><span class="line">                 dictGet(<span class="string">'ge_order.site_sku_info_dict'</span>,<span class="string">'spuId'</span>,skuId) <span class="keyword">as</span> spuId,</span><br><span class="line">                 saleOrdId</span><br><span class="line">            <span class="keyword">FROM</span></span><br><span class="line">                ge_order.%s</span><br><span class="line">            <span class="keyword">where</span> </span><br><span class="line">                dateTime &gt;= <span class="string">'%s'</span> <span class="keyword">AND</span> dateTime &lt;= <span class="string">'%s'</span>)</span><br><span class="line">            <span class="keyword">where</span> sjFlagx&lt;&gt;<span class="string">'9999'</span></span><br><span class="line">    <span class="keyword">SETTINGS</span> max_insert_threads=%s</span><br></pre></td></tr></table></figure>
+
+<p>如上是一个刷新sku所属spu、0级部门、1级部门的简单案例，需要注意：</p>
+<p>1.需要基于sku维度建立字典表，将维表数据放入内存中，并使用字典函数dictGet将大大加快关联速度；</p>
+<p>2.订单明细表和sku维表都需要以skuid作为分片键写入集群，这样可以直接在每个本地节点上提交读写本地表的刷岗sql；</p>
+<p>3.将T+2以前数据与T+1数据分成两个任务执行，因为订单明细一般并sku最新维表的实效要晚一些，那么在sku维表出数之后直接开始T+2以前历史数据的刷岗；在T+1订单明细出数后再进行T+1数据的刷岗，这样可以极大缩短sla。</p>
+<p><img src="//littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/1.jpg" alt></p>
+<h2 id="ck预计算"><a href="#ck预计算" class="headerlink" title="ck预计算"></a>ck预计算</h2><p>想尽一切办法把刷岗和预计算全部放到ck中来，主要有两个原因：</p>
+<p>1.缩短时效，ck这种在线引擎一定比spark的资源调度能力要强；</p>
+<p>2.节约资源，ck集群是申请后一直归你用，随便你怎么造，但是spark按任务使用资源计费，而且往往抢不到资源。</p>
+<p>上述刷岗使明细表与维表都按照skuid进行分片就是尽量避免刷岗过程中跨节点传输，浪费时间，同样在ck预计算过程中，也是要想尽一切办法，甚至细节到为每一个指标单独构建一套分片规则和对应的预计算链路，就是为了能让预计算都在一个节点上执行，最后无论是去重还是非去重指标直接在分布式表上sum即可。</p>
+<p>相关流量的uv指标预计算加工链路如下：</p>
+<p><img src="//littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/2.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2024/01/09/ClickHouse_clickhouse%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/3.jpg" alt></p>
+<h2 id="刷岗脚本实战"><a href="#刷岗脚本实战" class="headerlink" title="刷岗脚本实战"></a>刷岗脚本实战</h2><p>其中还包括一系列的建临时表、条数校验、attach分区等逻辑：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br><span class="line">613</span><br><span class="line">614</span><br><span class="line">615</span><br><span class="line">616</span><br><span class="line">617</span><br><span class="line">618</span><br><span class="line">619</span><br><span class="line">620</span><br><span class="line">621</span><br><span class="line">622</span><br><span class="line">623</span><br><span class="line">624</span><br><span class="line">625</span><br><span class="line">626</span><br><span class="line">627</span><br><span class="line">628</span><br><span class="line">629</span><br><span class="line">630</span><br><span class="line">631</span><br><span class="line">632</span><br><span class="line">633</span><br><span class="line">634</span><br><span class="line">635</span><br><span class="line">636</span><br><span class="line">637</span><br><span class="line">638</span><br><span class="line">639</span><br><span class="line">640</span><br><span class="line">641</span><br><span class="line">642</span><br><span class="line">643</span><br><span class="line">644</span><br><span class="line">645</span><br><span class="line">646</span><br><span class="line">647</span><br><span class="line">648</span><br><span class="line">649</span><br><span class="line">650</span><br><span class="line">651</span><br><span class="line">652</span><br><span class="line">653</span><br><span class="line">654</span><br><span class="line">655</span><br><span class="line">656</span><br><span class="line">657</span><br><span class="line">658</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3 </span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> urllib.request <span class="keyword">import</span> urlopen, Request</span><br><span class="line"><span class="keyword">from</span> urllib <span class="keyword">import</span> parse</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ThreadPoolExecutor</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cmd = <span class="string">"wget -T20 -t3 -w3 --random-wait http://ads-sz.s3-internal.cn-north-1.jdcloud-oss.com/ads_sz/GETask.py -O GETask.py"</span>;</span><br><span class="line">print(cmd + <span class="string">'...'</span>)</span><br><span class="line"></span><br><span class="line">status = os.system(cmd)</span><br><span class="line"><span class="keyword">if</span> status != <span class="number">0</span>:</span><br><span class="line">    print(<span class="string">'GETask.py download Failed! try again...'</span>)</span><br><span class="line">    code = os.system(cmd)</span><br><span class="line">    <span class="keyword">if</span> code != <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">"try failed! progress exit!"</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'GETask.py download Success!'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> GETask <span class="keyword">import</span> GETask</span><br><span class="line"></span><br><span class="line"><span class="comment">#请求参数解析</span></span><br><span class="line"><span class="keyword">if</span> len(sys.argv) &gt; <span class="number">1</span>:</span><br><span class="line">    data = sys.argv[<span class="number">1</span>]</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"args must input!"</span>)</span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">para_dic = json.loads(data)</span><br><span class="line">systemFlag = <span class="string">'SYSTEM'</span></span><br><span class="line"><span class="comment">#集群名称</span></span><br><span class="line">clusterEnum =para_dic[<span class="string">'clusterEnum'</span>]</span><br><span class="line"><span class="comment">#明细表</span></span><br><span class="line">detail_table = para_dic[<span class="string">'detail_table'</span>]</span><br><span class="line"><span class="comment">#刷新时间</span></span><br><span class="line">refresh_months = para_dic[<span class="string">'refresh_months'</span>]</span><br><span class="line"><span class="comment">#并发数量</span></span><br><span class="line">thread_num = int(para_dic[<span class="string">'thread_num'</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">select_hosts_sql=<span class="string">"""SELECT concat (toString(shard_num), ':' , host_name, ':' , ( case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' else '8123' end)) AS host_name FROM (SELECT shard_num, host_name, port FROM system.%s WHERE cluster = '%s' order by shard_num,replica_num)"""</span> </span><br><span class="line">ck_url_temp=<span class="string">"""http://%s/?user=%s&amp;password=%s&amp;query="""</span></span><br><span class="line">ck_domain_url = <span class="string">"""http://%s:%s/?user=%s&amp;password=%s&amp;query="""</span></span><br><span class="line">create_dist=<span class="string">"""CREATE TABLE if not EXISTS ge_order.%s_d as ge_order.%s ENGINE = Distributed('%s', 'ge_order', '%s', rand())"""</span></span><br><span class="line">dic =getattr(GETask, clusterEnum)</span><br><span class="line"><span class="comment"># # 集群配置信息CK集群信息域名，并且用来作为CK中zookeeper中表路径使用（没域名可使用集群中任一节点ip即可）</span></span><br><span class="line">ckt = GETask()</span><br><span class="line"><span class="comment">#(clusterName,hostName,clusterTable)</span></span><br><span class="line">clusterInfo = ckt.getClusterMessage(GETask, clusterEnum)</span><br><span class="line"><span class="comment">#集群域名</span></span><br><span class="line">ip =clusterInfo[<span class="number">1</span>]</span><br><span class="line"><span class="comment">#查询端口</span></span><br><span class="line">port = dic.get(<span class="string">"port"</span>).split(<span class="string">","</span>)[<span class="number">0</span>]</span><br><span class="line"><span class="comment">#用户名</span></span><br><span class="line">user=ckt.select_userPass(systemFlag)[<span class="number">0</span>]</span><br><span class="line"><span class="comment">#密码</span></span><br><span class="line">password=ckt.select_userPass(systemFlag)[<span class="number">1</span>]</span><br><span class="line"><span class="comment">#集群基本信息表名</span></span><br><span class="line">clusters=clusterInfo[<span class="number">2</span>]</span><br><span class="line"><span class="comment">#集群名称</span></span><br><span class="line">clusterName=clusterInfo[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">verify_sql = <span class="string">"""select sum(dealSaleAmt) from ge_order.%s_d where dateTime &gt;= '%s' and dateTime &lt;= '%s'"""</span></span><br><span class="line">verify_sql_dict = <span class="string">"""select sum(dealSaleAmt) from ge_order.%s_d where dateTime &gt;= '%s' and dateTime &lt;= '%s' and doubleCountFlag='0'"""</span></span><br><span class="line">select_count_sql = <span class="string">"""select count() from ge_order.%s_d"""</span></span><br><span class="line"></span><br><span class="line">clickhouse_database_tmp = <span class="string">"ge_order"</span></span><br><span class="line">clickhouse_table_tmp = <span class="string">"ck_ge_app_trade_site_ord_snapshot_dict_temp"</span></span><br><span class="line">clickhouse_database = <span class="string">"ge_order"</span></span><br><span class="line">clickhouse_table = <span class="string">"ck_ge_app_trade_site_ord_snapshot_dict"</span></span><br><span class="line"></span><br><span class="line">replace_partition_sql = <span class="string">"alter table "</span> + clickhouse_database + <span class="string">"."</span> + clickhouse_table + <span class="string">" replace partition '%s' FROM "</span> + clickhouse_database_tmp + <span class="string">"."</span> + clickhouse_table_tmp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">create_local = <span class="string">"""CREATE TABLE ge_order.%s</span></span><br><span class="line"><span class="string">(</span></span><br><span class="line"><span class="string">    `dateTime` String,</span></span><br><span class="line"><span class="string">    `secondTerminalId` String,</span></span><br><span class="line"><span class="string">    `speFlag` Int32,</span></span><br><span class="line"><span class="string">    `dealFlag` Int32,</span></span><br><span class="line"><span class="string">    `validFlag` Int32,</span></span><br><span class="line"><span class="string">    `outFlag` Int32,</span></span><br><span class="line"><span class="string">    `ordType` Int32,</span></span><br><span class="line"><span class="string">    `shopType` String,</span></span><br><span class="line"><span class="string">    `jxFlag` String,</span></span><br><span class="line"><span class="string">    `_171Flag` String,</span></span><br><span class="line"><span class="string">    `decentralFlag` String,</span></span><br><span class="line"><span class="string">    `neicaiFlag5star` Int32,</span></span><br><span class="line"><span class="string">    `neicaiFlag` Int32,</span></span><br><span class="line"><span class="string">    `daojiaFlag` Int32,</span></span><br><span class="line"><span class="string">    `deal1Min` Int32,</span></span><br><span class="line"><span class="string">    `valid1Min` Int32,</span></span><br><span class="line"><span class="string">    `out1Min` Int32,</span></span><br><span class="line"><span class="string">    `deal10Min` Int32,</span></span><br><span class="line"><span class="string">    `valid10Min` Int32,</span></span><br><span class="line"><span class="string">    `out10Min` Int32,</span></span><br><span class="line"><span class="string">    `dealHour` Int32,</span></span><br><span class="line"><span class="string">    `validHour` Int32,</span></span><br><span class="line"><span class="string">    `outHour` Int32,</span></span><br><span class="line"><span class="string">    `skuId` UInt64,</span></span><br><span class="line"><span class="string">    `spuId` UInt64,</span></span><br><span class="line"><span class="string">    `shopId` String,</span></span><br><span class="line"><span class="string">    `dealSaleQtty` Float64,</span></span><br><span class="line"><span class="string">    `validSaleQtty` Float64,</span></span><br><span class="line"><span class="string">    `outSaleQtty` Float64,</span></span><br><span class="line"><span class="string">    `dealPSaleOrdId` Nullable(String),</span></span><br><span class="line"><span class="string">    `validPSaleOrdId` Nullable(String),</span></span><br><span class="line"><span class="string">    `dealSaleOrdId` Nullable(String),</span></span><br><span class="line"><span class="string">    `validSaleOrdId` Nullable(String),</span></span><br><span class="line"><span class="string">    `outSaleOrdId` Nullable(String),</span></span><br><span class="line"><span class="string">    `dealSaleAmt` Float64,</span></span><br><span class="line"><span class="string">    `validSaleAmt` Float64,</span></span><br><span class="line"><span class="string">    `outSaleAmt` Float64,</span></span><br><span class="line"><span class="string">    `cityLevel` String,</span></span><br><span class="line"><span class="string">    `areaId` String,</span></span><br><span class="line"><span class="string">    `provinceId` String,</span></span><br><span class="line"><span class="string">    `cityId` String,</span></span><br><span class="line"><span class="string">    `decentralLevel1` Array(Nullable(String)),</span></span><br><span class="line"><span class="string">    `decentralLevel2` Array(Nullable(String)),</span></span><br><span class="line"><span class="string">    `decentralLevel3` Array(Nullable(String)),</span></span><br><span class="line"><span class="string">    `first_biz` String,</span></span><br><span class="line"><span class="string">    `scnd_biz` String,</span></span><br><span class="line"><span class="string">    `third_biz` String,</span></span><br><span class="line"><span class="string">    `provinceIdNum` String,</span></span><br><span class="line"><span class="string">    `cityIdNum` String,</span></span><br><span class="line"><span class="string">    `saleOrdId` String,</span></span><br><span class="line"><span class="string">    `venderId` String,</span></span><br><span class="line"><span class="string">    `providerCode` String,</span></span><br><span class="line"><span class="string">    `firstPlaceCd` Int64,</span></span><br><span class="line"><span class="string">    `secondPlaceCd` Int64,</span></span><br><span class="line"><span class="string">    `thirdPlaceCd` Int64,</span></span><br><span class="line"><span class="string">    `purChannelCd` Int64,</span></span><br><span class="line"><span class="string">    `virtualOrdFlag` Int32,</span></span><br><span class="line"><span class="string">    `gdxOperPlaceFlag` Int32,</span></span><br><span class="line"><span class="string">    `corpTypeCd1` String,</span></span><br><span class="line"><span class="string">    `corpTypeCd2` String,</span></span><br><span class="line"><span class="string">    `shadowSkuId` UInt64,</span></span><br><span class="line"><span class="string">    `skuFlag` String,</span></span><br><span class="line"><span class="string">    `decentralLevel4` Array(Nullable(String)),</span></span><br><span class="line"><span class="string">    `decentralLevel0` Array(Nullable(String)),</span></span><br><span class="line"><span class="string">    `thirdTerminalId` String,</span></span><br><span class="line"><span class="string">    `normalBFlag` Int32,</span></span><br><span class="line"><span class="string">    `cateDept0` String,</span></span><br><span class="line"><span class="string">    `cateDept1` String,</span></span><br><span class="line"><span class="string">    `cateDept2` String,</span></span><br><span class="line"><span class="string">    `cateDept3` String,</span></span><br><span class="line"><span class="string">    `cateDept4` String,</span></span><br><span class="line"><span class="string">    `cateDept5` String,</span></span><br><span class="line"><span class="string">    `cateErpGlobal` String,</span></span><br><span class="line"><span class="string">    `purErp` String,</span></span><br><span class="line"><span class="string">    `purConErp` String,</span></span><br><span class="line"><span class="string">    `firstIndId` String,</span></span><br><span class="line"><span class="string">    `secondIndId` String,</span></span><br><span class="line"><span class="string">    `thirdIndId` String,</span></span><br><span class="line"><span class="string">    `fourthIndId` String,</span></span><br><span class="line"><span class="string">    `brandId` String,</span></span><br><span class="line"><span class="string">    `mainBrandId` String,</span></span><br><span class="line"><span class="string">    `purSaleControlSeparateFlag` Int32,</span></span><br><span class="line"><span class="string">    `doubleCountFlag` String,</span></span><br><span class="line"><span class="string">    `firstBizCd` String,</span></span><br><span class="line"><span class="string">    `scndBizCd` String,</span></span><br><span class="line"><span class="string">    `thirdBizCd` String,</span></span><br><span class="line"><span class="string">    `popShopType` String,</span></span><br><span class="line"><span class="string">    `edlpFlag` Int32,</span></span><br><span class="line"><span class="string">    `firstTerminalId` String,</span></span><br><span class="line"><span class="string">    `bgId` String,</span></span><br><span class="line"><span class="string">    `sourceBgId` String,</span></span><br><span class="line"><span class="string">    `sourceDept0` String,</span></span><br><span class="line"><span class="string">    `sourceDept1` String,</span></span><br><span class="line"><span class="string">    `sourceDept2` String,</span></span><br><span class="line"><span class="string">    `sourceDept3` String,</span></span><br><span class="line"><span class="string">    `buyerErp` String,</span></span><br><span class="line"><span class="string">    `saleChaErp` String,</span></span><br><span class="line"><span class="string">    `plusOrdFlag` Int32</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string">ENGINE = ReplicatedMergeTree('/service-ck-x6w0v01471.ck-x6w0v01471-hb.jvessel2.jdcloud.com/tables/ge_order/%s_%s/&#123;shard&#125;', '&#123;replica&#125;')</span></span><br><span class="line"><span class="string">PARTITION BY dateTime</span></span><br><span class="line"><span class="string">ORDER BY (cateDept0, cateDept1, cateDept2, cateDept3, cateDept4, cateErpGlobal, purErp, purConErp, firstIndId, secondIndId, thirdIndId, fourthIndId, brandId, mainBrandId, secondTerminalId, speFlag, dealFlag, validFlag, outFlag, ordType, shopType,jxFlag, _171Flag, neicaiFlag5star, neicaiFlag)</span></span><br><span class="line"><span class="string">SETTINGS storage_policy = 'jdob_ha',index_granularity = 8192"""</span></span><br><span class="line"><span class="comment">#上线</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">drop_local_table_sql = <span class="string">"""drop table if exists ge_order.%s"""</span></span><br><span class="line">drop_dist_table_sql = <span class="string">"""drop table if exists ge_order.%s_d"""</span></span><br><span class="line"></span><br><span class="line">insert_sql = <span class="string">"""</span></span><br><span class="line"><span class="string">    INSERT</span></span><br><span class="line"><span class="string">    INTO</span></span><br><span class="line"><span class="string">    ge_order.%s(</span></span><br><span class="line"><span class="string">     dateTime,</span></span><br><span class="line"><span class="string">     secondTerminalId,</span></span><br><span class="line"><span class="string">     speFlag,</span></span><br><span class="line"><span class="string">     dealFlag,</span></span><br><span class="line"><span class="string">     validFlag,</span></span><br><span class="line"><span class="string">     outFlag,</span></span><br><span class="line"><span class="string">     ordType,</span></span><br><span class="line"><span class="string">     shopType,</span></span><br><span class="line"><span class="string">     jxFlag,</span></span><br><span class="line"><span class="string">     _171Flag,</span></span><br><span class="line"><span class="string">     decentralFlag,</span></span><br><span class="line"><span class="string">     neicaiFlag5star,</span></span><br><span class="line"><span class="string">     neicaiFlag,</span></span><br><span class="line"><span class="string">     daojiaFlag,</span></span><br><span class="line"><span class="string">     deal1Min,</span></span><br><span class="line"><span class="string">     valid1Min,</span></span><br><span class="line"><span class="string">     out1Min,</span></span><br><span class="line"><span class="string">     deal10Min,</span></span><br><span class="line"><span class="string">     valid10Min,</span></span><br><span class="line"><span class="string">     out10Min,</span></span><br><span class="line"><span class="string">     dealHour,</span></span><br><span class="line"><span class="string">     validHour,</span></span><br><span class="line"><span class="string">     outHour,</span></span><br><span class="line"><span class="string">     skuId,</span></span><br><span class="line"><span class="string">     spuId,</span></span><br><span class="line"><span class="string">     shopId,</span></span><br><span class="line"><span class="string">     dealSaleQtty,</span></span><br><span class="line"><span class="string">     validSaleQtty,</span></span><br><span class="line"><span class="string">     outSaleQtty,</span></span><br><span class="line"><span class="string">     dealPSaleOrdId,</span></span><br><span class="line"><span class="string">     validPSaleOrdId,</span></span><br><span class="line"><span class="string">     dealSaleOrdId,</span></span><br><span class="line"><span class="string">     validSaleOrdId,</span></span><br><span class="line"><span class="string">     outSaleOrdId,</span></span><br><span class="line"><span class="string">     dealSaleAmt,</span></span><br><span class="line"><span class="string">     validSaleAmt,</span></span><br><span class="line"><span class="string">     outSaleAmt,</span></span><br><span class="line"><span class="string">     cityLevel,</span></span><br><span class="line"><span class="string">     areaId,</span></span><br><span class="line"><span class="string">     provinceId,</span></span><br><span class="line"><span class="string">     cityId,</span></span><br><span class="line"><span class="string">     decentralLevel1,</span></span><br><span class="line"><span class="string">     decentralLevel2,</span></span><br><span class="line"><span class="string">     decentralLevel3,</span></span><br><span class="line"><span class="string">     first_biz,</span></span><br><span class="line"><span class="string">     scnd_biz,</span></span><br><span class="line"><span class="string">     third_biz,</span></span><br><span class="line"><span class="string">     provinceIdNum,</span></span><br><span class="line"><span class="string">     cityIdNum,</span></span><br><span class="line"><span class="string">     saleOrdId,</span></span><br><span class="line"><span class="string">     venderId,</span></span><br><span class="line"><span class="string">     providerCode,</span></span><br><span class="line"><span class="string">     firstPlaceCd,</span></span><br><span class="line"><span class="string">     secondPlaceCd,</span></span><br><span class="line"><span class="string">     thirdPlaceCd,</span></span><br><span class="line"><span class="string">     purChannelCd,</span></span><br><span class="line"><span class="string">     virtualOrdFlag,</span></span><br><span class="line"><span class="string">     gdxOperPlaceFlag,</span></span><br><span class="line"><span class="string">     corpTypeCd1,</span></span><br><span class="line"><span class="string">     corpTypeCd2,</span></span><br><span class="line"><span class="string">     shadowSkuId,</span></span><br><span class="line"><span class="string">     skuFlag,</span></span><br><span class="line"><span class="string">     decentralLevel4,</span></span><br><span class="line"><span class="string">     decentralLevel0,</span></span><br><span class="line"><span class="string">     thirdTerminalId,</span></span><br><span class="line"><span class="string">     normalBFlag,</span></span><br><span class="line"><span class="string">     cateDept0,</span></span><br><span class="line"><span class="string">     cateDept1,</span></span><br><span class="line"><span class="string">     cateDept2,</span></span><br><span class="line"><span class="string">     cateDept3,</span></span><br><span class="line"><span class="string">     cateDept4,</span></span><br><span class="line"><span class="string">     cateDept5,</span></span><br><span class="line"><span class="string">     cateErpGlobal,</span></span><br><span class="line"><span class="string">     purErp,</span></span><br><span class="line"><span class="string">     purConErp,</span></span><br><span class="line"><span class="string">     firstIndId,</span></span><br><span class="line"><span class="string">     secondIndId,</span></span><br><span class="line"><span class="string">     thirdIndId,</span></span><br><span class="line"><span class="string">     fourthIndId,</span></span><br><span class="line"><span class="string">     brandId,</span></span><br><span class="line"><span class="string">     mainBrandId,</span></span><br><span class="line"><span class="string">     purSaleControlSeparateFlag,</span></span><br><span class="line"><span class="string">     doubleCountFlag,</span></span><br><span class="line"><span class="string">     firstBizCd,</span></span><br><span class="line"><span class="string">     scndBizCd,</span></span><br><span class="line"><span class="string">     thirdBizCd,</span></span><br><span class="line"><span class="string">     popShopType,</span></span><br><span class="line"><span class="string">     edlpFlag,</span></span><br><span class="line"><span class="string">     firstTerminalId,</span></span><br><span class="line"><span class="string">     bgId,</span></span><br><span class="line"><span class="string">     sourceBgId,</span></span><br><span class="line"><span class="string">     sourceDept0,</span></span><br><span class="line"><span class="string">     sourceDept1,</span></span><br><span class="line"><span class="string">     sourceDept2,</span></span><br><span class="line"><span class="string">     sourceDept3,</span></span><br><span class="line"><span class="string">     buyerErp,</span></span><br><span class="line"><span class="string">     saleChaErp,</span></span><br><span class="line"><span class="string">     plusOrdFlag</span></span><br><span class="line"><span class="string">    )</span></span><br><span class="line"><span class="string">    SELECT</span></span><br><span class="line"><span class="string">         dateTime,</span></span><br><span class="line"><span class="string">         secondTerminalId,</span></span><br><span class="line"><span class="string">         speFlag,</span></span><br><span class="line"><span class="string">         dealFlag,</span></span><br><span class="line"><span class="string">         validFlag,</span></span><br><span class="line"><span class="string">         outFlag,</span></span><br><span class="line"><span class="string">         ordType,</span></span><br><span class="line"><span class="string">         shopType,</span></span><br><span class="line"><span class="string">         jxFlag,</span></span><br><span class="line"><span class="string">         _171Flag,</span></span><br><span class="line"><span class="string">         decentralFlag,</span></span><br><span class="line"><span class="string">         neicaiFlag5star,</span></span><br><span class="line"><span class="string">         neicaiFlag,</span></span><br><span class="line"><span class="string">         daojiaFlag,</span></span><br><span class="line"><span class="string">         deal1Min,</span></span><br><span class="line"><span class="string">         valid1Min,</span></span><br><span class="line"><span class="string">         out1Min,</span></span><br><span class="line"><span class="string">         deal10Min,</span></span><br><span class="line"><span class="string">         valid10Min,</span></span><br><span class="line"><span class="string">         out10Min,</span></span><br><span class="line"><span class="string">         dealHour,</span></span><br><span class="line"><span class="string">         validHour,</span></span><br><span class="line"><span class="string">         outHour,</span></span><br><span class="line"><span class="string">         skuId,</span></span><br><span class="line"><span class="string">         spuId,</span></span><br><span class="line"><span class="string">         shopId,</span></span><br><span class="line"><span class="string">         dealSaleQtty,</span></span><br><span class="line"><span class="string">         validSaleQtty,</span></span><br><span class="line"><span class="string">         outSaleQtty,</span></span><br><span class="line"><span class="string">         dealPSaleOrdId,</span></span><br><span class="line"><span class="string">         validPSaleOrdId,</span></span><br><span class="line"><span class="string">         dealSaleOrdId,</span></span><br><span class="line"><span class="string">         validSaleOrdId,</span></span><br><span class="line"><span class="string">         outSaleOrdId,</span></span><br><span class="line"><span class="string">         dealSaleAmt,</span></span><br><span class="line"><span class="string">         validSaleAmt,</span></span><br><span class="line"><span class="string">         outSaleAmt,</span></span><br><span class="line"><span class="string">         cityLevel,</span></span><br><span class="line"><span class="string">         areaId,</span></span><br><span class="line"><span class="string">         provinceId,</span></span><br><span class="line"><span class="string">         cityId,</span></span><br><span class="line"><span class="string">         decentral_business_1,</span></span><br><span class="line"><span class="string">         decentral_business_2,</span></span><br><span class="line"><span class="string">         decentral_business_3,</span></span><br><span class="line"><span class="string">         first_biz,</span></span><br><span class="line"><span class="string">         scnd_biz,</span></span><br><span class="line"><span class="string">         third_biz,</span></span><br><span class="line"><span class="string">         provinceIdNum,</span></span><br><span class="line"><span class="string">         cityIdNum,</span></span><br><span class="line"><span class="string">         saleOrdId,</span></span><br><span class="line"><span class="string">         venderId,</span></span><br><span class="line"><span class="string">         providerCode,</span></span><br><span class="line"><span class="string">         firstPlaceCd,</span></span><br><span class="line"><span class="string">         secondPlaceCd,</span></span><br><span class="line"><span class="string">         thirdPlaceCd,</span></span><br><span class="line"><span class="string">         purChannelCd,</span></span><br><span class="line"><span class="string">         virtualOrdFlag,</span></span><br><span class="line"><span class="string">         gdxOperPlaceFlag,</span></span><br><span class="line"><span class="string">         corpTypeCd1,</span></span><br><span class="line"><span class="string">         corpTypeCd2,</span></span><br><span class="line"><span class="string">         shadowSkuId,</span></span><br><span class="line"><span class="string">         skuFlag,</span></span><br><span class="line"><span class="string">         decentral_business_4,</span></span><br><span class="line"><span class="string">         decentral_business_0,</span></span><br><span class="line"><span class="string">         thirdTerminalId,</span></span><br><span class="line"><span class="string">         normalBFlag,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',multiIf(ordType &lt;&gt; '10',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept0',skuId),'0'),ordType='10' and healthFlag = '0','6210',ordType='10' and healthFlag = '1','3984','0'),sjFlagx='1','6210',sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateDept0',skuId),sjFlagx='3','1727',sjFlagx='4','4903',sjFlagx='5','1727','0') as cateDept0,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',multiIf(ordType &lt;&gt; '10',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept1',skuId),'0'),ordType='10' and healthFlag = '0','8709',ordType='10' and healthFlag = '1','6381','0'),sjFlagx='1','6316',sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateDept1',skuId),sjFlagx='3','4384',sjFlagx='4','32',sjFlagx='5','88888888','0') as cateDept1,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',multiIf(ordType &lt;&gt; '10',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept2',skuId),'0'),ordType='10' and healthFlag = '0','0',ordType='10' and healthFlag = '1','10545','0'),sjFlagx='1',dictGet('ge_order.site_global_sku_info_dict','cateDept2',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateDept2',skuId),sjFlagx='3','111111',sjFlagx='4',multiIf(provinceIdNum='52993','9191',provinceIdNum='32','9192',provinceIdNum='53283' or globalSaleFlag=2,'9193','0'),sjFlagx='5',ifNULL(dictGet('ge_order.site_sku_info_dict','cateDept2',skuId),'0'),'0') as cateDept2,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',multiIf(ordType &lt;&gt; '10',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept3',skuId),'0'),ordType='10' and healthFlag = '0','0',ordType='10' and healthFlag = '1','13099','0'),sjFlagx='1',dictGet('ge_order.site_global_sku_info_dict','cateDept3',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateDept3',skuId),sjFlagx='3',dictGet('ge_order.site_sku_info_dict','cateDept3',skuId),sjFlagx='4',multiIf(cityIdNum='52994','9194',cityIdNum='52995','9195',cityIdNum='2768','9196',cityIdNum='53309','9197',cityIdNum='53333','9198',cityIdNum='53456','9199'</span></span><br><span class="line"><span class="string">         ,cityIdNum='53440','9200',cityIdNum='53347','9201',cityIdNum='53303','9202',cityIdNum='53462','9203',cityIdNum='53422','9204',cityIdNum='53404','9205'</span></span><br><span class="line"><span class="string">         ,cityIdNum='53300','9206',globalSaleFlag=2,'9254','9207'),sjFlagx='5',ifNULL(dictGet('ge_order.site_sku_info_dict','cateDept3',skuId),'0'),'0') as cateDept3,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',case when ordType &lt;&gt; '10' then ifNull(dictGet('ge_order.site_sku_info_dict','cateDept4',skuId),'0') else '0' end,sjFlagx='1','0',sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateDept4',skuId),sjFlagx='3','0',sjFlagx='4','0',sjFlagx='5','0','0') as cateDept4,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',case when ordType &lt;&gt; '10' then ifNull(dictGet('ge_order.site_sku_info_dict','cateDept5',skuId),'0')  else '0' end,sjFlagx='1','0',sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateDept5',skuId),sjFlagx='3','0',sjFlagx='4','0',sjFlagx='5','0','0') as cateDept5,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',case when ordType &lt;&gt; '10' then ifNull(dictGet('ge_order.site_sku_info_dict','cateErpGlobal',skuId),'0') else '0' end,sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','cateErpGlobal',skuId),sjFlagx in ('1','3','4','5'),'0','0') as cateErpGlobal,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',case when ordType &lt;&gt; '10' then ifNull(dictGet('ge_order.site_sku_info_dict','purErp',skuId),'0') else '0' end,sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','purErp',skuId),sjFlagx in ('1','3','4','5'),'0','0')  as purErp,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0',case when ordType &lt;&gt; '10' then ifNull(dictGet('ge_order.site_sku_info_dict','purConErp',skuId),'0') else '0' end,sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','purConErp',skuId),sjFlagx in ('1','3','4','5'),'0','0') as purConErp,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','firstIndId',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','firstIndId',skuId),'0') as firstIndId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','secondIndId',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','secondIndId',skuId),'0') as secondIndId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','thirdIndId',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','thirdIndId',skuId),'0') as thirdIndId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','fourthIndId',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','fourthIndId',skuId),'0') as fourthIndId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','brandId',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','brandId',skuId),'0') as brandId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','mainBrandId',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','mainBrandId',skuId),'0') as mainBrandId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx in ('0','1','3','4','5'),dictGet('ge_order.site_sku_info_dict','purSaleControlSeparateFlag',skuId),sjFlagx='2',dictGet('ge_order.site_global_sku_info_dict','purSaleControlSeparateFlag',skuId),0) as purSaleControlSeparateFlag,</span></span><br><span class="line"><span class="string">         arrayJoin(sjFlag) as sjFlagx,</span></span><br><span class="line"><span class="string">         firstBizCd,</span></span><br><span class="line"><span class="string">         scndBizCd,</span></span><br><span class="line"><span class="string">         thirdBizCd,</span></span><br><span class="line"><span class="string">         popShopType,</span></span><br><span class="line"><span class="string">         dictGet('ge_order.site_sku_info_dict','edlpFlag',skuId) as edlpFlag,</span></span><br><span class="line"><span class="string">         firstTerminalId,</span></span><br><span class="line"><span class="string">         multiIf(ifNull(dictGet('ge_order.site_sku_info_dict','cateDept2',skuId),'0') in ('6483', '6485','10522','10526','6444','6445'),'JD_HEALTH',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept0',skuId),'0')='13126' AND sjFlagx&lt;&gt;'5','JD_MALL_I',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept1',skuId),'0')='6878','other','JD_MALL') as bgId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0','',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept2',skuId),'0') in ('6483', '6485','10522','10526','6444','6445'),'JD_HEALTH',ifNull(dictGet('ge_order.site_sku_info_dict','cateDept0',skuId),'0')='13126','JD_MALL_I','JD_MALL') as sourceBgId,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0','',sjFlagx in ('1','2','4','5'),ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept0',skuId),'0'),sjFlagx='3','1727','0') as sourceDept0,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0','',sjFlagx in ('1','2','3','4','5'),ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept1',skuId),'0'),'0') as sourceDept1,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0','',sjFlagx in ('1','2','3','4','5'),ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept2',skuId),'0'),'0') as sourceDept2,</span></span><br><span class="line"><span class="string">         multiIf(sjFlagx='0','',sjFlagx in ('1','2','3','4','5'),ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept3',skuId),'0'),'0') as sourceDept3,</span></span><br><span class="line"><span class="string">         dictGet('GE.sku_pur_cha_info_dict','buyerErp',tuple(skuId,purChannelCd)) as buyerErp,</span></span><br><span class="line"><span class="string">         if(dictGet('GE.sku_sale_cha_info_dict','saleChaErp',tuple(skuId,thirdPlaceCd)) in ('','0'),dictGet('GE.sku_sale_cha_info_dict','saleChaErp',tuple(skuId,toInt64(301))),dictGet('GE.sku_sale_cha_info_dict','saleChaErp',tuple(skuId,thirdPlaceCd))) as saleChaErp,</span></span><br><span class="line"><span class="string">         plusOrdFlag</span></span><br><span class="line"><span class="string">    FROM</span></span><br><span class="line"><span class="string">         (</span></span><br><span class="line"><span class="string">            SELECT</span></span><br><span class="line"><span class="string">                 dateTime,</span></span><br><span class="line"><span class="string">                 secondTerminalId,</span></span><br><span class="line"><span class="string">                 speFlag,</span></span><br><span class="line"><span class="string">                 dealFlag,</span></span><br><span class="line"><span class="string">                 validFlag,</span></span><br><span class="line"><span class="string">                 outFlag,</span></span><br><span class="line"><span class="string">                 ordType,</span></span><br><span class="line"><span class="string">                 shopType,</span></span><br><span class="line"><span class="string">                 jxFlag,</span></span><br><span class="line"><span class="string">                 _171Flag,</span></span><br><span class="line"><span class="string">                 decentralFlag,</span></span><br><span class="line"><span class="string">                 neicaiFlag5star,</span></span><br><span class="line"><span class="string">                 neicaiFlag,</span></span><br><span class="line"><span class="string">                 daojiaFlag,</span></span><br><span class="line"><span class="string">                 deal1Min,</span></span><br><span class="line"><span class="string">                 valid1Min,</span></span><br><span class="line"><span class="string">                 out1Min,</span></span><br><span class="line"><span class="string">                 deal10Min,</span></span><br><span class="line"><span class="string">                 valid10Min,</span></span><br><span class="line"><span class="string">                 out10Min,</span></span><br><span class="line"><span class="string">                 dealHour,</span></span><br><span class="line"><span class="string">                 validHour,</span></span><br><span class="line"><span class="string">                 outHour,</span></span><br><span class="line"><span class="string">                 skuId,</span></span><br><span class="line"><span class="string">                 dictGet('ge_order.site_sku_info_dict','spuId',skuId) as spuId,</span></span><br><span class="line"><span class="string">                 shopId,</span></span><br><span class="line"><span class="string">                 dealSaleQtty,</span></span><br><span class="line"><span class="string">                 validSaleQtty,</span></span><br><span class="line"><span class="string">                 outSaleQtty,</span></span><br><span class="line"><span class="string">                 dealPSaleOrdId,</span></span><br><span class="line"><span class="string">                 validPSaleOrdId,</span></span><br><span class="line"><span class="string">                 dealSaleOrdId,</span></span><br><span class="line"><span class="string">                 validSaleOrdId,</span></span><br><span class="line"><span class="string">                 outSaleOrdId,</span></span><br><span class="line"><span class="string">                 dealSaleAmt,</span></span><br><span class="line"><span class="string">                 validSaleAmt,</span></span><br><span class="line"><span class="string">                 outSaleAmt,</span></span><br><span class="line"><span class="string">                 cityLevel,</span></span><br><span class="line"><span class="string">                 areaId,</span></span><br><span class="line"><span class="string">                 provinceId,</span></span><br><span class="line"><span class="string">                 cityId,</span></span><br><span class="line"><span class="string">                 arrayDistinct(arrayMap(x -&gt; replaceAll(x, ' ', ''),decentralLevel1)) as decentral_business_1,</span></span><br><span class="line"><span class="string">                 arrayDistinct(arrayMap(x -&gt; replaceAll(x, ' ', ''),decentralLevel2)) as decentral_business_2,</span></span><br><span class="line"><span class="string">                 arrayDistinct(arrayMap(x -&gt; replaceAll(x, ' ', ''),decentralLevel3)) as decentral_business_3,</span></span><br><span class="line"><span class="string">                 first_biz,</span></span><br><span class="line"><span class="string">                 scnd_biz,</span></span><br><span class="line"><span class="string">                 third_biz,</span></span><br><span class="line"><span class="string">                 provinceIdNum,</span></span><br><span class="line"><span class="string">                 cityIdNum,</span></span><br><span class="line"><span class="string">                 saleOrdId,</span></span><br><span class="line"><span class="string">                 venderId,</span></span><br><span class="line"><span class="string">                 ifNULL(dictGet('ge_order.site_sku_info_dict','providerCode',skuId),'') as providerCode,</span></span><br><span class="line"><span class="string">                 firstPlaceCd,</span></span><br><span class="line"><span class="string">                 secondPlaceCd,</span></span><br><span class="line"><span class="string">                 thirdPlaceCd,</span></span><br><span class="line"><span class="string">                 purChannelCd,</span></span><br><span class="line"><span class="string">                 virtualOrdFlag,</span></span><br><span class="line"><span class="string">                 gdxOperPlaceFlag,</span></span><br><span class="line"><span class="string">                 corpTypeCd1,</span></span><br><span class="line"><span class="string">                 corpTypeCd2,</span></span><br><span class="line"><span class="string">                 shadowSkuId,</span></span><br><span class="line"><span class="string">                 skuFlag,</span></span><br><span class="line"><span class="string">                 arrayDistinct(arrayMap(x -&gt; replaceAll(x, ' ', ''),decentralLevel4)) as decentral_business_4,</span></span><br><span class="line"><span class="string">                 arrayDistinct(arrayMap(x -&gt; replaceAll(x, ' ', ''),decentralLevel0)) as decentral_business_0,</span></span><br><span class="line"><span class="string">                 thirdTerminalId,</span></span><br><span class="line"><span class="string">                 normalBFlag,</span></span><br><span class="line"><span class="string">                 array(if(dictGet('ge_order.site_global_sku_info_dict','cateDept0',skuId) in ('4903'),'2','9999'),if(daojiaFlag='1' and (ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept0',skuId),'0')&lt;&gt;'6210' or ifNull(dictGet('ge_order.site_sku_info_dict','cateDept1',skuId),'0')&lt;&gt;'6316' ),'1','9999'),</span></span><br><span class="line"><span class="string">                      if((ordType=4 or dictGet('ge_order.site_sku_info_dict','cateDept4',skuId) in ('7861', '4538')) and dictGet('ge_order.site_sku_info_dict','cateDept1',skuId)&lt;&gt;'4384','3','9999'),</span></span><br><span class="line"><span class="string">                      if(globalSaleFlag in (1,2) and dictGet('ge_order.site_sku_info_dict','cateDept2',skuId) not in ('45','1802'),'4','9999'),if(ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept1',skuId),'0')='11509' and ifNUll(dictGet('ge_order.site_sku_info_dict','cateDept2',skuId),'0')='11570' and dateTime&gt;='2023-03-01','5','9999'),'0') as sjFlag,</span></span><br><span class="line"><span class="string">                 firstBizCd,</span></span><br><span class="line"><span class="string">                 scndBizCd,</span></span><br><span class="line"><span class="string">                 thirdBizCd,</span></span><br><span class="line"><span class="string">                 popShopType,</span></span><br><span class="line"><span class="string">                 globalSaleFlag,</span></span><br><span class="line"><span class="string">                 cityIdNum,</span></span><br><span class="line"><span class="string">                 healthFlag,</span></span><br><span class="line"><span class="string">                 firstTerminalId,</span></span><br><span class="line"><span class="string">                 plusOrdFlag</span></span><br><span class="line"><span class="string">            FROM</span></span><br><span class="line"><span class="string">                ge_order.%s</span></span><br><span class="line"><span class="string">            where </span></span><br><span class="line"><span class="string">                dateTime &gt;= '%s' AND dateTime &lt;= '%s')</span></span><br><span class="line"><span class="string">            where sjFlagx&lt;&gt;'9999'</span></span><br><span class="line"><span class="string">    SETTINGS max_insert_threads=%s</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">select_count</span><span class="params">(table_name)</span>:</span></span><br><span class="line">    select_count_url = ck_domain_url % (ip,port,user,password) + (select_count_sql % table_name).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">    print(<span class="string">"select_count_url is : %s"</span> % select_count_url)</span><br><span class="line">    rsp = urlopen(select_count_url)</span><br><span class="line">    value_str = rsp.read().decode(<span class="string">"utf-8"</span>).replace(<span class="string">"\n"</span>, <span class="string">""</span>)</span><br><span class="line">    <span class="keyword">if</span> value_str == <span class="string">""</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> int(value_str)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detect_truncate</span><span class="params">(table_name)</span>:</span></span><br><span class="line">    detect = <span class="number">100</span></span><br><span class="line">    <span class="keyword">while</span> select_count(table_name) &gt; <span class="number">0</span> <span class="keyword">and</span> detect &gt; <span class="number">0</span>:</span><br><span class="line">        time.sleep(<span class="number">10</span>)</span><br><span class="line">        detect = detect - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> select_count(table_name) &lt;= <span class="number">0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">verify</span><span class="params">(table_dict, start_date, end_date)</span>:</span></span><br><span class="line">    select_detail_url = ck_domain_url % (ip,port,user,password)+ (verify_sql % (detail_table, start_date, end_date)).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">    rsp = urlopen(select_detail_url)</span><br><span class="line">    detail_value_str = rsp.read().decode(<span class="string">"utf-8"</span>).replace(<span class="string">"\n"</span>, <span class="string">""</span>)</span><br><span class="line">    <span class="keyword">if</span> detail_value_str == <span class="string">""</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    detail_value = float(detail_value_str)</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"From %s to %s detail value: %s"</span> % (start_date, end_date, detail_value))</span><br><span class="line"></span><br><span class="line">    select_dict_url = ck_domain_url % (ip,port,user,password) + (verify_sql_dict % (table_dict[<span class="string">"detail"</span>], start_date, end_date)).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">    rsp = urlopen(select_dict_url)</span><br><span class="line">    dict_value = float(rsp.read().decode(<span class="string">"utf-8"</span>).replace(<span class="string">"\n"</span>, <span class="string">""</span>))</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"From %s to %s dict value: %s"</span> % (start_date, end_date, dict_value))</span><br><span class="line">    <span class="keyword">if</span> abs(dict_value - detail_value) &gt; <span class="number">100</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">drop_table</span><span class="params">(host, table_dict)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        dict_url = ck_url_temp %(host,user,password) + (drop_local_table_sql % (table_dict[<span class="string">"detail"</span>])).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">        <span class="comment">#print(dict_url)</span></span><br><span class="line">        urlopen(Request(dict_url, data=parse.urlencode(&#123;&#125;).encode()))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"host %s truncate %s data exception: %s"</span> % (host, table_dict[<span class="string">"detail"</span>], str(sys.exc_info())))</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_table</span><span class="params">(host, table_dict,suffix)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        dict_create_url = ck_url_temp %(host,user,password) + (create_local % (table_dict[<span class="string">"detail"</span>],table_dict[<span class="string">"detail"</span>],suffix)).replace(<span class="string">"\n"</span>, <span class="string">" "</span>).replace(<span class="string">" "</span>,<span class="string">"%20"</span>)</span><br><span class="line">        print(dict_create_url)</span><br><span class="line">        urlopen(Request(dict_create_url, data=parse.urlencode(&#123;&#125;).encode()))</span><br><span class="line">        print(<span class="string">"host %s create table %s  sucess: %s"</span> % (host, table_dict[<span class="string">"detail"</span>], str(sys.exc_info())))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"host %s create table %s  exception: %s"</span> % (host, table_dict[<span class="string">"detail"</span>], str(sys.exc_info())))</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_d_table</span><span class="params">(host, table_dict)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        dict_create_url = ck_url_temp %(host,user,password) + (create_dist % (table_dict[<span class="string">"detail"</span>], table_dict[<span class="string">"detail"</span>],clusterName,table_dict[<span class="string">"detail"</span>])).replace(<span class="string">"\n"</span>, <span class="string">" "</span>).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">        print(dict_create_url)</span><br><span class="line">        urlopen(Request(dict_create_url, data=parse.urlencode(&#123;&#125;).encode()))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"host %s create table %s_d  exception: %s"</span> % (host, table_dict[<span class="string">"detail"</span>], str(sys.exc_info())))</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_inservice_table</span><span class="params">()</span>:</span></span><br><span class="line">    detail = <span class="string">"ck_ge_app_trade_site_ord_snapshot_dict_temp"</span></span><br><span class="line">    <span class="keyword">return</span> &#123;<span class="string">"detail"</span>: detail&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_data</span><span class="params">(host, start_date, end_date, table_dict)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"[%s] Begin to load data to %s from %s to %s"</span> % (datetime.datetime.now(), host, start_date, end_date))</span><br><span class="line">        insert_url = ck_url_temp %(host,user,password) + re.sub(<span class="string">' +'</span>, <span class="string">" "</span>, (insert_sql % (table_dict[<span class="string">"detail"</span>],detail_table, start_date, end_date,thread_num)).replace(<span class="string">"\n"</span>, <span class="string">" "</span>)).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">        urlopen(Request(insert_url, data=parse.urlencode(&#123;&#125;).encode()))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"load %s data to host: %s exception: %s"</span> % (table_dict[<span class="string">"detail"</span>], host, str(sys.exc_info())))</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">replace_partition</span><span class="params">(host, partition)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        replace_url = ck_url_temp %(host,user,password) + (replace_partition_sql % partition).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">        urlopen(Request(replace_url, data=parse.urlencode(&#123;&#125;).encode()))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"replace partition to host: %s exception: %s"</span> % (host, str(sys.exc_info())))</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    inservice_tables = get_inservice_table()</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"[%s] Inservice tables: %s"</span> % (datetime.datetime.now(), inservice_tables))</span><br><span class="line">    today = datetime.datetime.now()-datetime.timedelta(days=<span class="number">2</span>) </span><br><span class="line">    startTime = time.time()</span><br><span class="line">    select_hosts_url_all = ck_domain_url % (ip,port,user,password) + (select_hosts_sql % (clusters,clusterName)).replace(<span class="string">" "</span>, <span class="string">"%20"</span>)</span><br><span class="line">    print(<span class="string">"select_hosts_sql is : %s"</span> % select_hosts_url_all)</span><br><span class="line">    allRes = urlopen(select_hosts_url_all)</span><br><span class="line">    allHosts = allRes.read().decode(<span class="string">"utf-8"</span>).split(<span class="string">"\n"</span>)</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"[%s] Total %d hosts"</span> % (datetime.datetime.now(), len(allHosts) - <span class="number">1</span>))</span><br><span class="line">    end = today</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"[%s] begin to drop table"</span> % datetime.datetime.now())</span><br><span class="line">    shard_dict=&#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> host <span class="keyword">in</span> allHosts:</span><br><span class="line">        <span class="keyword">if</span> host != <span class="string">''</span>:</span><br><span class="line">            host_info = host.split(<span class="string">":"</span>)</span><br><span class="line">            ip_port = host_info[<span class="number">1</span>] + <span class="string">":"</span> + host_info[<span class="number">2</span>]</span><br><span class="line">            <span class="keyword">if</span> host_info[<span class="number">0</span>] <span class="keyword">in</span> shard_dict:</span><br><span class="line">                shard_dict[host_info[<span class="number">0</span>]].append(ip_port)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                shard_dict[host_info[<span class="number">0</span>]] = []</span><br><span class="line">                shard_dict[host_info[<span class="number">0</span>]].append(ip_port)</span><br><span class="line">            drop_table(ip_port, inservice_tables)</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"[%s] begin to recreate table"</span> % datetime.datetime.now())</span><br><span class="line">    suffix = int(time.time())</span><br><span class="line">    <span class="keyword">for</span> host <span class="keyword">in</span> allHosts:</span><br><span class="line">        <span class="keyword">if</span> host != <span class="string">''</span>:</span><br><span class="line">            host_info = host.split(<span class="string">":"</span>)</span><br><span class="line">            ip_port = host_info[<span class="number">1</span>] + <span class="string">":"</span> + host_info[<span class="number">2</span>]</span><br><span class="line">            create_table(ip_port, inservice_tables, suffix)</span><br><span class="line">            create_d_table(ip_port, inservice_tables)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> detect_truncate(inservice_tables[<span class="string">"detail"</span>]):</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"[%s] %s recreate table failed"</span> % (datetime.datetime.now(), inservice_tables[<span class="string">"detail"</span>]))</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line">    min_replica_num = <span class="number">10000</span></span><br><span class="line">    <span class="keyword">for</span> shard_hosts <span class="keyword">in</span> shard_dict.values():</span><br><span class="line">        min_replica_num = min(min_replica_num, len(shard_hosts))</span><br><span class="line">    pool = ThreadPoolExecutor(max_workers=min_replica_num * len(shard_dict))</span><br><span class="line">    step = min_replica_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, int(refresh_months) + <span class="number">1</span>):</span><br><span class="line">        start = end - datetime.timedelta(days=<span class="number">5</span>)</span><br><span class="line">        <span class="keyword">for</span> host_list <span class="keyword">in</span> shard_dict.values():</span><br><span class="line">            pool.submit(load_data, host_list[step - <span class="number">1</span>], start.strftime(<span class="string">"%Y-%m-%d"</span>), end.strftime(<span class="string">"%Y-%m-%d"</span>), inservice_tables)</span><br><span class="line">        step = step - <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> step == <span class="number">0</span>:</span><br><span class="line">            step = min_replica_num</span><br><span class="line">            pool.shutdown()</span><br><span class="line">            pool = ThreadPoolExecutor(max_workers=min_replica_num * len(shard_dict))</span><br><span class="line">        end = start - datetime.timedelta(days=<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        pool.shutdown()</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"Ending..."</span>)</span><br><span class="line">    check_time=<span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,<span class="number">4</span>):</span><br><span class="line">        time.sleep(<span class="number">300</span>)</span><br><span class="line">        <span class="keyword">if</span> verify(inservice_tables, start.strftime(<span class="string">"%Y-%m-%d"</span>), today.strftime(<span class="string">"%Y-%m-%d"</span>)):</span><br><span class="line">            <span class="keyword">print</span> (<span class="string">"""[%s-%s]数据校验正常"""</span> % (start.strftime(<span class="string">"%Y-%m-%d"</span>), today.strftime(<span class="string">"%Y-%m-%d"</span>)))</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            check_time+=<span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span>(check_time==<span class="number">3</span>):</span><br><span class="line">                print(<span class="string">"""[%s-%s]数据校验异常"""</span> % (start.strftime(<span class="string">"%Y-%m-%d"</span>), today.strftime(<span class="string">"%Y-%m-%d"</span>)))</span><br><span class="line">                sys.exit(<span class="number">1</span>)</span><br><span class="line">    partition_date = datetime.datetime.now()-datetime.timedelta(days=<span class="number">1</span>)</span><br><span class="line">    step = min_replica_num</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">868</span>):</span><br><span class="line">        pool = ThreadPoolExecutor(max_workers=len(allHosts) - <span class="number">1</span>)</span><br><span class="line">        partition_date = partition_date - datetime.timedelta(days=<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"[%s] Begin to replace partition %s"</span> % (datetime.datetime.now(), partition_date.strftime(<span class="string">"%Y-%m-%d"</span>)))</span><br><span class="line">        <span class="keyword">for</span> host_list <span class="keyword">in</span> shard_dict.values():</span><br><span class="line">            pool.submit(replace_partition, host_list[step - <span class="number">1</span>], partition_date.strftime(<span class="string">"%Y-%m-%d"</span>))</span><br><span class="line">        pool.shutdown()</span><br><span class="line">        time.sleep(<span class="number">0.2</span>)</span><br><span class="line">    endTime = time.time()</span><br><span class="line">    <span class="keyword">print</span> (<span class="string">"[%s] Totally cost %d seconds"</span> % (datetime.datetime.now(), endTime - startTime))</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+            <a href="/tags/%E5%88%B7%E5%B2%97/" rel="tag"><i class="fa fa-tag"></i> 刷岗</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/08/ClickHouse_ClickHouse%E6%95%B0%E6%8D%AE%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86/" rel="next" title="ClickHouse_ClickHouse数据生命周期管理">
+                <i class="fa fa-chevron-left"></i> ClickHouse_ClickHouse数据生命周期管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/" rel="prev" title="京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践">
+                京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClickHouse-clickhouse刷岗实战"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_clickhouse刷岗实战</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关键命令"><span class="nav-number">1.1.</span> <span class="nav-text">关键命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ck预计算"><span class="nav-number">1.2.</span> <span class="nav-text">ck预计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#刷岗脚本实战"><span class="nav-number">1.3.</span> <span class="nav-text">刷岗脚本实战</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

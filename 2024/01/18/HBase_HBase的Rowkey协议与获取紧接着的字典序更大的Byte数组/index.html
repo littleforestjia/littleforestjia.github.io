@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,Runsql," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组1.HBase的Rowkey协议设计1.1 存储字段Rowkey： 1.不存在scan场景 MD5散列|时间|时间粒度|REALTIME&#x2F;OFFLINE|分段(0)&#x2F;累计(1)|维度id1,维度id2,维度id3|维值1,维值2,维值3 2.存在scan场景 比如维度2是scan维度字段 MD5散列|时间|时间粒度|RE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/18/HBase_HBase%E7%9A%84Rowkey%E5%8D%8F%E8%AE%AE%E4%B8%8E%E8%8E%B7%E5%8F%96%E7%B4%A7%E6%8E%A5%E7%9D%80%E7%9A%84%E5%AD%97%E5%85%B8%E5%BA%8F%E6%9B%B4%E5%A4%A7%E7%9A%84Byte%E6%95%B0%E7%BB%84/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组1.HBase的Rowkey协议设计1.1 存储字段Rowkey： 1.不存在scan场景 MD5散列|时间|时间粒度|REALTIME&#x2F;OFFLINE|分段(0)&#x2F;累计(1)|维度id1,维度id2,维度id3|维值1,维值2,维值3 2.存在scan场景 比如维度2是scan维度字段 MD5散列|时间|时间粒度|RE">
+<meta property="article:published_time" content="2024-01-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:41:11.072Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="Runsql">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/18/HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组/"/>
+
+
+
+
+
+  <title>HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/18/HBase_HBase%E7%9A%84Rowkey%E5%8D%8F%E8%AE%AE%E4%B8%8E%E8%8E%B7%E5%8F%96%E7%B4%A7%E6%8E%A5%E7%9D%80%E7%9A%84%E5%AD%97%E5%85%B8%E5%BA%8F%E6%9B%B4%E5%A4%A7%E7%9A%84Byte%E6%95%B0%E7%BB%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-18T00:00:00+08:00">
+                2024-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组"><a href="#HBase-HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组" class="headerlink" title="HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组"></a>HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组</h1><h3 id="1-HBase的Rowkey协议设计"><a href="#1-HBase的Rowkey协议设计" class="headerlink" title="1.HBase的Rowkey协议设计"></a>1.HBase的Rowkey协议设计</h3><h4 id="1-1-存储字段"><a href="#1-1-存储字段" class="headerlink" title="1.1 存储字段"></a>1.1 存储字段</h4><p>Rowkey：</p>
+<p><strong>1.不存在scan场景</strong></p>
+<p><code>MD5散列|时间|时间粒度|REALTIME/OFFLINE|分段(0)/累计(1)|维度id1,维度id2,维度id3|维值1,维值2,维值3</code></p>
+<p><strong>2.存在scan场景</strong></p>
+<p>比如维度2是scan维度字段</p>
+<p><code>MD5散列|时间|时间粒度|REALTIME/OFFLINE|分段(0)/累计(1)|维度id1,维度id2,维度id3|维值1,维值3,维值2</code></p>
+<p><code>MD5散列|时间|时间粒度|REALTIME/OFFLINE|分段(0)/累计(1)|cateid,skuid,shopid|2232,10026,10000768934</code></p>
+<p><strong>3.分时聚合粒度场景</strong></p>
+<p>分时字段格式为hh:mm</p>
+<p><code>MD5散列|时间|时间粒度|REALTIME/OFFLINE|分段(0)/累计(1)|维度id1,维度id2|维值1,维值2,分时值</code></p>
+<p><code>MD5散列|时间|时间粒度|REALTIME/OFFLINE|分段(0)/累计(1)|cateid,skuid|2232,10000768934,10:30</code></p>
+<p>family：<strong>d</strong></p>
+<p>column：<strong>指标名称</strong></p>
+<p>value：<strong>指标值</strong>（全部转化为String类型存储）</p>
+<h4 id="1-2-Rowkey字段含义"><a href="#1-2-Rowkey字段含义" class="headerlink" title="1.2 Rowkey字段含义"></a>1.2 Rowkey字段含义</h4><p><strong>MD5散列</strong>：选取使用md5对scan字段或分时字段以前的rowkey字符串进行散列然后取前10位。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getHashValue</span></span>(value: <span class="type">String</span>): <span class="type">String</span> = &#123;</span><br><span class="line">  <span class="keyword">var</span> md5: <span class="type">MessageDigest</span> = <span class="literal">null</span></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    md5 = <span class="type">MessageDigest</span>.getInstance(<span class="string">"MD5"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">catch</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> e: <span class="type">Exception</span> =&gt; &#123;</span><br><span class="line">      e.printStackTrace()</span><br><span class="line">      println(e.getMessage)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">val</span> byteArray: <span class="type">Array</span>[<span class="type">Byte</span>] = value.getBytes(<span class="type">StandardCharsets</span>.<span class="type">UTF_8</span>)</span><br><span class="line">  <span class="keyword">val</span> md5Bytes: <span class="type">Array</span>[<span class="type">Byte</span>] = md5.digest(byteArray)</span><br><span class="line">  <span class="keyword">var</span> hexValue: <span class="type">String</span> = <span class="string">""</span></span><br><span class="line">  <span class="keyword">for</span> ( byte &lt;- md5Bytes) &#123;</span><br><span class="line">    <span class="keyword">val</span> str: <span class="type">Int</span> = byte.toInt &amp; <span class="number">0xff</span></span><br><span class="line">    <span class="keyword">if</span> (str &lt; <span class="number">16</span>) &#123;</span><br><span class="line">      hexValue=hexValue+<span class="string">"0"</span></span><br><span class="line">    &#125;</span><br><span class="line">    hexValue=hexValue+<span class="type">Integer</span>.toHexString(str)</span><br><span class="line">  &#125;</span><br><span class="line">  hexValue.substring(<span class="number">0</span>, <span class="number">10</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>时间粒度</strong>：预聚合的时间粒度，枚举值BY_SECOND,BY_ONE_MIN,BY_TEN_MIN,BY_HOUR,BY_HALF_HOUR,BY_DAY,BY_WEEK,BY_MONTH,BY_SEASON,BY_YEAR,BY_WEEK_ACCU,BY_MONTH_ACCU,BY_SEASON_ACCU,BY_YEAR_ACCU,BY_LAST_DAY_7,BY_LAST_DAY_30</p>
+<p><strong>实时离线</strong>：实时还是离线，枚举值 REALTIME/OFFLINE</p>
+<p><strong>分时类型</strong>：分时还是累计，枚举值 分段（0）/累计（1）</p>
+<p><strong>维度组合</strong>：维度组合使用元数据中心unify_drive_physic_table.order_by字段 (scan场景，只是把scan字段放最后，并保存在order_by字段中。)（scan场景通过rowkey处理）</p>
+<h3 id="2-获取紧接着的字典序更大的Byte数组"><a href="#2-获取紧接着的字典序更大的Byte数组" class="headerlink" title="2.获取紧接着的字典序更大的Byte数组"></a>2.获取紧接着的字典序更大的Byte数组</h3><h4 id="2-1-简介"><a href="#2-1-简介" class="headerlink" title="2.1 简介"></a>2.1 简介</h4><p>如第一节中Rowkey设计协议，在数据产品的HBase服务中，一般使用聚合维度组合的维值组成rowkey，如按一、二、三级品类进行聚合计算得到总成交金额：</p>
+<table>
+<thead>
+<tr>
+<th>Cate_1</th>
+<th>Cate_2</th>
+<th>Cate_3</th>
+<th>Ord_amt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1001</td>
+<td>13564</td>
+<td>163857</td>
+<td>654.98</td>
+</tr>
+<tr>
+<td>1001</td>
+<td>13564</td>
+<td>163864</td>
+<td>37457.76</td>
+</tr>
+<tr>
+<td>1001</td>
+<td>13564</td>
+<td>163452</td>
+<td>6357.66</td>
+</tr>
+</tbody></table>
+<p>那么会用一、二、三级品类编码值组成一个定长的rowkey，对应品类的总成交金额作为value进行存储，如上即存储三个kv。在数据服务中，常有这种取数需求：知道一、二级品类编码值1001和13564，不知道具体三级品类编码值，希望直接获取到该一、二级品类下所有三级品类的成交金额榜单。</p>
+<p>这时我们需要使用到HBase的scan接口，设置startkey为一、二级品类编码值拼接值<code>1001,13564</code>的Byte[]，然后获取到与该startkey等长的紧接着的字典序更大的Byte数组作为endkey，即可实现取数目的。</p>
+<p>如下方法即可实现该目的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] getNextByte(<span class="keyword">byte</span> [] arr)&#123;</span><br><span class="line">  <span class="keyword">byte</span> []arr_next=Arrays.copyOf(arr, arr.length);</span><br><span class="line">  <span class="keyword">int</span> len=arr_next.length-<span class="number">1</span>;</span><br><span class="line">  <span class="keyword">while</span>(len&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">    <span class="keyword">if</span>(arr_next[len]==-<span class="number">1</span>)&#123;</span><br><span class="line">      arr_next[len]=<span class="number">0</span>;</span><br><span class="line">      len--;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">      arr_next[len]=(<span class="keyword">byte</span>) (arr_next[len]+<span class="number">1</span>);<span class="comment">//(byte)128=-128, 符合hbase的排序规范</span></span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> arr_next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1）使用<code>Arrays.copyOf</code>方法创建原数组的一个副本<code>arr_next</code>，确保操作不会修改原数组。</p>
+<p>2）方法从数组的末尾开始向前遍历，这是因为我们需要找到最右边（低位）可以增加的位置，以保证变化最小且确保得到的数组在字典序上是“下一个”。</p>
+<p>3）由于在Java中<code>byte</code>类型是有符号的，范围是-128到127，当某个元素的值是-1时（相当于所有位都为1的二进制数），该方法将其置为0（所有位都是0的二进制数），这是因为-1之后的值在字节中是最小值0。然后继续向前遍历数组的前一个元素。</p>
+<p>4）如果找到的元素不是-1，该方法将此元素加1，然后中断循环。<code>(byte)(arr_next[len]+1)</code>这里确保即便结果的值超过了<code>byte</code>能表示的最大值127，也会通过类型转换（溢出）正确处理，例如128会变成-128（Java中byte的溢出行为）。</p>
+<h4 id="2-2-Java等编程语言中使用补码表示正负数"><a href="#2-2-Java等编程语言中使用补码表示正负数" class="headerlink" title="2.2 Java等编程语言中使用补码表示正负数"></a>2.2 Java等编程语言中使用补码表示正负数</h4><p><strong>要理解上述getNextByte()方法最关键的一点就是理解，字典序的大小比较与十进制数的大小比较是不一样的。十进制数大小比较是比较我们常规意识上的数值大小，如一个byte能表示-128到127，其中-128最小，127最大。字典序大小是比较二进制数大小，如一个byte最小是<code>00000000</code>，也就是十进制0，最大是<code>11111111</code>，也就是十进制-1。</strong></p>
+<p>对于正数和零来说，补码的表示与其原码直接按位表示的码相同，也就是一个正整数或零在内存中的表示直接反映了它的真实值，例如给定一个8位的byte类型：</p>
+<p>1）数值0的二进制原码表示为<code>00000000</code>，其补码表示（也就是它在计算机内存中的存储方式）也是<code>00000000</code>；</p>
+<p>2）数值1的二进制原码表示为<code>00000001</code>，其补码表示也是<code>00000001</code>；</p>
+<p>3）数值127（byte类型能表示的最大正整数）的二进制原码表示为<code>01111111</code>，其补码表示也是<code>01111111</code>。</p>
+<p>对于负数，补码则是通过取其正值的原码，先进行按位取反，然后加上1来得到的。例如，-1的补码在8位系统中为<code>11111111</code>，这是因为1的原码<code>00000001</code>按位取反后为<code>11111110</code>，再加上<code>1</code>得到<code>11111111</code>。</p>
+<p>所以getNextByte()方法中的<code>arr_next[len] == -1</code>就表示arr_next[len]达到了byte按字典序的最大值<code>11111111</code>。</p>
+<h4 id="2-3-计算机使用补码的优点"><a href="#2-3-计算机使用补码的优点" class="headerlink" title="2.3 计算机使用补码的优点"></a>2.3 计算机使用补码的优点</h4><p>计算机使用补码（Two’s complement）表示正负数主要有以下优点：</p>
+<p>1）负数的表示：补码系统中负数的表示非常优雅，负数-X的补码是将X的二进制表示按位取反然后加1。这种表示方法使得+0和-0有相同的表示（<code>000...0</code>）；并且最大范围内的所有正数和负数可以无歧义地用相同位数表示。比如，在8位表示中，-1用<code>11111111</code>表示，-128用<code>10000000</code>表示。</p>
+<p>2）自动处理溢出：当执行加法时，如果结果超出了表示范围，补码自动处理溢出，不需要额外的逻辑来检测或纠正这种情况，这意味着硬件可以更简单，而且运算结果仍然是正确的补码表示。</p>
+<p>3）统一的加法器：由于补码表示的优点，加法器如全加器可以同时处理正数加法、正数与负数加法、负数加法，甚至减法（通过加上一个数的补码来执行），这极大地简化了计算机的算术逻辑单元（ALU）的设计。举个例子，假设要在8位系统中计算<code>5 - 3</code>。在二进制中，5表示为<code>00000101</code>。3的补码，也就是<code>-3</code>, 表示为<code>11111101</code>（先取3的二进制表示<code>00000011</code>，然后按位取反得到<code>11111100</code>，最后加1得到<code>11111101</code>）。当你在补码系统中把<code>00000101</code>（5）和<code>11111101</code>（-3）相加，结果是<code>00000010</code>（2），这正是<code>5-3</code>的结果。</p>
+<p>由于这些原因，补码是完成整数算术运算的首选方法，尤其是在需要简化硬件设计并提高运算效率的环境中。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/Runsql/" rel="tag"><i class="fa fa-tag"></i> Runsql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/17/HBase_HBase%E7%9A%84Region%E8%BF%87%E5%A4%A7%E5%AF%BC%E8%87%B4%E5%86%99%E6%95%B0%E6%85%A2%E4%B8%8ECompact%E5%AF%BC%E8%87%B4CPU%E4%BD%BF%E7%94%A8%E7%8E%87%E9%99%A1%E5%A2%9E%E9%97%AE%E9%A2%98%E5%AE%9E%E6%88%98/" rel="next" title="HBase_HBase的Region过大导致写数慢与Compact导致CPU使用率陡增问题实战">
+                <i class="fa fa-chevron-left"></i> HBase_HBase的Region过大导致写数慢与Compact导致CPU使用率陡增问题实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/19/HBase_HBase%E7%9A%84runsql%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98%E4%B8%8Esql%E8%81%9A%E5%90%88%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/" rel="prev" title="HBase_HBase的runsql协处理器实战与sql聚合计算原理">
+                HBase_HBase的runsql协处理器实战与sql聚合计算原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBase的Rowkey协议与获取紧接着的字典序更大的Byte数组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-HBase的Rowkey协议设计"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.HBase的Rowkey协议设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-存储字段"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">1.1 存储字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Rowkey字段含义"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">1.2 Rowkey字段含义</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-获取紧接着的字典序更大的Byte数组"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.获取紧接着的字典序更大的Byte数组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-简介"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Java等编程语言中使用补码表示正负数"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 Java等编程语言中使用补码表示正负数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-计算机使用补码的优点"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">2.3 计算机使用补码的优点</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

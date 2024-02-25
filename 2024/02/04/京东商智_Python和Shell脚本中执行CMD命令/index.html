@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Python,Shell," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_Python和Shell脚本中执行CMD命令1.背景当我们无法远程登录到目标节点时，我们需要将想要执行的逻辑写成代码并打包上传到目标节点，然后指定代码包，最常见的就是Shell脚本和Python脚本。CMD命令是所有操作系统都支持的语言，也就不需要安装编译器、执行器，整个操作系统都是CMD命令的上下文环境。Shell脚本本身就是一批CMD命令组成的，直接使用sh命令即可执行；Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_Python和Shell脚本中执行CMD命令">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/04/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_Python%E5%92%8CShell%E8%84%9A%E6%9C%AC%E4%B8%AD%E6%89%A7%E8%A1%8CCMD%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_Python和Shell脚本中执行CMD命令1.背景当我们无法远程登录到目标节点时，我们需要将想要执行的逻辑写成代码并打包上传到目标节点，然后指定代码包，最常见的就是Shell脚本和Python脚本。CMD命令是所有操作系统都支持的语言，也就不需要安装编译器、执行器，整个操作系统都是CMD命令的上下文环境。Shell脚本本身就是一批CMD命令组成的，直接使用sh命令即可执行；Python">
+<meta property="article:published_time" content="2024-02-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:44:47.429Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Shell">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/04/京东商智_Python和Shell脚本中执行CMD命令/"/>
+
+
+
+
+
+  <title>京东商智_Python和Shell脚本中执行CMD命令 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/04/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_Python%E5%92%8CShell%E8%84%9A%E6%9C%AC%E4%B8%AD%E6%89%A7%E8%A1%8CCMD%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_Python和Shell脚本中执行CMD命令</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-04T00:00:00+08:00">
+                2024-02-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="京东商智-Python和Shell脚本中执行CMD命令"><a href="#京东商智-Python和Shell脚本中执行CMD命令" class="headerlink" title="京东商智_Python和Shell脚本中执行CMD命令"></a>京东商智_Python和Shell脚本中执行CMD命令</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>当我们无法远程登录到目标节点时，我们需要将想要执行的逻辑写成代码并打包上传到目标节点，然后指定代码包，最常见的就是Shell脚本和Python脚本。CMD命令是所有操作系统都支持的语言，也就不需要安装编译器、执行器，整个操作系统都是CMD命令的上下文环境。Shell脚本本身就是一批CMD命令组成的，直接使用sh命令即可执行；Python脚本中利用Python语法特性可以方便快捷实现很多逻辑，同时又经常需要调用CMD命令与操作系统交互实现指定目的，所以在Python脚本中熟练使用CMD命令进行交互非常重要。</p>
+<h3 id="2-shell脚本使用案例"><a href="#2-shell脚本使用案例" class="headerlink" title="2.shell脚本使用案例"></a>2.shell脚本使用案例</h3><p>如下脚本业务逻辑为获取ClickHouse集群节点列表，然后在每个节点上执行计数SQL，查看每个分片副本之间的数据差异：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ips=(`curl -u rw_sz_merchant_flow_slave:xD0t7iu6Qva7KMcGyK-_ 'http://ckpub202.olap.jd.com:2000/?' -d "select host_name from (select shard_num,concat(host_name,':',(case when port=9600 then '8623' when port=9700 then '8723' when port=9800 then '8823' when port=9900 then '8923' else '8123' end)) as host_name from system.clusters where cluster='LF02_CK_Pub_202' order by shard_num asc) "`);</span><br><span class="line">for i in "$&#123;ips[@]&#125;"</span><br><span class="line">do echo "=====$i =========";</span><br><span class="line">curl -u rw_sz_merchant_flow_slave:xD0t7iu6Qva7KMcGyK-_ 'http://'$i'/?' -d "select count(1) from sz.app_jdr_traffic_sz_heatmap_click_mvp_i_d_d where dt = '2023-12-31'"</span><br><span class="line"><span class="meta">#</span><span class="bash">curl -u rw_sz_merchant_flow_slave:xD0t7iu6Qva7KMcGyK-_ <span class="string">'http://'</span><span class="variable">$i</span><span class="string">'/?'</span> -d <span class="string">"drop table sz.app_jdr_traffic_sz_heatmap_click_mvp_i_d_d_d"</span></span></span><br><span class="line">echo "=========$res==============="</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p>使用sh命令即可运行此脚本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh ./&#123;脚本所在目录&#125;/&#123;脚本名&#125;.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-Python脚本使用案例"><a href="#3-Python脚本使用案例" class="headerlink" title="3.Python脚本使用案例"></a>3.Python脚本使用案例</h3><h4 id="3-1-Python脚本通过subprocess-Popen-函数执行CMD命令"><a href="#3-1-Python脚本通过subprocess-Popen-函数执行CMD命令" class="headerlink" title="3.1 Python脚本通过subprocess.Popen()函数执行CMD命令"></a>3.1 Python脚本通过subprocess.Popen()函数执行CMD命令</h4><p>Python在subprocess模块中封装好了Popen对象用于创建和管理子进程，我们常用该对象来执行CMD命令。另外在数据开发脚本中常在subprocess.Popen()外再封装一些对返回结果的标准处理流程，作为工具方法对外提供使用，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_shell_cmd</span><span class="params">(self, shellcmd, encoding=<span class="string">'utf8'</span>)</span>:</span></span><br><span class="line">    res = subprocess.Popen(shellcmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)</span><br><span class="line">    results = []</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        line = res.stdout.readline().decode(encoding).strip()</span><br><span class="line">        <span class="keyword">if</span> line == <span class="string">''</span> <span class="keyword">and</span> res.poll() <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            results.append(line)</span><br><span class="line">            self.log.info(line)</span><br><span class="line">    ReturnCode = res.returncode</span><br><span class="line">    <span class="keyword">return</span> [ReturnCode, <span class="string">'\n'</span>.join(results)]</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"><span class="comment"># run_shell_cmd_err 执行脚本，丢弃标准流，返回错误流</span></span><br><span class="line"><span class="comment"># 标准输出指定为dev/null，标准流的日志通过log正常输出</span></span><br><span class="line"><span class="comment"># return结果只包含日志内容</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_shell_cmd_err</span><span class="params">(self, shellcmd, encoding=<span class="string">'utf8'</span>)</span>:</span></span><br><span class="line">    devnull = open(os.devnull, <span class="string">"wb"</span>)</span><br><span class="line">    res = subprocess.Popen(shellcmd, shell=<span class="literal">True</span>, stdout=devnull, stderr= subprocess.PIPE)</span><br><span class="line">    results = []</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        line = res.stderr.readline().decode(encoding).strip()</span><br><span class="line">        <span class="keyword">if</span> line == <span class="string">''</span> <span class="keyword">and</span> res.poll() <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            results.append(line)</span><br><span class="line">            self.log.info(line)</span><br><span class="line">    ReturnCode = res.returncode</span><br><span class="line">    <span class="keyword">return</span> [ReturnCode, <span class="string">'\n'</span>.join(results)]</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"><span class="comment"># run_shell_cmd_out 执行脚本，标准流和错误流都在log输出一份，另外标准流在out也输出一份</span></span><br><span class="line"><span class="comment"># return结果中只包含脚本执行结果</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_shell_cmd_out</span><span class="params">(self, shellcmd, encoding=<span class="string">'utf8'</span>)</span>:</span></span><br><span class="line">    res = subprocess.Popen(shellcmd, shell=<span class="literal">True</span>, stdout= subprocess.PIPE, stderr= subprocess.PIPE)</span><br><span class="line">    task = threading.Thread(target=self.__process_output, args=(res, encoding)) </span><br><span class="line">    task.daemon = <span class="literal">True</span></span><br><span class="line">    task.start()</span><br><span class="line">    results = []</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        line = res.stdout.readline().decode(encoding).strip()</span><br><span class="line">        <span class="keyword">if</span> line == <span class="string">''</span> <span class="keyword">and</span> res.poll() <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            results.append(line)</span><br><span class="line">            self.log.info(line)</span><br><span class="line">            print(line)</span><br><span class="line">    ReturnCode = res.returncode</span><br><span class="line">    <span class="keyword">return</span> [ReturnCode, <span class="string">'\n'</span>.join(results)]</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3-2-Python脚本通过CMD命令连接ClickHouse集群执行SQL并获取解析结果"><a href="#3-2-Python脚本通过CMD命令连接ClickHouse集群执行SQL并获取解析结果" class="headerlink" title="3.2 Python脚本通过CMD命令连接ClickHouse集群执行SQL并获取解析结果"></a>3.2 Python脚本通过CMD命令连接ClickHouse集群执行SQL并获取解析结果</h4><p>如下脚本实现根据ClickHouse分布式表名获取到分布式表建表语句，然后获取SQL执行结果解析出对应本地表名：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string"># 根据源分布式表名获取源本地表名</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_local_table_name</span><span class="params">(self)</span>:</span></span><br><span class="line">    sql = <span class="string">"""SELECT create_table_query FROM system.tables WHERE name = '%s' AND database = '%s';"""</span> % (self.ck_table, self.ck_database)</span><br><span class="line">    cmd = <span class="string">"""curl -u %s:%s 'http://%s:%s/?' -d "%s" """</span> % (self.ck_user, self.ck_password, self.ck_host, self.ck_port, sql)</span><br><span class="line">    p = subprocess.Popen(cmd, shell=<span class="literal">True</span>, stdout=subprocess.PIPE)</span><br><span class="line">    table_create_sql, _ = p.communicate()</span><br><span class="line">    print(<span class="string">"分布式表建表语句如下："</span>)</span><br><span class="line">    print(table_create_sql.decode(<span class="string">"utf8"</span>).replace(<span class="string">"\\'"</span>, <span class="string">"'"</span>))</span><br><span class="line">    pattern = <span class="string">r"Distributed\('\w+', '\w+', '(\w+)',"</span></span><br><span class="line">    match = re.search(pattern, result.decode(<span class="string">"utf8"</span>).replace(<span class="string">"\\'"</span>, <span class="string">"'"</span>))</span><br><span class="line">    <span class="keyword">if</span> match:</span><br><span class="line">        <span class="comment"># 从分组中得到第三个参数，即匹配括号内第三个'(\w+)'</span></span><br><span class="line">        local_table_name = match.group(<span class="number">1</span>)</span><br><span class="line">        print(<span class="string">"获取到源表本地表名: "</span> + local_table_name)</span><br><span class="line">        <span class="keyword">return</span> local_table_name</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">"获取源表本地表名失败."</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3-3-subprocess-Popen-函数执行结果输出方式p-stdout与p-communicate-与p-wait-的区别"><a href="#3-3-subprocess-Popen-函数执行结果输出方式p-stdout与p-communicate-与p-wait-的区别" class="headerlink" title="3.3 subprocess.Popen()函数执行结果输出方式p.stdout与p.communicate()与p.wait()的区别"></a>3.3 subprocess.Popen()函数执行结果输出方式p.stdout与p.communicate()与p.wait()的区别</h4><p><strong>Popen.stdout</strong></p>
+<p>创建Popen实例时，如果设置了参数<code>stdout=subprocess.PIPE</code>，那么<code>Popen.stdout</code>将是一个指向子进程标准输出的文件类似对象。你可以直接使用它的read()或readline()等方法来读取子进程的输出。但是，这种方式可能会导致死锁，因为它不处理子进程的标准错误输出。如果子进程产生了足够多的错误输出填满系统的管道缓冲区，它可能会因为没有读取标准错误输出而被挂起。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">p = subprocess.Popen([<span class="string">'command'</span>], stdout=subprocess.PIPE)</span><br><span class="line">output = p.stdout.read()</span><br></pre></td></tr></table></figure>
+
+<p><strong>Popen.communicate()</strong></p>
+<p><code>Popen.communicate()</code>方法是与子进程交互的推荐方式。它允许你发送数据给子进程的标准输入，并且读取标准输出和标准错误输出，直到子进程完成。<code>communicate()</code>方法会等待子进程结束，并返回一个元组，通常为<code>(stdout_data, stderr_data)</code>。调用<code>communicate()</code>还可以帮助避免死锁，因为它会同时读取标准输出和标准错误流，这在处理可能同时生成标准输出和标准错误输出的子进程时非常重要。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">p = subprocess.Popen([<span class="string">'command'</span>], stdout=subprocess.PIPE, stderr=subprocess.PIPE)</span><br><span class="line">stdout_data, stderr_data = p.communicate()</span><br></pre></td></tr></table></figure>
+
+<p><strong>Popen.wait()</strong></p>
+<p><code>p.wait()</code> 方法同样会阻塞当前进程，直到子进程结束，然后它会返回子进程的退出码，返回值为0表示子进程成功结束。通常用于不关心子进程的输出，只想要知道子进程何时结束和成功与否的场合。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess </span><br><span class="line"></span><br><span class="line">p = subprocess.Popen([<span class="string">'command'</span>], stdout=subprocess.PIPE)</span><br><span class="line">returncode = p.wait()</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结</strong></p>
+<p>1）<code>p.stdout</code>直接读取子进程的标准输出流；而<code>p.communicate()</code>会读取子进程的标准输出和标准错误输出，从而避免了潜在的死锁问题。</p>
+<p>2）<code>p.stdout.read()</code>可能需要多次调用来获取所有输出，特别是对于阻塞调用；而<code>p.communicate()</code>只需调用一次，它会等待直到有所有输出产生。</p>
+<p>3）<code>p.communicate()</code>提供了一种发送输入和处理输出的同步方式，而<code>p.stdout</code>需要结合其他手动处理错误输出或额外的多线程/多进程逻辑。</p>
+<h4 id="3-4-subprocess-Popen-函数入参stderr-subprocess-PIPE与stderr-subprocess-STDOUT的区别"><a href="#3-4-subprocess-Popen-函数入参stderr-subprocess-PIPE与stderr-subprocess-STDOUT的区别" class="headerlink" title="3.4 subprocess.Popen()函数入参stderr=subprocess.PIPE与stderr=subprocess.STDOUT的区别"></a>3.4 subprocess.Popen()函数入参stderr=subprocess.PIPE与stderr=subprocess.STDOUT的区别</h4><p><strong>stderr=subprocess.PIPE</strong></p>
+<p>当stderr入参为<code>stderr=subprocess.PIPE</code>时，创建了一个新的管道，Python程序可以通过这个管道读取子进程的标准错误输出，stdout入参<code>stderr=subprocess.PIPE</code>同理。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">p = subprocess.Popen([<span class="string">"command"</span>], stdout=subprocess.PIPE, stderr=subprocess.PIPE)</span><br><span class="line">output, errput = p.communicate()</span><br><span class="line">print(output.decode(<span class="string">"utf8"</span>))</span><br><span class="line">print(errput.decode(<span class="string">"utf8"</span>))</span><br></pre></td></tr></table></figure>
+
+<p><strong>stderr=subprocess.STDOUT</strong></p>
+<p>stderr入参设置为<code>stderr=subprocess.STDOUT</code>表示子进程的标准错误输出被重定向到子进程的标准输出。使用该设置可以合并标准输出流和标准错误流。在该设置的情况下，不能独立捕获标准输出和标准错误，它们将会在同一个数据流中混杂在一起。这种方式在不关心错误信息和输出之间区别，只想获取所有输出信息时很有用。</p>
+<p>示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line">p = subprocess.Popen([<span class="string">"command"</span>], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)</span><br><span class="line">output, _ = p.communicate()</span><br><span class="line">print(output.decode(<span class="string">"utf8"</span>))</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+          
+            <a href="/tags/Shell/" rel="tag"><i class="fa fa-tag"></i> Shell</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/03/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_Python%E5%B9%B6%E5%8F%91%E5%A4%84%E7%90%86%E6%A8%A1%E5%9D%97multiprocessing/" rel="next" title="京东商智_Python并发处理模块multiprocessing">
+                <i class="fa fa-chevron-left"></i> 京东商智_Python并发处理模块multiprocessing
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/" rel="prev" title="Java服务_Redis实现限流与锁策略">
+                Java服务_Redis实现限流与锁策略 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#京东商智-Python和Shell脚本中执行CMD命令"><span class="nav-number">1.</span> <span class="nav-text">京东商智_Python和Shell脚本中执行CMD命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-shell脚本使用案例"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.shell脚本使用案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Python脚本使用案例"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.Python脚本使用案例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-Python脚本通过subprocess-Popen-函数执行CMD命令"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">3.1 Python脚本通过subprocess.Popen()函数执行CMD命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Python脚本通过CMD命令连接ClickHouse集群执行SQL并获取解析结果"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">3.2 Python脚本通过CMD命令连接ClickHouse集群执行SQL并获取解析结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-subprocess-Popen-函数执行结果输出方式p-stdout与p-communicate-与p-wait-的区别"><span class="nav-number">1.0.3.3.</span> <span class="nav-text">3.3 subprocess.Popen()函数执行结果输出方式p.stdout与p.communicate()与p.wait()的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-subprocess-Popen-函数入参stderr-subprocess-PIPE与stderr-subprocess-STDOUT的区别"><span class="nav-number">1.0.3.4.</span> <span class="nav-text">3.4 subprocess.Popen()函数入参stderr&#x3D;subprocess.PIPE与stderr&#x3D;subprocess.STDOUT的区别</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_SV服务缓存全量更新和增量更新方案一、背景目前元数据更新方案： 此处说的元数据中心是指分布式缓存Redis中的指标服务元数据，元数据每5分钟更新一次，更新全量元数据。 为什么需要增量更新： a、数据一致性：全量更新每5分钟元数据更新一次，用户影响路由的变动需要至多5分钟才能生效，影响用户体验，特别是对于频繁发生变动（调试）的预发环境来说。 b、稳定性：生产消费联动的能力基础，比如某张">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_SV服务缓存全量更新和增量更新方案">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_SV服务缓存全量更新和增量更新方案一、背景目前元数据更新方案： 此处说的元数据中心是指分布式缓存Redis中的指标服务元数据，元数据每5分钟更新一次，更新全量元数据。 为什么需要增量更新： a、数据一致性：全量更新每5分钟元数据更新一次，用户影响路由的变动需要至多5分钟才能生效，影响用户体验，特别是对于频繁发生变动（调试）的预发环境来说。 b、稳定性：生产消费联动的能力基础，比如某张">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/4.jpg">
+<meta property="article:published_time" content="2024-02-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:45:31.799Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/08/Java服务_SV服务缓存全量更新和增量更新方案/"/>
+
+
+
+
+
+  <title>Java服务_SV服务缓存全量更新和增量更新方案 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_SV服务缓存全量更新和增量更新方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-08T00:00:00+08:00">
+                2024-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-SV服务缓存全量更新和增量更新方案"><a href="#Java服务-SV服务缓存全量更新和增量更新方案" class="headerlink" title="Java服务_SV服务缓存全量更新和增量更新方案"></a>Java服务_SV服务缓存全量更新和增量更新方案</h1><h2 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h2><p><strong>目前元数据更新方案：</strong></p>
+<p>此处说的元数据中心是指分布式缓存Redis中的指标服务元数据，元数据每5分钟更新一次，更新全量元数据。</p>
+<p><strong>为什么需要增量更新：</strong></p>
+<p>a、<strong>数据一致性：</strong>全量更新每5分钟元数据更新一次，用户影响路由的变动需要至多5分钟才能生效，影响用户体验，特别是对于频繁发生变动（调试）的预发环境来说。</p>
+<p>b、<strong>稳定性：</strong>生产消费联动的能力基础，比如某张表能不能用要及时的感知，双流策略切换要及时感知等。</p>
+<h2 id="二、全局链路与更新范围"><a href="#二、全局链路与更新范围" class="headerlink" title="二、全局链路与更新范围"></a>二、全局链路与更新范围</h2><h3 id="1-全局链路"><a href="#1-全局链路" class="headerlink" title="1.全局链路"></a>1.全局链路</h3><p>元数据更新涉及到后端BE、元数据中心META、定义驱动SV三部分。</p>
+<p><img src="//littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/1.jpg" alt="img"></p>
+<p>增量更新和全量更新并行：可能会出现问题，考虑增量更新和全量更新用一把锁，全量更新抢占锁的权重更大，详细设计见元数据中心的增量更新技术方案。</p>
+<p>增量更新并行：改为顺序消费MQ的消息的话可以防止此问题。</p>
+<h3 id="2-定义驱动更新范围："><a href="#2-定义驱动更新范围：" class="headerlink" title="2.定义驱动更新范围："></a>2.定义驱动更新范围：</h3><p>1）属于定义驱动且需要增量更新的元数据：目前存在8种元数据，BE需要更新逻辑表，SV需要更新指标、修饰、维度、逻辑表、二级索引。</p>
+<p>2）属于定义驱动但不需要更新的元数据：已经不在界面上维护，更新频率较低，因此5分钟的全量更新即可满足更新需求。</p>
+<p><img src="//littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/2.jpg" alt="img"></p>
+<h2 id="三、详细设计"><a href="#三、详细设计" class="headerlink" title="三、详细设计"></a>三、详细设计</h2><h3 id="1-整体更新流程"><a href="#1-整体更新流程" class="headerlink" title="1.整体更新流程"></a>1.整体更新流程</h3><p><strong>全量更新链路为：到达更新时间点（定时任务），元数据中心从Mysql数据库中拉取数据并构建元数据Bean，将这些元数据Bean实例转化为Json字符串存入Redis中，更新完后发送MQ消息；定义驱动工程接收MQ更新消息，获取Redis中更新后的元数据详情，解析Json字符串并构建缓存和二级索引Bean，最后一起放入本地缓存LocalCache中。</strong></p>
+<p><strong>增量更新过程与全量更新类似，不同点在于触发点和增量更新逻辑表详情和二级索引的过程。</strong></p>
+<p><img src="//littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/3.jpg" alt="img"></p>
+<h3 id="2-增量更新的触发点梳理"><a href="#2-增量更新的触发点梳理" class="headerlink" title="2.增量更新的触发点梳理"></a>2.增量更新的触发点梳理</h3><p>目前主要是逻辑表配置页面接口的更新入口处，发送对应的增量更新的消息；对于水下能力带来的数据库数据更新，保持现状，依靠5分钟全量更新。</p>
+<table>
+<thead>
+<tr>
+<th>入口</th>
+<th>环境</th>
+<th>消息类型</th>
+<th>分类</th>
+<th>说明</th>
+<th>入口类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>(“/logic/add”)</td>
+<td>预发</td>
+<td>新增</td>
+<td>水上</td>
+<td>逻辑表-新增，新版需发布，旧版不走xbp直接发布</td>
+<td>http</td>
+</tr>
+<tr>
+<td>(“/logic/delete”)</td>
+<td>预发</td>
+<td>删除</td>
+<td>水上</td>
+<td>逻辑表-删除，当前环境和线上全删除</td>
+<td>http</td>
+</tr>
+<tr>
+<td>(“/logic/edit”)</td>
+<td>预发</td>
+<td>更新</td>
+<td>水上</td>
+<td>逻辑表-编辑，当前环境全量更新，线上环境只更新逻辑表Meta</td>
+<td>http</td>
+</tr>
+<tr>
+<td>(“/logic/release”)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>–add：Response&lt;Map&lt;String, Object&gt;&gt; logicTableAdd</td>
+<td>线上</td>
+<td>新增</td>
+<td>水上</td>
+<td>线上add逻辑表</td>
+<td>JSF</td>
+</tr>
+<tr>
+<td>–edit：Response&lt;Map&lt;String, Object&gt;&gt; logicTableUpdate</td>
+<td>线上</td>
+<td>更新</td>
+<td>水上</td>
+<td>线上update逻辑表</td>
+<td>JSF</td>
+</tr>
+<tr>
+<td>–delete:Response&lt;Map&lt;String, Object&gt;&gt; deleteLogicTable</td>
+<td>线上</td>
+<td>删除</td>
+<td>水上</td>
+<td>线上删除逻辑表</td>
+<td>JSF</td>
+</tr>
+</tbody></table>
+<p>为了防止元数据缓存更新失败，在每个触发点发完MQ消息之后，将一个标志变量放入ThreadLocal中，然后在需要改动数据库表的service或Mapper处检查这个标志变量，如果存在标志变量说明此次变更已经发过MQ消息了，符合预期；如果不存在标志变量说明此次变更未发过MQ消息，上述变更入口没有覆盖到这次变更，报警处理。</p>
+<h3 id="3-如何在增量更新时发送消息"><a href="#3-如何在增量更新时发送消息" class="headerlink" title="3.如何在增量更新时发送消息"></a>3.如何在增量更新时发送消息</h3><p>要想实现实时增量更新，需要在BE的数据变动时，发送一条增量更新的mq消息，目前元数据中心有对应接口提供：</p>
+<p><strong>调用元数据中心包中的接口</strong>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 接口会自动发出一个元数据更新的mq</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> metaType 更新的元数据类型</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> realTimeRefreshMsgType 更新的type : CHANGE / DELETE</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> envType 更新的环境类型 ALL/PRE/PROD  ?</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> idList 发生变更的元数据id list</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> topic 指定发送的topic</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">dataChangeMessage</span><span class="params">(MetaType metaType, RealTimeRefreshMsgType realTimeRefreshMsgType, EnvType envType, List&lt;Long&gt; idList, String topic)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>需要配置一个jmq 的producer来满足发送jmq的需求:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">jmq:</span><br><span class="line">    enabled: <span class="keyword">true</span></span><br><span class="line">    producers:</span><br><span class="line">      metaDataRealTimeRefreshProducer:  --producerName要保持一致</span><br><span class="line">        password: password</span><br><span class="line">        app: dataassetmeta  </span><br><span class="line">        address: nameserver.jmq.jd.local:<span class="number">80</span></span><br><span class="line">        enabled: <span class="keyword">true</span></span><br><span class="line">        policy:</span><br><span class="line">          retryTimes: <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-增量更新逻辑表详情和二级索引"><a href="#4-增量更新逻辑表详情和二级索引" class="headerlink" title="4.增量更新逻辑表详情和二级索引"></a>4.增量更新逻辑表详情和二级索引</h3><p>因为二级索引的更新较为复杂，所以展开叙述：</p>
+<p>二级索引是一个Map，键是元数据的id，值是Relation对象列表，如：Map&lt;Long, List&lt;DriveLogicTableDecorateRelationPO&gt;&gt;，如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 指标id-&gt;逻辑表RelationPO 二级索引</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Cache&lt;Long, List&lt;DriveLogicTableMetricRelationPO&gt;&gt; metricLogicTableRelationCache = CacheBuilder.newBuilder()</span><br><span class="line">            .maximumSize(MAXIMUM_SIZE)<span class="comment">//注：Cache指定maximumSize后，它不会立即占用全部指定的内存大小，而是会根据需要逐渐扩展。</span></span><br><span class="line">            .concurrencyLevel(CONCURRENCY_LEVEL)</span><br><span class="line">            .recordStats()</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 维度id-&gt;逻辑表RelationPO 二级索引</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Cache&lt;Long, List&lt;DriveLogicTableFieldRelationPO&gt;&gt; dimensionLogicTableRelationCache = CacheBuilder.newBuilder()</span><br><span class="line">            .maximumSize(MAXIMUM_SIZE)</span><br><span class="line">            .concurrencyLevel(CONCURRENCY_LEVEL)</span><br><span class="line">            .recordStats()</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 修饰id-&gt;逻辑表RelationPO 二级索引</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Cache&lt;Long, List&lt;DriveLogicTableDecorateRelationPO&gt;&gt; decorateLogicTableRelationCache = CacheBuilder.newBuilder()</span><br><span class="line">            .maximumSize(MAXIMUM_SIZE)<span class="comment">//这个值分开定义</span></span><br><span class="line">            .concurrencyLevel(CONCURRENCY_LEVEL)</span><br><span class="line">            .recordStats()</span><br><span class="line">            .build();</span><br></pre></td></tr></table></figure>
+
+<p>更新流程：</p>
+<p><img src="//littleforestjia.github.io/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/4.jpg" alt="img"></p>
+<p>更新二级索引流程举例：</p>
+<p>拿指标举例：原有的本地缓存中有逻辑表L1，L2，二级索引：M1-&gt;[R(L1),R(L2)]</p>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>本地缓存内容</th>
+<th>增量拉取内容</th>
+<th>动作</th>
+<th>新的本地缓存</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>删除（删除逻辑表）</td>
+<td>逻辑表L1，L2；二级索引：M1-&gt;[R(L1),R(L2)]</td>
+<td>id详情：L1</td>
+<td>删除L1相关的二级索引，即删除二级索引：M1-&gt;[R(L1)]</td>
+<td>逻辑表L1，L2；二级索引：M1-&gt;[R(L2)]</td>
+</tr>
+<tr>
+<td>更新（新增R)</td>
+<td>逻辑表L1，L2；二级索引：M1-&gt;[R(L1),R(L2)]</td>
+<td>id详情：L1R:L1的RList中有M1、M2</td>
+<td>查询L1中所有涉及到的二级索引，删除L1相关的所有二级索引，即删除二级索引：M1-&gt;[R(L1)]；然后新增由L1构建的新二级索引（用add，在旧的缓存基础上添加）</td>
+<td>逻辑表L1，L2；二级索引：删后变为：M1-&gt;[R(L2)]，增完最后变为：M1-&gt;[R(L1),R(L2)]M2-&gt;[R(L1)]</td>
+</tr>
+<tr>
+<td>更新（删除R）</td>
+<td>逻辑表L1，L2；二级索引：M1-&gt;[R(L1),R(L2)]</td>
+<td>id详情：L1R:L1的RList中无M1</td>
+<td>逻辑表L1，L2；二级索引：删后变为：M1-&gt;[R(L2)]，增完最后变为：M1-&gt;[R(L2)]</td>
+<td></td>
+</tr>
+<tr>
+<td>更新（更新R）</td>
+<td>逻辑表L1，L2；二级索引：M1-&gt;[R(L1),R(L2)]</td>
+<td>id详情：L1R:L1的RList中还是M1</td>
+<td>逻辑表L1，L2；二级索引：删后变为：M1-&gt;[R(L2)]，增完最后变为：M1-&gt;[R’(L1),R(L2)]</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>获取本地非idList的R对象举例（删除二级索引中idList相关项，以单逻辑表id、修饰场景举例）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 仅获取本地缓存中，非目标逻辑表的相关关系</span></span><br><span class="line">List&lt;DriveLogicTableDecorateRelationPO&gt; decorateRelationPOList = getDecorateRelationByIds(decorateIds).stream()</span><br><span class="line">     .filter(dr -&gt; dr.getDriveLogicTableId() != metaDriveLogicTableInfo.getId()).collect(toList());</span><br><span class="line"><span class="comment">// 补充变更逻辑表的修饰关系</span></span><br><span class="line">decorateRelationPOList.addAll(metaDriveLogicTableInfo.getDecorateRelationList().stream()</span><br><span class="line">      .map(d -&gt; convert2DriveLogicTableDecorateRelationPO(d)).collect(toList()));</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-补充"><a href="#5-补充" class="headerlink" title="5.补充"></a>5.补充</h3><p>a、增量更新上线后，每5分钟的全量更新可以延长更新时间（如半小时），作为增量更新的一个兜底。</p>
+<p>b、缓存全量更新和增量更新，都需要添加ducc开关，用于控制总的全量和增量更新开关，也要有不使用缓存的开关，防止缓存更新链路出问题或者缓存数据有误，需要快速恢复。</p>
+<p>c、增量更新如果失败了之后的处理方式：更新失败报警报出来，然后重试（更新操作幂等）。</p>
+<p>d、确认一下，消息消费是不是顺序的？–不是。</p>
+<p>e、Cache目前是全量–&gt;后续转化为LRU–&gt;有重复开发–&gt;拿元数据兜底而非BE，但是元数据没有二级索引。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"><i class="fa fa-tag"></i> Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/07/Java%E6%9C%8D%E5%8A%A1_Spring%E4%BA%8B%E7%89%A9%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" rel="next" title="Java服务_Spring事物与分布式事务">
+                <i class="fa fa-chevron-left"></i> Java服务_Spring事物与分布式事务
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/09/Java%E6%9C%8D%E5%8A%A1_%E5%88%86%E5%B8%83%E5%BC%8F%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97%E8%BF%BD%E8%B8%AA%E5%B7%A5%E5%85%B7MDC/" rel="prev" title="Java服务_分布式服务日志追踪工具MDC">
+                Java服务_分布式服务日志追踪工具MDC <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-SV服务缓存全量更新和增量更新方案"><span class="nav-number">1.</span> <span class="nav-text">Java服务_SV服务缓存全量更新和增量更新方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、背景"><span class="nav-number">1.1.</span> <span class="nav-text">一、背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、全局链路与更新范围"><span class="nav-number">1.2.</span> <span class="nav-text">二、全局链路与更新范围</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-全局链路"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.全局链路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-定义驱动更新范围："><span class="nav-number">1.2.2.</span> <span class="nav-text">2.定义驱动更新范围：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、详细设计"><span class="nav-number">1.3.</span> <span class="nav-text">三、详细设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-整体更新流程"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.整体更新流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-增量更新的触发点梳理"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.增量更新的触发点梳理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-如何在增量更新时发送消息"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.如何在增量更新时发送消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-增量更新逻辑表详情和二级索引"><span class="nav-number">1.3.4.</span> <span class="nav-text">4.增量更新逻辑表详情和二级索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-补充"><span class="nav-number">1.3.5.</span> <span class="nav-text">5.补充</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

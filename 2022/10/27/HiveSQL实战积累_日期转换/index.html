@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HiveSQL," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HiveSQL实战积累_日期转换1.日期格式转换to_date() to_date(时间戳&#x2F;日期)的作用是返回时间戳中的日期部分，该函数的入参必须是timestamp类型或者date类型，返回值类型为string。 12示例1:select to_date(cast(&#39;2010-12-08 10:03:01&#39; as timestamp)) --timestamp时间戳作为参数结果1:2010-12">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HiveSQL实战积累_日期转换">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/10/27/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E6%97%A5%E6%9C%9F%E8%BD%AC%E6%8D%A2/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HiveSQL实战积累_日期转换1.日期格式转换to_date() to_date(时间戳&#x2F;日期)的作用是返回时间戳中的日期部分，该函数的入参必须是timestamp类型或者date类型，返回值类型为string。 12示例1:select to_date(cast(&#39;2010-12-08 10:03:01&#39; as timestamp)) --timestamp时间戳作为参数结果1:2010-12">
+<meta property="article:published_time" content="2022-10-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:01:23.467Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HiveSQL">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/10/27/HiveSQL实战积累_日期转换/"/>
+
+
+
+
+
+  <title>HiveSQL实战积累_日期转换 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/10/27/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E6%97%A5%E6%9C%9F%E8%BD%AC%E6%8D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HiveSQL实战积累_日期转换</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-10-27T00:00:00+08:00">
+                2022-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">HiveSQL实战积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HiveSQL实战积累-日期转换"><a href="#HiveSQL实战积累-日期转换" class="headerlink" title="HiveSQL实战积累_日期转换"></a>HiveSQL实战积累_日期转换</h2><h3 id="1-日期格式转换"><a href="#1-日期格式转换" class="headerlink" title="1.日期格式转换"></a>1.日期格式转换</h3><p><strong>to_date()</strong></p>
+<p>to_date(时间戳/日期)的作用是返回时间戳中的日期部分，该函数的入参必须是timestamp类型或者date类型，返回值类型为string。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> <span class="keyword">to_date</span>(<span class="keyword">cast</span>(<span class="string">'2010-12-08 10:03:01'</span> <span class="keyword">as</span> <span class="built_in">timestamp</span>)) <span class="comment">--timestamp时间戳作为参数</span></span><br><span class="line">结果<span class="number">1</span>:<span class="number">2010</span><span class="number">-12</span><span class="number">-08</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例2:<span class="keyword">select</span> <span class="keyword">to_date</span>(<span class="string">'2010-12-08 10:03:01'</span>) <span class="comment">--date作为参数</span></span><br><span class="line">结果<span class="number">2</span>:<span class="number">2010</span><span class="number">-12</span><span class="number">-08</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>date_format()</strong></p>
+<p>date_format(日期,格式)的作用是对给定的日期字符串进行格式化。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> <span class="keyword">date_format</span>(<span class="string">'2015-04-02 13:34:12'</span>,<span class="string">'yyyy-MM-dd'</span>)</span><br><span class="line">结果<span class="number">1</span>:<span class="number">2015</span><span class="number">-04</span><span class="number">-02</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-时间戳转换"><a href="#2-时间戳转换" class="headerlink" title="2.时间戳转换"></a>2.时间戳转换</h3><p><strong>from_unixtime()</strong></p>
+<p>from_unixtime(时间戳,格式)的作用是将UNIX时间戳(从1070-01-01 00:00:00UTC到指定时间的秒数)转换为当前时区的指定格式时间字符串。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> from_unixtime(<span class="number">1505456567</span>) <span class="comment">--转换为默认日期格式yyyy-MM-dd HH:mm:ss</span></span><br><span class="line">结果<span class="number">1</span>:<span class="number">2017</span><span class="number">-09</span><span class="number">-15</span> <span class="number">14</span>:<span class="number">22</span>:<span class="number">47</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例2:<span class="keyword">select</span> from_unixtime(<span class="number">1505456567</span>,<span class="string">'yyyyMMdd'</span>)</span><br><span class="line">结果<span class="number">2</span>:<span class="number">20170915</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例3:<span class="keyword">select</span> from_unixtime(<span class="number">1505456567</span>,<span class="string">'yyyy-MM-dd HH:mm:ss'</span>)</span><br><span class="line">结果<span class="number">3</span>:<span class="number">2017</span><span class="number">-09</span><span class="number">-15</span> <span class="number">14</span>:<span class="number">22</span>:<span class="number">47</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例4:<span class="keyword">select</span> from_unixtime(<span class="keyword">unix_timestamp</span>(),<span class="string">'yyyy-MM-dd HH:mm:ss'</span>) <span class="comment">--unix_timestamp()获取系统当前时间</span></span><br><span class="line">结果<span class="number">4</span>:<span class="number">2023</span><span class="number">-02</span><span class="number">-04</span> <span class="number">15</span>:<span class="number">07</span>:<span class="number">35</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>unix_timestamp()</strong></p>
+<p>unix_timestamp(日期,日期格式)的作用是将“yyyy-MM-dd HH:mm:ss“格式的日期转换为UNIX时间戳，如果是其它格式的时间字符串则需要加入日期格式。该函数的入参类型为date，返回值类型为bigint，共十位，单位为秒，若转换失败则返回0。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> <span class="keyword">unix_timestamp</span>() <span class="comment">--获取当前时区的UNIX时间戳</span></span><br><span class="line">结果<span class="number">1</span>:<span class="number">1675494881</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例2:<span class="keyword">select</span> <span class="keyword">unix_timestamp</span>(<span class="string">'2017-09-15 14:23:00'</span>)</span><br><span class="line">结果<span class="number">2</span>:<span class="number">1505456580</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例3:<span class="keyword">select</span> <span class="keyword">unix_timestamp</span>(<span class="string">'2017-09-15 14:23:00'</span>,<span class="string">'yyyy-MM-dd HH:mm:ss'</span>)</span><br><span class="line">结果<span class="number">3</span>:<span class="number">1505456580</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例4:<span class="keyword">select</span> <span class="keyword">unix_timestamp</span>(<span class="string">'20170915 14:23:00'</span>,<span class="string">'yyyyMMdd HH:mm:ss'</span>)</span><br><span class="line">结果<span class="number">4</span>:<span class="number">1505456580</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-日期计算"><a href="#3-日期计算" class="headerlink" title="3.日期计算"></a>3.日期计算</h3><p><strong>date_sub()</strong></p>
+<p>date_sub(startdate,intdays)用于对参数1日期减少参数2天数，参数2intdays可以是负数。</p>
+<p><strong>date_add()</strong></p>
+<p>date_add(startdate, intdays)用于对参数1日期增加参数2天数，参数2intdays可以是负数。</p>
+<p><strong>datediff()</strong></p>
+<p>datediff(enddate,startdate)用于计算两个日期之间相差的天数，前一个参数减去后一个参数。</p>
+<p><strong>add_months()</strong></p>
+<p>add_months(date,intmonths)用于对参数1日期增加参数2月份，参数2intmonths可以是负数。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> add_months(<span class="string">'2019-01-21'</span>,<span class="number">-1</span>)</span><br><span class="line">结果<span class="number">1</span>:<span class="number">2018</span><span class="number">-12</span><span class="number">-21</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-获取日期"><a href="#4-获取日期" class="headerlink" title="4.获取日期"></a>4.获取日期</h3><p><strong>year()|month()|day()|hour()|minute()|second()|quarter()</strong></p>
+<p>year(date)|month(date)|day(date)|hour(date)|minute(date)|second(date)|quarter(date)用于返回date类型或timestamp类型入参的年|月|日|时|分|秒|季度，返回值类型为int。</p>
+<p><strong>weekofyear()</strong></p>
+<p>weekofyear(date)用于获取指定日期在一年中属于第几周，入参类型为date，返回值类型为int。</p>
+<p><strong>current_date</strong></p>
+<p>current_date用于返回当前日期。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> <span class="keyword">current_date</span></span><br><span class="line">结果<span class="number">1</span>:<span class="number">2023</span><span class="number">-02</span><span class="number">-04</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>current_timestamp</strong></p>
+<p>current_timestamp用于返回当前时间。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> <span class="keyword">current_timestamp</span></span><br><span class="line">结果<span class="number">1</span>:<span class="number">2023</span><span class="number">-02</span><span class="number">-04</span> <span class="number">16</span>:<span class="number">00</span>:<span class="number">38.753</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>last_day()</strong></p>
+<p>last_day(date)用于返回入参时间的当月最后一天日期</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> <span class="keyword">last_day</span>(<span class="string">'2019-06-21'</span>)</span><br><span class="line">结果<span class="number">1</span>:<span class="number">2019</span><span class="number">-06</span><span class="number">-30</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>next_day()</strong></p>
+<p>next_day(date,周几)用于返回入参时间的下周几的具体日期</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例1:<span class="keyword">select</span> next_day(<span class="string">'2021-05-28'</span>,<span class="string">'MO'</span>) <span class="comment">--2021-05-28往后的第一个周一</span></span><br><span class="line">结果<span class="number">1</span>:<span class="number">2021</span><span class="number">-05</span><span class="number">-31</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">示例2:<span class="keyword">select</span> next_day(<span class="string">'2020-01-01'</span>,<span class="string">'Fri'</span>) <span class="comment">--2020-01-01往后的第一个周五</span></span><br><span class="line">结果<span class="number">2</span>:<span class="number">2020</span><span class="number">-01</span><span class="number">-03</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://zhuanlan.zhihu.com/p/431965328" target="_blank" rel="noopener">hive中的日期转换</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HiveSQL/" rel="tag"><i class="fa fa-tag"></i> HiveSQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/10/20/Java%E6%9C%8D%E5%8A%A1_ck%E6%9C%8D%E5%8A%A1%E5%BC%B9%E6%80%A7%E6%8E%A5%E5%8F%A3service%E5%B1%82%E5%92%8Cdao%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%982/" rel="next" title="Java服务_ck服务弹性接口service层和dao层设计实战2">
+                <i class="fa fa-chevron-left"></i> Java服务_ck服务弹性接口service层和dao层设计实战2
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/11/04/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" rel="prev" title="HiveSQL实战积累_窗口函数">
+                HiveSQL实战积累_窗口函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HiveSQL实战积累-日期转换"><span class="nav-number">1.</span> <span class="nav-text">HiveSQL实战积累_日期转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-日期格式转换"><span class="nav-number">1.1.</span> <span class="nav-text">1.日期格式转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-时间戳转换"><span class="nav-number">1.2.</span> <span class="nav-text">2.时间戳转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-日期计算"><span class="nav-number">1.3.</span> <span class="nav-text">3.日期计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-获取日期"><span class="nav-number">1.4.</span> <span class="nav-text">4.获取日期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.5.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

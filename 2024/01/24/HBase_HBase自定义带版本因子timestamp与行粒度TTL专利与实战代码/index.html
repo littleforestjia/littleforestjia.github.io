@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,TTL,timestamp," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码一、专利撰写一种自定义行粒度生命周期的HBase表大批量数据写入方法技术领域本发明属于HBase数据库技术领域，具体涉及一种为每一行数据设置不同timestamp和cell TTL（time to live）的HBase表大批量数据写入方法。 背景技术HBase是一种非关系型数据库，具有高性能、高可靠性、分布式、可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码一、专利撰写一种自定义行粒度生命周期的HBase表大批量数据写入方法技术领域本发明属于HBase数据库技术领域，具体涉及一种为每一行数据设置不同timestamp和cell TTL（time to live）的HBase表大批量数据写入方法。 背景技术HBase是一种非关系型数据库，具有高性能、高可靠性、分布式、可">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/5.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/6.jpg">
+<meta property="article:published_time" content="2024-01-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:42:24.941Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="TTL">
+<meta property="article:tag" content="timestamp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/24/HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码/"/>
+
+
+
+
+
+  <title>HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-24T00:00:00+08:00">
+                2024-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码"><a href="#HBase-HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码" class="headerlink" title="HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码"></a>HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码</h1><h2 id="一、专利撰写"><a href="#一、专利撰写" class="headerlink" title="一、专利撰写"></a>一、专利撰写</h2><h3 id="一种自定义行粒度生命周期的HBase表大批量数据写入方法"><a href="#一种自定义行粒度生命周期的HBase表大批量数据写入方法" class="headerlink" title="一种自定义行粒度生命周期的HBase表大批量数据写入方法"></a>一种自定义行粒度生命周期的HBase表大批量数据写入方法</h3><h4 id="技术领域"><a href="#技术领域" class="headerlink" title="技术领域"></a>技术领域</h4><p>本发明属于HBase数据库技术领域，具体涉及一种为每一行数据设置不同timestamp和cell TTL（time to live）的HBase表大批量数据写入方法。</p>
+<h4 id="背景技术"><a href="#背景技术" class="headerlink" title="背景技术"></a>背景技术</h4><p>HBase是一种非关系型数据库，具有高性能、高可靠性、分布式、可伸缩等特点，非常适合存储非结构化数据。HBase数据库构建于Hadoop分布式文件系统之上，在物理存储上借助列簇实现KV（Key-Value）数据的存储，底层通过HDFS副本机制实现数据的冗余存储，具有极其出色的读写性能。</p>
+<p>HBase支持列簇粒度TTL和单元格粒度TTL。TTL的作用原理：系统当前毫秒级时间戳currentMilliseconds减去单元格时间戳timestamp 的差值大于TTL，则判定该单元格过期，无法被查询返回，在数据合并时被删除。列簇粒度TTL和单元格粒度TTL可以同时设置，系统按照最小的TTL来判断单元格数据是否过期。</p>
+<p>数据应用平台为了应对高并发场景下的数据查询请求压力，通常将明细数据按照设定的维度路径和指标口径进行预计算后以KV的形式存储在HBase数据库中。为了提供更加灵活和全面的数据展现形式，对于具有固定业务口径的一块数据看版，通常会提供单天、周至今、近7天、小时等不同聚合时间粒度的预计算数据供筛选切换，也会提供类目、品牌、商品等不同聚合维度路径的预计算数据供筛选切换。将这些时间粒度、维度路径等具有不同业务含义的聚合数据变化情况与营销、推荐等策略进行结合分析，即可帮助数据应用平台用户更加快捷、方便地了解数据影响因素，针对性地制定数据表现提升方案。</p>
+<p>数据应用平台使用多种多样的聚合时间粒度和维度路径预计算数据为用户提供灵活的时间范围和聚合维度选项，这些具有相同指标口径的数据通常存储在同一张HBase表中，只需要根据传入的聚合时间粒度类型和聚合维度枚举，即可区分具有不同业务含义的数据。针对该HBase表只需要在数据服务中建立一个数据模型，通过传入不同聚合维度组合和对应维度过滤值即可方便快捷地获取对应聚合数据，实现了模型口径唯一、服务开发便捷、高效查询、响应速度快等优点。但是在实际业务过程中，同一张HBase表中具有不同业务含义的预计算结果数据通常具有不同历史周期查询优先级，如部分业务数据历史周期的查询概率较高则需要存储较长周期，而部分业务数据历史周期的完全不会被查询到，随着业务模块的不断增加，HBase集群占用存储资源增长迅速，集群无法进行无限制的扩容；且每次新上业务需求进行历史数据回溯都会造成HBase数据生命周期计算起点时间戳timestamp刷新，导致历史数据无法按照预设生命周期及时过期清除，需要再等待一整个HBase列簇粒度TTL才能被真正清理。</p>
+<p>鉴于上述HBase数据库业务增长与存储现状，有必要针对存储无限制增长和数据冗余严重问题，在满足用户看数需求和数据存储成本中寻找一个平衡点，抑制存储增长，进行存储治理。同一张HBase表中具有不同业务含义的数据可以设置不同TTL，业务调整带来的历史回溯数据也应该按照业务时间正常过期。因此，设计一种针对同一张HBase表中不同业务含义数据行设置不同timestamp和cell TTL的大批量数据写入方法，显得十分迫切和重要。</p>
+<h4 id="发明内容"><a href="#发明内容" class="headerlink" title="发明内容"></a>发明内容</h4><p>本发明的目的是克服现有技术的不足，提供一种针对同一张HBase表中不同业务含义数据行设置不同timestamp和cell TTL的大批量数据写入方法，该方法能够有效缓解HBase集群存储无限制增长和数据冗余严重的问题。</p>
+<p>为了克服现有技术问题，本发明是通过以下技术方案实现的：</p>
+<p>1）一种针对同一张HBase表中不同业务含义数据行设置不同timestamp和cell TTL的大批量数据写入方法，特征在于数据集市应用层按照各种业务维度组合和聚合时间粒度预计算得到各个不同业务层级的结果数据，存放在Hive表中，采用MapReduce计算引擎并发读取Hive结果表的数据文件。</p>
+<p>2）按上述技术方案，所述MapReduce计算任务的Map阶段，每个Task读取一个Hive表存储文件，逐行读取Hive表存储文件中Text格式的预计算结果数据行，解析出字段数据并计数。</p>
+<p>3）按上述技术方案，所述MapTask解析提取出能够标识结果数据行唯一性的所有聚合维度字段值，这些维度值按照指定顺序拼接在一起能够具有唯一的业务含义。</p>
+<p>4）按上述技术方案，将所述能够标识数据行唯一性的聚合维度字段值按照从低基维度到高基维度的顺序排列，并将首个维度字段值进行反转散列再拼接，作为该数据行的Rowkey。</p>
+<p>5）按上述技术方案，所述MapTask解析提取出业务生产时间datetime，并将其转换为毫秒级Unix timestamp，作为预计算结果数据行的业务生产时间戳。</p>
+<p>6）按上述技术方案，将所述业务生产时间戳加上版本因子，作为该数据行的timestamp，所述timestamp计算公式如下：<img src="//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/1.jpg" alt="img">)式中<img src="//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/2.jpg" alt="img">)为上述业务生产时间戳，<img src="//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/3.jpg" alt="img">)为推数任务运行时系统时间戳，<img src="//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/4.jpg" alt="img">为一个自然天的毫秒数。</p>
+<p>7）按上述技术方案，所述MapTask解析提取出能够标识结果数据行在历史周期中业务新鲜度的维度字段值，根据这些具有不同业务含义的维度值确定该数据行在历史周期中的存储优先级。</p>
+<p>8）按上述技术方案，对上述历史存储优先级较高的数据行的设置较长的TTL，对上述历史存储优先级较低的数据行设置较短的TTL，将TTL封装为KeyValue对象的Tag属性。</p>
+<p>9）按上述技术方案，将所述Rowkey、timestamp、TTL Tag作为对象属性组装成HBase的一个Put对象，一个HBase数据库格式的数据行可以包含具有相同Rowkey、timestamp、TTL Tag属性和不同value属性的多个Put对象。</p>
+<p>10）按上述技术方案，所述MapReduce计算任务的Shuffle阶段，将Map阶段解析处理好的数据行根据Rowkey按照目标HBase表的Region切分点进行切分，发送到不同的Reduce节点上。</p>
+<p>11）按上述技术方案，所述MapReduce计算任务的Reduce阶段，每个Task将其所收到的所有数据行根据Rowkey按照字典序排序，通过检验排序后相邻数据行的Rowkey是否相等来校验每个数据行的业务含义唯一性，当存在相邻数据行Rowkey相等则抛出异常，停止运行计算任务。</p>
+<p>12）按上述技术方案，将所述解析处理、切分和排序判重完成后的HBase格式数据行按照指定压缩格式存入HFile文件中，可以通过参数指定ZSTD、BZIP2、LZ4等压缩格式。</p>
+<p>13）按上述技术方案，将所述压缩HFile文件存储在HDFS集群的临时目录中，使用BulkLoad方式将所述HFile文件推送到目标HBase集群存储目录中。</p>
+<p>14）按上述技术方案，将所述大批量数据写入方法将所述MapReduce计算任务Map阶段统计的解析数据行数与所述数据集市Hive表中数据行数进行比较，校验写入总行数成功后放开数据服务查询请求。</p>
+<p>本发明提供的自定义行粒度生命周期的HBase表大批量数据写入方法与现有技术相比，具有以下有益效果：将组成Rowkey的首个业务字段进行反转散列并按从低基到高基维度排序再拼接，实现了HBase数据的均匀散列、避免聚集，同时还能实现灵活的业务维度组合前缀匹配查询；提取业务生产时间作为数据单元格timestamp，避免业务数据回溯时按照数据更新时间重新计算TTL造成数据存储冗余；为业务生产时间timestamp添加版本因子，确保数据单元格在更新前后业务生产时间不变的情况下，更新后的timestamp大于更新前的timestamp，避免数据更新失效；为同一张HBase表中具有不同业务含义的数据添加不同的生命周期，将不会再被使用的历史数据提前清理，缓解存储资源紧张问题；通过检验有序相邻数据行的Rowkey是否相等来确保每个数据行的业务唯一性，方便快速发现上游数据问题和响应；采用ZSTD等压缩格式存储HFile文件并直接推送到HBase集群存储目录中，传输速度快，占用带宽、存储资源少；比对写入目标HBase表数据行数和源Hive表数据行数，确保数据写入无遗漏。</p>
+<h4 id="附图说明"><a href="#附图说明" class="headerlink" title="附图说明"></a>附图说明</h4><p>图1为本发明的整体流程示意图。</p>
+<p>图2为本发明所述的HBase单元格自定义组装的属性。</p>
+<p>图1:</p>
+<p><img src="//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/5.jpg" alt></p>
+<p>图2:</p>
+<p><img src="//littleforestjia.github.io/2024/01/24/HBase_HBase%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B8%A6%E7%89%88%E6%9C%AC%E5%9B%A0%E5%AD%90timestamp%E4%B8%8E%E8%A1%8C%E7%B2%92%E5%BA%A6TTL%E4%B8%93%E5%88%A9%E4%B8%8E%E5%AE%9E%E6%88%98%E4%BB%A3%E7%A0%81/6.jpg" alt></p>
+<h2 id="二、实战代码"><a href="#二、实战代码" class="headerlink" title="二、实战代码"></a>二、实战代码</h2><h3 id="1-Spark2HBase推数工具"><a href="#1-Spark2HBase推数工具" class="headerlink" title="1.Spark2HBase推数工具"></a>1.Spark2HBase推数工具</h3><p>注意此处目前在实际代码中有三处与上述专利内容存在差异：</p>
+<p>1）此处使用Spark引擎替换MapReduce引擎，计算效率更高，且可以先进行逻辑运算再将存储在内存中的RDD数据直接进行解析转化写入HBase，而MapReduce引起只能直接读取Hive表数据文件；</p>
+<p>2）此处没有给timestamp加上版本因子，是线上使用自定义timestamp然后进行数据回刷之后发现数据没有更新才暴露出的这个问题，后续才想到版本因子这个解法，但是还没真正写到代码中并应用到线上；</p>
+<p>3）此处的rowkey没有采用首个业务字段反转的散列方式，而是采用前缀字段MD5的方式进行散列，数据均匀性好很多。</p>
+<p>实战代码如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Spark2HBase</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> <span class="type">SEPARATOR</span>: <span class="type">String</span> = <span class="string">"|"</span></span><br><span class="line">  <span class="keyword">val</span> <span class="type">COMMA</span>: <span class="type">String</span> = <span class="string">","</span></span><br><span class="line">  <span class="keyword">val</span> <span class="type">EMPTY</span>: <span class="type">String</span> = <span class="string">""</span></span><br><span class="line">  <span class="keyword">val</span> <span class="type">DATEFORMAT</span>: <span class="type">String</span> = <span class="string">"yyyy-MM-dd HH:mm:ss"</span></span><br><span class="line">  <span class="keyword">val</span> <span class="type">DATESUFFIX</span>: <span class="type">String</span> = <span class="string">" 23:59:59"</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//指标与id --uv:392,pv:123</span></span><br><span class="line">    <span class="keyword">val</span> indicationString = args(<span class="number">0</span>)</span><br><span class="line">    <span class="comment">//维度与排序后id --123:stat_ct_cd,234:shop_id,240:sku_id,246:chan_cd</span></span><br><span class="line">    <span class="keyword">val</span> dimensionString = args(<span class="number">1</span>)</span><br><span class="line">    <span class="comment">//时间字段名称 --dt</span></span><br><span class="line">    <span class="keyword">val</span> time = args(<span class="number">2</span>)</span><br><span class="line">    <span class="comment">//时间粒度字段名称 --tp</span></span><br><span class="line">    <span class="keyword">val</span> timeInterval = args(<span class="number">3</span>)</span><br><span class="line">    <span class="comment">//时效类型 --offtime</span></span><br><span class="line">    <span class="keyword">val</span> timeAgingType = args(<span class="number">4</span>)</span><br><span class="line">    <span class="comment">//分时字段名称 --time_granularity</span></span><br><span class="line">    <span class="keyword">val</span> timeSplitField = args(<span class="number">5</span>)</span><br><span class="line">    <span class="comment">//预计算sql</span></span><br><span class="line">    <span class="keyword">val</span> sparkSql = args(<span class="number">6</span>)</span><br><span class="line">    <span class="comment">//accesskey --NA4CH6B7RFYAJLV3ZMMAHDFGO4</span></span><br><span class="line">    <span class="keyword">val</span> accesskey = args(<span class="number">7</span>)</span><br><span class="line">    <span class="comment">//instanceName --CL1000000005186</span></span><br><span class="line">    <span class="keyword">val</span> instanceName = args(<span class="number">8</span>)</span><br><span class="line">    <span class="comment">//目标hbase表名</span></span><br><span class="line">    <span class="keyword">val</span> hbaseTableName = args(<span class="number">9</span>)</span><br><span class="line">    <span class="comment">//hfile临时存储路径 --hdfs://ns3/user/mart_sz/ads_zs/app_zs_z1702_product_compete_source_deletetest/dt=2023-06-01/stat_ct_cd=day/sz_elaHB_IBD_SHOP_VIEW_INSHOP_NEW</span></span><br><span class="line">    <span class="keyword">val</span> outputPath = args(<span class="number">10</span>)</span><br><span class="line">    <span class="comment">//源数据表存储路径根目录 --hdfs://ns3</span></span><br><span class="line">    <span class="keyword">val</span> inputRootPath = args(<span class="number">11</span>)</span><br><span class="line">    <span class="comment">//是否开启按业务周期写入timestamp标识</span></span><br><span class="line">    <span class="keyword">var</span> customTimestampFlag = args(<span class="number">12</span>).toBoolean</span><br><span class="line">    <span class="comment">//是否开启对d7,d30,非周末tw,非月末tm预计算数据单独设置ttl标识</span></span><br><span class="line">    <span class="keyword">var</span> cellTimeToLiveFlag = args(<span class="number">13</span>).toBoolean</span><br><span class="line">    <span class="comment">//单独设置ttl寿命，单位为毫秒</span></span><br><span class="line">    <span class="keyword">val</span> cellTimeToLive = args(<span class="number">14</span>).toLong * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span></span><br><span class="line">    <span class="comment">//rowkey首字段散列方式</span></span><br><span class="line">    <span class="keyword">val</span> hashFunction = args(<span class="number">15</span>)</span><br><span class="line">    <span class="comment">//scan维度字段 --shop_id,sku_id</span></span><br><span class="line">    <span class="keyword">val</span> scanFields = args(<span class="number">16</span>)</span><br><span class="line">    <span class="comment">//生产预发环境标识 --PROD/PRE</span></span><br><span class="line">    <span class="keyword">val</span> multiEnv = args(<span class="number">17</span>)</span><br><span class="line">    <span class="comment">//sparkSQL的partition数量</span></span><br><span class="line">    <span class="keyword">val</span> partitions = args(<span class="number">18</span>).toInt</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化spark环境</span></span><br><span class="line">    <span class="keyword">val</span> bld7 = <span class="string">"BY_LAST_DAYS_7"</span></span><br><span class="line">    <span class="keyword">val</span> bld30 = <span class="string">"BY_LAST_DAYS_30"</span></span><br><span class="line">    <span class="keyword">val</span> bma = <span class="string">"BY_MONTH_ACCU"</span></span><br><span class="line">    <span class="keyword">val</span> bwa = <span class="string">"BY_WEEK_ACCU"</span></span><br><span class="line">    <span class="keyword">val</span> bm = <span class="string">"BY_MONTH"</span></span><br><span class="line">    <span class="keyword">val</span> bw = <span class="string">"BY_WEEK"</span></span><br><span class="line">    <span class="comment">//周至今、月至今、近7、近30的同比数据与当期数据同时写入，如果要写入cellttl，则不开启按业务周期写入timestamp标识</span></span><br><span class="line">    <span class="keyword">if</span> ((sparkSql.contains(bld30) || sparkSql.contains(bma) || sparkSql.contains(bld7) || sparkSql.contains(bwa)) &amp;&amp; cellTimeToLiveFlag) &#123;</span><br><span class="line">      cellTimeToLiveFlag = <span class="literal">true</span></span><br><span class="line">      customTimestampFlag = <span class="literal">false</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      cellTimeToLiveFlag = <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    println(<span class="string">s"指标与id:<span class="subst">$indicationString</span>"</span>)</span><br><span class="line">    println(<span class="string">s"维度与排序后id:<span class="subst">$dimensionString</span>"</span>)</span><br><span class="line">    println(<span class="string">s"时间字段名称:<span class="subst">$time</span>"</span>)</span><br><span class="line">    println(<span class="string">s"时间粒度字段名称:<span class="subst">$timeInterval</span>"</span>)</span><br><span class="line">    println(<span class="string">s"时效类型:<span class="subst">$timeAgingType</span>"</span>)</span><br><span class="line">    println(<span class="string">s"分时字段名称:<span class="subst">$timeSplitField</span>"</span>)</span><br><span class="line">    println(<span class="string">s"预计算sql:<span class="subst">$sparkSql</span>"</span>)</span><br><span class="line">    println(<span class="string">s"accesskey:<span class="subst">$accesskey</span>"</span>)</span><br><span class="line">    println(<span class="string">s"instanceName:<span class="subst">$instanceName</span>"</span>)</span><br><span class="line">    println(<span class="string">s"目标hbase表名:<span class="subst">$hbaseTableName</span>"</span>)</span><br><span class="line">    println(<span class="string">s"hfile临时存储路径:<span class="subst">$outputPath</span>"</span>)</span><br><span class="line">    println(<span class="string">s"源数据表存储路径根目录:<span class="subst">$inputRootPath</span>"</span>)</span><br><span class="line">    println(<span class="string">s"是否开启按业务周期写入timestamp标识:<span class="subst">$customTimestampFlag</span>"</span>)</span><br><span class="line">    println(<span class="string">s"是否开启对d7,d30,非周末tw,非月末tm预计算数据单独设置ttl标识:<span class="subst">$cellTimeToLiveFlag</span>"</span>)</span><br><span class="line">    println(<span class="string">s"单独设置ttl寿命:<span class="subst">$cellTimeToLive</span>"</span>)</span><br><span class="line">    println(<span class="string">s"rowkey首字段散列方式:<span class="subst">$hashFunction</span>"</span>)</span><br><span class="line">    println(<span class="string">s"scan维度字段:<span class="subst">$scanFields</span>"</span>)</span><br><span class="line">    println(<span class="string">s"sparkSQL的partition数量:<span class="subst">$partitions</span>"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> sparkSession = <span class="type">SparkSession</span>.builder().</span><br><span class="line">      appName(<span class="string">"hdfs 2 hbase through spark"</span>).</span><br><span class="line">      config(<span class="string">"spark.sql.shuffle.partitions"</span>, partitions).</span><br><span class="line">      config(<span class="string">"spark.executor.extraJavaOptions"</span>, <span class="string">"-XX:MaxHeapSize=4G -XX:ParallelGCThreads=2 -XX:MaxJavaStackTraceDepth=1000000"</span>).</span><br><span class="line">      enableHiveSupport().getOrCreate();</span><br><span class="line">    <span class="keyword">val</span> spark = sparkSession</span><br><span class="line">    <span class="keyword">val</span> sc = spark.sparkContext</span><br><span class="line">    <span class="keyword">val</span> accumulator = sc.longAccumulator(<span class="string">"RowCountor"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取指标-id映射map</span></span><br><span class="line">    <span class="keyword">val</span> indicationList = indicationString.split(<span class="string">","</span>)</span><br><span class="line">    <span class="keyword">val</span> indicatorMap = <span class="keyword">new</span> mutable.<span class="type">HashMap</span>[<span class="type">String</span>, <span class="type">String</span>]</span><br><span class="line">    <span class="keyword">for</span> (element &lt;- indicationList) &#123;</span><br><span class="line">      indicatorMap.put(element.split(<span class="string">":"</span>)(<span class="number">0</span>), element.split(<span class="string">":"</span>)(<span class="number">1</span>))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取id-维度映射map</span></span><br><span class="line">    <span class="keyword">val</span> dimensionList = dimensionString.split(<span class="string">","</span>)</span><br><span class="line">    <span class="keyword">val</span> dimensionMap = <span class="keyword">new</span> mutable.<span class="type">HashMap</span>[<span class="type">String</span>, <span class="type">String</span>]</span><br><span class="line">    <span class="keyword">for</span> (element &lt;- dimensionList) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="string">"dt"</span>.equals(element.split(<span class="string">":"</span>)(<span class="number">1</span>))) &#123;</span><br><span class="line">        dimensionMap.put(element.split(<span class="string">":"</span>)(<span class="number">0</span>), element.split(<span class="string">":"</span>)(<span class="number">1</span>))</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取需要拼接到rowkey中的维度id list</span></span><br><span class="line">    <span class="keyword">val</span> dimensionIdList = <span class="keyword">new</span> mutable.<span class="type">ListBuffer</span>[<span class="type">String</span>]</span><br><span class="line">    <span class="keyword">for</span> (element &lt;- dimensionList) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="string">"dt"</span>.equals(element.split(<span class="string">":"</span>)(<span class="number">1</span>))) &#123;</span><br><span class="line">        dimensionIdList.append(element.split(<span class="string">":"</span>)(<span class="number">0</span>))</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取scan维度字段list</span></span><br><span class="line">    <span class="keyword">var</span> scanFieldList = <span class="keyword">new</span> mutable.<span class="type">ListBuffer</span>[<span class="type">String</span>]</span><br><span class="line">    <span class="keyword">if</span> (!<span class="string">"NULL"</span>.equals(scanFields)) &#123;</span><br><span class="line">      <span class="keyword">for</span> (element &lt;- scanFields.split(<span class="string">","</span>)) &#123;</span><br><span class="line">        scanFieldList.append(element)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取需要从行数据中解析出来的字段，包括指标+维度+时间+时间粒度的set</span></span><br><span class="line">    <span class="keyword">val</span> indicatorDimensionSet = <span class="keyword">new</span> mutable.<span class="type">HashSet</span>[<span class="type">String</span>]</span><br><span class="line">    <span class="keyword">for</span> (element &lt;- indicatorMap.keys) &#123;</span><br><span class="line">      indicatorDimensionSet.add(element)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (element &lt;- dimensionMap.values) &#123;</span><br><span class="line">      indicatorDimensionSet.add(element)</span><br><span class="line">    &#125;</span><br><span class="line">    indicatorDimensionSet.add(time)</span><br><span class="line">    indicatorDimensionSet.add(timeInterval)</span><br><span class="line">    indicatorDimensionSet.add(timeSplitField)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//初始化hbase环境</span></span><br><span class="line">    <span class="keyword">val</span> config = <span class="keyword">new</span> <span class="type">HBaseConfiguration</span>()</span><br><span class="line">    config.set(<span class="string">"bdp.hbase.accesskey"</span>, accesskey)</span><br><span class="line">    config.set(<span class="string">"bdp.hbase.instance.name"</span>, instanceName)</span><br><span class="line">    config.set(<span class="string">"fs.defaultFS"</span>, inputRootPath)</span><br><span class="line">    config.setLong(<span class="string">"hbase.rpc.timeout"</span>, <span class="number">14400000</span>)</span><br><span class="line">    config.setBoolean(<span class="string">"hbase.policy.http.client.v2.enabled"</span>, <span class="literal">false</span>)</span><br><span class="line">    <span class="keyword">val</span> hbaseContext = <span class="keyword">new</span> <span class="type">HBaseContext</span>(sc, config)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//执行sparkSQL</span></span><br><span class="line">    <span class="keyword">var</span> dataFrame: <span class="type">Dataset</span>[<span class="type">Row</span>] = <span class="literal">null</span></span><br><span class="line">    dataFrame = spark.sql(sparkSql)</span><br><span class="line">    <span class="keyword">val</span> schema = dataFrame.schema</span><br><span class="line">    <span class="keyword">var</span> sourceRdd = dataFrame.rdd</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果输出目录存在则删除</span></span><br><span class="line">    <span class="keyword">val</span> dfs = <span class="type">FileSystem</span>.get(config)</span><br><span class="line">    <span class="keyword">if</span> (dfs.exists(<span class="keyword">new</span> <span class="type">Path</span>(outputPath))) &#123;</span><br><span class="line">      dfs.delete(<span class="keyword">new</span> <span class="type">Path</span>(outputPath), <span class="literal">true</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> formatRdd = sourceRdd.map(row =&gt; &#123;</span><br><span class="line">      accumulator.add(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">      <span class="comment">//用于存储拼装key的键值对</span></span><br><span class="line">      <span class="keyword">var</span> rowMap = <span class="keyword">new</span> mutable.<span class="type">HashMap</span>[<span class="type">String</span>, <span class="type">String</span>]</span><br><span class="line"></span><br><span class="line">      <span class="comment">//从一行数据中取出需要的字段名和字段值</span></span><br><span class="line">      schema.foreach &#123; f =&gt;</span><br><span class="line">        <span class="keyword">val</span> fieldName = f.name</span><br><span class="line">        <span class="keyword">val</span> fieldIndex = row.fieldIndex(fieldName)</span><br><span class="line">        <span class="keyword">val</span> fieldValue = row.get(fieldIndex)</span><br><span class="line">        <span class="keyword">if</span> (indicatorDimensionSet.contains(fieldName))</span><br><span class="line">          <span class="keyword">if</span>(fieldValue != <span class="literal">null</span>)&#123;</span><br><span class="line">            rowMap.put(fieldName, fieldValue.toString)</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">var</span> rowkey: <span class="type">String</span> = rowMap(time) + <span class="type">SEPARATOR</span> + getStandardTimeInterval(rowMap(timeInterval)) + <span class="type">SEPARATOR</span> + timeAgingType + <span class="type">SEPARATOR</span> + getTimeSharingType(rowMap(timeInterval)) + <span class="type">SEPARATOR</span></span><br><span class="line">      <span class="keyword">for</span>(element1 &lt;- dimensionIdList) &#123;</span><br><span class="line">        <span class="keyword">if</span>(rowMap.contains(dimensionMap(element1))) &#123;</span><br><span class="line">          rowkey += element1</span><br><span class="line">          rowkey += <span class="type">COMMA</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      rowkey = rowkey.substring(<span class="number">0</span>, rowkey.length - <span class="number">1</span>)</span><br><span class="line">      rowkey += <span class="type">SEPARATOR</span></span><br><span class="line">      <span class="keyword">for</span>(element1 &lt;- dimensionIdList) &#123;</span><br><span class="line">        <span class="keyword">if</span>(rowMap.contains(dimensionMap(element1)) &amp;&amp; !scanFieldList.contains(dimensionMap(element1))) &#123;</span><br><span class="line">          rowkey += rowMap(dimensionMap(element1))</span><br><span class="line">          rowkey += <span class="type">COMMA</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      rowkey = rowkey.substring(<span class="number">0</span>, rowkey.length - <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">      rowkey = getHashValue(rowkey, <span class="string">"String"</span>, hashFunction) + <span class="type">SEPARATOR</span> + rowkey</span><br><span class="line"></span><br><span class="line">      <span class="comment">//添加scan字段值</span></span><br><span class="line">      <span class="keyword">for</span> (element1 &lt;- scanFieldList) &#123;</span><br><span class="line">        <span class="keyword">if</span>(rowMap.contains(element1)) &#123;</span><br><span class="line">          rowkey += <span class="type">COMMA</span></span><br><span class="line">          rowkey += rowMap(element1)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//添加分时时间切片字段，格式为 hh:mm，scan字段和分时切片不能同时使用。</span></span><br><span class="line">      <span class="keyword">if</span> (rowMap.contains(timeSplitField)) &#123;</span><br><span class="line">        rowkey += <span class="type">COMMA</span></span><br><span class="line">        rowkey += rowMap(timeSplitField)</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">//预发环境在key头部添加"pre_"前缀</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="string">"PRE"</span>.equals(multiEnv)) &#123;</span><br><span class="line">        rowkey = <span class="string">"pre_"</span> + rowkey</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">val</span> familyQualifiersValuesWithTimeStampAndTimeToLive = <span class="keyword">new</span> <span class="type">FamiliesQualifiersValuesWithTimeStampAndTimeToLive</span></span><br><span class="line">      <span class="keyword">for</span>(element &lt;- indicatorMap.keys) &#123;</span><br><span class="line">        familyQualifiersValuesWithTimeStampAndTimeToLive += (<span class="type">Bytes</span>.toBytes(<span class="string">"d"</span>), <span class="type">Bytes</span>.toBytes(element), <span class="type">Bytes</span>.toBytes(<span class="keyword">if</span>(rowMap.contains(element)) rowMap(element) <span class="keyword">else</span> <span class="string">""</span>), getTimestamp(customTimestampFlag, rowMap(time)) , getCellTimeToLive(cellTimeToLiveFlag, cellTimeToLive))</span><br><span class="line">      &#125;</span><br><span class="line">      (<span class="keyword">new</span> <span class="type">ByteArrayWrapper</span>(<span class="type">Bytes</span>.toBytes(rowkey)), familyQualifiersValuesWithTimeStampAndTimeToLive)</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    formatRdd.hbaseBulkLoadThinRowsWithTimeStampAndTimeToLive(hbaseContext, <span class="type">TableName</span>.valueOf(hbaseTableName), t =&gt; &#123;t&#125;, outputPath)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> conn = <span class="type">ConnectionFactory</span>.createConnection(config)</span><br><span class="line">    <span class="keyword">val</span> table = conn.getTable(<span class="type">TableName</span>.valueOf(hbaseTableName))</span><br><span class="line">    <span class="keyword">val</span> load = <span class="type">JDBulkLoadHFiles</span>.create(config)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      load.bulkLoad(table.getName, <span class="keyword">new</span> <span class="type">Path</span>(outputPath))</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> e:<span class="type">Exception</span> =&gt; &#123;</span><br><span class="line">        e.printStackTrace()</span><br><span class="line">        println(e.getMessage)</span><br><span class="line">        <span class="type">System</span>.exit(<span class="number">1</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (table != <span class="literal">null</span>) &#123;</span><br><span class="line">      table.close()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (conn != <span class="literal">null</span>) &#123;</span><br><span class="line">      conn.close()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    println(<span class="string">"总写入行数："</span> + accumulator.value)</span><br><span class="line">    sparkSession.stop()</span><br><span class="line">    println(<span class="string">"spark2hbase任务执行完毕！"</span>)</span><br><span class="line">    <span class="comment">//todo spark任务运行完成后，一些线程池连接并未合理关闭，暂时先用主线程强制正常退出来进行任务关闭。</span></span><br><span class="line">    <span class="type">System</span>.exit(<span class="number">0</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//将数据按照指定方式进行散列（目前先写死是md5） todo</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getHashValue</span></span>(value: <span class="type">String</span>, valueType: <span class="type">String</span>, function: <span class="type">String</span>): <span class="type">String</span> = &#123;</span><br><span class="line">    <span class="keyword">var</span> md5: <span class="type">MessageDigest</span> = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      md5 = <span class="type">MessageDigest</span>.getInstance(<span class="string">"MD5"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> e: <span class="type">Exception</span> =&gt; &#123;</span><br><span class="line">        e.printStackTrace()</span><br><span class="line">        println(e.getMessage)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> byteArray: <span class="type">Array</span>[<span class="type">Byte</span>] = value.getBytes(<span class="type">StandardCharsets</span>.<span class="type">UTF_8</span>)</span><br><span class="line">    <span class="keyword">val</span> md5Bytes: <span class="type">Array</span>[<span class="type">Byte</span>] = md5.digest(byteArray)</span><br><span class="line">    <span class="keyword">var</span> hexValue: <span class="type">String</span> = <span class="string">""</span></span><br><span class="line">    <span class="keyword">for</span> ( byte &lt;- md5Bytes) &#123;</span><br><span class="line">      <span class="keyword">val</span> str: <span class="type">Int</span> = byte.toInt &amp; <span class="number">0xff</span></span><br><span class="line">      <span class="keyword">if</span> (str &lt; <span class="number">16</span>) &#123;</span><br><span class="line">        hexValue=hexValue+<span class="string">"0"</span></span><br><span class="line">      &#125;</span><br><span class="line">      hexValue=hexValue+<span class="type">Integer</span>.toHexString(str)</span><br><span class="line">    &#125;</span><br><span class="line">    hexValue.substring(<span class="number">0</span>, <span class="number">10</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//获取timestamp</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getTimestamp</span></span>(customTimestampFlag: <span class="type">Boolean</span>, dt: <span class="type">String</span>): <span class="type">Long</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span>(customTimestampFlag) &#123;</span><br><span class="line">      <span class="keyword">val</span> fm = <span class="keyword">new</span> <span class="type">SimpleDateFormat</span>(<span class="type">DATEFORMAT</span>)</span><br><span class="line">      <span class="keyword">var</span> dateTime = fm.parse(dt + <span class="type">DATESUFFIX</span>)</span><br><span class="line">      dateTime.getTime</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="number">0</span>L</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//获取cellTTL todo 非周末周至今、非月末月至今、近7天、近30天此类数据才会加上cellTTL</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getCellTimeToLive</span></span>(cellTimeToLiveFlag: <span class="type">Boolean</span>, cellTimeToLive: <span class="type">Long</span>): <span class="type">Array</span>[<span class="type">Tag</span>] = &#123;</span><br><span class="line">    <span class="keyword">if</span>(cellTimeToLiveFlag) &#123;</span><br><span class="line">      <span class="type">Array</span>[<span class="type">Tag</span>](<span class="keyword">new</span> <span class="type">ArrayBackedTag</span>(<span class="type">TagType</span>.<span class="type">TTL_TAG_TYPE</span>, <span class="type">Bytes</span>.toBytes(cellTimeToLive)))</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="literal">null</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//获取分时类型，根据tp字段中的聚合周期类型值判断，目前支持的累计类型有：十分累计BY_TEN_MIN_ACCU，小时累计BY_HOUR_ACCU</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getTimeSharingType</span></span>(aggType: <span class="type">String</span>): <span class="type">String</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> <span class="type">AccuAggTypeSet</span> = mutable.<span class="type">HashSet</span>(<span class="string">"BY_TEN_MIN_ACCU"</span>,<span class="string">"BY_HOUR_ACCU"</span>)</span><br><span class="line">    <span class="keyword">if</span>(<span class="type">AccuAggTypeSet</span>.contains(aggType)) &#123;</span><br><span class="line">      <span class="string">"1"</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="string">"0"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//获取标准聚合周期时间粒度，将BY_TEN_MIN_ACCU、BY_HOUR_ACCU转化为BY_TEN_MIN、BY_HOUR</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">getStandardTimeInterval</span></span>(aggType: <span class="type">String</span>): <span class="type">String</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">"BY_TEN_MIN_ACCU"</span>.equals(aggType)) &#123;</span><br><span class="line">      <span class="string">"BY_TEN_MIN"</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"BY_HOUR_ACCU"</span>.equals(aggType)) &#123;</span><br><span class="line">      <span class="string">"BY_HOUR"</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      aggType</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/TTL/" rel="tag"><i class="fa fa-tag"></i> TTL</a>
+          
+            <a href="/tags/timestamp/" rel="tag"><i class="fa fa-tag"></i> timestamp</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/23/HBase_HBase%E8%87%AA%E5%B8%A6%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7PerformanceEvaluation%E6%94%B9%E9%80%A0%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/" rel="next" title="HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战">
+                <i class="fa fa-chevron-left"></i> HBase_HBase自带压测工具PerformanceEvaluation改造与应用实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/25/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E8%AF%BB%E5%8F%96json%E6%95%B0%E6%8D%AE/" rel="prev" title="HiveSQL实战积累_读取json数据">
+                HiveSQL实战积累_读取json数据 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码"><span class="nav-number">1.</span> <span class="nav-text">HBase_HBase自定义带版本因子timestamp与行粒度TTL专利与实战代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、专利撰写"><span class="nav-number">1.1.</span> <span class="nav-text">一、专利撰写</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一种自定义行粒度生命周期的HBase表大批量数据写入方法"><span class="nav-number">1.1.1.</span> <span class="nav-text">一种自定义行粒度生命周期的HBase表大批量数据写入方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#技术领域"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">技术领域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#背景技术"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">背景技术</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发明内容"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">发明内容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#附图说明"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">附图说明</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、实战代码"><span class="nav-number">1.2.</span> <span class="nav-text">二、实战代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Spark2HBase推数工具"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.Spark2HBase推数工具</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

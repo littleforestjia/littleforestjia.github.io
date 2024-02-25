@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_湖仓一体优点与具体场景方案&amp;网易有道实时湖仓实践之路概念介绍：1、数据仓库：面向主题的、集成的、相对稳定的、反映历史变化的数据集合，用于支持管理决策。 关键词：结构化数据、数据清洗、预定义模型、面向主题、高度规范化、面向业务报表和分析 2、数据湖：数据湖 是一个存储企业的各种各样原始数据的大规模存储库，其中的数据可供存取、处理、分析及传输。数据湖是以其自然格式存储的数据的系统或存">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_湖仓一体优点与具体场景方案&amp;网易有道实时湖仓实践之路">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_湖仓一体优点与具体场景方案&amp;网易有道实时湖仓实践之路概念介绍：1、数据仓库：面向主题的、集成的、相对稳定的、反映历史变化的数据集合，用于支持管理决策。 关键词：结构化数据、数据清洗、预定义模型、面向主题、高度规范化、面向业务报表和分析 2、数据湖：数据湖 是一个存储企业的各种各样原始数据的大规模存储库，其中的数据可供存取、处理、分析及传输。数据湖是以其自然格式存储的数据的系统或存">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/5.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/6.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/7.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/8.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/9.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/10.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/11.jpg">
+<meta property="article:published_time" content="2024-02-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:29:41.984Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/15/京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路/"/>
+
+
+
+
+
+  <title>京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-15T00:00:00+08:00">
+                2024-02-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="京东商智-湖仓一体优点与具体场景方案-amp-网易有道实时湖仓实践之路"><a href="#京东商智-湖仓一体优点与具体场景方案-amp-网易有道实时湖仓实践之路" class="headerlink" title="京东商智_湖仓一体优点与具体场景方案&amp;网易有道实时湖仓实践之路"></a>京东商智_湖仓一体优点与具体场景方案&amp;网易有道实时湖仓实践之路</h1><h2 id="概念介绍："><a href="#概念介绍：" class="headerlink" title="概念介绍："></a>概念介绍：</h2><h3 id="1、数据仓库："><a href="#1、数据仓库：" class="headerlink" title="1、数据仓库："></a>1、数据仓库：</h3><p>面向主题的、集成的、相对稳定的、反映历史变化的数据集合，用于支持管理决策。</p>
+<p>关键词：<em>结构化数据、数据清洗、预定义模型、面向主题、高度规范化、面向业务报表和分析</em></p>
+<h3 id="2、数据湖："><a href="#2、数据湖：" class="headerlink" title="2、数据湖："></a>2、数据湖：</h3><p>数据湖 是一个存储企业的各种各样原始数据的大规模存储库，其中的数据可供存取、处理、分析及传输。数据湖是以其自然格式存储的数据的系统或存储库，通常是对象blob或文件。</p>
+<p>关键词：<em>原始数据、多样化数据类型、弹性存储、低规范化、支持探索性分析、灵活性、可扩展性</em></p>
+<h3 id="3、湖仓一体："><a href="#3、湖仓一体：" class="headerlink" title="3、湖仓一体："></a>3、湖仓一体：</h3><p>提供一个统一的、可共享的数据底座，避免传统的数据湖、数据仓库之间的数据移动，将原始数据、加工清洗数据、模型化数据，共同存储于一体化的“湖仓”中，既能面向业务实现高并发、精准化、高性能的实时、离线数据的查询服务，又能承载分析报表、批处理、数据挖掘等分析型业务。</p>
+<p>关键词：<em>原始和加工数据共存、支持实时和批处理、可靠性、性能优化、数据治理和元数据管理</em></p>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/1.jpg" alt="img"></p>
+<blockquote>
+<p>上图来源 Lakehouse: A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics</p>
+</blockquote>
+<p>数仓演进的核心驱动力即为，<strong>在降低计算、存储与维护成本的同时，获取高鲁棒、强时效的数据</strong></p>
+<h2 id="现状介绍："><a href="#现状介绍：" class="headerlink" title="现状介绍："></a>现状介绍：</h2><p>行业现状：国内外主流企业全面向第三代湖仓架构演进</p>
+<ul>
+<li><strong>腾讯</strong> 数据湖入湖日增量40万亿条，总存储量约60PB，在内部主要业务线均有落地，包括视频号、财付通、广告归因等。湖仓数据规模增长迅速，而传统离线数仓增长基本停滞</li>
+<li><strong>字节跳动</strong> 数据湖表数量8000+，总存储量约40PB，涉及业务方超过200，包括字节电商、短视频等</li>
+<li><strong>阿里云</strong> 数据湖入湖日增量1PB，服务集团内部几乎所有数据业务线</li>
+</ul>
+<p>京东现状：整体处于第二代数仓架构阶段，并且为标准的Lambda架构</p>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/2.jpg" alt="img"></p>
+<h2 id="现状痛点："><a href="#现状痛点：" class="headerlink" title="现状痛点："></a>现状痛点：</h2><h3 id="1、数据实时性和完整性矛盾："><a href="#1、数据实时性和完整性矛盾：" class="headerlink" title="1、数据实时性和完整性矛盾："></a>1、数据实时性和完整性矛盾：</h3><p>在线分析和在线训练场景需要数据具备实时性（T+0）和一定的历史数据。但当前数仓采用Lambda架构，实时数据和历史数据分别存储在不同介质中，使得在需要同时具备实时性和完整性的数据应用场景下，用户需要分别对接不同的系统，使用不同的API实现需求，并且需要接受口径差异问题，这样的设计低效且不友好。</p>
+<p>典型案例：搜索导购</p>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/3.jpg" alt="img"></p>
+<h3 id="2、离线任务时效性问题："><a href="#2、离线任务时效性问题：" class="headerlink" title="2、离线任务时效性问题："></a>2、离线任务时效性问题：</h3><p>离线链路冗长，T+1批处理时数据量级波动大，导致任务时效性受影响。波动时GDM资产完成时间可能超过4:00，可能引发雪崩，任务集中抢占资源，导致大量任务延迟。</p>
+<h3 id="3、老架构维护成本高："><a href="#3、老架构维护成本高：" class="headerlink" title="3、老架构维护成本高："></a>3、老架构维护成本高：</h3><p>当前的埋点日志入仓采用自运维的Plumber任务，对物理机资源有强依赖，日常需求达到80台，大促期间更需150台。但集团正处于减少物理机资源阶段，可能无法满足未来扩容需求。</p>
+<ul>
+<li>典型案例：流量资产</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/4.jpg" alt="img"></p>
+<h3 id="4、状态数据的更新和存储问题："><a href="#4、状态数据的更新和存储问题：" class="headerlink" title="4、状态数据的更新和存储问题："></a>4、<strong>状态数据的更新和存储问题：</strong></h3><p>在当前的传统数据仓库架构中，数据状态的更新是一种重量级操作，它的操作方式是将分区内全部数据重写，即使其中的大部分数据没有发生变化。这不仅浪费了大量的计算资源，也降低了系统的效率。另外，为了能快速查询到历史时刻的数据快照，我们每天或每小时都要存储全量数据，这同样消耗了大量的存储资源。</p>
+<ul>
+<li><p>典型案例：</p>
+</li>
+<li><ul>
+<li>商品价格表-小时粒度（目前只包含10%活跃商品）：每天数据量500亿</li>
+<li>商品全量表-天粒度：每天数据量1300亿，以每天1亿的速度增长</li>
+</ul>
+</li>
+</ul>
+<h3 id="5、秒级实时数据-秒级响应成本高："><a href="#5、秒级实时数据-秒级响应成本高：" class="headerlink" title="5、秒级实时数据/秒级响应成本高："></a>5、秒级实时数据/秒级响应成本高：</h3><p>当前实时数据通过秒级数据实现，整体计算和存储资源较高，对于低优先级或对时效无强要求的场景，存在资源浪费的情况。</p>
+<h2 id="预期收益："><a href="#预期收益：" class="headerlink" title="预期收益："></a>预期收益：</h2><ol>
+<li><p>实现离线数据的近线时效，增量式的数据处理链路可以最大化提高数据产出的时效性，将T+1的数据缩短至T+0，可以显著提高业务侧观测和监控数据效果的效率。</p>
+</li>
+<li><p>流量离线gdm层计算完成时间由3:00-4:00提升至00:00-00:20，实现计算削峰，解决时效问题</p>
+</li>
+<li><p>降低构建大宽表的资源成本，将数据修改原子化（刷数、刷岗），提供作业效率。</p>
+</li>
+<li><p>当前BC每月例行刷数，需要刷adm层-app层-在线存储层（ck）至少三层，涉及交易、用户、财务主题，约20+任务，每个任务都需重新处理500E左右数据，但是BC维度变化影响数据量不足5%，其中有95%的不变数据在浪费资源，后续可做到只修改变化数据</p>
+</li>
+<li><p>数据由快照改为增量存储，降低存储代价，同时支持回看有状态的历史快照。</p>
+</li>
+<li><p>当前全量商品1300亿，为了能回看历史每天全量存储，一年共消耗约7.2PB，使用Time travel + Savepoint能力，一年只需消耗约892TB</p>
+</li>
+<li><p>流批一体的计算链路，统一计算引擎，天然做到数据口径一致，较Lambda架构降低50%的维护和对接成本，对外做到离近线一套查询Api，业务方无须异构取数，有效提高算法侧迭代、AB效率。</p>
+</li>
+<li><p>使数仓具备索引能力，降低模型使用的开销，提升查询效率，同时可以直接对接主流引擎（Clickhouse、StarRocks等）实现查询分层</p>
+</li>
+</ol>
+<h2 id="联合立项："><a href="#联合立项：" class="headerlink" title="联合立项："></a>联合立项：</h2><ol>
+<li>资产：一期实现价格资产、流量资产（点击、曝光、订单）支持搜推导购的业务落地</li>
+<li>平台：打通spark查询hudi的能力、实现hudi FK的更新能力，覆盖更多更新场景</li>
+</ol>
+<h2 id="技术方案："><a href="#技术方案：" class="headerlink" title="技术方案："></a>技术方案：</h2><p><strong>技术选型：</strong>计算引擎（Flink/Spark）+数据湖平台（Hudi）+分布式存储（HDFS）</p>
+<p><strong>流量资产方案：</strong></p>
+<ol>
+<li>将之前通过物理机读cfs链路修改为读Topic，使数据源头一致</li>
+<li>将批量处理的MR作业改为流处理的Flink作业，提升数据时效</li>
+<li>将数据由写入Hive表调整为写入Hudi表，使其具备事务性</li>
+<li>合并冗余逻辑，减少数据落地，降低存储成本</li>
+</ol>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/5.jpg" alt="img"></p>
+<p><strong>搜推专属资产方案：</strong></p>
+<ol>
+<li>借助Hudi多源 Partial update能力将搜索、点击、订单、标签等数据关联成宽表，提高数据易用性</li>
+</ol>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/6.jpg" alt="img"></p>
+<p><strong>价格资产方案：</strong></p>
+<p>通过基于Primary Key的update实现状态快速更新，结合Time travel和Savepoint特性做到数据存储最小化</p>
+<ul>
+<li>Time travel：用户可以提供一个时间点来查询对应时间上的 Hudi 表快照数据。</li>
+<li>Savepoint：可以保证某个 commit 时间点的快照数据不会被清理，而在 savepoint 之外的中间数据仍然可以被清理。</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/7.jpg" alt="img"></p>
+<h2 id="项目进展："><a href="#项目进展：" class="headerlink" title="项目进展："></a>项目进展：</h2><p><strong>流量资产：</strong>已完成App端 曝光、点击、订单，BDM/GDM在Hudi中的实现，BDM任务使用940C资源处理能力可达2.7E/Min（曝光日常峰值8kw/Min，大促2.7E/Min），对于批处理链路GDM层时效在0:20分之前完成，目前在验证数据准确性，预计在12月底上线</p>
+<p>排除已知历史因素：1）曝光白名单限制；2）M端数据回灌逻辑；3）异常流量逻辑；4）跨天日志拆分逻辑；5）跨天日志补充逻辑；6）虚拟点击；7）请求错误码范围差异；8）日志过长丢弃规则等</p>
+<p>曝光：差异0.0000125% </p>
+<p>订单：差异0.00003% </p>
+<p>点击：差异0.05% </p>
+<p>正在和埋点采集侧、架构师等共同推进解决</p>
+<p><strong>价格资产：</strong>已通过基于PK的Upsert能力完成GDM实现，正在验证和整理 Time Travel Query &amp; Change Data Capture &amp; Incremental Query 做数据状态回看的忧劣势，预计将500E/天的数据量，降低至30E/天，计划在12月底上线</p>
+<p><strong>搜推资产：</strong></p>
+<p><strong>重点落地场景：</strong>搜索下拉、AIGC-京言、主搜切换真实曝光</p>
+<p><strong>解决业务侧的诉求：</strong>① 以搜索导购的场景为例，算法侧需要有统一的中间层模型，以实现下游使用场景的一致，包含：指标计算、分析报表、及特征计算等；② Join关联性能</p>
+<p><strong>核心使用场景：</strong>客户端埋点、服务端埋点、反作弊数据源关联（Primary Key + Partial Update）</p>
+<p><strong>具体进展：</strong></p>
+<p>①已完成AIGC-京言</p>
+<ul>
+<li>服务端请求日志和客户端埋点接入Hudi，并已提供给搜索算法团队试用；</li>
+<li>针对AB实验需求，正在尝试落地基于Hudi的近实时AB效果解决方案。</li>
+</ul>
+<p>②在导购场景中已通过Primary Key+Partial Update能力完成曝光+点击join的关联处理，后续将进行增加订单流的接入，预计整体可以在12月底提供业务使用</p>
+<p><strong>正在推动解决的问题：</strong>目前因Hudi暂未与Presto集成，导致查询端较慢。搜推算法同学使用体验有待进一步提升</p>
+<p><strong>其它推进项：</strong>1）Hudi与Spark、Hive、Presto等引擎的集成；2）容灾措施（机房宕机、任务重启、数据修复等）；3）与批任务的资源隔离；4）Hudi流式写入带来的小文件问题；5）埋点数据CFS与JDQ数据对齐 等</p>
+<h2 id="番外参考：网易有道关于实时湖仓的实践之路"><a href="#番外参考：网易有道关于实时湖仓的实践之路" class="headerlink" title="番外参考：网易有道关于实时湖仓的实践之路"></a>番外参考：网易有道关于实时湖仓的实践之路</h2><h3 id="1-业务背景"><a href="#1-业务背景" class="headerlink" title="1.业务背景"></a>1.业务背景</h3><p>有道的数据层架构可分为离线和实时两部分，离线计算主要采用Hive、Spark，采用批处理的方式定时调度。实时部分采用 Flink+Doris（版本 0.14.0）构建实时数仓，用于处理实时埋点日志、业务库变更数据。ODS 层数据源为 Kafka 埋点日志、数据库业务数据，DWD、DWS层数据通过Flink计算引擎加工，写入 Doris 中。同时将 Doris 数据定时同步至 Hive，用于离线调度计算。该架构存在如下问题：</p>
+<p>1.开发和运维成本高：Flink SQL 与 Hive/Spark 语法差异大，Hive/Spark 向 Flink 迁移成本高，Flink 大状态任务运维和优化难度高。</p>
+<p>2.在全增量流式读取场景的支持性较弱，难以满足有道场景下 Flink 全量读取 Hive 历史数据及 Kafka 增量数据的需求。</p>
+<p>3.流批存储不统一，造成双倍的数据开发和存储成本，且容易造成数据口径不一致。</p>
+<p>4.Doris 作为数据孤岛，采用 SSD 存储，成本较高，不适合大规模词典日志数据存储，长期两套存储方案不利于成本优化。</p>
+<p>5.需要持续地在 Hive 和 Doris 之间导入导出数据，链路过长容易引入不稳定因素，比如大规模数据写入时，Doris 导出 Hive 偶发数据丢失，并且不支持储存长 String 类型的字符串。</p>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/8.jpg" alt="img"></p>
+<p>结合上述问题，有道希望从 Hive 升级为湖仓一体方案，支持流批读写，统一数据存储。并基于 Spark/Trino/Hive ETL 搭建分钟/小时级近实时数仓，降低开发和运维成本，在绝大多数场景下替换 Doris 的分钟级数仓场景，减少数据库数据同步成本，有效降本增效。</p>
+<p><strong>解读：从上述描述可以看出，网易有道当前的数仓架构已经实现了数据源统一，也就是实时和离线数仓的数据都是从同样的一套kafka+flink任务来的，并使用flink引擎完成DWD和DWS两层的实时计算与出数，再将数据同步到hive中去作为离线数仓库，使用spark引擎去做多分区的大批量数据聚合计算。这一套明显是比当前的京东架构要领先的，主要是在数据源统一和实时离线数仓口径统一上领先很多。但是这一套架构比京东正在做的湖仓一体架构要落后一点，主要是实时离线应用层存储的区别，排除给黄金眼和商智等成熟数据产品的实时模块数据单独使用一套flink计算和olap在线引擎，京东正在做的湖仓一体将全量历史数据和增量数据都存放在hudi数据湖中，实时离线的分析类查询都是用数据湖中的同一份数据，而网易有道的这个架构明显还是实时数据和历史数据分别存储在不同介质中，使得在需要同时具备实时性和完整性的数据应用场景下，用户需要分别对接不同的系统。</strong></p>
+<h3 id="2-引入Amoro-Mixed-Hive"><a href="#2-引入Amoro-Mixed-Hive" class="headerlink" title="2.引入Amoro Mixed Hive"></a>2.引入Amoro Mixed Hive</h3><p>Amoro Mixed Hive 提供了 Hive 读写兼容、数据自优化的能力，基于此提供了两种不同时效性读取的能力：</p>
+<ol>
+<li><p>Merge on read 可以达到分钟级数据新鲜度。</p>
+</li>
+<li><p>Hive 读可以达到小时级新鲜度。</p>
+</li>
+</ol>
+<p>同时也实现了对 Hive 数据的更新和删除，下游老 Hive 任务无需作任何修改即可享受数据时效性提升到小时级，对于习惯使用 Hive 的分析师来讲可以做到无感，降低了新技术的使用门槛。</p>
+<p><strong>Hive表格式兼容</strong></p>
+<p>Amoro 为了兼容 Hive 设计了 Mixed Hive，Mixed Hive 的存储结构如图， BaseStore是一张独立的 iceberg 表，Hive 表作为 BaseStore 的一部分，ChangeStore 是一张独立的 iceberg 表,  Mixed Hive 支持：</p>
+<ul>
+<li>schema、partition、types 与 Hive format 保持一致。</li>
+<li>使用 Hive connector 将 Mixed Hive 表当成 Hive 表来读写。</li>
+<li>可以将 Hive 表原地升级为 Mixed Hive 表，升级过程没有数据重写和迁移，秒级响应。</li>
+<li>具备湖仓一体的特性，包括基于主键 upsert，流式读写，ACID，time travel 等功能。</li>
+</ul>
+<p>Hive 读写兼容的特性实现 Hive 表向 Mixed Hive 的无缝迁移， 并且可以做到上下游无感知。</p>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/9.jpg" alt="img"></p>
+<p><strong>Hive数据更新</strong></p>
+<p>Amoro 借助 Self-optimizing 将实时写入的变更合并到 Hive， 实现了 Hive 数据更新。Self-optimizing 目标是基于新型数据湖表格式打造像数据库、传统数仓一样开箱即用的流式湖仓服务，Self-optimizing 包含但不限于文件合并，去重，排序。</p>
+<p>Amoro 将表中的文件按照大小分为了两类：</p>
+<p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/10.jpg" alt="img"></p>
+<ul>
+<li>Fragment File：碎片文件，默认配置下小于 16 MB 的文件，此类文件需要及时得合并成更大的文件，以提升读取性能。</li>
+<li>Segment File：默认配置下大于 16MB 的文件，此类文件已经具备一定的大小，但还不到理想的 128MB。</li>
+</ul>
+<p>基于文件分类，Amoro 将文件优化任务分为三类：Minor optimizing、Major optimizing、Full optimizing，应对写友好、读友好的场景，在保证写入性能同时，保证读性能的平衡。特别的 Full optimizing 会将实时写入的数据定时合并到 Hive 目录，实现 Hive 数据视图的更新，提高 Hive 数据的时效性。</p>
+<p>持续的 Self-optimizing 可以有效优化表内文件的大小分布，降低小文件数，减少 AP 查询的性能开销。 </p>
+<p><strong>解读：很明显这个Amoro就是适配了原hive表的一种基于iceberg引擎的数据湖引擎，可以兼容旧hive表，也具有数据湖引擎的流式读写能力。</strong></p>
+<h3 id="3-落地方案"><a href="#3-落地方案" class="headerlink" title="3.落地方案"></a>3.<strong>落地方案</strong></h3><p><img src="//littleforestjia.github.io/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/11.jpg" alt="img"></p>
+<p>基于 Amoro，我们对于传统链路进行了以下改造：</p>
+<p>1.开发方式上，贴源层的数据导入从 Flink SQL 方式改造成基于实时数据湖平台，业务通过简单的交互即可完成 Hive 升级和入湖链路的构建。</p>
+<blockquote>
+<p>为了屏蔽底层存储变更对于业务开发的学习成本， 网易杭研基于 Amoro 在内部提供了实时数据湖开发平台，封装了从 Hive 表升级到构建数据入湖全流程，帮助用户一站式完成开发和运维，降低用户的使用门槛和成本。支持基于NDC（网易数据运河）打通从源端数据库 binlog 直接输出到 Mixed Hive 表全增量入湖链路；也支持配置日志 kakfa 到 Mixed Hive 表的实时入湖链路。</p>
+</blockquote>
+<p>2.通过数据传输定时同步数据库到 Hive 的链路，改造成实时 Mixed Hive format 表，数据时效性提升的同时，也提前了离线 workflow 基线，数据产出时间大大提前。</p>
+<p>3.Amoro 替换 Doirs，降低数据链路的复杂度，做到存储的流批统一，提高了稳定性，也降低了用户数据开发和数据修复的成本。</p>
+<p>4.数据查询端，通过直接查询 Mixed Hive format 表实现数据时效性的提升,数据报表时效性可以达到分钟级；原来查询 Hive 的报表链路时效性可以提升到小时级。</p>
+<p><strong>解读：可以看出这一套升级后的新架构其实就和京东湖仓一体的建设架构差不多了，实现了实时离线存储的统一。只不过网易有道对Amoro进行了一定的查询优化，满足了实时查询场景要求，而京东由于产品特性要求，另外建设了一台实时数据加工和存储链路。但是仔细一想，其实京东的这套实时数据加工链路也完全可以和湖仓一体机构融合在一起，只需要单独为产品模块创建一个ck或doris等介质加速存储即可满足查询的性能要求。</strong></p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://mp.weixin.qq.com/s/it0msNzl6WATlcqOREgOSQ" target="_blank" rel="noopener">网易有道关于实时湖仓的实践之路</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/14/Java%E6%9C%8D%E5%8A%A1_%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%90%8C%E7%BB%B4%E5%BA%A6%E8%BF%87%E6%BB%A4%E7%B1%BB%E5%9E%8B%E8%A7%A3%E6%9E%90/" rel="next" title="Java服务_观察者模式实现不同维度过滤类型解析">
+                <i class="fa fa-chevron-left"></i> Java服务_观察者模式实现不同维度过滤类型解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/16/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E5%9D%97%E5%AD%98%E5%82%A8&%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8&%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8&HDFS%E7%9A%84%E5%8C%BA%E5%88%AB%E4%B8%8E%E5%AD%98%E7%AE%97%E5%88%86%E7%A6%BB/" rel="prev" title="京东商智_块存储&文件存储&对象存储&HDFS的区别与存算分离">
+                京东商智_块存储&文件存储&对象存储&HDFS的区别与存算分离 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#京东商智-湖仓一体优点与具体场景方案-amp-网易有道实时湖仓实践之路"><span class="nav-number">1.</span> <span class="nav-text">京东商智_湖仓一体优点与具体场景方案&amp;网易有道实时湖仓实践之路</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概念介绍："><span class="nav-number">1.1.</span> <span class="nav-text">概念介绍：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、数据仓库："><span class="nav-number">1.1.1.</span> <span class="nav-text">1、数据仓库：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、数据湖："><span class="nav-number">1.1.2.</span> <span class="nav-text">2、数据湖：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、湖仓一体："><span class="nav-number">1.1.3.</span> <span class="nav-text">3、湖仓一体：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#现状介绍："><span class="nav-number">1.2.</span> <span class="nav-text">现状介绍：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#现状痛点："><span class="nav-number">1.3.</span> <span class="nav-text">现状痛点：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、数据实时性和完整性矛盾："><span class="nav-number">1.3.1.</span> <span class="nav-text">1、数据实时性和完整性矛盾：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、离线任务时效性问题："><span class="nav-number">1.3.2.</span> <span class="nav-text">2、离线任务时效性问题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、老架构维护成本高："><span class="nav-number">1.3.3.</span> <span class="nav-text">3、老架构维护成本高：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、状态数据的更新和存储问题："><span class="nav-number">1.3.4.</span> <span class="nav-text">4、状态数据的更新和存储问题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、秒级实时数据-秒级响应成本高："><span class="nav-number">1.3.5.</span> <span class="nav-text">5、秒级实时数据&#x2F;秒级响应成本高：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预期收益："><span class="nav-number">1.4.</span> <span class="nav-text">预期收益：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#联合立项："><span class="nav-number">1.5.</span> <span class="nav-text">联合立项：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术方案："><span class="nav-number">1.6.</span> <span class="nav-text">技术方案：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目进展："><span class="nav-number">1.7.</span> <span class="nav-text">项目进展：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#番外参考：网易有道关于实时湖仓的实践之路"><span class="nav-number">1.8.</span> <span class="nav-text">番外参考：网易有道关于实时湖仓的实践之路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-业务背景"><span class="nav-number">1.8.1.</span> <span class="nav-text">1.业务背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-引入Amoro-Mixed-Hive"><span class="nav-number">1.8.2.</span> <span class="nav-text">2.引入Amoro Mixed Hive</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-落地方案"><span class="nav-number">1.8.3.</span> <span class="nav-text">3.落地方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.8.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

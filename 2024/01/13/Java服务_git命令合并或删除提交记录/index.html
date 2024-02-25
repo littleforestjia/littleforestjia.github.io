@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Git,Java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_git命令合并或删除提交记录git reset回滚到指定commit1.现在有两个commit 使用git log查看commit日志和对应hash码 12345678910111213commit def5adef853da4cc05752bdb36577c127be71ba5Author: xxxDate:   Thu Dec 28 16:01:36 2017 +0800优化代码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_git命令合并或删除提交记录">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/13/Java%E6%9C%8D%E5%8A%A1_git%E5%91%BD%E4%BB%A4%E5%90%88%E5%B9%B6%E6%88%96%E5%88%A0%E9%99%A4%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_git命令合并或删除提交记录git reset回滚到指定commit1.现在有两个commit 使用git log查看commit日志和对应hash码 12345678910111213commit def5adef853da4cc05752bdb36577c127be71ba5Author: xxxDate:   Thu Dec 28 16:01:36 2017 +0800优化代码">
+<meta property="article:published_time" content="2024-01-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:39:56.940Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/13/Java服务_git命令合并或删除提交记录/"/>
+
+
+
+
+
+  <title>Java服务_git命令合并或删除提交记录 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/13/Java%E6%9C%8D%E5%8A%A1_git%E5%91%BD%E4%BB%A4%E5%90%88%E5%B9%B6%E6%88%96%E5%88%A0%E9%99%A4%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_git命令合并或删除提交记录</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-13T00:00:00+08:00">
+                2024-01-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-git命令合并或删除提交记录"><a href="#Java服务-git命令合并或删除提交记录" class="headerlink" title="Java服务_git命令合并或删除提交记录"></a>Java服务_git命令合并或删除提交记录</h1><h2 id="git-reset回滚到指定commit"><a href="#git-reset回滚到指定commit" class="headerlink" title="git reset回滚到指定commit"></a>git reset回滚到指定commit</h2><p><strong>1.现在有两个commit</strong></p>
+<p>使用git log查看commit日志和对应hash码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">commit def5adef853da4cc05752bdb36577c127be71ba5</span><br><span class="line"></span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:01:36 2017 +0800</span><br><span class="line"></span><br><span class="line">优化代码</span><br><span class="line"></span><br><span class="line">commit f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 15:59:46 2017 +0800</span><br><span class="line"></span><br><span class="line">修复</span><br><span class="line">(END)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2.需要回滚到上一次或者之前某次commit之后</strong></p>
+<p>使用如下命令可以回到上一次commit之后</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard HEAD^</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令也可以回到上一次commit之后</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard HEAD~1</span><br></pre></td></tr></table></figure>
+
+<p>使用如下命令可以回到指定某次commit之后</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard f36801544670e00b2f59a28e19017d2786c4085e</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3.执行完之后查看日志确认</strong></p>
+<p>使用git log查看commit日志可以发现回到了指定reset的那次commit之后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git log</span><br><span class="line"></span><br><span class="line">commit f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 15:59:46 2017 +0800</span><br><span class="line"></span><br><span class="line">修复</span><br><span class="line">(END)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>4.如果你发现回滚错了，还能补救</strong></p>
+<p>使用git reflog命令可以查看reset在内的commit日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git reflog</span><br><span class="line"></span><br><span class="line">f368015 HEAD@&#123;0&#125;: reset: moving to f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">def5ade HEAD@&#123;1&#125;: reset: moving to def5ade</span><br><span class="line">f368015 HEAD@&#123;2&#125;: reset: moving to f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">def5ade HEAD@&#123;3&#125;: commit: 优化代码</span><br><span class="line">f368015 HEAD@&#123;4&#125;: commit (initial): 修复</span><br></pre></td></tr></table></figure>
+
+<p>然后再用git reset即可定位到目标comimt之后</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git reset --hard def5ade</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>5.如果要将reset推到远程仓库，需要使用强推</strong></p>
+<p>因为此时本地库head指定的commit版本要比远程仓库更旧</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>由此可见git reset可以很方便的回到历史某一commit之后，缺点是该commit后面的所有改动提交都会被删除。如果想要只删除一次commit，保留后续commit，就需要使用另一个命令git revert。</strong></p>
+<h2 id="git-revert删除指定commit，但是留下commit记录"><a href="#git-revert删除指定commit，但是留下commit记录" class="headerlink" title="git revert删除指定commit，但是留下commit记录"></a>git revert删除指定commit，但是留下commit记录</h2><p><strong>1.现在有三个commit</strong></p>
+<p>使用git log查看commit日志和对应hash码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">commit def5adef853da4cc05752bdb36577c127be71ba5</span><br><span class="line"></span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:02:36 2017 +0800</span><br><span class="line"></span><br><span class="line">优化代码</span><br><span class="line">commit 853dadef5adef4cc05752bdb36577c127be71ba5</span><br><span class="line"></span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:01:36 2017 +0800</span><br><span class="line"></span><br><span class="line">增加文件</span><br><span class="line">commit f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 15:59:46 2017 +0800</span><br><span class="line"></span><br><span class="line">修复</span><br><span class="line">(END)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2.现在想要删除第二个commit所提交的改动</strong></p>
+<p>也就是想要删除’增加文件’这一步对应的代码改动，那么可以使用git revert -n命令指定hash码进行反做</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git revert -n 853dadef5adef4cc05752bdb36577c127be71ba5</span><br></pre></td></tr></table></figure>
+
+<p>这时可能会出现冲突，那么需要手动修改冲突的文件，修改之后就相当于又有新代码了，然后需要重新add提交一下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m "重做 增加文件"</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3.执行完之后git log查看日志</strong></p>
+<p>会发现原来的commit日志记录还在，这次还增加了一个commit日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">git log</span><br><span class="line"></span><br><span class="line">commit 05752def5adef853da4ccbdb36577c127be71ba5</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:01:36 2017 +0800</span><br><span class="line"></span><br><span class="line">重做 增加文件</span><br><span class="line"></span><br><span class="line">commit def5adef853da4cc05752bdb36577c127be71ba5</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:01:36 2017 +0800</span><br><span class="line"></span><br><span class="line">优化代码</span><br><span class="line">commit 853dadef5adef4cc05752bdb36577c127be71ba5</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:01:36 2017 +0800</span><br><span class="line"></span><br><span class="line">增加文件</span><br><span class="line">commit f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 15:59:46 2017 +0800</span><br><span class="line"></span><br><span class="line">修复</span><br><span class="line">(END)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>4.如果这个时候需要推远程仓库，直接git push即可</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>由此可见git revert其实就是帮你快速定位复现某次commit的代码改动点，并辅助你快捷删除，但是本质还是一次commit代码改动。这种方法可以帮助我们快速删除历史某次commit代码，但是commit日志的记录还在，让人看上去并不舒服，如果想要把对应commit日志记录也删除，需要使用git rebase命令。</strong></p>
+<h2 id="git-rebase删除指定commit，并清理commit日志记录"><a href="#git-rebase删除指定commit，并清理commit日志记录" class="headerlink" title="git rebase删除指定commit，并清理commit日志记录"></a>git rebase删除指定commit，并清理commit日志记录</h2><p><strong>1.现在有三个commit</strong></p>
+<p>使用git log查看commit日志和对应hash码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">commit def5adef853da4cc05752bdb36577c127be71ba5</span><br><span class="line"></span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:02:36 2017 +0800</span><br><span class="line"></span><br><span class="line">优化代码</span><br><span class="line">commit 853dadef5adef4cc05752bdb36577c127be71ba5</span><br><span class="line"></span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 16:01:36 2017 +0800</span><br><span class="line"></span><br><span class="line">增加文件</span><br><span class="line">commit f36801544670e00b2f59a28e19017d2786c4085e</span><br><span class="line">Author: xxx</span><br><span class="line">Date:   Thu Dec 28 15:59:46 2017 +0800</span><br><span class="line"></span><br><span class="line">修复</span><br><span class="line">(END)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2.用git rebase –onto删除第二个commit带来的代码改动</strong></p>
+<p>也就是要删除’增加文件’这一次commit，也就是853dade这次，我们可以使用<code>git rebase --onto  [startpoint]  [endpoint]</code>命令来删除目标commit，假设是在bugfix_1215分支上，可以使用如下命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase --onto bugfix_1215~853dade bugfix_1215~def5ade bugfix_1215</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase --onto bugfix_1215~2 bugfix_1215~1 bugfix_1215</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3.也可以用git rebase -i打开commit日志文件进行删除操作</strong></p>
+<p>注意如果是要删除某次commit，一定要git rebase -i指定这次commit之前一次commit的hash码，因为git rebase -i命令是前开后闭的，不会展示指定的commit日志，而是展示指定commit之后的所有commit日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i f368015</span><br></pre></td></tr></table></figure>
+
+<p>然后会进入commit日志文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">pick 853dade 增加文件</span><br><span class="line">pick def5ade 优化代码</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line"># 命令:</span><br><span class="line"># p, pick &lt;提交&gt; &#x3D; 使用提交</span><br><span class="line"># r, reword &lt;提交&gt; &#x3D; 使用提交，但编辑提交说明</span><br><span class="line"># e, edit &lt;提交&gt; &#x3D; 使用提交，但停止以便在 shell 中修补提交</span><br><span class="line"># s, squash &lt;提交&gt; &#x3D; 使用提交，但挤压到前一个提交</span><br><span class="line"># f, fixup [-C | -c] &lt;提交&gt; &#x3D; 类似于 &quot;squash&quot;，但只保留前一个提交</span><br><span class="line">#                    的提交说明，除非使用了 -C 参数，此情况下则只</span><br><span class="line">&quot;~&#x2F;IdeaProjects&#x2F;clickhouse2hbase&#x2F;.git&#x2F;rebase-merge&#x2F;git-rebase-todo&quot; 29L, 1418B</span><br></pre></td></tr></table></figure>
+
+<p>按i进入编辑，将853dade这个hash码前面的pick改为drop即可删除提交内容，但是同样可能会有冲突，需要手动修改一下，这也可能会带来一个新的commit。</p>
+<p><strong>4.同步到远程仓库需要强推</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git push -f</span><br></pre></td></tr></table></figure>
+
+<p>要注意的是，这样做会 彻底删掉那条commit，唯一的找回方式还是通过git reflog。</p>
+<h2 id="git-rebase合并commit"><a href="#git-rebase合并commit" class="headerlink" title="git rebase合并commit"></a>git rebase合并commit</h2><p>git rebase除了可以用于无痕删除commit之外，另一个作用是可以合并多次commit。在开发和调试是可能有很多杂乱的commit记录，最后提交合并时，为了cr可读性需要合并多次commit。</p>
+<p>主要还是使用git rebase -i命令，比如有顺序提交的a、b、c、d四次commit，想要合并b、c、d三次commit。那么由于git rebase -i命令的前开后闭特性，需要使用<code>git rebase -i a</code>命令展示出同时包含b、c、d三次commit的日志文件如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">pick b 第二次提交</span><br><span class="line">pick c 第三次提交</span><br><span class="line">pick d 第四次提交</span><br><span class="line"></span><br><span class="line">#</span><br><span class="line"># 命令:</span><br><span class="line"># p, pick &lt;提交&gt; &#x3D; 使用提交</span><br><span class="line"># r, reword &lt;提交&gt; &#x3D; 使用提交，但编辑提交说明</span><br><span class="line"># e, edit &lt;提交&gt; &#x3D; 使用提交，但停止以便在 shell 中修补提交</span><br><span class="line"># s, squash &lt;提交&gt; &#x3D; 使用提交，但挤压到前一个提交</span><br><span class="line"># f, fixup [-C | -c] &lt;提交&gt; &#x3D; 类似于 &quot;squash&quot;，但只保留前一个提交</span><br><span class="line">#                    的提交说明，除非使用了 -C 参数，此情况下则只</span><br><span class="line">&quot;~&#x2F;IdeaProjects&#x2F;clickhouse2hbase&#x2F;.git&#x2F;rebase-merge&#x2F;git-rebase-todo&quot; 29L, 1418B</span><br></pre></td></tr></table></figure>
+
+<p>然后保留最老的一次commit b不动，将c、d前面的pick改成s，然后按esc推出编辑模式，输入:wq保存文件。</p>
+<p>之后会马上跳转到commit描述日志文件中，然后同样进入编辑模式，合并为一天commit描述信息，再推出保存即可。</p>
+<p>完事之后同步到远程仓库也需要git push -f强推。</p>
+<h2 id="squash-merge合并commit"><a href="#squash-merge合并commit" class="headerlink" title="squash merge合并commit"></a>squash merge合并commit</h2><p>squash merge才是我用的最多的合并commit方法，非常方便快捷。</p>
+<p>squash merge是一种git合并的方法，可用于将一个分支的多个小的commit整合成一个更干净的提交以便于代码审查和保持版本历史的整洁，特别适用于团队协作项目。</p>
+<p>以下是使用Squash merge的步骤： </p>
+<ol>
+<li>在开发分支上进行开发并提交多个小的commit。</li>
+<li>切换到全新分支（通常是从最新master分支checkout出来的一个全新分支）。 </li>
+<li>运行<code>git merge --squash branch-name</code>，其中<code>branch-name</code>是开发分支名称，这将把开发分支上的所有改动都应用在全新分支上。</li>
+<li>在全新分支上运行<code>git commit</code>来创建一个新的合并提交，这个提交将包含所有开发分支上的代码更改。</li>
+<li>编写合并提交的信息，并保存退出。</li>
+<li>运行<code>git push</code>将合并提交推送到远程仓库。</li>
+</ol>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://cloud.tencent.com/developer/article/1854421" target="_blank" rel="noopener">Git如何删除某次commit 操作</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/342114817" target="_blank" rel="noopener">【git】如何利用 rebase 合并多次 commit</a></p>
+<p><a href="https://blog.51cto.com/u_11579569/5519205" target="_blank" rel="noopener">Git rebase skip误操作后，找回提交的commit</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Git/" rel="tag"><i class="fa fa-tag"></i> Git</a>
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/" rel="next" title="Java服务_ELK日志采集与可视化链路建设实战经验">
+                <i class="fa fa-chevron-left"></i> Java服务_ELK日志采集与可视化链路建设实战经验
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/" rel="prev" title="HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战">
+                HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-git命令合并或删除提交记录"><span class="nav-number">1.</span> <span class="nav-text">Java服务_git命令合并或删除提交记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#git-reset回滚到指定commit"><span class="nav-number">1.1.</span> <span class="nav-text">git reset回滚到指定commit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-revert删除指定commit，但是留下commit记录"><span class="nav-number">1.2.</span> <span class="nav-text">git revert删除指定commit，但是留下commit记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-rebase删除指定commit，并清理commit日志记录"><span class="nav-number">1.3.</span> <span class="nav-text">git rebase删除指定commit，并清理commit日志记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-rebase合并commit"><span class="nav-number">1.4.</span> <span class="nav-text">git rebase合并commit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#squash-merge合并commit"><span class="nav-number">1.5.</span> <span class="nav-text">squash merge合并commit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">1.6.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

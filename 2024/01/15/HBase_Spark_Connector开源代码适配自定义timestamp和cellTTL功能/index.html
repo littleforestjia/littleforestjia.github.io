@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HBase,Bulkload,Spark,ZSTD," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能1.背景之前使用MapReduce实现从Hive表的HDFS源文件中读取行数据，进行转化和写入HBase，使用这种方法时直接使用HFileOutputFormat2.configureIncrementalLoad()方法即可使用HBase封装好的排序Reducer。但是使用这种MapReduce有一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/15/HBase_Spark_Connector%E5%BC%80%E6%BA%90%E4%BB%A3%E7%A0%81%E9%80%82%E9%85%8D%E8%87%AA%E5%AE%9A%E4%B9%89timestamp%E5%92%8CcellTTL%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能1.背景之前使用MapReduce实现从Hive表的HDFS源文件中读取行数据，进行转化和写入HBase，使用这种方法时直接使用HFileOutputFormat2.configureIncrementalLoad()方法即可使用HBase封装好的排序Reducer。但是使用这种MapReduce有一">
+<meta property="article:published_time" content="2024-01-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:15:03.406Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HBase">
+<meta property="article:tag" content="Bulkload">
+<meta property="article:tag" content="Spark">
+<meta property="article:tag" content="ZSTD">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/15/HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能/"/>
+
+
+
+
+
+  <title>HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/15/HBase_Spark_Connector%E5%BC%80%E6%BA%90%E4%BB%A3%E7%A0%81%E9%80%82%E9%85%8D%E8%87%AA%E5%AE%9A%E4%B9%89timestamp%E5%92%8CcellTTL%E5%8A%9F%E8%83%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-15T00:00:00+08:00">
+                2024-01-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HBase/" itemprop="url" rel="index">
+                    <span itemprop="name">HBase</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="HBase-Spark-Connector开源代码适配自定义timestamp和cellTTL功能"><a href="#HBase-Spark-Connector开源代码适配自定义timestamp和cellTTL功能" class="headerlink" title="HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能"></a>HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>之前使用MapReduce实现从Hive表的HDFS源文件中读取行数据，进行转化和写入HBase，使用这种方法时直接使用<code>HFileOutputFormat2.configureIncrementalLoad()</code>方法即可使用HBase封装好的排序Reducer。但是使用这种MapReduce有一个缺点，必须直接读取Hive表源文件，无法做到先进行过滤或聚合计算再进行数据转换和推数，这样在很多情况下会造成hive存储资源的浪费。为了解决这个问题，我寻找开源代码，发现可以通过Spark执行sql，再将SparkSQL执行结果放入DF中，再进行数据转换和推数，<a href="https://github.com/apache/hbase-connectors" target="_blank" rel="noopener">hbase-connectors</a>工程就封装实现了该功能，让我们能够像使用MapReduce一样方便快捷地使用Spark进行HBase推数。</p>
+<p>但是该开源工程还未实现能够自定义写入HBase数据cell的timestamp和tags参数的功能，为了实现不同业务数据按不同ttl过滤，从而避免存储浪费，现添加一个方法，实现能够自定义timestamp和ttlTag参数并传入生效。</p>
+<h3 id="2-代码改造"><a href="#2-代码改造" class="headerlink" title="2.代码改造"></a>2.代码改造</h3><h4 id="2-1-添加一个Cell抽象类"><a href="#2-1-添加一个Cell抽象类" class="headerlink" title="2.1 添加一个Cell抽象类"></a>2.1 添加一个Cell抽象类</h4><p>该开源工程中定义了一个FamiliesQualifiersValues类，用来标识一个cell的存储和排序方式，对应的创建一个FamiliesQualifiersValuesWithTimeStampAndTimeToLive类，添加timeStamp和tags属性：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.hadoop.hbase.spark</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.<span class="type">Tag</span></span><br><span class="line"><span class="keyword">import</span> java.util</span><br><span class="line"><span class="keyword">import</span> org.apache.yetus.audience.<span class="type">InterfaceAudience</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * This object is a clean way to store and sort all cells that will be bulk</span></span><br><span class="line"><span class="comment"> * loaded into a single row</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@InterfaceAudience</span>.<span class="type">Public</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FamiliesQualifiersValuesWithTimeStampAndTimeToLive</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  <span class="comment">//Tree maps are used because we need the results to</span></span><br><span class="line">  <span class="comment">// be sorted when we read them</span></span><br><span class="line">  <span class="keyword">val</span> familyMap = <span class="keyword">new</span> util.<span class="type">TreeMap</span>[<span class="type">ByteArrayWrapper</span>,</span><br><span class="line">    util.<span class="type">TreeMap</span>[<span class="type">ByteArrayWrapper</span>, (<span class="type">Array</span>[<span class="type">Byte</span>], <span class="type">Long</span>, <span class="type">Array</span>[<span class="type">Tag</span>])]]()</span><br><span class="line"></span><br><span class="line">  <span class="comment">//normally in a row there are more columns then</span></span><br><span class="line">  <span class="comment">//column families this wrapper is reused for column</span></span><br><span class="line">  <span class="comment">//family look ups</span></span><br><span class="line">  <span class="keyword">val</span> reusableWrapper = <span class="keyword">new</span> <span class="type">ByteArrayWrapper</span>(<span class="literal">null</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * Adds a new cell to an existing row</span></span><br><span class="line"><span class="comment">   * @param family    HBase column family</span></span><br><span class="line"><span class="comment">   * @param qualifier HBase column qualifier</span></span><br><span class="line"><span class="comment">   * @param value     HBase cell value</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">+=</span> </span>(family: <span class="type">Array</span>[<span class="type">Byte</span>], qualifier: <span class="type">Array</span>[<span class="type">Byte</span>], value: <span class="type">Array</span>[<span class="type">Byte</span>], timeStamp: <span class="type">Long</span>, tags: <span class="type">Array</span>[<span class="type">Tag</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line"></span><br><span class="line">    reusableWrapper.value = family</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> qualifierValues = familyMap.get(reusableWrapper)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (qualifierValues == <span class="literal">null</span>) &#123;</span><br><span class="line">      qualifierValues = <span class="keyword">new</span> util.<span class="type">TreeMap</span>[<span class="type">ByteArrayWrapper</span>, (<span class="type">Array</span>[<span class="type">Byte</span>], <span class="type">Long</span>, <span class="type">Array</span>[<span class="type">Tag</span>])]()</span><br><span class="line">      familyMap.put(<span class="keyword">new</span> <span class="type">ByteArrayWrapper</span>(family), qualifierValues)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    qualifierValues.put(<span class="keyword">new</span> <span class="type">ByteArrayWrapper</span>(qualifier), (value, timeStamp, tags))</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * A wrapper for "+=" method above, can be used by Java</span></span><br><span class="line"><span class="comment">   * @param family    HBase column family</span></span><br><span class="line"><span class="comment">   * @param qualifier HBase column qualifier</span></span><br><span class="line"><span class="comment">   * @param value     HBase cell value</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(family: <span class="type">Array</span>[<span class="type">Byte</span>], qualifier: <span class="type">Array</span>[<span class="type">Byte</span>], value: <span class="type">Array</span>[<span class="type">Byte</span>], timeStamp: <span class="type">Long</span>, tags: <span class="type">Array</span>[<span class="type">Tag</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">this</span> += (family, qualifier, value, timeStamp, tags)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-2-在HBaseRDDFunctions中添加对应bulkload方法"><a href="#2-2-在HBaseRDDFunctions中添加对应bulkload方法" class="headerlink" title="2.2 在HBaseRDDFunctions中添加对应bulkload方法"></a>2.2 在HBaseRDDFunctions中添加对应bulkload方法</h4><p>HBaseRDDFunctions中常用的bulkload方法就是hbaseBulkLoad、hbaseBulkLoadThinRows，现对应新增一个hbaseBulkLoadThinRowsWithTimeStampAndTimeToLive方法，替换入参为FamiliesQualifiersValuesWithTimeStampAndTimeToLive：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hbaseBulkLoadThinRowsWithTimeStampAndTimeToLive</span></span>(hc: <span class="type">HBaseContext</span>,</span><br><span class="line">                                                    tableName: <span class="type">TableName</span>,</span><br><span class="line">                                                    mapFunction: (<span class="type">T</span>) =&gt;</span><br><span class="line">                                                      (<span class="type">ByteArrayWrapper</span>, <span class="type">FamiliesQualifiersValuesWithTimeStampAndTimeToLive</span>),</span><br><span class="line">                                                    stagingDir:<span class="type">String</span>,</span><br><span class="line">                                                    familyHFileWriteOptionsMap:</span><br><span class="line">                                                    util.<span class="type">Map</span>[<span class="type">Array</span>[<span class="type">Byte</span>], <span class="type">FamilyHFileWriteOptions</span>] =</span><br><span class="line">                                                    <span class="keyword">new</span> util.<span class="type">HashMap</span>[<span class="type">Array</span>[<span class="type">Byte</span>], <span class="type">FamilyHFileWriteOptions</span>](),</span><br><span class="line">                                                    compactionExclude: <span class="type">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">                                                    maxSize:<span class="type">Long</span> = <span class="type">HConstants</span>.<span class="type">DEFAULT_MAX_FILE_SIZE</span>):<span class="type">Unit</span> = &#123;</span><br><span class="line">  hc.bulkLoadThinRowsWithTimeStampAndTimeToLive(rdd, tableName,</span><br><span class="line">    mapFunction, stagingDir, familyHFileWriteOptionsMap,</span><br><span class="line">    compactionExclude, maxSize)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-3-在HBaseContext中添加对应bulkload方法实现"><a href="#2-3-在HBaseContext中添加对应bulkload方法实现" class="headerlink" title="2.3 在HBaseContext中添加对应bulkload方法实现"></a>2.3 在HBaseContext中添加对应bulkload方法实现</h4><p>在HBaseContext中编写了bulkLoadThinRows等方法的具体实现逻辑，现对应将hbaseBulkLoadThinRowsWithTimeStampAndTimeToLive方法的实现逻辑也新增在该类中：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bulkLoadThinRowsWithTimeStampAndTimeToLive</span></span>[<span class="type">T</span>](rdd:<span class="type">RDD</span>[<span class="type">T</span>],</span><br><span class="line">                        tableName: <span class="type">TableName</span>,</span><br><span class="line">                        mapFunction: (<span class="type">T</span>) =&gt;</span><br><span class="line">                          (<span class="type">ByteArrayWrapper</span>, <span class="type">FamiliesQualifiersValuesWithTimeStampAndTimeToLive</span>),</span><br><span class="line">                        stagingDir:<span class="type">String</span>,</span><br><span class="line">                        familyHFileWriteOptionsMap:</span><br><span class="line">                        util.<span class="type">Map</span>[<span class="type">Array</span>[<span class="type">Byte</span>], <span class="type">FamilyHFileWriteOptions</span>] =</span><br><span class="line">                        <span class="keyword">new</span> util.<span class="type">HashMap</span>[<span class="type">Array</span>[<span class="type">Byte</span>], <span class="type">FamilyHFileWriteOptions</span>],</span><br><span class="line">                        compactionExclude: <span class="type">Boolean</span> = <span class="literal">false</span>,</span><br><span class="line">                        maxSize:<span class="type">Long</span> = <span class="type">HConstants</span>.<span class="type">DEFAULT_MAX_FILE_SIZE</span>):</span><br><span class="line"><span class="type">Unit</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> stagingPath = <span class="keyword">new</span> <span class="type">Path</span>(stagingDir)</span><br><span class="line">  <span class="keyword">val</span> fs = stagingPath.getFileSystem(config)</span><br><span class="line">  <span class="keyword">if</span> (fs.exists(stagingPath)) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">FileAlreadyExistsException</span>(<span class="string">"Path "</span> + stagingDir + <span class="string">" already exists"</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">val</span> conn = <span class="type">HBaseConnectionCache</span>.getConnection(config)</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> regionLocator = conn.getRegionLocator(tableName)</span><br><span class="line">    <span class="keyword">val</span> startKeys = regionLocator.getStartKeys</span><br><span class="line">    <span class="keyword">if</span> (startKeys.length == <span class="number">0</span>) &#123;</span><br><span class="line">      logInfo(<span class="string">"Table "</span> + tableName.toString + <span class="string">" was not found"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> defaultCompressionStr = config.get(<span class="string">"hfile.compression"</span>,</span><br><span class="line">      <span class="type">Compression</span>.<span class="type">Algorithm</span>.<span class="type">ZSTD</span>.getName)</span><br><span class="line">    <span class="keyword">val</span> defaultCompression = <span class="type">HFileWriterImpl</span></span><br><span class="line">      .compressionByName(defaultCompressionStr)</span><br><span class="line">    <span class="keyword">val</span> nowTimeStamp = <span class="type">System</span>.currentTimeMillis()</span><br><span class="line">    <span class="keyword">val</span> tableRawName = tableName.getName</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> familyHFileWriteOptionsMapInternal =</span><br><span class="line">      <span class="keyword">new</span> util.<span class="type">HashMap</span>[<span class="type">ByteArrayWrapper</span>, <span class="type">FamilyHFileWriteOptions</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> entrySetIt = familyHFileWriteOptionsMap.entrySet().iterator()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (entrySetIt.hasNext) &#123;</span><br><span class="line">      <span class="keyword">val</span> entry = entrySetIt.next()</span><br><span class="line">      familyHFileWriteOptionsMapInternal.put(<span class="keyword">new</span> <span class="type">ByteArrayWrapper</span>(entry.getKey), entry.getValue)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> regionSplitPartitioner =</span><br><span class="line">      <span class="keyword">new</span> <span class="type">BulkLoadPartitioner</span>(startKeys)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//This is where all the magic happens</span></span><br><span class="line">    <span class="comment">//Here we are going to do the following things</span></span><br><span class="line">    <span class="comment">// 1. FlapMap every row in the RDD into key column value tuples</span></span><br><span class="line">    <span class="comment">// 2. Then we are going to repartition sort and shuffle</span></span><br><span class="line">    <span class="comment">// 3. Finally we are going to write out our HFiles</span></span><br><span class="line">    rdd.map( r =&gt; mapFunction(r)).</span><br><span class="line">      repartitionAndSortWithinPartitions(regionSplitPartitioner).</span><br><span class="line">      hbaseForeachPartition(<span class="keyword">this</span>, (it, conn) =&gt; &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">val</span> conf = broadcastedConf.value.value</span><br><span class="line">        <span class="keyword">val</span> fs = <span class="keyword">new</span> <span class="type">Path</span>(stagingDir).getFileSystem(conf)</span><br><span class="line">        <span class="keyword">val</span> writerMap = <span class="keyword">new</span> mutable.<span class="type">HashMap</span>[<span class="type">ByteArrayWrapper</span>, <span class="type">WriterLength</span>]</span><br><span class="line">        <span class="keyword">var</span> previousRow:<span class="type">Array</span>[<span class="type">Byte</span>] = <span class="type">HConstants</span>.<span class="type">EMPTY_BYTE_ARRAY</span></span><br><span class="line">        <span class="keyword">var</span> rollOverRequested = <span class="literal">false</span></span><br><span class="line">        <span class="keyword">val</span> localTableName = <span class="type">TableName</span>.valueOf(tableRawName)</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Here is where we finally iterate through the data in this partition of the</span></span><br><span class="line">        <span class="comment">//RDD that has been sorted and partitioned</span></span><br><span class="line">        it.foreach&#123; <span class="keyword">case</span> (rowKey:<span class="type">ByteArrayWrapper</span>,</span><br><span class="line">        familiesQualifiersValuesWithTimeStampAndTimeToLive:<span class="type">FamiliesQualifiersValuesWithTimeStampAndTimeToLive</span>) =&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (<span class="type">Bytes</span>.compareTo(previousRow, rowKey.value) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">KeyAlreadyExistsException</span>(<span class="string">"The following key was sent to the "</span> +</span><br><span class="line">              <span class="string">"HFile load more then one: "</span> + <span class="type">Bytes</span>.toString(previousRow))</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="comment">//The family map is a tree map so the families will be sorted</span></span><br><span class="line">          <span class="keyword">val</span> familyIt = familiesQualifiersValuesWithTimeStampAndTimeToLive.familyMap.entrySet().iterator()</span><br><span class="line">          <span class="keyword">while</span> (familyIt.hasNext) &#123;</span><br><span class="line">            <span class="keyword">val</span> familyEntry = familyIt.next()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">val</span> family = familyEntry.getKey.value</span><br><span class="line"></span><br><span class="line">            <span class="keyword">val</span> qualifierIt = familyEntry.getValue.entrySet().iterator()</span><br><span class="line"></span><br><span class="line">            <span class="comment">//The qualifier map is a tree map so the families will be sorted</span></span><br><span class="line">            <span class="keyword">while</span> (qualifierIt.hasNext) &#123;</span><br><span class="line"></span><br><span class="line">              <span class="keyword">val</span> qualifierEntry = qualifierIt.next()</span><br><span class="line">              <span class="keyword">val</span> qualifier = qualifierEntry.getKey</span><br><span class="line">              <span class="keyword">val</span> cellValue = qualifierEntry.getValue._1</span><br><span class="line">              <span class="keyword">val</span> cellTimeStamp = qualifierEntry.getValue._2</span><br><span class="line">              <span class="keyword">val</span> cellTags = qualifierEntry.getValue._3</span><br><span class="line"></span><br><span class="line">              writeValueToHFileWithTimeStampAndTimeToLive(rowKey.value,</span><br><span class="line">                family,</span><br><span class="line">                qualifier.value, <span class="comment">// qualifier</span></span><br><span class="line">                cellValue, <span class="comment">// value</span></span><br><span class="line">                cellTimeStamp,</span><br><span class="line">                cellTags,</span><br><span class="line">                nowTimeStamp,</span><br><span class="line">                fs,</span><br><span class="line">                conn,</span><br><span class="line">                localTableName,</span><br><span class="line">                conf,</span><br><span class="line">                familyHFileWriteOptionsMapInternal,</span><br><span class="line">                defaultCompression,</span><br><span class="line">                writerMap,</span><br><span class="line">                stagingDir)</span><br><span class="line"></span><br><span class="line">              previousRow = rowKey.value</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            writerMap.values.foreach( wl =&gt; &#123;</span><br><span class="line">              rollOverRequested = rollOverRequested || wl.written &gt; maxSize</span><br><span class="line"></span><br><span class="line">              <span class="comment">//This will only roll if we have at least one column family file that is</span></span><br><span class="line">              <span class="comment">//bigger then maxSize and we have finished a given row key</span></span><br><span class="line">              <span class="keyword">if</span> (rollOverRequested) &#123;</span><br><span class="line">                rollWriters(fs, writerMap,</span><br><span class="line">                  regionSplitPartitioner,</span><br><span class="line">                  previousRow,</span><br><span class="line">                  compactionExclude)</span><br><span class="line">                rollOverRequested = <span class="literal">false</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//This will get a writer for the column family</span></span><br><span class="line">        <span class="comment">//If there is no writer for a given column family then</span></span><br><span class="line">        <span class="comment">//it will get created here.</span></span><br><span class="line">        <span class="comment">//We have finished all the data so lets close up the writers</span></span><br><span class="line">        rollWriters(fs, writerMap,</span><br><span class="line">          regionSplitPartitioner,</span><br><span class="line">          previousRow,</span><br><span class="line">          compactionExclude)</span><br><span class="line">        rollOverRequested = <span class="literal">false</span></span><br><span class="line">      &#125;)</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">null</span> != conn) conn.close()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">writeValueToHFileWithTimeStampAndTimeToLive</span></span>(rowKey: <span class="type">Array</span>[<span class="type">Byte</span>],</span><br><span class="line">                                                        family: <span class="type">Array</span>[<span class="type">Byte</span>],</span><br><span class="line">                                                        qualifier: <span class="type">Array</span>[<span class="type">Byte</span>],</span><br><span class="line">                                                        cellValue:<span class="type">Array</span>[<span class="type">Byte</span>],</span><br><span class="line">                                                        timeStamp: <span class="type">Long</span>,</span><br><span class="line">                                                        tags: <span class="type">Array</span>[<span class="type">Tag</span>],</span><br><span class="line">                                                        nowTimeStamp: <span class="type">Long</span>,</span><br><span class="line">                                                        fs: <span class="type">FileSystem</span>,</span><br><span class="line">                                                        conn: <span class="type">Connection</span>,</span><br><span class="line">                                                        tableName: <span class="type">TableName</span>,</span><br><span class="line">                                                        conf: <span class="type">Configuration</span>,</span><br><span class="line">                                                        familyHFileWriteOptionsMapInternal:</span><br><span class="line">                              util.<span class="type">HashMap</span>[<span class="type">ByteArrayWrapper</span>, <span class="type">FamilyHFileWriteOptions</span>],</span><br><span class="line">                                                        hfileCompression:<span class="type">Compression</span>.<span class="type">Algorithm</span>,</span><br><span class="line">                                                        writerMap:mutable.<span class="type">HashMap</span>[<span class="type">ByteArrayWrapper</span>, <span class="type">WriterLength</span>],</span><br><span class="line">                                                        stagingDir: <span class="type">String</span></span><br><span class="line">                             ): <span class="type">WriterLength</span> = &#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> wl = writerMap.getOrElseUpdate(<span class="keyword">new</span> <span class="type">ByteArrayWrapper</span>(family), &#123;</span><br><span class="line">    <span class="keyword">val</span> familyDir = <span class="keyword">new</span> <span class="type">Path</span>(stagingDir, <span class="type">Bytes</span>.toString(family))</span><br><span class="line"></span><br><span class="line">    familyDir.getFileSystem(conf).mkdirs(familyDir);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> loc:<span class="type">HRegionLocation</span> = &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> locator =</span><br><span class="line">          conn.getRegionLocator(tableName)</span><br><span class="line">        locator.getRegionLocation(rowKey)</span><br><span class="line">      &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> e: <span class="type">Throwable</span> =&gt;</span><br><span class="line">          logWarning(<span class="string">"there's something wrong when locating rowkey: "</span> +</span><br><span class="line">            <span class="type">Bytes</span>.toString(rowKey))</span><br><span class="line">          <span class="literal">null</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">null</span> == loc) &#123;</span><br><span class="line">      <span class="keyword">if</span> (log.isTraceEnabled) &#123;</span><br><span class="line">        logTrace(<span class="string">"failed to get region location, so use default writer: "</span> +</span><br><span class="line">          <span class="type">Bytes</span>.toString(rowKey))</span><br><span class="line">      &#125;</span><br><span class="line">      getNewHFileWriter(family = family,</span><br><span class="line">        conf = conf,</span><br><span class="line">        favoredNodes = <span class="literal">null</span>,</span><br><span class="line">        fs = fs,</span><br><span class="line">        familydir = familyDir,</span><br><span class="line">        familyHFileWriteOptionsMapInternal,</span><br><span class="line">        hfileCompression)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (log.isDebugEnabled) &#123;</span><br><span class="line">        logDebug(<span class="string">"first rowkey: ["</span> + <span class="type">Bytes</span>.toString(rowKey) + <span class="string">"]"</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">val</span> initialIsa =</span><br><span class="line">        <span class="keyword">new</span> <span class="type">InetSocketAddress</span>(loc.getHostname, loc.getPort)</span><br><span class="line">      <span class="keyword">if</span> (initialIsa.isUnresolved) &#123;</span><br><span class="line">        <span class="keyword">if</span> (log.isTraceEnabled) &#123;</span><br><span class="line">          logTrace(<span class="string">"failed to resolve bind address: "</span> + loc.getHostname + <span class="string">":"</span></span><br><span class="line">            + loc.getPort + <span class="string">", so use default writer"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        getNewHFileWriter(family,</span><br><span class="line">          conf,</span><br><span class="line">          <span class="literal">null</span>,</span><br><span class="line">          fs,</span><br><span class="line">          familyDir,</span><br><span class="line">          familyHFileWriteOptionsMapInternal,</span><br><span class="line">          hfileCompression)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(log.isDebugEnabled) &#123;</span><br><span class="line">          logDebug(<span class="string">"use favored nodes writer: "</span> + initialIsa.getHostString)</span><br><span class="line">        &#125;</span><br><span class="line">        getNewHFileWriter(family,</span><br><span class="line">          conf,</span><br><span class="line">          <span class="type">Array</span>[<span class="type">InetSocketAddress</span>](initialIsa),</span><br><span class="line">          fs,</span><br><span class="line">          familyDir,</span><br><span class="line">          familyHFileWriteOptionsMapInternal,</span><br><span class="line">          hfileCompression)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> setTimeStamp = nowTimeStamp</span><br><span class="line">  <span class="keyword">if</span> (timeStamp != <span class="number">0</span>L) &#123;</span><br><span class="line">    setTimeStamp = timeStamp</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">val</span> keyValue =<span class="keyword">new</span> <span class="type">KeyValue</span>(rowKey,</span><br><span class="line">    family,</span><br><span class="line">    qualifier,</span><br><span class="line">    setTimeStamp,cellValue,tags)</span><br><span class="line"></span><br><span class="line">  wl.writer.append(keyValue)</span><br><span class="line">  wl.written += keyValue.getLength</span><br><span class="line"></span><br><span class="line">  wl</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-4-修改默认压缩格式"><a href="#2-4-修改默认压缩格式" class="headerlink" title="2.4 修改默认压缩格式"></a>2.4 修改默认压缩格式</h4><p>如果在推数组件中不指定压缩格式，数据推送到HBase中之后数据可用，且会在compact之后按HBase设置的压缩格式重新压缩，但是这样会导致hfile文件load速度特别慢，且HBase集群存储短期膨胀非常严重。如果在推数组件中设置好ZSTD，在进行hfile数据写入时就进行数据压缩，可以大大提高效率，缓解存储压力。如ZSTD压缩格式的文件仅为未压缩文件的十分之一大小。该开源组件中默认是不使用压缩格式，现修改代码为默认使用ZSTD压缩格式，就在bulkLoadThinRowsWithTimeStampAndTimeToLive()方法中：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> defaultCompressionStr = config.get(<span class="string">"hfile.compression"</span>,</span><br><span class="line">        <span class="type">Compression</span>.<span class="type">Algorithm</span>.<span class="type">ZSTD</span>.getName)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HBase/" rel="tag"><i class="fa fa-tag"></i> HBase</a>
+          
+            <a href="/tags/Bulkload/" rel="tag"><i class="fa fa-tag"></i> Bulkload</a>
+          
+            <a href="/tags/Spark/" rel="tag"><i class="fa fa-tag"></i> Spark</a>
+          
+            <a href="/tags/ZSTD/" rel="tag"><i class="fa fa-tag"></i> ZSTD</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/14/HBase_gRPC&protobuf&HBase%E5%9F%BA%E4%BA%8Eprotobuf%E5%88%9B%E5%BB%BAendpoint%E5%8D%8F%E5%A4%84%E7%90%86%E5%99%A8%E5%AE%9E%E6%88%98/" rel="next" title="HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战">
+                <i class="fa fa-chevron-left"></i> HBase_gRPC&protobuf&HBase基于protobuf创建endpoint协处理器实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/16/HBase_HBase%E8%A1%A8%E8%A1%8C%E6%95%B0%E7%BB%9F%E8%AE%A1%E5%AE%9E%E6%88%98/" rel="prev" title="HBase_HBase表行数统计实战">
+                HBase_HBase表行数统计实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HBase-Spark-Connector开源代码适配自定义timestamp和cellTTL功能"><span class="nav-number">1.</span> <span class="nav-text">HBase_Spark_Connector开源代码适配自定义timestamp和cellTTL功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-代码改造"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.代码改造</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-添加一个Cell抽象类"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 添加一个Cell抽象类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-在HBaseRDDFunctions中添加对应bulkload方法"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 在HBaseRDDFunctions中添加对应bulkload方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-在HBaseContext中添加对应bulkload方法实现"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">2.3 在HBaseContext中添加对应bulkload方法实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-修改默认压缩格式"><span class="nav-number">1.0.2.4.</span> <span class="nav-text">2.4 修改默认压缩格式</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

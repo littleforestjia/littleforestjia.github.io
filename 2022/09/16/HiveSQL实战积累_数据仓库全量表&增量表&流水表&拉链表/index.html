@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hive,数据仓库," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HiveSQL实战积累_数据仓库全量表&amp;增量表&amp;流水表&amp;拉链表1.基础概念 全量表：全量表就是每天拉取原表中的所有数据，每个dt分区存储全部的数据，进行任何数据查询都只需要使用dt&#x3D;&#39;yyyy-mm-dd&#39;即可。 增量表：增量表就是每天拉取当天的更新数据，至于如何处理每天的更新数据，又将增量表分为流水表和拉链表。 流水表：流水表就是每天拉取当天的更新数据，然">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HiveSQL实战积累_数据仓库全量表&amp;增量表&amp;流水表&amp;拉链表">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/09/16/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%85%A8%E9%87%8F%E8%A1%A8&%E5%A2%9E%E9%87%8F%E8%A1%A8&%E6%B5%81%E6%B0%B4%E8%A1%A8&%E6%8B%89%E9%93%BE%E8%A1%A8/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HiveSQL实战积累_数据仓库全量表&amp;增量表&amp;流水表&amp;拉链表1.基础概念 全量表：全量表就是每天拉取原表中的所有数据，每个dt分区存储全部的数据，进行任何数据查询都只需要使用dt&#x3D;&#39;yyyy-mm-dd&#39;即可。 增量表：增量表就是每天拉取当天的更新数据，至于如何处理每天的更新数据，又将增量表分为流水表和拉链表。 流水表：流水表就是每天拉取当天的更新数据，然">
+<meta property="article:published_time" content="2022-09-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T08:44:29.046Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Hive">
+<meta property="article:tag" content="数据仓库">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/09/16/HiveSQL实战积累_数据仓库全量表&增量表&流水表&拉链表/"/>
+
+
+
+
+
+  <title>HiveSQL实战积累_数据仓库全量表&增量表&流水表&拉链表 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/09/16/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E5%85%A8%E9%87%8F%E8%A1%A8&%E5%A2%9E%E9%87%8F%E8%A1%A8&%E6%B5%81%E6%B0%B4%E8%A1%A8&%E6%8B%89%E9%93%BE%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HiveSQL实战积累_数据仓库全量表&增量表&流水表&拉链表</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-09-16T00:00:00+08:00">
+                2022-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">HiveSQL实战积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HiveSQL实战积累-数据仓库全量表-amp-增量表-amp-流水表-amp-拉链表"><a href="#HiveSQL实战积累-数据仓库全量表-amp-增量表-amp-流水表-amp-拉链表" class="headerlink" title="HiveSQL实战积累_数据仓库全量表&amp;增量表&amp;流水表&amp;拉链表"></a>HiveSQL实战积累_数据仓库全量表&amp;增量表&amp;流水表&amp;拉链表</h2><h3 id="1-基础概念"><a href="#1-基础概念" class="headerlink" title="1.基础概念"></a>1.基础概念</h3><ul>
+<li>全量表：全量表就是每天拉取原表中的所有数据，每个dt分区存储全部的数据，进行任何数据查询都只需要使用<code>dt=&#39;yyyy-mm-dd&#39;</code>即可。</li>
+<li>增量表：增量表就是每天拉取当天的更新数据，至于如何处理每天的更新数据，又将增量表分为流水表和拉链表。</li>
+<li>流水表：流水表就是每天拉取当天的更新数据，然后将这些更新数据直接不做计算存储到表中，每个dt分区存储的就是更新数据。</li>
+<li>拉链表：拉链表就是每天拉取当天的更新数据，然后将这些数据进行聚合计算，实现对历史状态的维护。通常拉链表需要start_date、end_date、dp、dt四个字段来维护数据。</li>
+</ul>
+<h3 id="2-拉链表案例"><a href="#2-拉链表案例" class="headerlink" title="2.拉链表案例"></a>2.拉链表案例</h3><p>2022-10-01的订单底表：</p>
+<table>
+<thead>
+<tr>
+<th>order_id</th>
+<th>status</th>
+<th>modified_date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100001</td>
+<td>创建</td>
+<td>2022-10-01</td>
+</tr>
+<tr>
+<td>100002</td>
+<td>创建</td>
+<td>2022-10-01</td>
+</tr>
+<tr>
+<td>100003</td>
+<td>创建</td>
+<td>2022-10-01</td>
+</tr>
+</tbody></table>
+<p>2022-10-02的订单底表：</p>
+<table>
+<thead>
+<tr>
+<th>order_id</th>
+<th>status</th>
+<th>modified_date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100001</td>
+<td>完成</td>
+<td>2022-10-02</td>
+</tr>
+<tr>
+<td>100002</td>
+<td>创建</td>
+<td>2022-10-01</td>
+</tr>
+<tr>
+<td>100003</td>
+<td>创建</td>
+<td>2022-10-01</td>
+</tr>
+<tr>
+<td>100004</td>
+<td>创建</td>
+<td>2022-10-02</td>
+</tr>
+</tbody></table>
+<p>2022-10-02加工完的订单拉链表：</p>
+<table>
+<thead>
+<tr>
+<th>order_id</th>
+<th>status</th>
+<th>start_date</th>
+<th>end_date</th>
+<th>dp</th>
+<th>dt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100001</td>
+<td>创建</td>
+<td>2022-10-01</td>
+<td>2022-10-02</td>
+<td>EXPIRED</td>
+<td>2022-10-02</td>
+</tr>
+<tr>
+<td>100002</td>
+<td>创建</td>
+<td>2022-10-01</td>
+<td>9999-12-31</td>
+<td>ACTIVE</td>
+<td>9999-12-31</td>
+</tr>
+<tr>
+<td>100003</td>
+<td>创建</td>
+<td>2022-10-01</td>
+<td>9999-12-31</td>
+<td>ACTIVE</td>
+<td>9999-12-31</td>
+</tr>
+<tr>
+<td>100001</td>
+<td>完成</td>
+<td>2022-10-02</td>
+<td>9999-12-31</td>
+<td>ACTIVE</td>
+<td>9999-12-31</td>
+</tr>
+<tr>
+<td>100004</td>
+<td>创建</td>
+<td>2022-10-02</td>
+<td>9999-12-31</td>
+<td>ACTIVE</td>
+<td>9999-12-31</td>
+</tr>
+</tbody></table>
+<p>数据仓库中拉链表的start_date表示该条记录的生命周期开始时间，end_date表示该条记录的生命周期结束时间，dp则表示该条数据是否处于有效状态，dt一般会与end_date字段写入同样的数据。</p>
+<p><strong>从拉链表中获取有效数据只能用如下两种写法：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> chain_table_name <span class="keyword">where</span> dp = <span class="string">'ACTIVE'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> chain_table_name <span class="keyword">where</span> start_date &lt;= <span class="keyword">sysdate</span>(<span class="number">-1</span>) <span class="keyword">and</span> end_date &gt; <span class="keyword">sysdate</span>(<span class="number">-1</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>从拉链表中获取历史上某一天的当时的有效数据，比如2022-10-01，只能用如下写法：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> chain_table_name <span class="keyword">where</span> start_date &lt;= <span class="string">'2022-10-01'</span> <span class="keyword">and</span> end_date &gt; <span class="string">'2022-10-01'</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-拉链表加工过程"><a href="#3-拉链表加工过程" class="headerlink" title="3.拉链表加工过程"></a>3.拉链表加工过程</h3><h4 id="3-1从订单底表中取出增量数据"><a href="#3-1从订单底表中取出增量数据" class="headerlink" title="3.1从订单底表中取出增量数据"></a>3.1从订单底表中取出增量数据</h4><p>首先需要从订单底表中取出当天的更新数据放入一张流水表中，假设订单底表名为order_bottom，流水增量表名为order_inc，执行sql如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> overwrite <span class="keyword">TABLE</span> order_inc <span class="keyword">PARTITION</span> (dt = <span class="string">'2022-10-02'</span>) </span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	order_id,</span><br><span class="line">	<span class="keyword">status</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	order_bottom</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	modified_date = <span class="string">'2022-10-02'</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2将流水增量表与拉链表中的有效数据关联"><a href="#3-2将流水增量表与拉链表中的有效数据关联" class="headerlink" title="3.2将流水增量表与拉链表中的有效数据关联"></a>3.2将流水增量表与拉链表中的有效数据关联</h4><p>将流水表中的增量数据与拉链表中的有效数据进行关联，将已经存在的数据设置为失效数据，同时将所有增量数据添加为新的有效数据。假设关联得到的临时表名为order_tmp，最终拉链表名为order_chain，执行sql如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> order_tmp;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> order_tmp <span class="keyword">AS</span></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">	order_id,</span><br><span class="line">	<span class="keyword">status</span>,</span><br><span class="line">	start_date,</span><br><span class="line">	end_date,</span><br><span class="line">	dp,</span><br><span class="line">	dt</span><br><span class="line"><span class="keyword">FROM</span> (</span><br><span class="line">  <span class="comment">--将已存在的有效订单记录设置为失效</span></span><br><span class="line">	<span class="keyword">SELECT</span> </span><br><span class="line">  	a.order_id,</span><br><span class="line">		a.status,</span><br><span class="line">		a.start_date,</span><br><span class="line">		<span class="keyword">CASE</span> </span><br><span class="line">  		<span class="keyword">WHEN</span> b.order_id <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">AND</span> a.end_date &gt; <span class="string">'2022-10-02'</span> <span class="keyword">THEN</span> <span class="string">'2022-10-02'</span></span><br><span class="line">  		<span class="keyword">ELSE</span> a.end_date </span><br><span class="line">  	<span class="keyword">END</span> <span class="keyword">AS</span> end_date,</span><br><span class="line">  	<span class="keyword">CASE</span> </span><br><span class="line">  		<span class="keyword">WHEN</span> b.order_id <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">AND</span> a.end_date &gt; <span class="string">'2022-10-02'</span> <span class="keyword">THEN</span> <span class="string">'EXPIRED'</span></span><br><span class="line">  		<span class="keyword">ELSE</span> a.dp </span><br><span class="line">  	<span class="keyword">END</span> <span class="keyword">AS</span> dp,</span><br><span class="line">		<span class="keyword">CASE</span> </span><br><span class="line">  		<span class="keyword">WHEN</span> b.order_id <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">AND</span> a.end_date &gt; <span class="string">'2022-10-02'</span> <span class="keyword">THEN</span> <span class="string">'2022-10-02'</span></span><br><span class="line">  		<span class="keyword">ELSE</span> a.dt </span><br><span class="line">  	<span class="keyword">END</span> <span class="keyword">AS</span> dt</span><br><span class="line">  <span class="keyword">FROM</span></span><br><span class="line">  	(<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_chain <span class="keyword">WHERE</span> dp = <span class="string">'ACTIVE'</span>) a</span><br><span class="line">  	<span class="keyword">left</span> jion (<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_inc <span class="keyword">WHERE</span> dt = <span class="string">'2022-10-02'</span>) b</span><br><span class="line">  	<span class="keyword">on</span> a.order_id = b.order_id;</span><br><span class="line">  </span><br><span class="line">  UNION ALL</span><br><span class="line">  </span><br><span class="line">  <span class="comment">--将增量数据全部添加并设置为有效</span></span><br><span class="line">  <span class="keyword">SELECT</span></span><br><span class="line">  	order_id,</span><br><span class="line">  	<span class="keyword">status</span>,</span><br><span class="line">  	dt <span class="keyword">as</span> start_date,</span><br><span class="line">  	<span class="string">'9999-12-31'</span> <span class="keyword">as</span> end_date,</span><br><span class="line">  	<span class="string">'ACTIVE'</span> <span class="keyword">as</span> dp,</span><br><span class="line"> 		<span class="string">'9999-12-31'</span> <span class="keyword">as</span> dt</span><br><span class="line">  <span class="keyword">FROM</span></span><br><span class="line">  	order_inc</span><br><span class="line">  <span class="keyword">WHERE</span></span><br><span class="line">  	dt = <span class="string">'2022-10-02'</span></span><br><span class="line">) c;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3用临时表替换当前拉链表的有效分区和新增无效分区"><a href="#3-3用临时表替换当前拉链表的有效分区和新增无效分区" class="headerlink" title="3.3用临时表替换当前拉链表的有效分区和新增无效分区"></a>3.3用临时表替换当前拉链表的有效分区和新增无效分区</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--替换有效分区</span></span><br><span class="line"><span class="keyword">INSERT</span> overwrite <span class="keyword">TABLE</span> order_chain <span class="keyword">PARTITION</span> (dp = <span class="string">'ACTIVE'</span>) </span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_tmp <span class="keyword">WHERE</span> dp = <span class="string">'ACTIVE'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">--新增无效分区</span></span><br><span class="line"><span class="keyword">INSERT</span> overwrite <span class="keyword">TABLE</span> order_chain <span class="keyword">PARTITION</span> (dp = <span class="string">'EXPIRED'</span>, dt = <span class="string">'2022-10-02'</span>) </span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> order_tmp <span class="keyword">WHERE</span> dp = <span class="string">'EXPIRED'</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-拉链表使用疑惑"><a href="#4-拉链表使用疑惑" class="headerlink" title="4.拉链表使用疑惑"></a>4.拉链表使用疑惑</h3><h4 id="4-1拉链表与流水表的区别"><a href="#4-1拉链表与流水表的区别" class="headerlink" title="4.1拉链表与流水表的区别"></a>4.1拉链表与流水表的区别</h4><p><strong>其实跟着上面过一遍拉链表的加工过程就知道区别了，两者都是增量表。流水表是简单的新增每天的更新数据，添加一天数据并不会影响到之前的数据。而拉链表在拿到更新数据之后，还要按照主键进行聚合，修改旧数据的状态。</strong></p>
+<p><strong>还有一点要注意的就是拉链表设置的时间粒度问题，比如一个订单状态可能在一天内改变了两次以上，那么流水表会记录订单的每条修改记录。而拉链表在按照主键聚合的加工过程中，一个订单只取最后的状态作为拉链表中的有效状态，而同一天中的前几次修改记录是直接删除，还是直接以失效状态放入拉链表中可以自行设计。</strong></p>
+<h4 id="4-2拉链表归档："><a href="#4-2拉链表归档：" class="headerlink" title="4.2拉链表归档："></a>4.2拉链表归档：</h4><p><strong>从上面拉链表的加工过程可以知道，拉链表每次新增数据时，都要读取dp=’ACTIVE’有效分区的全量数据来与增量数据进行关联，当数据越来越多，这个计算过程的耗时也会越来越大，我们不可能任其数据量无限增长。那么对于拉链表一般会定期进行归档，就是将end_date=’9999-12-31’但是入库时间较早的一些数据放入’HISTORY’分区中。</strong></p>
+<p><strong>一般自行结合业务场景估计数据大概多久后就不会再出现状态变化，以此来设计归档周期，如3个月、6个月等。如果想从归档后的拉链表中获取完整的全量有效数据，就必须使用<code>select * from chain_table_name where start_date &lt;= sysdate(-1) and end_date &gt; sysdate(-1)</code>。</strong></p>
+<h3 id="5-数据仓库表类型选择"><a href="#5-数据仓库表类型选择" class="headerlink" title="5.数据仓库表类型选择"></a>5.数据仓库表类型选择</h3><p>bdm缓冲数据模型、fdm基础数据模型、gdm公共数据模型、adm聚合数据模型。fdm层一般要求在保留历史数据的同时，尽可能少的占用存储空间，且要求可以高效快速地获取历史上任意一天的快照数据，所以一般选用流水表或拉链表来构建fdm模型。gdm层在数据量不大的情况下可以选用全量表，在数据量较大时也要使用流水表或拉链表。</p>
+<p>注意使用全量表时，一定要指定dt分区，因为一个分区就是全量数据。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hive/" rel="tag"><i class="fa fa-tag"></i> Hive</a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93/" rel="tag"><i class="fa fa-tag"></i> 数据仓库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/09/09/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E6%A0%B9%E6%8D%AE%E6%B5%81%E9%87%8F%E5%BA%95%E8%A1%A8%E6%8C%89%E5%8D%8A%E5%B0%8F%E6%97%B6%E7%BB%9F%E8%AE%A1%E7%B4%AF%E5%8A%A0%E6%B5%81%E9%87%8F%E6%8C%87%E6%A0%87/" rel="next" title="HiveSQL实战积累_根据流量底表按半小时统计累加流量指标">
+                <i class="fa fa-chevron-left"></i> HiveSQL实战积累_根据流量底表按半小时统计累加流量指标
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/09/23/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_%E8%A1%8C%E8%BD%AC%E5%88%97%E4%B8%8E%E5%88%97%E8%BD%AC%E8%A1%8C/" rel="prev" title="HiveSQL实战积累_行转列与列转行">
+                HiveSQL实战积累_行转列与列转行 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HiveSQL实战积累-数据仓库全量表-amp-增量表-amp-流水表-amp-拉链表"><span class="nav-number">1.</span> <span class="nav-text">HiveSQL实战积累_数据仓库全量表&amp;增量表&amp;流水表&amp;拉链表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-基础概念"><span class="nav-number">1.1.</span> <span class="nav-text">1.基础概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-拉链表案例"><span class="nav-number">1.2.</span> <span class="nav-text">2.拉链表案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-拉链表加工过程"><span class="nav-number">1.3.</span> <span class="nav-text">3.拉链表加工过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1从订单底表中取出增量数据"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1从订单底表中取出增量数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2将流水增量表与拉链表中的有效数据关联"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2将流水增量表与拉链表中的有效数据关联</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3用临时表替换当前拉链表的有效分区和新增无效分区"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3用临时表替换当前拉链表的有效分区和新增无效分区</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-拉链表使用疑惑"><span class="nav-number">1.4.</span> <span class="nav-text">4.拉链表使用疑惑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1拉链表与流水表的区别"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1拉链表与流水表的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2拉链表归档："><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2拉链表归档：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-数据仓库表类型选择"><span class="nav-number">1.5.</span> <span class="nav-text">5.数据仓库表类型选择</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

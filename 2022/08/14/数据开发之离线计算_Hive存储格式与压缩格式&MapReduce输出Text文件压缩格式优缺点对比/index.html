@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MapReduce,Hive," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据开发之离线计算_Hive存储格式与压缩格式&amp;MapReduce输出Text文件压缩格式优缺点对比1.Hive存储格式hive底层数据是存储在hdfs系统中的文件，hive的存储格式和压缩格式是两个不同的概念。存储格式是指数据按照何种规则存储在hdfs文件中，如TextFile(行式存储)、SequenceFile(行式存储)、ORC(列式存储)、Parquet(列式存储)等；压缩格式是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据开发之离线计算_Hive存储格式与压缩格式&amp;MapReduce输出Text文件压缩格式优缺点对比">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2022/08/14/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Hive%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F%E4%B8%8E%E5%8E%8B%E7%BC%A9%E6%A0%BC%E5%BC%8F&MapReduce%E8%BE%93%E5%87%BAText%E6%96%87%E4%BB%B6%E5%8E%8B%E7%BC%A9%E6%A0%BC%E5%BC%8F%E4%BC%98%E7%BC%BA%E7%82%B9%E5%AF%B9%E6%AF%94/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="数据开发之离线计算_Hive存储格式与压缩格式&amp;MapReduce输出Text文件压缩格式优缺点对比1.Hive存储格式hive底层数据是存储在hdfs系统中的文件，hive的存储格式和压缩格式是两个不同的概念。存储格式是指数据按照何种规则存储在hdfs文件中，如TextFile(行式存储)、SequenceFile(行式存储)、ORC(列式存储)、Parquet(列式存储)等；压缩格式是">
+<meta property="article:published_time" content="2022-08-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:04:52.861Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="MapReduce">
+<meta property="article:tag" content="Hive">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2022/08/14/数据开发之离线计算_Hive存储格式与压缩格式&MapReduce输出Text文件压缩格式优缺点对比/"/>
+
+
+
+
+
+  <title>数据开发之离线计算_Hive存储格式与压缩格式&MapReduce输出Text文件压缩格式优缺点对比 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2022/08/14/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_Hive%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F%E4%B8%8E%E5%8E%8B%E7%BC%A9%E6%A0%BC%E5%BC%8F&MapReduce%E8%BE%93%E5%87%BAText%E6%96%87%E4%BB%B6%E5%8E%8B%E7%BC%A9%E6%A0%BC%E5%BC%8F%E4%BC%98%E7%BC%BA%E7%82%B9%E5%AF%B9%E6%AF%94/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数据开发之离线计算_Hive存储格式与压缩格式&MapReduce输出Text文件压缩格式优缺点对比</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-14T00:00:00+08:00">
+                2022-08-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97/" itemprop="url" rel="index">
+                    <span itemprop="name">数据开发之离线计算</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据开发之离线计算-Hive存储格式与压缩格式-amp-MapReduce输出Text文件压缩格式优缺点对比"><a href="#数据开发之离线计算-Hive存储格式与压缩格式-amp-MapReduce输出Text文件压缩格式优缺点对比" class="headerlink" title="数据开发之离线计算_Hive存储格式与压缩格式&amp;MapReduce输出Text文件压缩格式优缺点对比"></a>数据开发之离线计算_Hive存储格式与压缩格式&amp;MapReduce输出Text文件压缩格式优缺点对比</h2><h3 id="1-Hive存储格式"><a href="#1-Hive存储格式" class="headerlink" title="1.Hive存储格式"></a>1.Hive存储格式</h3><p><strong>hive底层数据是存储在hdfs系统中的文件，hive的存储格式和压缩格式是两个不同的概念。存储格式是指数据按照何种规则存储在hdfs文件中，如TextFile(行式存储)、SequenceFile(行式存储)、ORC(列式存储)、Parquet(列式存储)等；压缩格式是指hdfs文件以何种规则进行压缩，如Gzip、Lzo、Bzip2、Default、Snappy、Zstd等。</strong></p>
+<h4 id="1-1-TextFile"><a href="#1-1-TextFile" class="headerlink" title="1.1 TextFile"></a>1.1 TextFile</h4><p>TextFile是hive默认的文件存储格式，存储方式为按行存储。</p>
+<h4 id="1-2-SequenceFile"><a href="#1-2-SequenceFile" class="headerlink" title="1.2 SequenceFile"></a>1.2 SequenceFile</h4><p>SequenceFile是一种二进制存储文件，存储方式为按行存储，将每行数据以key-value的形式进行序列化后保存到文件中。</p>
+<p>SequenceFile支持三种压缩格式：NONE、RECORD、BLOCK，且压缩后的SequenceFile也支持切片。</p>
+<h4 id="1-3-ORC"><a href="#1-3-ORC" class="headerlink" title="1.3 ORC"></a>1.3 ORC</h4><p>ORC是hive特有的数据存储格式，存储方式按列存储。具体操作就是将数据按行进行分块，每个分块的大小默认就是hdfs的block大小，也就是ORC文件的每个分块默认就保存在hdfs的一个block上，然后每个分块内的数据按列存储，每个分块内都由列索引、列数据、文件目录信息三部分组成。</p>
+<p><strong>未压缩的ORC文件支持切片。</strong></p>
+<h4 id="1-4-Parquet"><a href="#1-4-Parquet" class="headerlink" title="1.4 Parquet"></a>1.4 Parquet</h4><p>Parquet是一种二进制存储文件，存储方式为按列存储。</p>
+<h3 id="2-Hive表常用存储格式与压缩格式搭配"><a href="#2-Hive表常用存储格式与压缩格式搭配" class="headerlink" title="2.Hive表常用存储格式与压缩格式搭配"></a>2.Hive表常用存储格式与压缩格式搭配</h3><h4 id="2-1-Hive建表语句设置存储格式"><a href="#2-1-Hive建表语句设置存储格式" class="headerlink" title="2.1 Hive建表语句设置存储格式"></a>2.1 Hive建表语句设置存储格式</h4><p>Hive表数据存储在文件系统上，必须要有文件存储格式来规范化数据的存储，按照约定好的格式来写数据和读数据。Hive有一些已经定义好的存储格式，也支持用户自定义文件存储格式，我们一般在建表时通过file_format和row_format两部分来设置该表的存储格式。</p>
+<p>先不聊自定义文件存储格式，主要关注如何使用Hive已经定义好的存储格式。</p>
+<p><strong>Hive建表语句中常见的file_format和row_format设置格式如下：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ROW FORMAT row_format] </span><br><span class="line">[STORED AS file_format]</span><br></pre></td></tr></table></figure>
+
+<p><strong>其中row_format用于定义行数据存储格式，可以选择的设置方式有两种：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.DELIMITED [FIELDS TERMINATED BY char [ESCAPED BY char]] [COLLECTION ITEMS TERMINATED BY char] [MAP KEYS TERMINATED BY char] [LINES TERMINATED BY char] [NULL DEFINED AS char]</span><br><span class="line"></span><br><span class="line">2.SERDE serde_name [WITH SERDEPROPERTIES (property_name&#x3D;property_value, property_name&#x3D;property_value, ...)]</span><br></pre></td></tr></table></figure>
+
+<p><strong>其中file_format用于定义文件数据存储格式，可以选择的设置方式有七种：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1.SEQUENCEFILE</span><br><span class="line">2.TEXTFILE</span><br><span class="line">3.RCFILE</span><br><span class="line">4.ORC</span><br><span class="line">5.PARQUET</span><br><span class="line">6.AVRO</span><br><span class="line">7.INPUTFORMAT input_format_classname OUTPUTFORMAT output_format_classname</span><br></pre></td></tr></table></figure>
+
+<p><strong>其实说到底通过这些file_format和row_format的设置主要需要选择SERDE、INPUTFORMAT、OUTPUTFORMAT三个参数选用哪些类。他们之间的关系如官方文档所说，SerDe就是行数据的序列化与反序列化规则。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SerDe is a short name for “Serializer and Deserializer.”</span><br><span class="line">Hive uses SerDe to read and write table rows.</span><br><span class="line">HDFS files –&gt; InputFileFormat –&gt; &lt;key, value&gt; –&gt; Deserializer –&gt; Row object</span><br><span class="line">Row object –&gt; Serializer –&gt; &lt;key, value&gt; –&gt; OutputFileFormat –&gt; HDFS files</span><br></pre></td></tr></table></figure>
+
+<p><strong>实际上STORED AS后面可以选择的file_format中有一部分已经将SERDE、INPUTFORMAT、OUTPUTFORMAT三者都已经设定好了，而另一部分只设定了INPUTFORMAT、OUTPUTFORMAT两个参数。</strong></p>
+<h4 id="2-2-TextFile不压缩"><a href="#2-2-TextFile不压缩" class="headerlink" title="2.2 TextFile不压缩"></a>2.2 TextFile不压缩</h4><p>STORED AS TEXTFILE只设定了INPUTFORMAT、OUTPUTFORMAT两个参数，等效于：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">STORED AS INPUTFORMAT</span><br><span class="line">  'org.apache.hadoop.mapred.TextInputFormat'</span><br><span class="line">  OUTPUTFORMAT</span><br><span class="line">  'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'</span><br></pre></td></tr></table></figure>
+
+<p><strong>当使用STORED AS TEXTFILE时，如果ROW FORMAT中也没有设置SERDE参数，则默认使用’org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe’来作为SERDE参数。</strong></p>
+<h4 id="2-3-TextFile-Lzo"><a href="#2-3-TextFile-Lzo" class="headerlink" title="2.3 TextFile+Lzo"></a>2.3 TextFile+Lzo</h4><p><strong>我们公司最常见的要推到hbase中的app表存储格式和压缩格式就是TextFile+Lzo：</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="keyword">exists</span> app.app_zh_industry_market_trend_off_line_compare_scndcatg( </span><br><span class="line">terminal_type <span class="built_in">int</span> <span class="keyword">COMMENT</span> <span class="string">'渠道'</span>, </span><br><span class="line">deal_sale_amount_index <span class="keyword">double</span> <span class="keyword">COMMENT</span> <span class="string">'成交金额指数'</span>)</span><br><span class="line"><span class="keyword">COMMENT</span> <span class="string">'行业趋势-大盘走势'</span></span><br><span class="line">PARTITIONED <span class="keyword">BY</span> ( </span><br><span class="line">  dt <span class="keyword">string</span> <span class="keyword">COMMENT</span> <span class="string">'时间戳'</span></span><br><span class="line">  )</span><br><span class="line"><span class="keyword">ROW</span> <span class="keyword">FORMAT</span> SERDE <span class="string">'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'</span></span><br><span class="line"><span class="keyword">WITH</span> SERDEPROPERTIES (</span><br><span class="line"><span class="string">'field.delim'</span>=<span class="string">'\t'</span></span><br><span class="line">) </span><br><span class="line"><span class="keyword">STORED</span> <span class="keyword">AS</span> INPUTFORMAT <span class="string">"com.hadoop.mapred.DeprecatedLzoTextInputFormat"</span></span><br><span class="line">OUTPUTFORMAT <span class="string">"org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"</span></span><br><span class="line">LOCATION <span class="string">'hdfs://ns3/user/mart_sz/bi_compass/app.db/app_zh_industry_market_trend_off_line_compare_scndcatg'</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看存储路径可以看到问出文件名为hdfs://ns3/user/mart_sz/bi_compass/app.db/app_zh_industry_market_trend_off_line_compare_scndcatg/dt=2022-08-24/000000_0.lzo，压缩文件后缀名为lzo。</strong></p>
+<h4 id="2-4-ORC不压缩"><a href="#2-4-ORC不压缩" class="headerlink" title="2.4 ORC不压缩"></a>2.4 ORC不压缩</h4><p><strong>我们公司最常见的gdm、adm表存储格式和压缩格式就是ORC不压缩</strong>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="keyword">exists</span> adm.adm_zh_industry_market_trend_offline_scndcatg( </span><br><span class="line">terminal_type <span class="keyword">string</span> <span class="keyword">COMMENT</span> <span class="string">'渠道'</span>, </span><br><span class="line">deal_sale_amount <span class="keyword">double</span> <span class="keyword">COMMENT</span> <span class="string">'成交金额'</span>)</span><br><span class="line"><span class="keyword">COMMENT</span> <span class="string">'行业趋势-大盘走势'</span></span><br><span class="line">PARTITIONED <span class="keyword">BY</span> ( </span><br><span class="line">  dt <span class="keyword">string</span> <span class="keyword">COMMENT</span> <span class="string">'时间戳'</span></span><br><span class="line">  )</span><br><span class="line"><span class="keyword">ROW</span> <span class="keyword">FORMAT</span> SERDE <span class="string">'org.apache.hadoop.hive.ql.io.orc.OrcSerde'</span></span><br><span class="line"><span class="keyword">WITH</span> SERDEPROPERTIES (</span><br><span class="line"><span class="string">'field.delim'</span>=<span class="string">'\t'</span></span><br><span class="line">) <span class="keyword">STORED</span> <span class="keyword">AS</span> orc</span><br><span class="line">LOCATION</span><br><span class="line">  <span class="string">'hdfs://ns3/user/mart_sz/bi_compass/adm.db/adm_zh_industry_market_trend_offline_scndcatg'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>STORED AS ORC直接设定了SERDE、INPUTFORMAT、OUTPUTFORMAT三个参数，等效于：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ROW FORMAT SERDE</span><br><span class="line">  'org.apache.hadoop.hive.ql.io.orc.OrcSerde'</span><br><span class="line">  STORED AS INPUTFORMAT</span><br><span class="line">  'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat'</span><br><span class="line">  OUTPUTFORMAT</span><br><span class="line">  'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看存储路径可以看到存储文件名为hdfs://ns3/user/mart_sz/bi_compass/adm.db/adm_zh_industry_market_trend_offline_scndcatg/dt=2022-08-07/part-00000-3a1cfbf7-f62d-4df7-89c4-74beacd628f3，没有压缩格式后缀名。</strong></p>
+<h3 id="3-MapReduce输出Text文件压缩格式"><a href="#3-MapReduce输出Text文件压缩格式" class="headerlink" title="3.MapReduce输出Text文件压缩格式"></a>3.MapReduce输出Text文件压缩格式</h3><h4 id="3-1-MapReduce压缩格式选择"><a href="#3-1-MapReduce压缩格式选择" class="headerlink" title="3.1 MapReduce压缩格式选择"></a>3.1 MapReduce压缩格式选择</h4><p>MapReduce计算任务输入时不需要指定压缩算法，计算任务会自动检查文件的后缀名，然后选择对应的压缩算法对输入文件进行解压。</p>
+<p>MapReduce计算任务设置压缩算法主要是对map输出和reduce输出而言的：为mapper输出设置压缩格式可以减少中间临时存储所占用的空间，减少网络io；为reduce输出设置压缩格式可以减少最终输出存储所占用的空间。但是为输出设置压缩算法会使计算时间变长，因为解压缩比较耗时。</p>
+<p><strong>还有需要重点考虑的是最终输出文件所采用的压缩方式是否支持分片，如果不支持分片则该文件被下一个MapReduce任务处理是，只能使用一个map来处理一整个文件。常见的Text压缩算法有Gzip、Lzo、Bzip2、Default、Snappy、Zstd，其中只有Bzip2是支持分片的，但是Bzip2的解压缩耗时又是最长的。</strong></p>
+<h5 id="配置map输出压缩算法代码"><a href="#配置map输出压缩算法代码" class="headerlink" title="配置map输出压缩算法代码"></a>配置map输出压缩算法代码</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开启map端输出压缩</span></span><br><span class="line">conf.setBoolean(<span class="string">"mapreduce.map.output.compress"</span>, <span class="keyword">true</span>);</span><br><span class="line"><span class="comment">//设置map端输出压缩方式，压缩算法可以选择GzipCodec.class、BZip2Codec.class、ZStandardCodec.class等。</span></span><br><span class="line">conf.setClass(<span class="string">"mapreduce.map.output.compress.codec"</span>, BZip2Codec<span class="class">.<span class="keyword">class</span>, <span class="title">CompressionCodec</span>.<span class="title">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h5 id="配置reduce输出压缩算法代码"><a href="#配置reduce输出压缩算法代码" class="headerlink" title="配置reduce输出压缩算法代码"></a>配置reduce输出压缩算法代码</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开启reduce端输出压缩</span></span><br><span class="line">FileOutputFormat.setCompressOutput(job, <span class="keyword">true</span>);</span><br><span class="line"><span class="comment">//设置reduce端输出压缩方式，压缩算法可以选择GzipCodec.class、BZip2Codec.class、ZStandardCodec.class等。</span></span><br><span class="line">FileOutputFormat.setOutputCompressorClass(job, BZip2Codec<span class="class">.<span class="keyword">class</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-压缩格式对比"><a href="#3-2-压缩格式对比" class="headerlink" title="3.2 压缩格式对比"></a>3.2 压缩格式对比</h4><p>上文中讲到我按照十六进制字符串格式解码hbase快照数据之后存储到Text文件中，如果不对这个Text文件进行压缩，那么所需要的存储空间会是hfile文件的十几倍，我选择使用压缩算法以快照读取时间换数据存储空间。</p>
+<p>现根据日志对不压缩、Gzip、BZip2、ZStandard四种方式从压缩率、计算时间、可否分片三个角度进行对比。</p>
+<p><strong>Text文件数据重推回hbase过程中设置输入分片大小为100M：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//重要：Text文件输入分片大小</span></span><br><span class="line">Long minsize = <span class="number">100000000L</span>;</span><br><span class="line">conf.setLong(<span class="string">"mapreduce.input.fileinputformat.split.minsize"</span>, minsize);</span><br></pre></td></tr></table></figure>
+
+<h5 id="不压缩"><a href="#不压缩" class="headerlink" title="不压缩"></a>不压缩</h5><p>快照读取日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T17:10:14.445+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_1698579101801_1199082 completed successfully</span><br><span class="line">[2022-08-01T17:10:14.577+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 48</span><br><span class="line">	File Input Format Counters </span><br><span class="line">		Bytes Read&#x3D;0</span><br><span class="line">	File Output Format Counters </span><br><span class="line">		Bytes Written&#x3D;27656259760</span><br><span class="line">[2022-08-01T17:10:14.578+08:00] [INFO] ads.hbase2hive.GetHbaseTool.run(GetHbaseTool.java 160) [main] : spent time:910</span><br></pre></td></tr></table></figure>
+
+<p>重推到hbase日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T17:53:09.388+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8091494100801_19551256 completed successfully</span><br><span class="line">[2022-08-01T17:53:09.752+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 53</span><br><span class="line">		Killed map tasks&#x3D;6</span><br><span class="line">		Launched map tasks&#x3D;86</span><br><span class="line">		Launched reduce tasks&#x3D;10</span><br><span class="line">		Other local map tasks&#x3D;86</span><br></pre></td></tr></table></figure>
+
+<h5 id="Gzip"><a href="#Gzip" class="headerlink" title="Gzip"></a>Gzip</h5><p>快照读取日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T17:12:48.403+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8091494100801_19543019 completed successfully</span><br><span class="line">[2022-08-01T17:12:48.501+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 48</span><br><span class="line">	File Input Format Counters </span><br><span class="line">		Bytes Read&#x3D;0</span><br><span class="line">	File Output Format Counters </span><br><span class="line">		Bytes Written&#x3D;1143284839</span><br><span class="line">[2022-08-01T17:12:48.502+08:00] [INFO] ads.hbase2hive.GetHbaseTool.run(GetHbaseTool.java 160) [main] : spent time:1015</span><br></pre></td></tr></table></figure>
+
+<p>重推到hbase日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T18:28:00.834+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8091494100801_19555491 completed successfully</span><br><span class="line">[2022-08-01T18:28:00.933+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 53</span><br><span class="line">		Killed map tasks&#x3D;4</span><br><span class="line">		Launched map tasks&#x3D;59</span><br><span class="line">		Launched reduce tasks&#x3D;10</span><br><span class="line">		Other local map tasks&#x3D;59</span><br></pre></td></tr></table></figure>
+
+<h5 id="BZip2"><a href="#BZip2" class="headerlink" title="BZip2"></a>BZip2</h5><p>快照读取日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T17:34:23.111+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8091494100801_19543036 completed successfully</span><br><span class="line">[2022-08-01T17:34:23.193+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 48</span><br><span class="line">	File Input Format Counters </span><br><span class="line">		Bytes Read&#x3D;0</span><br><span class="line">	File Output Format Counters </span><br><span class="line">		Bytes Written&#x3D;739276228</span><br><span class="line">[2022-08-01T17:34:23.194+08:00] [INFO] ads.hbase2hive.GetHbaseTool.run(GetHbaseTool.java 160) [main] : spent time:2300</span><br></pre></td></tr></table></figure>
+
+<p>重推到hbase日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T18:26:08.242+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_1698579101801_1210959 completed successfully</span><br><span class="line">[2022-08-01T18:26:08.332+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 53</span><br><span class="line">		Killed map tasks&#x3D;13</span><br><span class="line">		Launched map tasks&#x3D;72</span><br><span class="line">		Launched reduce tasks&#x3D;10</span><br><span class="line">		Other local map tasks&#x3D;72</span><br></pre></td></tr></table></figure>
+
+<h5 id="ZStandard"><a href="#ZStandard" class="headerlink" title="ZStandard"></a>ZStandard</h5><p>快照读取日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T17:14:54.008+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8091494100801_19543124 completed successfully</span><br><span class="line">[2022-08-01T17:14:54.097+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 48</span><br><span class="line">	File Input Format Counters </span><br><span class="line">		Bytes Read&#x3D;0</span><br><span class="line">	File Output Format Counters </span><br><span class="line">		Bytes Written&#x3D;1198029197</span><br><span class="line">[2022-08-01T17:14:54.098+08:00] [INFO] ads.hbase2hive.GetHbaseTool.run(GetHbaseTool.java 160) [main] : spent time:1090</span><br></pre></td></tr></table></figure>
+
+<p>重推到hbase日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[2022-08-01T18:28:37.733+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1417) [main] : Job job_8091494100801_19555530 completed successfully</span><br><span class="line">[2022-08-01T18:28:37.815+08:00] [INFO] hadoop.mapreduce.Job.monitorAndPrintJob(Job.java 1424) [main] : Counters: 53</span><br><span class="line">		Killed map tasks&#x3D;4</span><br><span class="line">		Launched map tasks&#x3D;59</span><br><span class="line">		Launched reduce tasks&#x3D;10</span><br><span class="line">		Other local map tasks&#x3D;59</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结上述日志可知，未设置压缩格式的Text文件大小是27.6GB，Gzip格式的是1.1GB，BZip2格式的是0.7GB，ZStandard格式的是1.2GB；</strong></p>
+<p><strong>未设置压缩格式的Text文件读取与存储时间910s，Gzip格式的是1015s，BZip2格式的是2300s，ZStandard格式的是1090s；</strong></p>
+<p><strong>读取Gzip压缩格式Text文件的map数是55，BZip2格式的是59，ZStandard格式的是55，说明Gzip、ZStandard不可分片，BZip2可分片。</strong></p>
+<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a href="https://blog.csdn.net/mhtian2015/article/details/78873815" target="_blank" rel="noopener">HIVE STORED&amp;Row format</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MapReduce/" rel="tag"><i class="fa fa-tag"></i> MapReduce</a>
+          
+            <a href="/tags/Hive/" rel="tag"><i class="fa fa-tag"></i> Hive</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/08/08/HBase_HBase%E5%88%A0%E6%95%B0%E7%AD%96%E7%95%A5%E6%80%BB%E7%BB%93/" rel="next" title="HBase_HBase删数策略总结">
+                <i class="fa fa-chevron-left"></i> HBase_HBase删数策略总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/08/21/Java%E6%9C%8D%E5%8A%A1_JOptSimple%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%E5%A4%84%E7%90%86%E5%99%A8/" rel="prev" title="Java服务_JOptSimple命令行参数处理器">
+                Java服务_JOptSimple命令行参数处理器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据开发之离线计算-Hive存储格式与压缩格式-amp-MapReduce输出Text文件压缩格式优缺点对比"><span class="nav-number">1.</span> <span class="nav-text">数据开发之离线计算_Hive存储格式与压缩格式&amp;MapReduce输出Text文件压缩格式优缺点对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Hive存储格式"><span class="nav-number">1.1.</span> <span class="nav-text">1.Hive存储格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-TextFile"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 TextFile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-SequenceFile"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 SequenceFile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-ORC"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 ORC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-Parquet"><span class="nav-number">1.1.4.</span> <span class="nav-text">1.4 Parquet</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Hive表常用存储格式与压缩格式搭配"><span class="nav-number">1.2.</span> <span class="nav-text">2.Hive表常用存储格式与压缩格式搭配</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Hive建表语句设置存储格式"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 Hive建表语句设置存储格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-TextFile不压缩"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 TextFile不压缩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-TextFile-Lzo"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 TextFile+Lzo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-ORC不压缩"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.4 ORC不压缩</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-MapReduce输出Text文件压缩格式"><span class="nav-number">1.3.</span> <span class="nav-text">3.MapReduce输出Text文件压缩格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-MapReduce压缩格式选择"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 MapReduce压缩格式选择</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#配置map输出压缩算法代码"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">配置map输出压缩算法代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#配置reduce输出压缩算法代码"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">配置reduce输出压缩算法代码</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-压缩格式对比"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 压缩格式对比</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#不压缩"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">不压缩</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Gzip"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">Gzip</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#BZip2"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">BZip2</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ZStandard"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">ZStandard</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">1.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

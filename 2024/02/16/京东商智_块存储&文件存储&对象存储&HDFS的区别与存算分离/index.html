@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_块存储&amp;文件存储&amp;对象存储&amp;HDFS的区别与存算分离1.背景1.1 存算分离背景随着大数据技术架构的演进，存储与计算分离的架构能更好的满足用户对降低数据存储成本的需求，也能够更加灵活地实现针对计算或者存储资源的扩缩容。例如商智HBase离线集群存储高密，造成CPU资源严重浪费，而实时集群计算高密，造成磁盘利用率较低；又例如希望实现白天qps高则动态扩充计算资源，晚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_块存储&amp;文件存储&amp;对象存储&amp;HDFS的区别与存算分离">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/16/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E5%9D%97%E5%AD%98%E5%82%A8&%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8&%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8&HDFS%E7%9A%84%E5%8C%BA%E5%88%AB%E4%B8%8E%E5%AD%98%E7%AE%97%E5%88%86%E7%A6%BB/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_块存储&amp;文件存储&amp;对象存储&amp;HDFS的区别与存算分离1.背景1.1 存算分离背景随着大数据技术架构的演进，存储与计算分离的架构能更好的满足用户对降低数据存储成本的需求，也能够更加灵活地实现针对计算或者存储资源的扩缩容。例如商智HBase离线集群存储高密，造成CPU资源严重浪费，而实时集群计算高密，造成磁盘利用率较低；又例如希望实现白天qps高则动态扩充计算资源，晚">
+<meta property="article:published_time" content="2024-02-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:30:47.012Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/16/京东商智_块存储&文件存储&对象存储&HDFS的区别与存算分离/"/>
+
+
+
+
+
+  <title>京东商智_块存储&文件存储&对象存储&HDFS的区别与存算分离 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/16/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E5%9D%97%E5%AD%98%E5%82%A8&%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8&%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8&HDFS%E7%9A%84%E5%8C%BA%E5%88%AB%E4%B8%8E%E5%AD%98%E7%AE%97%E5%88%86%E7%A6%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_块存储&文件存储&对象存储&HDFS的区别与存算分离</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-16T00:00:00+08:00">
+                2024-02-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="京东商智-块存储-amp-文件存储-amp-对象存储-amp-HDFS的区别与存算分离"><a href="#京东商智-块存储-amp-文件存储-amp-对象存储-amp-HDFS的区别与存算分离" class="headerlink" title="京东商智_块存储&amp;文件存储&amp;对象存储&amp;HDFS的区别与存算分离"></a>京东商智_块存储&amp;文件存储&amp;对象存储&amp;HDFS的区别与存算分离</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><h4 id="1-1-存算分离背景"><a href="#1-1-存算分离背景" class="headerlink" title="1.1 存算分离背景"></a>1.1 存算分离背景</h4><p>随着大数据技术架构的演进，存储与计算分离的架构能更好的满足用户对降低数据存储成本的需求，也能够更加灵活地实现针对计算或者存储资源的扩缩容。例如商智HBase离线集群存储高密，造成CPU资源严重浪费，而实时集群计算高密，造成磁盘利用率较低；又例如希望实现白天qps高则动态扩充计算资源，晚上降低的潮汐功能。现在业内较为领先的云服务供应商如阿里云、腾讯云等都提供了存算分离的HBase集群、Spark集群等。</p>
+<p>存算分离的好处是方便动态扩缩容，既方便了计算的扩缩容也方便了存储的扩缩容。计算存储资源池化，计算不够加cpu，存储容量不够加hdd，iops不够加ssd甚至nvme，memory不够既可以在计算侧加cache也可以在存储侧加cache。</p>
+<p>但是存算分离是要牺牲一部分性能的，计算不能部署在存储所在的节点，数据传输必须通过网络io。比如直接基于HDFS集群部署的HBase集群和Spark集群就有一个短路读的特性，就是client跟datanode在同一个节点，client就直接读本地文件，不再通过socket通信，计算存储分离后这种特性就没用了。仅就目前的情况看，存算分离的道路还很长。至少目前阶段，大部分的sql、mq、search engine、newsql和大部分的olap等io密集型system，还是存算一体引擎。</p>
+<h4 id="1-2-对象存储背景"><a href="#1-2-对象存储背景" class="headerlink" title="1.2 对象存储背景"></a>1.2 对象存储背景</h4><p>传统HBase集群、Spark集群等大数据框架下的计算引擎，底层都是使用HDFS分布式文件系统来作为存储系统，为了进一步降低成本，如阿里云等供应商还提供了OSS等对象存储系统作为温冷数据的底层存储系统；而且对于不同的存储场景，HDFS不能完全解决问题，使用对象存储作为最底层的存储基座，基于不同的oss pool，构建一些不同类型的DFS，可以为不同场景提供存储能力。</p>
+<h3 id="2-块存储、文件存储、对象存储的区别"><a href="#2-块存储、文件存储、对象存储的区别" class="headerlink" title="2.块存储、文件存储、对象存储的区别"></a>2.块存储、文件存储、对象存储的区别</h3><h4 id="2-1-块存储"><a href="#2-1-块存储" class="headerlink" title="2.1 块存储"></a>2.1 块存储</h4><p>物理块是指以扇区为基础，一个或几个连续的扇区组成一个物理块。它是在文件系统与块设备（例如：磁盘驱动器）之间。在网络存储中，块存储系统主要是将裸磁盘物理块空间重新进行逻辑划分和映射给主机使用的，如主机上面的操作系统识别到有5块逻辑存储硬盘，但是操作系统是区分不出每个逻辑块具体来自哪个物理机的哪个扇区，它一概就认为只是5块裸的物理硬盘而已，跟直接拿一块物理硬盘挂载到操作系统没有区别的。</p>
+<p>优点：</p>
+<p>1）可以将多块廉价的硬盘组合起来，成为一个大容量的逻辑盘对外提供服务，提高了容量。</p>
+<p>2）写入数据的时候，由于是多块磁盘组合出来的逻辑盘，所以几块磁盘可以并行写入的，提升了读写效率。</p>
+<p>3）在更新时块级更新效率高，实时性强，备份时间短，且增量备份时，只备份修改过的物理块，速度快。</p>
+<p>缺点：</p>
+<p>1）不利于数据共享，对于不同物理块或者不同操作系统主机之间，难以实现数据的共享。</p>
+<h4 id="2-2-文件存储"><a href="#2-2-文件存储" class="headerlink" title="2.2 文件存储"></a>2.2 文件存储</h4><p>文件存储系统把存储介质上的数据组织成目录-子目录-文件这种形式的数据结构，用于从这个结构中寻找、添加、修改、删除文件的程序，并维护这个目录结构。在网络存储中，底层数据并非存储在本地的存储介质，而是另外一台服务器上，不同的客户端都可以用类似文件系统的方式访问这台服务器上的文件，这样的系统叫网络文件系统。其中FTP、HTTP也算是网络文件存储的某种特殊实现，都是可以通过某个url数据目录来访问一个文件。</p>
+<p>文件存储系统中单个文件可能由于一个或多个逻辑块组成，且逻辑块之间是不连续分布，而逻辑块又大于或等于物理块整数倍。整体映射关系：扇区→物理块→逻辑块→文件系统。</p>
+<p>优点：</p>
+<p>1）结构清晰，方便理解和操作，不仅能够提供给计算机软件程序使用，也能直接提供给人使用和操作。</p>
+<p>2）方便数据共享，文件一旦存储到文件存储系统中，任何支持对应文件格式的系统主机都可以读取并使用其中数据。</p>
+<p>缺点：</p>
+<p>1）读写速率低，传输速率慢，另外所有读写都要1台服务器里面的硬盘来承担，相比起磁盘阵列动不动就几十上百块硬盘同时读写，速率慢了许多。</p>
+<p>2）文件级别的增删改查较重，首先会查找每个文件逻辑块，其次物理块，需要一层一层往下查找，最后才能得到整个文件。文件级备份时比较费时间，效率不高，实时性不强，备份时间长。</p>
+<h4 id="2-3-对象存储"><a href="#2-3-对象存储" class="headerlink" title="2.3 对象存储"></a>2.3 对象存储</h4><p>对象存储其实介于块存储和文件存储之间。文件存储的树状结构以及路径访问方式虽然方便人类理解、记忆和访问，但计算机需要把路径进行分解，然后逐级向下查找，最后才能查找到需要的文件，对于应用程序来说既没必要，也很浪费性能；而块存储是排它的，数据共享性极差，服务器上的某个逻辑块被一台客户端挂载后，其它客户端就无法访问上面的数据了。为了实现读写快，又利于共享，于是就有了对象存储。</p>
+<p>对象存储则将存储数据的元数据独立了出来，控制节点叫元数据服务器，里面主要负责存储对象的属性，如存储数据被打散存放到了哪几台分布式服务器中等信息；而其他负责存储数据的分布式服务器叫做OSD，主要负责存储对象的数据部分。</p>
+<p>当用户访问对象存储系统中的存储对象，会先访问元数据服务器，元数据服务器只负责反馈对象存储在哪些OSD，假设反馈文件A存储在B、C、D三台OSD，那么用户就会再次直接访问3台OSD服务器去读取数据。这时候由于是3台OSD同时对外传输数据，所以传输的速度就加快了。当OSD服务器数量越多，这种读写速度的提升就越大，通过此种方式，实现了读写快的目的。另一方面，对象存储软件是有专门的文件系统的，所以OSD对外又相当于文件服务器，那么就不存在文件共享方面的困难了，也解决了文件共享方面的问题。所以对象存储的出现，很好地结合了块存储与文件存储的优点。</p>
+<p>注意：从上述描述也可以看出，如果没有分布式存储服务器OSD，只是单机存储的话，对象存储系统也没有分布式读写的特性了，所以对象存储系统在分布式存储场景下才有发挥空间。</p>
+<h4 id="2-4-块存储存在文件存储的必要"><a href="#2-4-块存储存在文件存储的必要" class="headerlink" title="2.4 块存储存在文件存储的必要"></a>2.4 块存储存在文件存储的必要</h4><p>最后为什么对象存储兼具块存储与文件存储的好处，不直接全盘改为使用对象存储，还要使用块存储或文件存储呢：</p>
+<p>1）有一类应用是需要存储直接裸盘映射的，例如数据库。因为数据库需要存储裸盘映射给自己后，再根据自己的数据库文件系统来对裸盘进行格式化的，所以是不能够采用其他已经被格式化为某种文件系统的存储的。此类应用更适合使用块存储。</p>
+<p>2）对象存储的成本比起普通的文件存储还是较高，需要购买专门的对象存储软件以及大容量硬盘。如果对数据量要求不是海量，也不是分布式应用场景，只是为了做文件共享的时候，直接用文件存储的形式性价比更高。</p>
+<h3 id="3-对象存储分布式系统与HDFS的区别"><a href="#3-对象存储分布式系统与HDFS的区别" class="headerlink" title="3. 对象存储分布式系统与HDFS的区别"></a>3. 对象存储分布式系统与HDFS的区别</h3><p>随着大数据技术架构的演进，存储与计算分离的架构能更好的满足用户对降低数据存储成本，按需调度计算资源的诉求，正在成为越来越多人的选择，在此基础上，存储系统也就可以选择HDFS以外的其他存储系统。对象存储系统拥有可靠、可扩展和更低成本等特性，是更优的低成本存储方式；但是，对象存储对海量文件的写性能比HDFS差很多。所以将海量的温冷数据放到对象存储上，热数据仍存放在HDFS上是一种兼顾成本和性能的方法。</p>
+<h4 id="3-1-读写特性差异"><a href="#3-1-读写特性差异" class="headerlink" title="3.1 读写特性差异"></a>3.1 读写特性差异</h4><p>HDFS将集群作为一个整体面向用户和应用程序访问，它支持我们像在普通文件系统上一样创建目录和存储文件；而对象存储不存在目录结构，所有的文件都存储在一个平面的地址空间中，这种简单的存储方式大大增强了它的伸缩性，可以使用三种基本操作对存储的资源进行管理：PUT和GET，DELETE。</p>
+<h4 id="3-2-冗余原理差异"><a href="#3-2-冗余原理差异" class="headerlink" title="3.2 冗余原理差异"></a>3.2 冗余原理差异</h4><p>HDFS存储的高可用原理是对数据分片后进行冗余存储，这样的设计保障了数据的准确性，即使是集群中某块磁盘损坏也不会丢失数据，但是这样的存储开销会很大，集群的容量很快就会成为瓶颈。</p>
+<p>对象存储采用纠删码的方式来对数据进行存储，纠删码（Erasure Coding，EC）是一种编码容错技术，基本原理是将数据分割为n块，然后通过一定的计算得到m个冗余块，然后将这n+m块元素存储在不同的位置，达到高可用的目的。对于这n+m块的元素，可以使用其中任意n块恢复出原有的数据，因此磁盘利用率为n/(n+m)，相比HDFS的副本存储，具有冗余度低、磁盘利用率高的特点，可以大大节约存储开销。注意对象存储不是需要n*m个冗余块，而是n+m，如假设n和m分别是(9,3)，算法会将数据先分成九份，然后经过计算得到3个冗余块。在这12份数据中，任意9份都可以恢复出完整的数据。</p>
+<h4 id="3-3-伸缩性差异"><a href="#3-3-伸缩性差异" class="headerlink" title="3.3 伸缩性差异"></a>3.3 伸缩性差异</h4><p>HDFS中使用了Name Node管理集群的元数据，因此当集群的容量变得越来越大时，Name Node的负担也会越来越重；对于对象存储来说，元数据不再存储在一台单独的机器上，而是通过一致性哈希算法分片存储到不同的节点上，当集群中的数据不断增长时，可以在集群中添加节点以有效的提升容量。</p>
+<h4 id="3-4-总结"><a href="#3-4-总结" class="headerlink" title="3.4 总结"></a>3.4 总结</h4><p>对象存储通过简化文件系统功能的方式，实现在低成本存储的同时能够保证扩展性和可靠性。因此，对象存储首先是一种有效的数据存档方案，可以用于将温冷数据从HDFS卸载到成本较低的对象存储设备上。其次，对象存储也能良好的胜任数据湖收集数据和创造业务价值的要求，以高度可扩展、安全且经济有效的方式来存储和保护数据。而面对这些要求，传统的HDFS的架构差异往往会导致在成本、灵活性上的问题。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/15/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E6%B9%96%E4%BB%93%E4%B8%80%E4%BD%93%E4%BC%98%E7%82%B9%E4%B8%8E%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E6%96%B9%E6%A1%88&%E7%BD%91%E6%98%93%E6%9C%89%E9%81%93%E5%AE%9E%E6%97%B6%E6%B9%96%E4%BB%93%E5%AE%9E%E8%B7%B5%E4%B9%8B%E8%B7%AF/" rel="next" title="京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路">
+                <i class="fa fa-chevron-left"></i> 京东商智_湖仓一体优点与具体场景方案&网易有道实时湖仓实践之路
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/17/Java%E6%9C%8D%E5%8A%A1_%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5%E5%AE%9E%E6%88%98%E6%A2%B3%E7%90%86%E4%B8%8E%E5%B8%B8%E8%A7%81%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88/" rel="prev" title="Java服务_数据服务缓存策略实战梳理与常见分布式缓存实现方案">
+                Java服务_数据服务缓存策略实战梳理与常见分布式缓存实现方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#京东商智-块存储-amp-文件存储-amp-对象存储-amp-HDFS的区别与存算分离"><span class="nav-number">1.</span> <span class="nav-text">京东商智_块存储&amp;文件存储&amp;对象存储&amp;HDFS的区别与存算分离</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-存算分离背景"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">1.1 存算分离背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-对象存储背景"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">1.2 对象存储背景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-块存储、文件存储、对象存储的区别"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.块存储、文件存储、对象存储的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-块存储"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 块存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-文件存储"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 文件存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-对象存储"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">2.3 对象存储</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-块存储存在文件存储的必要"><span class="nav-number">1.0.2.4.</span> <span class="nav-text">2.4 块存储存在文件存储的必要</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-对象存储分布式系统与HDFS的区别"><span class="nav-number">1.0.3.</span> <span class="nav-text">3. 对象存储分布式系统与HDFS的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-读写特性差异"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">3.1 读写特性差异</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-冗余原理差异"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">3.2 冗余原理差异</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-伸缩性差异"><span class="nav-number">1.0.3.3.</span> <span class="nav-text">3.3 伸缩性差异</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-总结"><span class="nav-number">1.0.3.4.</span> <span class="nav-text">3.4 总结</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

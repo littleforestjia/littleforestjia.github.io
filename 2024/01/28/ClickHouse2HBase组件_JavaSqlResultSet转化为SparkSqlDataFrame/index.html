@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse,Spark," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame1.背景当前预计算任务主要基于Spark集群进行数据计算再推到HBase等kv数据库，Spark离线计算集群按资源使用率进行计费，费用高昂；且在分区数据量级1亿场景下，Spark引擎计算效率不如ClickHouse引擎，考虑通过ClickHouse凌晨生产时段进行预计算加工既可以节约成本，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/28/ClickHouse2HBase%E7%BB%84%E4%BB%B6_JavaSqlResultSet%E8%BD%AC%E5%8C%96%E4%B8%BASparkSqlDataFrame/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame1.背景当前预计算任务主要基于Spark集群进行数据计算再推到HBase等kv数据库，Spark离线计算集群按资源使用率进行计费，费用高昂；且在分区数据量级1亿场景下，Spark引擎计算效率不如ClickHouse引擎，考虑通过ClickHouse凌晨生产时段进行预计算加工既可以节约成本，">
+<meta property="article:published_time" content="2024-01-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:43:15.233Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/28/ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame/"/>
+
+
+
+
+
+  <title>ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/28/ClickHouse2HBase%E7%BB%84%E4%BB%B6_JavaSqlResultSet%E8%BD%AC%E5%8C%96%E4%B8%BASparkSqlDataFrame/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-28T00:00:00+08:00">
+                2024-01-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClickHouse2HBase组件-JavaSqlResultSet转化为SparkSqlDataFrame"><a href="#ClickHouse2HBase组件-JavaSqlResultSet转化为SparkSqlDataFrame" class="headerlink" title="ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame"></a>ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame</h1><h3 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h3><p>当前预计算任务主要基于Spark集群进行数据计算再推到HBase等kv数据库，Spark离线计算集群按资源使用率进行计费，费用高昂；且在分区数据量级1亿场景下，Spark引擎计算效率不如ClickHouse引擎，考虑通过ClickHouse凌晨生产时段进行预计算加工既可以节约成本，又可以提高时效。</p>
+<p>但是直接在ClickHouse客户端提交一个对所有数据进行Cube预计算的命令很难成功，主要会面临两个问题：1）计算超时，当数据量和计算量较大时，单条命令执行时间较长，一般平台设置即席查询超限时间20s，沟通后最多提升到600s，对大批量有聚合计算的查询仍有瓶颈；2）本地节点内存超限，当数据量较大时，从远程节点返回给本地节点进行聚合计算的数据量也会很大，易导致内存超限。 </p>
+<p>为了解决上述业务场景问题，想到了一个拆分方案：选取聚合维度中维度枚举值最多的那个维度，查询出其所有维值列表，然后将这些维值分批切片，按批次来执行预计算，每批只筛选其中部分维值对应数据进行预计算，依次执行完所有维值数据。那么要获取并存储高基维值，并适当使用并发，Spark引擎是不二之选，在开发过程中遇到一个问题，我们需要把ClickHouse分片分批执行的ResultSet结果合并起来，并转化为DataFrame方便后续继续进行各种并发的转换和执行操作。</p>
+<h3 id="2-java-sql-ResultSet转化为spark-sql-DataFrame解析"><a href="#2-java-sql-ResultSet转化为spark-sql-DataFrame解析" class="headerlink" title="2.java.sql.ResultSet转化为spark.sql.DataFrame解析"></a>2.java.sql.ResultSet转化为spark.sql.DataFrame解析</h3><h4 id="2-1-从java-sql-ResultSet中获取查询结果schema"><a href="#2-1-从java-sql-ResultSet中获取查询结果schema" class="headerlink" title="2.1 从java.sql.ResultSet中获取查询结果schema"></a>2.1 从java.sql.ResultSet中获取查询结果schema</h4><p>在Java里，可以使用ResultSet.getMetaData()方法获得ResultSetMetaData对象，ResultSetMetaData对象中保存了ResultSet中数据的schema信息。</p>
+<p>ResultSetMetaData类提供了一系列的方法来获取关于列的详细信息，比如列名、列类型、列的数量等，以下是一些常用方法：</p>
+<p>getColumnCount()：返回ResultSet中列的数量。</p>
+<p>getColumnName(int index)：根据索引获取指定列的名称。</p>
+<p>getColumnTypeName(int index)：根据索引获取指定列的数据库特定的类型名称。</p>
+<p>getColumnType(int index)：根据索引返回指定列的SQL类型。</p>
+<p>isNullable(int index)：根据索引表示指定列的值是否可以为 null。</p>
+<p>getPrecision(int index)：根据索引返回指定列的精度。</p>
+<p>getScale(int index)：根据索引获取指定列的小数点右边的位数。</p>
+<h4 id="2-2-手动转换步骤"><a href="#2-2-手动转换步骤" class="headerlink" title="2.2 手动转换步骤"></a>2.2 手动转换步骤</h4><p>要将一个JDBC查询结果集并入Spark数据集中，需要将ResultSet中的数据逐行转化为Row对象，还需要获取到ResultSet中数据的Schema，然后使用spark.createDataFrame()创建DataFrame对象。如下代码是一个简单的手动转换案例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConvertResultSetToSparkRow</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Row&gt; <span class="title">resultSetToSparkRowList</span><span class="params">(ResultSet rs)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        List&lt;Row&gt; rowsList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        ResultSetMetaData metaData = rs.getMetaData();</span><br><span class="line">        <span class="keyword">int</span> columnCount = metaData.getColumnCount();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 把结果集中的每一行转换为一个 Spark Row 对象</span></span><br><span class="line">        <span class="keyword">while</span> (rs.next()) &#123;</span><br><span class="line">            Object[] rowFields = <span class="keyword">new</span> Object[columnCount];</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; columnCount; i++) &#123;</span><br><span class="line">                rowFields[i] = rs.getObject(i + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            Row row = RowFactory.create(rowFields);</span><br><span class="line">            rowsList.add(row);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> rowsList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> StructType <span class="title">createSchemaFromResultSet</span><span class="params">(ResultSetMetaData metaData)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        List&lt;StructField&gt; fields = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> columnCount = metaData.getColumnCount();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 从结果集元数据中创建 Spark DataFrame 的 schema</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= columnCount; i++) &#123;</span><br><span class="line">            <span class="comment">// 这里假设所有列都是 StringType，您需要根据实际列的类型来创建对应的数据类型</span></span><br><span class="line">            StructField field = DataTypes.createStructField(metaData.getColumnName(i), DataTypes.StringType, <span class="keyword">true</span>);</span><br><span class="line">            fields.add(field);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> DataTypes.createStructType(fields);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        Connection connection = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">// ... 设置数据库连接参数 ...</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 建立数据库连接</span></span><br><span class="line">            connection = DriverManager.getConnection(<span class="string">"jdbc:mysql://localhost:3306/yourdatabase"</span>, <span class="string">"username"</span>, <span class="string">"password"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 创建 statement 对象并执行查询</span></span><br><span class="line">            Statement statement = connection.createStatement();</span><br><span class="line">            ResultSet rs = statement.executeQuery(<span class="string">"SELECT * FROM yourtable"</span>);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 转换为 Spark Rows</span></span><br><span class="line">            ConvertResultSetToSparkRow converter = <span class="keyword">new</span> ConvertResultSetToSparkRow();</span><br><span class="line">            List&lt;Row&gt; sparkRows = converter.resultSetToSparkRowList(rs);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 创建 schema</span></span><br><span class="line">            StructType schema = converter.createSchemaFromResultSet(rs.getMetaData());</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 在这一点上，你现在可以使用 sparkRows 列表和 schema 创建 Spark DataFrame</span></span><br><span class="line">            <span class="comment">// 例如: spark.createDataFrame(sparkRows, schema);</span></span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-3-Spark快捷转换方法"><a href="#2-3-Spark快捷转换方法" class="headerlink" title="2.3 Spark快捷转换方法"></a>2.3 Spark快捷转换方法</h4><p>Spark提供的DataFrameReader.jdbc()方法对上述转换步骤进行了封装，自动处理了ResultSet到Spark的Row对象的转换，同时根据数据查询结果自动推断出schema，无须我们再手动实现上述代码，可以直接从JDBC源读取数据的schema和dataframe。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcToDataFrameExample</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化 SparkSession</span></span><br><span class="line">        SparkSession spark = SparkSession.builder()</span><br><span class="line">                .appName(<span class="string">"JdbcToDataFrameExample"</span>)</span><br><span class="line">                .master(<span class="string">"local[*]"</span>) <span class="comment">// 这里使用本地模式运行，适合演示和测试</span></span><br><span class="line">                .getOrCreate();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// JDBC 连接参数</span></span><br><span class="line">        String jdbcUrl = <span class="string">"jdbc:mysql://localhost:3306/yourdatabase"</span>;</span><br><span class="line">        String tableName = <span class="string">"yourtable"</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 数据库认证信息</span></span><br><span class="line">        Properties connectionProperties = <span class="keyword">new</span> Properties();</span><br><span class="line">        connectionProperties.put(<span class="string">"user"</span>, <span class="string">"username"</span>);</span><br><span class="line">        connectionProperties.put(<span class="string">"password"</span>, <span class="string">"password"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用 DataFrameReader 读取 JDBC 数据源</span></span><br><span class="line">        Dataset&lt;Row&gt; dataframe = spark.read()</span><br><span class="line">                .jdbc(jdbcUrl, tableName, connectionProperties);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 打印 schema 信息</span></span><br><span class="line">        dataframe.printSchema();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 显示前 10 行数据</span></span><br><span class="line">        dataframe.show(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 停止 SparkSession</span></span><br><span class="line">        spark.stop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spark.read.load()方法本质同样也是借助DataFrameReader类进行自动处理，使用案例如下：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过标准维度枚举值的第一行获取最终结果的schema</span></span><br><span class="line"><span class="keyword">val</span> firstRow = dimensionListDF.first()</span><br><span class="line"><span class="keyword">val</span> firstDimensionValue = firstRow.get(firstRow.fieldIndex(dimensionName)).toString</span><br><span class="line"><span class="keyword">val</span> firstDimensionSql = ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">0</span>) + ckDatabase + <span class="string">"."</span> + ckTable +</span><br><span class="line">  ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">1</span>).</span><br><span class="line">    replaceFirst(<span class="string">"WHERE"</span>, <span class="string">" WHERE "</span> + dimensionName + <span class="string">" in ('"</span> + firstDimensionValue + <span class="string">"') AND"</span>)</span><br><span class="line">println(<span class="string">"用于获取最终结果schema查询sql如下："</span>)</span><br><span class="line">println(firstDimensionSql)</span><br><span class="line"><span class="keyword">var</span> firstDimensionResultDF = spark.read.jdbc(<span class="string">s"jdbc:clickhouse://<span class="subst">$ckHost</span>:<span class="subst">$ckPort</span>/<span class="subst">$ckDatabase</span>"</span>, <span class="string">s"(<span class="subst">$firstDimensionSql</span>) temp"</span>, connectionProperties)</span><br><span class="line"><span class="keyword">val</span> schema = firstDimensionResultDF.schema</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="3-手动将java-sql-ResultSet转化为spark-sql-DataFrame实战"><a href="#3-手动将java-sql-ResultSet转化为spark-sql-DataFrame实战" class="headerlink" title="3.手动将java.sql.ResultSet转化为spark.sql.DataFrame实战"></a>3.手动将java.sql.ResultSet转化为spark.sql.DataFrame实战</h3><p>在第一节背景下，在分布式场景中，直接使用Spark的DataFrameReader对ClickHouse预计算结果数据进行获取和处理会有超时和超内存问题，现在需要手动将分批分片执行结果转化为DataFrame，方便后续并发转换和写入其他引擎操作。</p>
+<p>1.首先还是借助DataFrameReader执行一行预计算数据获取到ResultSet的schema，后续多处都需要用到：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过标准维度枚举值的第一行获取最终结果的schema</span></span><br><span class="line"><span class="keyword">val</span> firstRow = dimensionListDF.first()</span><br><span class="line"><span class="keyword">val</span> firstDimensionValue = firstRow.get(firstRow.fieldIndex(dimensionName)).toString</span><br><span class="line"><span class="keyword">val</span> firstDimensionSql = ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">0</span>) + ckDatabase + <span class="string">"."</span> + ckTable +</span><br><span class="line">  ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">1</span>).</span><br><span class="line">    replaceFirst(<span class="string">"WHERE"</span>, <span class="string">" WHERE "</span> + dimensionName + <span class="string">" in ('"</span> + firstDimensionValue + <span class="string">"') AND"</span>)</span><br><span class="line">println(<span class="string">"用于获取最终结果schema查询sql如下："</span>)</span><br><span class="line">println(firstDimensionSql)</span><br><span class="line"><span class="keyword">var</span> firstDimensionResultDF = spark.read.jdbc(<span class="string">s"jdbc:clickhouse://<span class="subst">$ckHost</span>:<span class="subst">$ckPort</span>/<span class="subst">$ckDatabase</span>"</span>, <span class="string">s"(<span class="subst">$firstDimensionSql</span>) temp"</span>, connectionProperties)</span><br><span class="line"><span class="keyword">val</span> schema = firstDimensionResultDF.schema</span><br></pre></td></tr></table></figure>
+
+<p>2.在分布式partition内部将每行数据转化为Row对象并添加到ListBuffer[Row]对象中，最后将所有分区输出结果Iterator合并为一个数据集RDD：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//分布式获取最终结果</span></span><br><span class="line"><span class="keyword">val</span> resultRDD = dimensionListDF.rdd.mapPartitionsWithIndex(</span><br><span class="line">  (partitionKey,rows) =&gt; &#123;</span><br><span class="line">    <span class="keyword">var</span> key:<span class="type">Int</span> = partitionKey</span><br><span class="line">    <span class="keyword">val</span> hostAddress:<span class="type">String</span> = clusterInfoMap.get(partitionKey).map(_._1).getOrElse(<span class="string">""</span>)</span><br><span class="line">    <span class="keyword">val</span> port:<span class="type">Int</span> =clusterInfoMap.get(partitionKey).map(_._2).getOrElse(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> conn = clickhouseClient.getConnection(hostAddress, port, ckUser, ckPassword, ckDatabase)</span><br><span class="line">    <span class="keyword">val</span> statement = conn.createStatement()</span><br><span class="line">    <span class="comment">//批次条数计数器</span></span><br><span class="line">    <span class="keyword">var</span> counter = <span class="number">0</span></span><br><span class="line">    <span class="keyword">val</span> dimensionValueList = <span class="type">ListBuffer</span>[<span class="type">String</span>]()</span><br><span class="line">    <span class="keyword">val</span> resultRows = <span class="type">ListBuffer</span>[<span class="type">Row</span>]()</span><br><span class="line"></span><br><span class="line">    <span class="comment">//依次处理每条记录</span></span><br><span class="line">    <span class="keyword">for</span> (row &lt;- rows) &#123;</span><br><span class="line">      counter += <span class="number">1</span></span><br><span class="line">      dimensionValueList.append(row.get(row.fieldIndex(dimensionName)).toString)</span><br><span class="line">      <span class="keyword">if</span> (counter &gt;= ckFetchsize) &#123;</span><br><span class="line">        <span class="keyword">val</span> executeSql = ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">0</span>) + ckDatabase + <span class="string">"."</span> + ckTable +</span><br><span class="line">          ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">1</span>).</span><br><span class="line">            replaceFirst(<span class="string">"WHERE"</span>, <span class="string">" WHERE "</span> + dimensionName + <span class="string">" in ("</span> + dimensionValueList.map(<span class="string">"'"</span> + _ + <span class="string">"'"</span>).mkString(<span class="string">","</span>) + <span class="string">") AND"</span>)</span><br><span class="line">        println(executeSql)</span><br><span class="line">        <span class="keyword">val</span> resultSet = statement.executeQuery(executeSql)</span><br><span class="line">        <span class="keyword">while</span> (resultSet.next()) &#123;</span><br><span class="line">          <span class="keyword">val</span> rowData = (<span class="number">1</span> to schema.length).map(i =&gt; resultSet.getObject(i))</span><br><span class="line">          resultRows += <span class="keyword">new</span> <span class="type">GenericRowWithSchema</span>(rowData.toArray, schema)</span><br><span class="line">        &#125;</span><br><span class="line">        counter = <span class="number">0</span></span><br><span class="line">        dimensionValueList.clear()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (counter &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">val</span> executeSql = ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">0</span>) + ckDatabase + <span class="string">"."</span> + ckTable +</span><br><span class="line">        ckSql.split(ckDatabase + <span class="string">"."</span> + ckTable)(<span class="number">1</span>).</span><br><span class="line">          replaceFirst(<span class="string">"WHERE"</span>, <span class="string">" WHERE "</span> + dimensionName + <span class="string">" in ("</span> + dimensionValueList.map(<span class="string">"'"</span> + _ + <span class="string">"'"</span>).mkString(<span class="string">","</span>) + <span class="string">") AND"</span>)</span><br><span class="line">      println(executeSql)</span><br><span class="line">      <span class="keyword">val</span> resultSet = statement.executeQuery(executeSql)</span><br><span class="line">      <span class="keyword">while</span> (resultSet.next()) &#123;</span><br><span class="line">        <span class="keyword">val</span> rowData = (<span class="number">1</span> to schema.length).map(i =&gt; resultSet.getObject(i))</span><br><span class="line">        resultRows += <span class="keyword">new</span> <span class="type">GenericRowWithSchema</span>(rowData.toArray, schema)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    conn.close()</span><br><span class="line">    resultRows.toIterator</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+            <a href="/tags/Spark/" rel="tag"><i class="fa fa-tag"></i> Spark</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/27/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_HIVE%E7%9A%84mapjoin%E5%8E%9F%E7%90%86%E4%B8%8E%E5%A4%9C%E9%97%B4%E4%BB%BB%E5%8A%A1%E5%80%BE%E6%96%9C%E5%BF%AB%E9%80%9F%E5%A4%84%E7%90%86/" rel="next" title="数据开发之离线计算_HIVE的mapjoin原理与夜间任务倾斜快速处理">
+                <i class="fa fa-chevron-left"></i> 数据开发之离线计算_HIVE的mapjoin原理与夜间任务倾斜快速处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/29/ClickHouse2HBase%E7%BB%84%E4%BB%B6_JavaSql%E4%B8%AD%E7%9A%84PreparedStatement%E5%8E%9F%E7%90%86%E4%B8%8E%E5%BA%94%E7%94%A8%E5%AE%9E%E6%88%98/" rel="prev" title="ClickHouse2HBase组件_JavaSql中的PreparedStatement原理与应用实战">
+                ClickHouse2HBase组件_JavaSql中的PreparedStatement原理与应用实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClickHouse2HBase组件-JavaSqlResultSet转化为SparkSqlDataFrame"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse2HBase组件_JavaSqlResultSet转化为SparkSqlDataFrame</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-背景"><span class="nav-number">1.0.1.</span> <span class="nav-text">1.背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-java-sql-ResultSet转化为spark-sql-DataFrame解析"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.java.sql.ResultSet转化为spark.sql.DataFrame解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-从java-sql-ResultSet中获取查询结果schema"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">2.1 从java.sql.ResultSet中获取查询结果schema</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-手动转换步骤"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">2.2 手动转换步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-Spark快捷转换方法"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">2.3 Spark快捷转换方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-手动将java-sql-ResultSet转化为spark-sql-DataFrame实战"><span class="nav-number">1.0.3.</span> <span class="nav-text">3.手动将java.sql.ResultSet转化为spark.sql.DataFrame实战</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

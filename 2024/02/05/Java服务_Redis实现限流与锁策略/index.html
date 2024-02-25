@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_Redis实现限流与锁策略Redis实现分布式锁的7种方案常开发中，秒杀下单、抢红包等等业务场景，都需要用到分布式锁，而Redis非常适合作为分布式锁使用。 1.概要的说一下七种方法：  方案一：SETNX + EXPIRE。使用SETNX命令来抢占锁，如果成功，再使用EXPIRE命令给锁设置一个过期时间。这种方案的缺点是SETNX和EXPIRE不是原子操作，可能导致锁无法释放。 方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_Redis实现限流与锁策略">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_Redis实现限流与锁策略Redis实现分布式锁的7种方案常开发中，秒杀下单、抢红包等等业务场景，都需要用到分布式锁，而Redis非常适合作为分布式锁使用。 1.概要的说一下七种方法：  方案一：SETNX + EXPIRE。使用SETNX命令来抢占锁，如果成功，再使用EXPIRE命令给锁设置一个过期时间。这种方案的缺点是SETNX和EXPIRE不是原子操作，可能导致锁无法释放。 方">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/3.jpg">
+<meta property="article:published_time" content="2024-02-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:44:58.158Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/05/Java服务_Redis实现限流与锁策略/"/>
+
+
+
+
+
+  <title>Java服务_Redis实现限流与锁策略 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_Redis实现限流与锁策略</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-05T00:00:00+08:00">
+                2024-02-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-Redis实现限流与锁策略"><a href="#Java服务-Redis实现限流与锁策略" class="headerlink" title="Java服务_Redis实现限流与锁策略"></a>Java服务_Redis实现限流与锁策略</h1><h2 id="Redis实现分布式锁的7种方案"><a href="#Redis实现分布式锁的7种方案" class="headerlink" title="Redis实现分布式锁的7种方案"></a>Redis实现分布式锁的7种方案</h2><p>常开发中，秒杀下单、抢红包等等业务场景，都需要用到分布式锁，而Redis非常适合作为分布式锁使用。</p>
+<p><strong>1.概要的说一下七种方法：</strong></p>
+<ul>
+<li><strong>方案一：SETNX + EXPIRE</strong>。使用SETNX命令来抢占锁，如果成功，再使用EXPIRE命令给锁设置一个过期时间。这种方案的缺点是SETNX和EXPIRE不是原子操作，可能导致锁无法释放。</li>
+<li><strong>方案二：SETNX + value值是（系统时间+过期时间）</strong>。使用SETNX命令来抢占锁，如果失败，再获取锁的过期时间，如果已经过期，就用GETSET命令更新锁的过期时间。这种方案的缺点是需要客户端的时间同步，而且可能导致锁的过期时间被覆盖或者被其他客户端删除。</li>
+<li><strong>方案三：使用Lua脚本（包含SETNX + EXPIRE两条指令）</strong>。使用Lua脚本来保证SETNX和EXPIRE的原子性，如果抢占锁成功，就设置锁的过期时间。这种方案的优点是避免了方案一的问题，但是还是存在方案二的问题。</li>
+<li><strong>方案四：SET的扩展命令（SET EX PX NX）</strong>。使用SET命令的扩展参数来实现分布式锁，EX表示过期时间，PX表示毫秒单位，NX表示只有当键不存在时才设置值。这种方案的优点是简单高效，可以一条命令完成加锁和设置过期时间。</li>
+<li><strong>方案五：SET EX PX NX + 校验唯一随机值,再释放锁</strong>。在方案四的基础上，增加了一个唯一随机值作为锁的持有者标识，只有持有者才能释放锁。这种方案的优点是增加了安全性，避免了其他客户端误删或者覆盖锁。</li>
+<li><strong>方案六: 开源框架Redisson</strong>。Redisson是一个基于Redis的Java分布式对象和服务框架，提供了多种分布式锁的实现，如可重入锁、公平锁、读写锁等。这种方案的优点是功能丰富，易于使用和集成。</li>
+<li><strong>方案七：多机实现的分布式锁Redlock</strong>。Redlock是Redis作者提出的一种基于多个Redis节点实现分布式锁的算法，可以保证在任何时刻只有一个客户端持有锁，并且能够容忍一定数量的节点故障。这种方案的优点是高可用性和高可靠性。</li>
+</ul>
+<p><strong>2.什么是分布式锁</strong></p>
+<p>分布式锁就是，控制分布式系统不同进程共同访问共享资源的一种锁的实现。如果不同的系统或同一个系统的不同主机之间共享了某个临界资源，往往需要互斥来防止彼此干扰，以保证一致性。</p>
+<p>一把靠谱的分布式锁需要具备的特性：</p>
+<ul>
+<li><strong>「互斥性」</strong>: 任意时刻，只有一个客户端能持有锁。</li>
+<li><strong>「锁超时释放」</strong>：持有锁超时，可以释放，防止不必要的资源浪费，也可以防止死锁。</li>
+<li><strong>「可重入性」</strong>:一个线程如果获取了锁之后,可以再次对其请求加锁。</li>
+<li><strong>「高性能和高可用」</strong>：加锁和解锁需要开销尽可能低，同时也要保证高可用，避免分布式锁失效。</li>
+<li><strong>「安全性」</strong>：锁只能被持有的客户端删除，不能被其他客户端删除</li>
+</ul>
+<p><strong>方案一：SETNX + EXPIRE</strong></p>
+<p>SETNX 是SET IF NOT EXISTS的简写.日常命令格式是SETNX key value，如果 key不存在，则SETNX成功返回1，如果这个key已经存在了，则返回0。key可以设置为key_resource_id,value设置任意值，伪代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>（jedis.setnx(key_resource_id,lock_value) == <span class="number">1</span>）&#123; <span class="comment">//加锁</span></span><br><span class="line">    expire（key_resource_id，<span class="number">100</span>）; <span class="comment">//设置过期时间</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">do</span> something  <span class="comment">//业务请求</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>()&#123;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">finally</span> &#123;</span><br><span class="line">       jedis.del(key_resource_id); <span class="comment">//释放锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这个方案中，<code>setnx</code>和<code>expire</code>两个命令分开了，<strong>「不是原子操作」</strong>。如果执行完<code>setnx</code>加锁，正要执行<code>expire</code>设置过期时间时，进程crash或者要重启维护了，那么这个锁就“长生不老”了，<strong>「别的线程永远获取不到锁啦」</strong>。</p>
+<p><strong>锁方案二：SETNX + value值是(系统时间+过期时间)</strong></p>
+<p>为了解决方案一，<strong>「发生异常锁得不到释放的场景」</strong>，有小伙伴认为，可以把过期时间放到<code>setnx</code>的value值里面。如果加锁失败，再拿出value值校验一下即可。加锁代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> expires = System.currentTimeMillis() + expireTime; <span class="comment">//系统时间+设置的过期时间</span></span><br><span class="line">String expiresStr = String.valueOf(expires);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果当前锁不存在，返回加锁成功</span></span><br><span class="line"><span class="keyword">if</span> (jedis.setnx(key_resource_id, expiresStr) == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">// 如果锁已经存在，获取锁的过期时间</span></span><br><span class="line">String currentValueStr = jedis.get(key_resource_id);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果获取到的过期时间，小于系统当前时间，表示已经过期</span></span><br><span class="line"><span class="keyword">if</span> (currentValueStr != <span class="keyword">null</span> &amp;&amp; Long.parseLong(currentValueStr) &lt; System.currentTimeMillis()) &#123;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// 锁已过期，获取上一个锁的过期时间，并设置现在锁的过期时间（不了解redis的getSet命令的小伙伴，可以去官网看下哈）</span></span><br><span class="line">    String oldValueStr = jedis.getSet(key_resource_id, expiresStr);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (oldValueStr != <span class="keyword">null</span> &amp;&amp; oldValueStr.equals(currentValueStr)) &#123;</span><br><span class="line">         <span class="comment">// 考虑多线程并发的情况，只有一个线程的设置值和当前值相同，它才可以加锁</span></span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">        </span><br><span class="line"><span class="comment">//其他情况，均返回加锁失败</span></span><br><span class="line"><span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方案的优点是，巧妙移除<code>expire</code>单独设置过期时间的操作，把<strong>「过期时间放到setnx的value值」</strong>里面来。解决了方案一发生异常，锁得不到释放的问题。但是这个方案还有别的缺点：(1)过期时间是客户端自己生成的（System.currentTimeMillis()是当前系统的时间），必须要求分布式环境下，每个客户端的时间必须同步；(2)如果锁过期的时候，并发多个客户端同时请求过来，都执行jedis.getSet()，最终只能有一个客户端加锁成功，但是该客户端锁的过期时间，可能被别的客户端覆盖；(3)该锁没有保存持有者的唯一标识，可能被别的客户端释放/解锁。</p>
+<p><strong>方案三：使用Lua脚本(包含SETNX + EXPIRE两条指令)</strong></p>
+<p>实际上，我们还可以使用Lua脚本来保证原子性（包含setnx和expire两条指令），lua脚本如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> redis.call(<span class="string">'setnx'</span>,KEYS[<span class="number">1</span>],ARGV[<span class="number">1</span>]) == <span class="number">1</span> then</span><br><span class="line">   redis.call(<span class="string">'expire'</span>,KEYS[<span class="number">1</span>],ARGV[<span class="number">2</span>])</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">end;</span><br></pre></td></tr></table></figure>
+
+<p>加锁代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String lua_scripts = <span class="string">"if redis.call('setnx',KEYS[1],ARGV[1]) == 1 then"</span> +</span><br><span class="line">            <span class="string">" redis.call('expire',KEYS[1],ARGV[2]) return 1 else return 0 end"</span>;   </span><br><span class="line">Object result = jedis.eval(lua_scripts, Collections.singletonList(key_resource_id), Collections.singletonList(values));</span><br><span class="line"><span class="comment">//判断是否成功</span></span><br><span class="line"><span class="keyword">return</span> result.equals(<span class="number">1L</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>方案四：SET的扩展命令（SET EX PX NX）</strong></p>
+<p>除了使用，使用Lua脚本，保证<code>SETNX + EXPIRE</code>两条指令的原子性，我们还可以巧用Redis的SET指令扩展参数（<code>SET key value[EX seconds][PX milliseconds][NX|XX]</code>），它也是原子性的。</p>
+<p><code>SET key value[EX seconds][PX milliseconds][NX|XX]</code>，其参数含义分别为：</p>
+<p>EX seconds :设定key的过期时间，时间单位是秒；</p>
+<p>PX milliseconds: 设定key的过期时间，单位为毫秒；</p>
+<p>NX :表示key不存在的时候，才能set成功，也即保证只有第一个客户端请求才能获得锁，而其他客户端请求只能等其释放锁，才能获取；</p>
+<p>XX: 仅当key存在时设置值。</p>
+<p>伪代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>（jedis.set(key_resource_id, lock_value, <span class="string">"NX"</span>, <span class="string">"EX"</span>, <span class="number">100</span>s) == <span class="number">1</span>）&#123; <span class="comment">//加锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">do</span> something  <span class="comment">//业务处理</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>()&#123;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">finally</span> &#123;</span><br><span class="line">       jedis.del(key_resource_id); <span class="comment">//释放锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这个方案还是可能存在问题：</p>
+<p>问题一：<strong>「锁过期释放了，业务还没执行完」</strong>。假设线程a获取锁成功，一直在执行临界区的代码。但是100s过去后，它还没执行完。但是，这时候锁已经过期了，此时线程b又请求过来。显然线程b就可以获得锁成功，也开始执行临界区的代码。那么问题就来了，临界区的业务代码都不是严格串行执行的啦。</p>
+<p>问题二：<strong>「锁被别的线程误删」</strong>。假设线程a执行完后，去释放锁。但是它不知道当前的锁可能是线程b持有的（线程a去释放锁时，有可能过期时间已经到了，此时线程b进来占有了锁）。那线程a就把线程b的锁释放掉了，但是线程b临界区业务代码可能都还没执行完呢。</p>
+<p><strong>方案五：SET EX PX NX  + 校验唯一随机值,再删除</strong></p>
+<p>既然锁可能被别的线程误删，那我们给value值设置一个标记当前线程唯一的随机数，在删除的时候，校验一下。伪代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>（jedis.set(key_resource_id, uni_request_id, <span class="string">"NX"</span>, <span class="string">"EX"</span>, <span class="number">100</span>s) == <span class="number">1</span>）&#123; <span class="comment">//加锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">do</span> something  <span class="comment">//业务处理</span></span><br><span class="line">    &#125;<span class="keyword">catch</span>()&#123;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">finally</span> &#123;</span><br><span class="line">       <span class="comment">//判断是不是当前线程加的锁,是才释放</span></span><br><span class="line">       <span class="keyword">if</span> (uni_request_id.equals(jedis.get(key_resource_id))) &#123;</span><br><span class="line">        jedis.del(lockKey); <span class="comment">//释放锁</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这里，<strong>「判断是不是当前线程加的锁」</strong>和<strong>「释放锁」</strong>不是一个原子操作。如果调用jedis.del()释放锁的时候，可能这把锁已经不属于当前客户端，会解除他人加的锁。</p>
+<p>为了更严谨，一般也是用lua脚本代替。lua脚本如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> redis.call(<span class="string">'get'</span>,KEYS[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] then </span><br><span class="line">   <span class="keyword">return</span> redis.call(<span class="string">'del'</span>,KEYS[<span class="number">1</span>]) </span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">   <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">end;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><strong>方案六：Redisson框架</strong></p>
+<p>方案五还是可能存在<strong>「锁过期释放，业务没执行完」</strong>的问题。有些小伙伴认为，稍微把锁过期时间设置长一些就可以啦。其实我们设想一下，是否可以给获得锁的线程，开启一个定时守护线程，每隔一段时间检查锁是否还存在，存在则对锁的过期时间延长，防止锁过期提前释放。(也就是看门狗策略)</p>
+<p>当前开源框架Redisson解决了这个问题，Redisson底层原理图：</p>
+<p><img src="//littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/1.jpg" alt></p>
+<p>只要线程一加锁成功，就会启动一个<code>watch dog</code>看门狗，它是一个后台线程，会每隔10秒检查一下，如果线程1还持有锁，那么就会不断的延长锁key的生存时间。因此，Redisson就是使用Redisson解决了<strong>「锁过期释放，业务没执行完」</strong>问题。</p>
+<p><strong>方案七：多机实现的分布式锁Redlock+Redisson</strong></p>
+<p>前面六种方案都只是基于单机版Redis的讨论，还不是很完美，其实Redis一般都是集群部署的：</p>
+<p><img src="//littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/2.jpg" alt></p>
+<p>如果线程一在Redis的master节点上拿到了锁，但是加锁的key还没同步到slave节点，恰好这时，master节点发生故障，一个slave节点就会升级为master节点，线程二就可以获取同个key的锁啦，但线程一也已经拿到锁了，锁的安全性就没了。</p>
+<p>为了解决这个问题，Redis作者antirez提出一种高级的分布式锁算法：Redlock，其核心思想是这样的：搞多个Redis master部署，以保证它们不会同时宕掉，并且这些master节点是完全相互独立的，相互之间不存在数据同步，同时需要确保在这多个master实例上，是与在Redis单实例，使用相同方法来获取和释放锁。</p>
+<p><img src="//littleforestjia.github.io/2024/02/05/Java%E6%9C%8D%E5%8A%A1_Redis%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E4%B8%8E%E9%94%81%E7%AD%96%E7%95%A5/3.jpg" alt></p>
+<p>RedLock的实现步骤如下：</p>
+<ul>
+<li>获取当前时间，以毫秒为单位。</li>
+<li>按顺序向5个master节点请求加锁。客户端设置网络连接和响应超时时间，并且超时时间要小于锁的失效时间。（假设锁自动失效时间为10秒，则超时时间一般在5-50毫秒之间,我们就假设超时时间是50ms吧）。如果超时，跳过该master节点，尽快去尝试下一个master节点。</li>
+<li>客户端使用当前时间减去开始获取锁时间（即步骤1记录的时间），得到获取锁使用的时间。当且仅当超过一半（N/2+1，这里是5/2+1=3个节点）的Redis master节点都获得锁，并且使用的时间小于锁失效时间时，锁才算获取成功。（如上图，10s&gt; 30ms+40ms+50ms+4m0s+50ms）</li>
+<li>如果取到了锁，key的真正有效时间就变啦，需要减去获取锁所使用的时间。</li>
+<li>如果获取锁失败（没有在至少N/2+1个master实例取到锁，有或者获取锁时间已经超过了有效时间），客户端要在所有的master节点上解锁（即便有些master节点根本就没有加锁成功，也需要解锁，以防止有些漏网之鱼）。</li>
+</ul>
+<p><strong>选择哪种方案</strong></p>
+<p>主要根据以下几个因素来选择合适的方案：</p>
+<ul>
+<li><strong>性能和效率</strong>。如果你需要一个简单高效的分布式锁，可以选择方案四或者方案五，它们只需要一条命令就可以完成加锁和设置过期时间，而且可以避免锁无法释放的问题。</li>
+<li><strong>安全性和可靠性</strong>。如果你需要一个安全可靠的分布式锁，可以选择方案五或者方案七，它们可以保证锁只能被持有者释放，而且可以容忍一定数量的节点故障。</li>
+<li><strong>功能和易用性</strong>。如果你需要一个功能丰富易于使用的分布式锁，可以选择方案六，它提供了多种分布式锁的实现，如可重入锁、公平锁、读写锁等，而且可以方便地集成到Java项目中。</li>
+</ul>
+<p>当然，这些方案并不是完美的，它们可能存在一些潜在的问题或者局限性，你需要根据自己的业务需求和场景来权衡利弊，选择最适合你的方案。</p>
+<p><a href="https://www.cnblogs.com/shoshana-kong/p/17519673.html" target="_blank" rel="noopener">Redis实现分布式锁的7种方案</a></p>
+<h2 id="Redis实现限流"><a href="#Redis实现限流" class="headerlink" title="Redis实现限流"></a>Redis实现限流</h2><h3 id="三种Redis限流策略"><a href="#三种Redis限流策略" class="headerlink" title="三种Redis限流策略"></a>三种Redis限流策略</h3><p>Redis是一款高性能的key-value数据存储系统，越来越多的应用需要利用Redis实现限流功能，以避免应用遭受突发高流量而导致服务不可用等问题，常见的有三种策略：</p>
+<p><strong>1.计数器算法</strong></p>
+<p>计数器算法是Redis实现限流的常见手段，其核心思路是利用redis提供的key过期时间作为限流窗口期，key的值记录该窗口期内已经产生的访问资源次数，key本身记录限流的资源范围。当请求到来时，将统计单位时间内的请求数量与阈值进行比较，当达到阈值时就拒绝后续访问，从而起到限制流量的目的。具体实现方法如下：</p>
+<p>1.1 使用Redis的原子操作incr操作，实现计数器的自增。</p>
+<p>1.2 通过Redis对key设置过期时间，例如设置一分钟后过期。</p>
+<p>1.3 当计算器的值超过限制阈值时，拒绝访问，否则可以继续访问并执行incr操作。</p>
+<p>需要注意的是，由于计数器算法只记录请求数量，无法区分不同类型的请求，可能会存在被恶意用户绕过的可能性。因此，这种方法适用于单一请求的场景，如接口限流。</p>
+<p><strong>2.漏桶算法</strong></p>
+<p>漏桶算法也是一种流量控制算法，和计数器算法相比，漏桶算法会对请求进行一个统一的速率限制，而非单纯地限制访问量。</p>
+<p>具体实现方法如下：</p>
+<p>2.1 将漏桶看作一个固定大小的容器，以固定的速率漏出水。</p>
+<p>2.2 使用Redis的List数据类型，将每个请求按照时间顺序加入List中，即水流进入水桶的过程。</p>
+<p>2.3 使用Redis的过期机制，将List中已经达到一定时间的请求移出，即水从桶中漏出的过程。</p>
+<p>2.4 当请求加入List时，判断List的长度是否达到桶的最大限制，如果超过限制，就拒绝请求，否则可以正常处理。</p>
+<p>漏桶算法可用于应对各种请求，由于限制速率而非请求数量，不容易被恶意用户绕过，常用于对整个应用的限流控制。</p>
+<p><strong>3.令牌桶算法</strong></p>
+<p>令牌桶算法也属于流量控制算法，其主要思想为固定速率向令牌桶中添加令牌，一个请求需要获取令牌才能执行，当令牌桶中没有令牌时，请求将被拒绝。具体实现方法如下：</p>
+<p>3.1 使用Redis的List数据类型，将一定数量的令牌添加到List中，表示令牌桶的容量。</p>
+<p>3.2 使用Redis过期机制，每当有请求到来时，如果List中还有令牌，则可以正常处理请求，并从List中移除一个令牌，否则拒绝请求。</p>
+<p>3.3 当令牌生成速度过快或者请求到来速度过慢时，可能会出现令牌桶溢出的情况。因此，可使用Redis的有序集合数据类型，记录每次执行的时间和执行次数，用于在下一次添加令牌时，调整添加令牌的数量，以适应实际情况。</p>
+<p>令牌桶算法不仅能够限制并发数，而且可以控制请求速率，比较适合对底层资源进行保护，比如数据库连接池、磁盘IO等。</p>
+<h3 id="计数器算法限流实例"><a href="#计数器算法限流实例" class="headerlink" title="计数器算法限流实例"></a>计数器算法限流实例</h3><p><strong>具体实现方案如下:</strong></p>
+<ul>
+<li>首先规定资源限制范围，一般都是限制对某个接口的调用频率，因此key使用接口方法名即可；</li>
+<li>第一次访问资源时,key不存在，那么新创建一个key,并将值设置为1,最后设置key的过期时间,表示开启限流窗口期；</li>
+<li>每一次访问资源，会首先判断当前是否存在限流窗口期，如果存在，将访问次数加一，并判断是否达到最大资源访问次数限制；</li>
+<li>如果达到了，则抛出异常，告诉用户访问频繁，请稍后再试；</li>
+<li>如果没达到，则放行请求；</li>
+<li>在不是第一次访问资源的前提下，如果发现限流窗口期过了，那么重新开启一个。</li>
+</ul>
+<p><strong>1.准备工作</strong></p>
+<p>添加依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-pool2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>添加配置信息</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring</span>:<span class="string"></span></span><br><span class="line">  <span class="attr">redis</span>:<span class="string"></span></span><br><span class="line">    <span class="attr">host</span>: <span class="string">xxx</span></span><br><span class="line">    <span class="attr">port</span>: <span class="string">6379</span></span><br><span class="line">    <span class="attr">password</span>: <span class="string">xxx</span></span><br><span class="line">    <span class="attr">lettuce</span>:<span class="string"></span></span><br><span class="line"><span class="comment">      #只有自动配置连接池的依赖,连接池才会生效</span></span><br><span class="line">      <span class="attr">pool</span>:<span class="string"></span></span><br><span class="line">        <span class="meta">max-active</span>: <span class="string">8 #最大连接</span></span><br><span class="line">        <span class="meta">max-idle</span>: <span class="string">8 #最大空闲连接</span></span><br><span class="line">        <span class="meta">min-idle</span>: <span class="string">0 #最小空闲连接</span></span><br><span class="line">        <span class="meta">max-wait</span>: <span class="string">100 #连接等待时间</span></span><br></pre></td></tr></table></figure>
+
+<p>修改redisTemplate的序列化方式为JSON</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ConditionalOnMissingBean</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RedisTemplate&lt;String, Object&gt; <span class="title">redisTemplate</span><span class="params">(RedisConnectionFactory redisConnectionFactory)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//创建template</span></span><br><span class="line">    RedisTemplate&lt;String, Object&gt; redisTemplate = <span class="keyword">new</span> RedisTemplate&lt;&gt;();</span><br><span class="line">    <span class="comment">//设置连接工厂</span></span><br><span class="line">    redisTemplate.setConnectionFactory(redisConnectionFactory);</span><br><span class="line">    <span class="comment">//设置序列化工具</span></span><br><span class="line">    GenericJackson2JsonRedisSerializer jsonRedisSerializer = <span class="keyword">new</span> GenericJackson2JsonRedisSerializer();</span><br><span class="line">    <span class="comment">//key和hashKey采用String序列化</span></span><br><span class="line">    redisTemplate.setKeySerializer(RedisSerializer.string());</span><br><span class="line">    redisTemplate.setHashKeySerializer(RedisSerializer.string());</span><br><span class="line">    <span class="comment">//value和hashValue用JSON序列化</span></span><br><span class="line">    redisTemplate.setValueSerializer(jsonRedisSerializer);</span><br><span class="line">  	redisTemplate.setHashValueSerializer(jsonRedisSerializer);</span><br><span class="line">  	<span class="keyword">return</span> redisTemplate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>2.限流核心类实现</strong></p>
+<p>定义一个顶层的流量控制接口实现，pass方法返回true，表示方向请求，否则表示请求被拦截了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">RateLimiter</span> </span>&#123;</span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">      * <span class="doctag">@param</span> requestInfo 请求信息</span></span><br><span class="line"><span class="comment">      * <span class="doctag">@return</span> 当前请求是否允许通过</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">     <span class="function"><span class="keyword">boolean</span> <span class="title">pass</span><span class="params">(RequestInformation requestInfo)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>requestInfo提供当前请求的相关信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RequestInformation</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 限流key</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String key;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 限流时间</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> time;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * time时间内最大请求资源次数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> count;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 限流类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> limitType;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 请求的方法信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Method method;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 方法参数信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> Object[] arguments;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 客户端IP地址</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String ip;</span><br><span class="line">    <span class="keyword">private</span> HttpServletRequest httpServletRequest;</span><br><span class="line">    <span class="keyword">private</span> HttpServletResponse httpServletResponse;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RequestInformation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提供一个限流注解,该注解可以标注在方法或者类上，标注在类上，则表示当前类所有方法都需要流量控制：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD,ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Limiter &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 限流key--默认为rate_limit:业务名:类名.方法名 ,如果限制了IP类型,则为: rate_limit:业务名:ip:类名.方法名</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">String <span class="title">key</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 限流时间,单位为s</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">time</span><span class="params">()</span> <span class="keyword">default</span> 60</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> time时间内限制的资源请求次数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">count</span><span class="params">()</span> <span class="keyword">default</span> 100</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 限流类型</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">limitType</span><span class="params">()</span> <span class="keyword">default</span> LimitType.DEFAULT</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>redis作为限流器的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisRateLimiterImpl</span> <span class="keyword">implements</span> <span class="title">RateLimiter</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String RATE_LIMITER_KEY_PREFIX=<span class="string">"rate_limiter"</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 使用redis做限流处理使用的lua脚本</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span>  <span class="keyword">final</span> String LIMITER_LUA=</span><br><span class="line">            <span class="string">"local key = KEYS[1]\n"</span> +</span><br><span class="line">            <span class="string">"local count = tonumber(ARGV[1])\n"</span> +</span><br><span class="line">            <span class="string">"local time = tonumber(ARGV[2])\n"</span> +</span><br><span class="line">            <span class="string">"local current = redis.call('get', key)\n"</span> +</span><br><span class="line">            <span class="string">"if current and tonumber(current) &gt; count then\n"</span> +</span><br><span class="line">            <span class="string">"    return 1\n"</span> +</span><br><span class="line">            <span class="string">"end\n"</span> +</span><br><span class="line">            <span class="string">"current = redis.call('incr', key)\n"</span> +</span><br><span class="line">            <span class="string">"if tonumber(current) == 1 then\n"</span> +</span><br><span class="line">            <span class="string">"    redis.call('expire', key, time)\n"</span> +</span><br><span class="line">            <span class="string">"end\n"</span> +</span><br><span class="line">            <span class="string">"return 0\n"</span>;</span><br><span class="line">    <span class="keyword">private</span> RedisTemplate&lt;String, Object&gt; redisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RedisRateLimiterImpl</span><span class="params">(RedisTemplate&lt;String, Object&gt; redisTemplate)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.redisTemplate = redisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> requestInfo 请求信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 当前请求是否允许通过</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">pass</span><span class="params">(RequestInformation requestInfo)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//拿到限流key</span></span><br><span class="line">        String limiterKey=getRateLimiterKey(requestInfo);</span><br><span class="line">        <span class="comment">//执行lua脚本</span></span><br><span class="line">        Long limiterRes = redisTemplate.execute(RedisScript.of(LIMITER_LUA,Long<span class="class">.<span class="keyword">class</span>), <span class="title">List</span>.<span class="title">of</span>(<span class="title">limiterKey</span>), <span class="title">requestInfo</span>.<span class="title">getCount</span>(), <span class="title">requestInfo</span>.<span class="title">getTime</span>())</span>;</span><br><span class="line">        <span class="comment">//判断限流结果</span></span><br><span class="line">        <span class="keyword">return</span> limiterRes==<span class="number">0L</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getRateLimiterKey</span><span class="params">(RequestInformation requestInfo)</span> </span>&#123;</span><br><span class="line">         <span class="keyword">return</span> combineKey(RATE_LIMITER_KEY_PREFIX,</span><br><span class="line">                 requestInfo.getKey(),</span><br><span class="line">                 requestInfo.getIp(),</span><br><span class="line">                 requestInfo.getMethod().getClass().getName(),</span><br><span class="line">                 requestInfo.getMethod().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">combineKey</span><span class="params">(String ... keys)</span> </span>&#123;</span><br><span class="line">        StringBuilder keyBuilder=<span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; keys.length; i++) &#123;</span><br><span class="line">              <span class="keyword">if</span>(StringUtils.isEmpty(keys[i]))&#123;</span><br><span class="line">                  <span class="keyword">continue</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              keyBuilder.append(keys[i]);</span><br><span class="line">              <span class="keyword">if</span>(i==keys.length-<span class="number">1</span>)&#123;</span><br><span class="line">                  <span class="keyword">continue</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              keyBuilder.append(<span class="string">":"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> keyBuilder.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>lua脚本解释:</strong></p>
+<p>KEYS 和 ARGV 都是一会调用时候传进来的参数，tonumber 就是把字符串转为数字，redis.call 就是执行具体的 redis 指令，具体流程是这样：</p>
+<ul>
+<li>首先获取到传进来的 key 以及 限流的 count 和时间 time；</li>
+<li>通过 get 获取到这个 key 对应的值，这个值就是当前时间窗内这个接口可以访问多少次；</li>
+<li>如果是第一次访问，此时拿到的结果为 nil，否则拿到的结果应该是一个数字，所以接下来就判断，如果拿到的结果是一个数字，并且这个数字还大于 count，那就说明已经超过流量限制了，那么返回1表示请求拦截；</li>
+<li>如果拿到的结果为 nil，说明是第一次访问，此时就给当前 key 自增 1，然后设置一个过期时间；</li>
+<li>最后返回0表示请求放行。</li>
+</ul>
+<p>另外lua脚本也可以定义在文件在，然后通过加载文件获取：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> DefaultRedisScript&lt;Long&gt; <span class="title">limitScript</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DefaultRedisScript&lt;Long&gt; redisScript = <span class="keyword">new</span> DefaultRedisScript&lt;&gt;();</span><br><span class="line">    redisScript.setScriptSource(<span class="keyword">new</span> ResourceScriptSource(<span class="keyword">new</span> ClassPathResource(<span class="string">"lua/limit.lua"</span>)));</span><br><span class="line">    redisScript.setResultType(Long<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">return</span> redisScript;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>3.aop相关逻辑实现</strong></p>
+<p>我们需要将限流逻辑在需要流量管控的方法执行前先执行，因此需要拦截目标方法，有两个思路:</p>
+<ul>
+<li>通过@Aspect注解标注一个切面类，用@Before或者@Around注解标注在切面方法上，里面填写限流管控逻辑；</li>
+<li>手动编写一个advisor增强器，注入容器，并提供相关拦截器和pointcut实现。</li>
+</ul>
+<p><strong>手动编写advisor方式的实现具体步骤如下:</strong></p>
+<p>编写拦截器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RateLimiterMethodInterceptor</span> <span class="keyword">implements</span> <span class="title">MethodInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> RateLimiter rateLimiter;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RateLimiterMethodInterceptor</span><span class="params">(RateLimiter rateLimiter)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rateLimiter=rateLimiter;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(MethodInvocation invocation)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            RequestInformation requestInformation = <span class="keyword">new</span> RequestInformation();</span><br><span class="line">            buildMethodInfo(requestInformation,invocation);</span><br><span class="line">            buildLimitInfo(requestInformation);</span><br><span class="line">            buildRequestInfo(requestInformation);</span><br><span class="line">            <span class="keyword">if</span> (rateLimiter.pass(requestInformation))&#123;</span><br><span class="line">                <span class="keyword">return</span> invocation.proceed();</span><br><span class="line">            &#125;</span><br><span class="line">            logWarn(requestInformation);</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">           <span class="keyword">throw</span> e;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RateLimiterException(<span class="string">"访问过于频繁,请稍后再试!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">logWarn</span><span class="params">(RequestInformation requestInformation)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(requestInformation.getHttpServletRequest()!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            log.warn(<span class="string">"rateLimiter拦截了一个请求,该请求信息如下: URI: &#123;&#125; ,IP: &#123;&#125; ,方法名: &#123;&#125; ,方法参数信息: &#123;&#125; "</span>,</span><br><span class="line">                    requestInformation.getHttpServletRequest().getRequestURI(),requestInformation.getIp(),requestInformation.getMethod().getName(),</span><br><span class="line">                    Arrays.toString(requestInformation.getArguments()));</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            log.warn(<span class="string">"rateLimiter拦截了一个请求,该请求信息如下: 方法名: &#123;&#125; ,方法参数信息: &#123;&#125; "</span>,</span><br><span class="line">                    requestInformation.getMethod().getName(), Arrays.toString(requestInformation.getArguments()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">buildLimitInfo</span><span class="params">(RequestInformation requestInformation)</span> <span class="keyword">throws</span> RateLimiterException </span>&#123;</span><br><span class="line">        Method method = requestInformation.getMethod();</span><br><span class="line">        Limiter limiter;</span><br><span class="line">        <span class="keyword">if</span>(method.isAnnotationPresent(Limiter<span class="class">.<span class="keyword">class</span>))</span>&#123;</span><br><span class="line">            limiter = method.getAnnotation(Limiter<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            limiter=method.getClass().getAnnotation(Limiter<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(limiter==<span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RateLimiterException(<span class="string">"无法在当前方法"</span>+method.getName()+<span class="string">"或者类"</span>+method.getClass().getName()+<span class="string">"上寻找到@Limiter注解"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        requestInformation.setKey(limiter.key());</span><br><span class="line">        requestInformation.setCount(limiter.count());</span><br><span class="line">        requestInformation.setTime(limiter.time());</span><br><span class="line">        requestInformation.setLimitType(limiter.limitType());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">buildMethodInfo</span><span class="params">(RequestInformation requestInformation, MethodInvocation invocation)</span> </span>&#123;</span><br><span class="line">        requestInformation.setMethod(invocation.getMethod());</span><br><span class="line">        <span class="keyword">if</span>(invocation <span class="keyword">instanceof</span> ReflectiveMethodInvocation)&#123;</span><br><span class="line">            ReflectiveMethodInvocation reflectiveMethodInvocation = (ReflectiveMethodInvocation) invocation;</span><br><span class="line">            requestInformation.setArguments(reflectiveMethodInvocation.getArguments());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 从线程上下文中取出请求和响应相关信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">buildRequestInfo</span><span class="params">(RequestInformation requestInformation)</span> </span>&#123;</span><br><span class="line">        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();</span><br><span class="line">        <span class="keyword">if</span>(requestAttributes <span class="keyword">instanceof</span> ServletRequestAttributes)&#123;</span><br><span class="line">            ServletRequestAttributes sra = (ServletRequestAttributes) requestAttributes;</span><br><span class="line">            requestInformation.setHttpServletRequest(sra.getRequest());</span><br><span class="line">            requestInformation.setHttpServletResponse(sra.getResponse());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(requestInformation.getHttpServletRequest()!=<span class="keyword">null</span> &amp;&amp; requestInformation.getLimitType()==LimitType.IP)&#123;</span><br><span class="line">            requestInformation.setIp(IPUtils.getIpAddress(requestInformation.getHttpServletRequest()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编写advisor增强器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RateLimiterAutoConfiguration</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RateLimiterAdvisor <span class="title">rateLimiterAdvisor</span><span class="params">(RateLimiter rateLimiter)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> RateLimiterAdvisor(rateLimiter);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConditionalOnMissingBean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RateLimiter <span class="title">rateLimiter</span><span class="params">(RedisTemplate&lt;String, Object&gt; redisTemplate)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> RedisRateLimiterImpl(redisTemplate);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>采用@Aspect注解切面的实现代码如下：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RateLimiterAspect</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(RateLimiterAspect<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedisTemplate&lt;Object, Object&gt; redisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RedisScript&lt;Long&gt; limitScript;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span>(<span class="string">"@annotation(rateLimiter)"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doBefore</span><span class="params">(JoinPoint point, RateLimiter rateLimiter)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        String key = rateLimiter.key();</span><br><span class="line">        <span class="keyword">int</span> time = rateLimiter.time();</span><br><span class="line">        <span class="keyword">int</span> count = rateLimiter.count();</span><br><span class="line"></span><br><span class="line">        String combineKey = getCombineKey(rateLimiter, point);</span><br><span class="line">        List&lt;Object&gt; keys = Collections.singletonList(combineKey);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Long number = redisTemplate.execute(limitScript, keys, count, time);</span><br><span class="line">            <span class="keyword">if</span> (number==<span class="keyword">null</span> || number.intValue() &gt; count) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ServiceException(<span class="string">"访问过于频繁，请稍候再试"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            log.info(<span class="string">"限制请求'&#123;&#125;',当前请求'&#123;&#125;',缓存key'&#123;&#125;'"</span>, count, number.intValue(), key);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ServiceException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"服务器限流异常，请稍候再试"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getCombineKey</span><span class="params">(RateLimiter rateLimiter, JoinPoint point)</span> </span>&#123;</span><br><span class="line">        StringBuffer stringBuffer = <span class="keyword">new</span> StringBuffer(rateLimiter.key());</span><br><span class="line">        <span class="keyword">if</span> (rateLimiter.limitType() == LimitType.IP) &#123;</span><br><span class="line">            stringBuffer.append(IpUtils.getIpAddr(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest())).append(<span class="string">"-"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        MethodSignature signature = (MethodSignature) point.getSignature();</span><br><span class="line">        Method method = signature.getMethod();</span><br><span class="line">        Class&lt;?&gt; targetClass = method.getDeclaringClass();</span><br><span class="line">        stringBuffer.append(targetClass.getName()).append(<span class="string">"-"</span>).append(method.getName());</span><br><span class="line">        <span class="keyword">return</span> stringBuffer.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><a href="https://blog.csdn.net/m0_53157173/article/details/128900913" target="_blank" rel="noopener">利用Redis实现限流</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"><i class="fa fa-tag"></i> Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/04/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_Python%E5%92%8CShell%E8%84%9A%E6%9C%AC%E4%B8%AD%E6%89%A7%E8%A1%8CCMD%E5%91%BD%E4%BB%A4/" rel="next" title="京东商智_Python和Shell脚本中执行CMD命令">
+                <i class="fa fa-chevron-left"></i> 京东商智_Python和Shell脚本中执行CMD命令
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/06/Java%E6%9C%8D%E5%8A%A1_SpringAOP&Filter&Interceptor%E6%AF%94%E8%BE%83%E4%B8%8E%E5%AE%9E%E6%88%98/" rel="prev" title="Java服务_SpringAOP&Filter&Interceptor比较与实战">
+                Java服务_SpringAOP&Filter&Interceptor比较与实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-Redis实现限流与锁策略"><span class="nav-number">1.</span> <span class="nav-text">Java服务_Redis实现限流与锁策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis实现分布式锁的7种方案"><span class="nav-number">1.1.</span> <span class="nav-text">Redis实现分布式锁的7种方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis实现限流"><span class="nav-number">1.2.</span> <span class="nav-text">Redis实现限流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三种Redis限流策略"><span class="nav-number">1.2.1.</span> <span class="nav-text">三种Redis限流策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计数器算法限流实例"><span class="nav-number">1.2.2.</span> <span class="nav-text">计数器算法限流实例</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

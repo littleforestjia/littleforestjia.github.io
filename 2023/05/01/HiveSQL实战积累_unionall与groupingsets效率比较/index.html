@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="HiveSQL," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="HiveSQL实战积累_unionall与groupingsets效率比较1.SQL实例groupingsets实例： 1234567891011SELECT	shop_id AS shop_id,	COALESCE(chan_cd, 999999) AS chan_cd,	COALESCE(stat_ct, 999999) AS stat_ct,	SUM(cust_qty) AS cust_qt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HiveSQL实战积累_unionall与groupingsets效率比较">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2023/05/01/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_unionall%E4%B8%8Egroupingsets%E6%95%88%E7%8E%87%E6%AF%94%E8%BE%83/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="HiveSQL实战积累_unionall与groupingsets效率比较1.SQL实例groupingsets实例： 1234567891011SELECT	shop_id AS shop_id,	COALESCE(chan_cd, 999999) AS chan_cd,	COALESCE(stat_ct, 999999) AS stat_ct,	SUM(cust_qty) AS cust_qt">
+<meta property="article:published_time" content="2023-04-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:00:44.679Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="HiveSQL">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2023/05/01/HiveSQL实战积累_unionall与groupingsets效率比较/"/>
+
+
+
+
+
+  <title>HiveSQL实战积累_unionall与groupingsets效率比较 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2023/05/01/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_unionall%E4%B8%8Egroupingsets%E6%95%88%E7%8E%87%E6%AF%94%E8%BE%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HiveSQL实战积累_unionall与groupingsets效率比较</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-05-01T00:00:00+08:00">
+                2023-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">HiveSQL实战积累</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="HiveSQL实战积累-unionall与groupingsets效率比较"><a href="#HiveSQL实战积累-unionall与groupingsets效率比较" class="headerlink" title="HiveSQL实战积累_unionall与groupingsets效率比较"></a>HiveSQL实战积累_unionall与groupingsets效率比较</h2><h3 id="1-SQL实例"><a href="#1-SQL实例" class="headerlink" title="1.SQL实例"></a>1.SQL实例</h3><p>groupingsets实例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	shop_id <span class="keyword">AS</span> shop_id,</span><br><span class="line">	<span class="keyword">COALESCE</span>(chan_cd, <span class="number">999999</span>) <span class="keyword">AS</span> chan_cd,</span><br><span class="line">	<span class="keyword">COALESCE</span>(stat_ct, <span class="number">999999</span>) <span class="keyword">AS</span> stat_ct,</span><br><span class="line">	<span class="keyword">SUM</span>(cust_qty) <span class="keyword">AS</span> cust_qty</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app.app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	shop_id,</span><br><span class="line">	chan_cd,</span><br><span class="line">	stat_ct <span class="keyword">grouping</span> <span class="keyword">sets</span>((shop_id, chan_cd, stat_ct),(shop_id, chan_cd),(shop_id));</span><br></pre></td></tr></table></figure>
+
+<p>groupingsets执行计划：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Explain</span></span><br><span class="line">STAGE DEPENDENCIES:</span><br><span class="line">  Stage<span class="number">-1</span> <span class="keyword">is</span> a root stage</span><br><span class="line">  Stage<span class="number">-0</span> depends <span class="keyword">on</span> stages: Stage<span class="number">-1</span></span><br><span class="line"></span><br><span class="line">STAGE PLANS:</span><br><span class="line">  Stage: Stage<span class="number">-1</span></span><br><span class="line">    <span class="keyword">Map</span> Reduce</span><br><span class="line">      <span class="keyword">Map</span> <span class="keyword">Operator</span> Tree:</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">alias</span>: app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">              expressions: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), chan_cd (<span class="keyword">type</span>: <span class="built_in">int</span>), stat_ct (<span class="keyword">type</span>: <span class="built_in">bigint</span>), cust_qty (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">              outputColumnNames: shop_id, chan_cd, stat_ct, cust_qty</span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">                aggregations: <span class="keyword">sum</span>(cust_qty)</span><br><span class="line">                <span class="keyword">keys</span>: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), chan_cd (<span class="keyword">type</span>: <span class="built_in">int</span>), stat_ct (<span class="keyword">type</span>: <span class="built_in">bigint</span>), <span class="string">'0'</span> (<span class="keyword">type</span>: <span class="keyword">string</span>)</span><br><span class="line">                <span class="keyword">mode</span>: <span class="keyword">hash</span></span><br><span class="line">                outputColumnNames: _col0, _col1, _col2, _col3, _col4</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                Reduce <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  <span class="keyword">key</span> expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col3 (<span class="keyword">type</span>: <span class="keyword">string</span>)</span><br><span class="line">                  <span class="keyword">sort</span> <span class="keyword">order</span>: ++++</span><br><span class="line">                  <span class="keyword">Map</span>-reduce <span class="keyword">partition</span> <span class="keyword">columns</span>: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col3 (<span class="keyword">type</span>: <span class="keyword">string</span>)</span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">value</span> expressions: _col4 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">      Reduce <span class="keyword">Operator</span> Tree:</span><br><span class="line">        <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">          aggregations: <span class="keyword">sum</span>(VALUE._col0)</span><br><span class="line">          <span class="keyword">keys</span>: KEY._col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), KEY._col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), KEY._col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), KEY._col3 (<span class="keyword">type</span>: <span class="keyword">string</span>)</span><br><span class="line">          <span class="keyword">mode</span>: mergepartial</span><br><span class="line">          outputColumnNames: _col0, _col1, _col2, _col4</span><br><span class="line">          <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">          pruneGroupingSetId: <span class="literal">true</span></span><br><span class="line">          <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">            expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), <span class="keyword">COALESCE</span>(_col1,<span class="number">999999</span>) (<span class="keyword">type</span>: <span class="built_in">int</span>), <span class="keyword">COALESCE</span>(_col2,<span class="number">999999</span>) (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col4 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">            outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">              compressed: <span class="literal">false</span></span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">table</span>:</span><br><span class="line">                  <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.TextInputFormat</span><br><span class="line">                  <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat</span><br><span class="line">                  serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe</span><br><span class="line"></span><br><span class="line">  Stage: Stage<span class="number">-0</span></span><br><span class="line">    <span class="keyword">Fetch</span> <span class="keyword">Operator</span></span><br><span class="line">      <span class="keyword">limit</span>: <span class="number">-1</span></span><br><span class="line">      Processor Tree:</span><br><span class="line">        ListSink</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>unionall实例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	shop_id,</span><br><span class="line">	<span class="number">999999</span> <span class="keyword">AS</span> chan_cd,</span><br><span class="line">	<span class="number">999999</span> <span class="keyword">AS</span> stat_ct,</span><br><span class="line">	<span class="keyword">SUM</span>(cust_qty) <span class="keyword">AS</span> cust_qty</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app.app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	shop_id</span><br><span class="line"></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	shop_id,</span><br><span class="line">	chan_cd,</span><br><span class="line">	<span class="number">999999</span> <span class="keyword">AS</span> stat_ct,</span><br><span class="line">	<span class="keyword">SUM</span>(cust_qty) <span class="keyword">AS</span> cust_qty</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app.app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	shop_id,</span><br><span class="line">	chan_cd</span><br><span class="line"></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	shop_id,</span><br><span class="line">	chan_cd,</span><br><span class="line">	stat_ct,</span><br><span class="line">	<span class="keyword">SUM</span>(cust_qty) <span class="keyword">AS</span> cust_qty</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	app.app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	shop_id,</span><br><span class="line">	chan_cd,</span><br><span class="line">	stat_ct</span><br></pre></td></tr></table></figure>
+
+<p>unionall执行计划：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Explain</span></span><br><span class="line">STAGE DEPENDENCIES:</span><br><span class="line">  Stage<span class="number">-1</span> <span class="keyword">is</span> a root stage</span><br><span class="line">  Stage<span class="number">-2</span> depends <span class="keyword">on</span> stages: Stage<span class="number">-1</span>, Stage<span class="number">-3</span>, Stage<span class="number">-4</span></span><br><span class="line">  Stage<span class="number">-3</span> <span class="keyword">is</span> a root stage</span><br><span class="line">  Stage<span class="number">-4</span> <span class="keyword">is</span> a root stage</span><br><span class="line">  Stage<span class="number">-0</span> depends <span class="keyword">on</span> stages: Stage<span class="number">-2</span></span><br><span class="line"></span><br><span class="line">STAGE PLANS:</span><br><span class="line">  Stage: Stage<span class="number">-1</span></span><br><span class="line">    <span class="keyword">Map</span> Reduce</span><br><span class="line">      <span class="keyword">Map</span> <span class="keyword">Operator</span> Tree:</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">alias</span>: app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">              expressions: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), cust_qty (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">              outputColumnNames: shop_id, cust_qty</span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">                aggregations: <span class="keyword">sum</span>(cust_qty)</span><br><span class="line">                <span class="keyword">keys</span>: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                <span class="keyword">mode</span>: <span class="keyword">hash</span></span><br><span class="line">                outputColumnNames: _col0, _col1</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                Reduce <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  <span class="keyword">key</span> expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                  <span class="keyword">sort</span> <span class="keyword">order</span>: +</span><br><span class="line">                  <span class="keyword">Map</span>-reduce <span class="keyword">partition</span> <span class="keyword">columns</span>: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">value</span> expressions: _col1 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">      Reduce <span class="keyword">Operator</span> Tree:</span><br><span class="line">        <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">          aggregations: <span class="keyword">sum</span>(VALUE._col0)</span><br><span class="line">          <span class="keyword">keys</span>: KEY._col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">          <span class="keyword">mode</span>: mergepartial</span><br><span class="line">          outputColumnNames: _col0, _col1</span><br><span class="line">          <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">          <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">            expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), <span class="number">999999</span> (<span class="keyword">type</span>: <span class="built_in">int</span>), <span class="number">999999</span> (<span class="keyword">type</span>: <span class="built_in">int</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">            outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">              compressed: <span class="literal">false</span></span><br><span class="line">              <span class="keyword">table</span>:</span><br><span class="line">                  <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.SequenceFileInputFormat</span><br><span class="line">                  <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat</span><br><span class="line">                  serde: org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe</span><br><span class="line"></span><br><span class="line">  Stage: Stage<span class="number">-2</span></span><br><span class="line">    <span class="keyword">Map</span> Reduce</span><br><span class="line">      <span class="keyword">Map</span> <span class="keyword">Operator</span> Tree:</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">Union</span></span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">                expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col3 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  compressed: <span class="literal">false</span></span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">table</span>:</span><br><span class="line">                      <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.TextInputFormat</span><br><span class="line">                      <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat</span><br><span class="line">                      serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">Union</span></span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">                expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col3 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  compressed: <span class="literal">false</span></span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">table</span>:</span><br><span class="line">                      <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.TextInputFormat</span><br><span class="line">                      <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat</span><br><span class="line">                      serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">Union</span></span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">                expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col3 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  compressed: <span class="literal">false</span></span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">3</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">table</span>:</span><br><span class="line">                      <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.TextInputFormat</span><br><span class="line">                      <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat</span><br><span class="line">                      serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe</span><br><span class="line"></span><br><span class="line">  Stage: Stage<span class="number">-3</span></span><br><span class="line">    <span class="keyword">Map</span> Reduce</span><br><span class="line">      <span class="keyword">Map</span> <span class="keyword">Operator</span> Tree:</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">alias</span>: app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">              expressions: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), chan_cd (<span class="keyword">type</span>: <span class="built_in">int</span>), cust_qty (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">              outputColumnNames: shop_id, chan_cd, cust_qty</span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">                aggregations: <span class="keyword">sum</span>(cust_qty)</span><br><span class="line">                <span class="keyword">keys</span>: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), chan_cd (<span class="keyword">type</span>: <span class="built_in">int</span>)</span><br><span class="line">                <span class="keyword">mode</span>: <span class="keyword">hash</span></span><br><span class="line">                outputColumnNames: _col0, _col1, _col2</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                Reduce <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  <span class="keyword">key</span> expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>)</span><br><span class="line">                  <span class="keyword">sort</span> <span class="keyword">order</span>: ++</span><br><span class="line">                  <span class="keyword">Map</span>-reduce <span class="keyword">partition</span> <span class="keyword">columns</span>: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>)</span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">value</span> expressions: _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">      Reduce <span class="keyword">Operator</span> Tree:</span><br><span class="line">        <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">          aggregations: <span class="keyword">sum</span>(VALUE._col0)</span><br><span class="line">          <span class="keyword">keys</span>: KEY._col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), KEY._col1 (<span class="keyword">type</span>: <span class="built_in">int</span>)</span><br><span class="line">          <span class="keyword">mode</span>: mergepartial</span><br><span class="line">          outputColumnNames: _col0, _col1, _col2</span><br><span class="line">          <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">          <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">            expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), <span class="number">999999</span> (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">            outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">              compressed: <span class="literal">false</span></span><br><span class="line">              <span class="keyword">table</span>:</span><br><span class="line">                  <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.SequenceFileInputFormat</span><br><span class="line">                  <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat</span><br><span class="line">                  serde: org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe</span><br><span class="line"></span><br><span class="line">  Stage: Stage<span class="number">-4</span></span><br><span class="line">    <span class="keyword">Map</span> Reduce</span><br><span class="line">      <span class="keyword">Map</span> <span class="keyword">Operator</span> Tree:</span><br><span class="line">          TableScan</span><br><span class="line">            <span class="keyword">alias</span>: app_zs_z0404_shop_all_chan_cust_feature_analysis_test</span><br><span class="line">            <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">            <span class="keyword">Select</span> <span class="keyword">Operator</span></span><br><span class="line">              expressions: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), chan_cd (<span class="keyword">type</span>: <span class="built_in">int</span>), stat_ct (<span class="keyword">type</span>: <span class="built_in">bigint</span>), cust_qty (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">              outputColumnNames: shop_id, chan_cd, stat_ct, cust_qty</span><br><span class="line">              <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">              <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">                aggregations: <span class="keyword">sum</span>(cust_qty)</span><br><span class="line">                <span class="keyword">keys</span>: shop_id (<span class="keyword">type</span>: <span class="built_in">bigint</span>), chan_cd (<span class="keyword">type</span>: <span class="built_in">int</span>), stat_ct (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                <span class="keyword">mode</span>: <span class="keyword">hash</span></span><br><span class="line">                outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">                <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                Reduce <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">                  <span class="keyword">key</span> expressions: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                  <span class="keyword">sort</span> <span class="keyword">order</span>: +++</span><br><span class="line">                  <span class="keyword">Map</span>-reduce <span class="keyword">partition</span> <span class="keyword">columns</span>: _col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), _col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), _col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">                  <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">                  <span class="keyword">value</span> expressions: _col3 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">      Reduce <span class="keyword">Operator</span> Tree:</span><br><span class="line">        <span class="keyword">Group</span> <span class="keyword">By</span> <span class="keyword">Operator</span></span><br><span class="line">          aggregations: <span class="keyword">sum</span>(VALUE._col0)</span><br><span class="line">          <span class="keyword">keys</span>: KEY._col0 (<span class="keyword">type</span>: <span class="built_in">bigint</span>), KEY._col1 (<span class="keyword">type</span>: <span class="built_in">int</span>), KEY._col2 (<span class="keyword">type</span>: <span class="built_in">bigint</span>)</span><br><span class="line">          <span class="keyword">mode</span>: mergepartial</span><br><span class="line">          outputColumnNames: _col0, _col1, _col2, _col3</span><br><span class="line">          <span class="keyword">Statistics</span>: <span class="keyword">Num</span> <span class="keyword">rows</span>: <span class="number">1</span> <span class="keyword">Data</span> <span class="keyword">size</span>: <span class="number">0</span> Basic stats: <span class="keyword">PARTIAL</span> <span class="keyword">Column</span> stats: <span class="keyword">NONE</span></span><br><span class="line">          <span class="keyword">File</span> <span class="keyword">Output</span> <span class="keyword">Operator</span></span><br><span class="line">            compressed: <span class="literal">false</span></span><br><span class="line">            <span class="keyword">table</span>:</span><br><span class="line">                <span class="keyword">input</span> <span class="keyword">format</span>: org.apache.hadoop.mapred.SequenceFileInputFormat</span><br><span class="line">                <span class="keyword">output</span> <span class="keyword">format</span>: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat</span><br><span class="line">                serde: org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe</span><br><span class="line"></span><br><span class="line">  Stage: Stage<span class="number">-0</span></span><br><span class="line">    <span class="keyword">Fetch</span> <span class="keyword">Operator</span></span><br><span class="line">      <span class="keyword">limit</span>: <span class="number">-1</span></span><br><span class="line">      Processor Tree:</span><br><span class="line">        ListSink</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="2-比较结论"><a href="#2-比较结论" class="headerlink" title="2.比较结论"></a>2.比较结论</h3><p><strong>从执行计划中不太看得出执行效率高低，可以看出groupingsets是在一个MR中完成的，不确定不同的groupingId是并行执行的还是串行执行的，但是可以看出unionall中不同的groupby组合是并发执行的。</strong></p>
+<p><strong>根据前辈的口口相传经验，unionall比groupingsets的并行度更高，效率更高。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HiveSQL/" rel="tag"><i class="fa fa-tag"></i> HiveSQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/01/04/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_groupingsets%E5%8A%A0lvlcode%E5%AE%9E%E7%8E%B0%E5%BF%AB%E9%80%9F%E5%A4%9A%E7%BB%B4%E5%BA%A6%E9%A2%84%E8%81%9A%E5%90%88%E4%B8%8E%E5%85%B3%E8%81%94/" rel="next" title="HiveSQL实战积累_groupingsets加lvlcode实现快速多维度预聚合与关联">
+                <i class="fa fa-chevron-left"></i> HiveSQL实战积累_groupingsets加lvlcode实现快速多维度预聚合与关联
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2023/05/12/HiveSQL%E5%AE%9E%E6%88%98%E7%A7%AF%E7%B4%AF_hiveUDF%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8/" rel="prev" title="HiveSQL实战积累_hiveUDF原理与使用">
+                HiveSQL实战积累_hiveUDF原理与使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HiveSQL实战积累-unionall与groupingsets效率比较"><span class="nav-number">1.</span> <span class="nav-text">HiveSQL实战积累_unionall与groupingsets效率比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-SQL实例"><span class="nav-number">1.1.</span> <span class="nav-text">1.SQL实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-比较结论"><span class="nav-number">1.2.</span> <span class="nav-text">2.比较结论</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

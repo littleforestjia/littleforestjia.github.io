@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Java,Filebeat,Logstash,Elasticsearch,Grafana," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_ELK日志采集与可视化链路建设实战经验一、分布式链路追踪的前世今生1.起源1.1 服务化框架 –&gt; 微服务架构的演进产生新事物的原因一定是新事物的优越性和旧事物的缺陷两方面导致。传统的服务架构已经无法处理「服务的用户量逐渐增加、大规模高并发请求」的问题。 微服务架构（分布式系统）： 微服务架构并不是为了拆分而拆分，拆分微服务的目的是通过对微服务进行水平扩展解决传统的单体应用在业">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_ELK日志采集与可视化链路建设实战经验">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_ELK日志采集与可视化链路建设实战经验一、分布式链路追踪的前世今生1.起源1.1 服务化框架 –&gt; 微服务架构的演进产生新事物的原因一定是新事物的优越性和旧事物的缺陷两方面导致。传统的服务架构已经无法处理「服务的用户量逐渐增加、大规模高并发请求」的问题。 微服务架构（分布式系统）： 微服务架构并不是为了拆分而拆分，拆分微服务的目的是通过对微服务进行水平扩展解决传统的单体应用在业">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/3.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/4.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/5.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/6.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/7.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/8.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/9.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/10.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/12.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/13.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/14.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/15.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/16.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/17.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/18.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/19.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/20.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/21.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/22.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/23.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/24.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/25.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/26.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/27.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/28.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/29.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/30.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/31.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/32.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/33.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/34.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/35.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/36.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/37.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/38.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/39.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/40.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/41.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/42.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/43.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/44.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/45.jpg">
+<meta property="article:published_time" content="2024-01-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:39:45.548Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Filebeat">
+<meta property="article:tag" content="Logstash">
+<meta property="article:tag" content="Elasticsearch">
+<meta property="article:tag" content="Grafana">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/11/Java服务_ELK日志采集与可视化链路建设实战经验/"/>
+
+
+
+
+
+  <title>Java服务_ELK日志采集与可视化链路建设实战经验 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_ELK日志采集与可视化链路建设实战经验</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-11T00:00:00+08:00">
+                2024-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-ELK日志采集与可视化链路建设实战经验"><a href="#Java服务-ELK日志采集与可视化链路建设实战经验" class="headerlink" title="Java服务_ELK日志采集与可视化链路建设实战经验"></a>Java服务_ELK日志采集与可视化链路建设实战经验</h1><h2 id="一、分布式链路追踪的前世今生"><a href="#一、分布式链路追踪的前世今生" class="headerlink" title="一、分布式链路追踪的前世今生"></a>一、分布式链路追踪的前世今生</h2><h3 id="1-起源"><a href="#1-起源" class="headerlink" title="1.起源"></a>1.起源</h3><h4 id="1-1-服务化框架-–-gt-微服务架构的演进"><a href="#1-1-服务化框架-–-gt-微服务架构的演进" class="headerlink" title="1.1 服务化框架 –&gt; 微服务架构的演进"></a>1.1 服务化框架 –&gt; 微服务架构的演进</h4><p>产生新事物的原因一定是新事物的优越性和旧事物的缺陷两方面导致。传统的服务架构已经无法处理「服务的用户量逐渐增加、大规模高并发请求」的问题。</p>
+<p><strong>微服务架构（分布式系统）：</strong></p>
+<p>微服务架构并不是为了拆分而拆分，拆分微服务的目的是通过对微服务进行水平扩展解决传统的单体应用在业务急剧增长时遇到的问题，</p>
+<p>而且由于拆分的微服务系统中专业的人做专业的事，人员和项目的职责单一、低耦合、高内聚，所以产生问题的概率就会降到最小。</p>
+<h4 id="1-2-微服务架构与传统单体框架的对比示意"><a href="#1-2-微服务架构与传统单体框架的对比示意" class="headerlink" title="1.2 微服务架构与传统单体框架的对比示意"></a>1.2 微服务架构与传统单体框架的对比示意</h4><p><strong>微服务的架构图示例：</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/1.jpg" alt></p>
+<p>从图中可以看出 :</p>
+<ul>
+<li>微服务把每一个职责单一的功能放在一个独立的服务中。</li>
+<li>每个服务运行在一个单独的进程中。</li>
+<li>每个服务有多个实例在运行，每个实例可以运行在容器化的平台内，达到平滑伸缩的效果。</li>
+<li>每个服务都有自己的储存。</li>
+<li>每个服务都有自己的运营平台，每个服务都高度自治，内部的变化对外透明。</li>
+<li>每个服务都可根据性能需求独立地进行水平伸缩。</li>
+</ul>
+<p><strong>传统单体架构的伸缩架构</strong>：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/2.jpg" alt></p>
+<p>对比微服务架构与传统单体架构，传统单体架构特点：</p>
+<ul>
+<li>传统单体架构将所有模块化组件混合后运行在同一个JVM进程中。</li>
+<li>可对包含多个模块化组件的整体JVM进程进行水平扩展，而无法对某个模块化组件进行水平化扩展。</li>
+<li>某个模块化组件发生变化时，需要所有的模块化组件进行编译、打包和上线。</li>
+<li>久而久之，模块间的依赖将会不清晰，相互耦合、相互依赖成为家常便饭。</li>
+</ul>
+<h4 id="1-3-分布式系统与微服务的优势"><a href="#1-3-分布式系统与微服务的优势" class="headerlink" title="1.3 分布式系统与微服务的优势"></a>1.3 分布式系统与微服务的优势</h4><ul>
+<li><strong>扩展性：</strong> 分布式系统天然具备“按需扩展”的能力，比如双11大促前通过添加机器实现快速水平扩容，大促结束后释放机器，充分利用云计算的分时复用能力，节约成本。利用微服务，还可以实现按需精准扩容，比如登录服务扩容10倍，下单服务扩容3倍，最大化的节省资源。</li>
+<li><strong>可靠性：</strong> 分布式系统可以有效抵抗“单点风险”，不会因为某一个节点的故障，影响整体的服务可用性。结合流量调度、离群实例摘除和弹性扩容等技术，甚至可以实现故障自愈。</li>
+<li><strong>可维护性：</strong> 分布式系统的可维护性更强，一方面我们将一个复杂服务拆分成多个简单的微服务，每一个微服务的逻辑都更加清晰、更易理解。就好比我们写代码，将一个几百行的复杂函数重构成若干个简单函数，代码可读性就会直线上升。另一方面，一些通用的微服务可以被高度复用，无需重复开发和维护，比如你在开发一个电商 APP，可以直接调用第三方提供的支付、物流等服务接口，整体开发和维护效率将大幅提升。</li>
+</ul>
+<h4 id="1-4-分布式系统与微服务引入的问题"><a href="#1-4-分布式系统与微服务引入的问题" class="headerlink" title="1.4 分布式系统与微服务引入的问题"></a>1.4 分布式系统与微服务引入的问题</h4><ul>
+<li><strong>模糊性：</strong> 随着系统的分布式程度越来越高，异常表象与根因之间的逻辑联系变得愈加模糊，问题诊断的难度急剧上升。比如A、B两个服务共享同一个数据库实例，当A服务在压测期间，大量占用数据库的服务端连接和计算资源，会导致B服务出现连接超时或响应变慢等问题。如果B服务是通过C服务间接依赖该数据库实例，问题的定位就会变得更加困难。</li>
+<li><strong>不一致：</strong> 虽然分布式应用从总体上变的更加可靠，但是每一个独立节点的状态却难以保证。导致这种不一致的原因有很多，比如前文提到的单机故障这种预期外的不一致，或者应用Owner执行分批发布或流量灰度时导致的预期内行为不一致。这种不一致性导致我们难以确定一个用户请求在系统内的准确执行路径与行为逻辑，可能引发不可预知的逻辑灾难。</li>
+<li><strong>去中心化：</strong> 当你的系统拥有上千个微服务镜像运行在数百台机器实例上，你该如何梳理它们之间的依赖关系，又该如何找到核心业务的关键执行路径？特别是在分布式的场景下，你没有一个中心化的节点（Master）来保存每个服务之间的依赖与调度状态，每个独立节点都在自行其是，无法分辨自己在整个系统中的位置，只能“盲人摸象、管中窥豹”，缺乏全局视图。</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/3.jpg" alt></p>
+<h3 id="2-诞生"><a href="#2-诞生" class="headerlink" title="2.诞生"></a>2.诞生</h3><p><strong>为了应对分布式环境下的不一致、模糊性等问题，人们试图通过请求粒度的轨迹追踪与数据透传，实现节点间的确定性关联，分布式链路追踪技术也由此诞生。</strong></p>
+<h4 id="2-1-里程碑事件：Google-Dapper"><a href="#2-1-里程碑事件：Google-Dapper" class="headerlink" title="2.1 里程碑事件：Google Dapper"></a>2.1 里程碑事件：Google Dapper</h4><p>分布式链路追踪诞生的标志性事件就是 Google Dapper 论文的发表。2010年4月，Benjamin H. Sigelman 等人在 Google Technical Report 上发表了《Dapper, a Large-Scale Distributed Systems Tracing Infrastructure》，揭开了分布式链路追踪的技术大幕，开启了一段全新的技术浪潮。</p>
+<p>Dapper 首先明确了分布式链路追踪的两个目标：任意部署和持续监测。进而给出了三个具体的设计准则：</p>
+<ul>
+<li><strong>低开销：</strong> 确保核心系统不会因为额外的性能开销拒绝使用。</li>
+<li><strong>应用级透明：</strong> 对应用开发透明，无需开发人员的协助，降低接入门槛，提高迭代效率。</li>
+<li><strong>可扩展：</strong> 在未来相当长一段时间内，随着业务的高速发展，仍然可以有效运转。</li>
+</ul>
+<p>下面几张图展示了 Dapper 对链路透传、调用链结构和数据采集流程的描述，对 Dapper 感兴趣的同学建议直接阅读原作。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/4.jpg" alt></p>
+<p>Dapper 论文有两个重要的意义，</p>
+<ol>
+<li>详细阐述了分布式链路追踪的设计理念，为后来的实现者提供了重要的理论指导；</li>
+<li>通过 Dapper 在 Google 生产环境的大规模落地实践，证明了分布式链路追踪技术的企业级价值，为分布式链路追踪的推广作出了不可磨灭的贡献。</li>
+</ol>
+<h4 id="2-2-基本原理"><a href="#2-2-基本原理" class="headerlink" title="2.2 基本原理"></a>2.2 基本原理</h4><p>分布式链路追踪并不是无中生有、凭空诞生的新概念，而是轨迹追踪在 IT 领域的又一次成功运用。轨迹追踪的理念早已被广泛应用于社会生活的方方面面，比如物流订单追踪。</p>
+<p>一个快递包裹会在发件站点被赋予一个快递单号，沿途的中转节点会记录该快递到达的时间等信息，而用户通过快递单号就可以查询自己的包裹途径了哪些站点，耗时多久，是否存在滞留或丢件的情况。</p>
+<p>下表对比了物流追踪与链路追踪的关联与差异性。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/5.jpg" alt></p>
+<p><strong>分布式链路追踪的基本原理就是在分布式应用的接口方法上设置一些观察点（类似快递中转站记录点），然后在入口节点给每个请求分配一个全局唯一的标识 TraceId（类似快递单号），当请求流经这些观察点时就会记录一行对应的链路日志（包含链路唯一标识，接口名称，时间戳，主机信息等）。最后通过 TraceId 将一次请求的所有链路日志进行组装，就可以还原出该次请求的链路轨迹</strong>，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/6.jpg" alt></p>
+<p>分布式链路追踪实现请求回溯的关键点有两个：</p>
+<ol>
+<li>一是低成本、高质量的观察点设置，也就是链路插桩，确保我们追踪的信息足够丰富，能够快速定位异常根因；</li>
+<li>二是保证链路上下文在不同环境下都能够完整透传，避免出现上下文丢失导致的断链现象。</li>
+</ol>
+<p>下面，我们来看一个高速公路的例子，进一步加深对链路追踪实现原理的认识。</p>
+<p><strong>一辆汽车飞驰在高速公路上</strong></p>
+<p>小明、小红、小玉计划在“五一”期间去自驾游，他们的旅游路线各不相同。如果我们想追踪他们的行程轨迹与时间该如何实现？</p>
+<p>可能你会建议在每辆车上安装一个追踪器，确实，这是一种行之有效的方法。但是，当出行车辆扩展到全国数以十亿计的规模，安装追踪器的成本就会很高。此时，让我们换个角度思考一下，高速公路的路线是固定的，每隔一段距离就会有一个收费站，如果我们在每个收费站上安装监控，记录车辆在每个收费站的轨迹与时间，就可以很经济的实现车辆轨迹与行驶时间的追踪。最终，我们得到了如下所示的行程记录：</p>
+<table>
+<thead>
+<tr>
+<th>游客</th>
+<th>行程路线</th>
+<th>行驶距离</th>
+<th>行驶时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>小明</td>
+<td>北京 -&gt; 石家庄 -&gt; 郑州 -&gt; 西安</td>
+<td>1140 公里</td>
+<td>13 小时 34 分钟</td>
+</tr>
+<tr>
+<td>小红</td>
+<td>北京 -&gt; 天津 -&gt; 济南 -&gt; 南京 -&gt; 杭州</td>
+<td>1280 公里</td>
+<td>14 小时 33 分钟</td>
+</tr>
+<tr>
+<td>小玉</td>
+<td>北京 -&gt; 天津 -&gt; 济南 -&gt; 南京 -&gt; 上海</td>
+<td>1234 公里</td>
+<td>13 小时 53 分钟</td>
+</tr>
+</tbody></table>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/7.jpg" alt></p>
+<p>如果我们将每个游客替换为服务请求，收费站替换为服务接口，那我们就可以得到每次请求在分布式系统中的调用轨迹与状态，这就是分布式链路追踪的含义。</p>
+<h3 id="3-基础术语"><a href="#3-基础术语" class="headerlink" title="3.基础术语"></a>3.基础术语</h3><p>虽然分布式链路追踪的实现方式多种多样，不同开源或商业化产品都有自己的数据模型和定义。但是仍然有一些基础术语在业界具备广泛的共识，以 OpenTracing 为例。</p>
+<h4 id="3-1-Trace"><a href="#3-1-Trace" class="headerlink" title="3.1 Trace"></a>3.1 Trace</h4><p>一条 Trace 代表一次入口请求在 IT 系统内的完整调用轨迹及其关联数据集合。其中，全局唯一的链路标识TraceId，是最具代表的一个属性。</p>
+<p>通过 TraceId 我们才能将同一个请求分散在不同节点的链路数据准确的关联起来，实现请求粒度的“确定性关联”价值。这也是 Trace 区别于 Metrics、Log 其他两类可观测技术的关键属性。</p>
+<h4 id="3-2-Span"><a href="#3-2-Span" class="headerlink" title="3.2 Span"></a>3.2 Span</h4><p>光有 TraceId 还不够，请求在每一跳的接口方法上执行了什么动作，耗时多久，执行状态是成功还是失败？承载这些信息的基础对象就是 Span。通常一个完整的 Span 具有如下属性：</p>
+<ul>
+<li>Operation Name：描述了当前接口的行为语义，比如 /api/createOrder 代表执行了一次创建订单的动作。</li>
+<li>SpanId/ParentSpanId：接口调用的层级标识，用于还原 Trace 内部的层次调用关系。</li>
+<li>Start/FinishTime：接口调用的开始和结束时间，二者相减就是该次调用的耗时。</li>
+<li>StatusCode：响应状态，标识当次调用是成功或失败。</li>
+<li>Tags &amp; Events：调用附加信息，详见下面的描述。</li>
+</ul>
+<h4 id="3-3-Tags"><a href="#3-3-Tags" class="headerlink" title="3.3 Tags"></a>3.3 Tags</h4><p>SpanName 的描述通常是高度抽象的，仅仅回答这个接口是做什么的。如果需要进一步记录请求的行为特征，可以使用 Tags 来扩展语义。Tags 是一组由 {Key:Value} 组成的键值对集合，描述这一次接口调用的具体属性，比如将 UserType 添加到 Tags 中，就可以观察某一类用户（比如 VIP 用户）的链路行为状态。如果将设备类型加到 Tags 中，可以对比不同设备的性能差异。</p>
+<p>由于 Tags 只支持结构化的 KV 键值对，因此，它可以作为标签添加到聚合后的链路指标中，有效提升监控告警的数据精度。更准确的回答异常或性能问题发生的原因，比如集中在某个地域、设备或版本。</p>
+<h4 id="3-4-Logs"><a href="#3-4-Logs" class="headerlink" title="3.4 Logs"></a>3.4 Logs</h4><p>Tags 会随着链路上下文自动向下游透传，如果希望记录一些不需要透传的事件信息，可以使用 Logs 字段。每个 Span 都可以进行多次 Logs 操作，但每个 Logs 对象都需要带有一个时间戳，Logs 的内容可以是非结构化的复杂对象。</p>
+<p>为了节省成本，一般不会对 Logs 字段建立索引，也不支持 Logs 的查询或统计，仅仅作为附加信息关联在调用链上，用于单请求诊断。</p>
+<p>下图展示了一个 OpenTracing 的 Span 示例，不同开源实现的链路模型我们将在后续章节再展开介绍。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/8.jpg" alt></p>
+<h3 id="4-分布式链路追踪的应用"><a href="#4-分布式链路追踪的应用" class="headerlink" title="4.分布式链路追踪的应用"></a>4.分布式链路追踪的应用</h3><p>狭义上的分布式链路追踪（Tracing），是指跟踪请求在分布式系统中的流转路径与状态，主要用途是协助开发运维人员进行故障诊断、容量预估、性能瓶颈分析与调用链路梳理等工作。技术实现上包含了数据埋点、采集、存储、分析、可视化等环节，形成了一套完整的技术体系。</p>
+<p>而更广义的分布式链路追踪，则涵盖了由数据透传能力衍生的生态系统，比如全链路压测、微服务流量路由、业务场景链路拆分等。我们可以为调用链路赋予业务语义，也可以将一次调用生命周期内的所有数据进行关联整合，不再局限于链路数据本身。</p>
+<p>由此可见，分布式链路追踪的应用场景广阔，潜力巨大，它的核心属性就是“关联”。然而，分布式链路追踪（Tracing）相对于统计指标（Metrics）和应用日志（Logging）来说更加难以理解，不容易运用，更难用好。接下来，我们通过一个生动形象的例子，了解下分布式链路追踪的经典用法，加深对它的技术本质的掌握。</p>
+<p><strong>游客、收费站和交通局</strong></p>
+<p>分布式链路追踪的用法有很多，但是最经典、最常用的有三种，还是以上一节的高速公路为例，不同角色对应着不同的用法。</p>
+<ul>
+<li>游客，只关心自身的行程路线，需要途经哪些收费站点？行驶时间有多长？沿途是否有拥堵或危险路段等。</li>
+<li>收费站，只关心自身站点的状态，比如站点吞吐量、平均过闸时间等，以便于提前安排检票口值班人数。</li>
+<li>交通局，会将所有的出行记录汇总，提前估算整个高速公路网的出行流量、易拥堵路段、事故多发路段等，以便于提前疏通或加固问题路段，并给出合理的建议出行路线，有时还需要提前制定车辆限流策略等。</li>
+</ul>
+<p>分布式链路追踪的应用和行程轨迹追踪类似，游客关心的是单次请求的轨迹回溯，收费站关注的是服务接口维度的汇总统计，旅游局则类似全局链路拓扑梳理。</p>
+<h4 id="4-1-单请求轨迹回溯"><a href="#4-1-单请求轨迹回溯" class="headerlink" title="4.1 单请求轨迹回溯"></a>4.1 单请求轨迹回溯</h4><p>单请求轨迹回溯是分布式链路追踪最基础的功能，它记录了一次请求经过的所有服务节点以及对应的节点状态信息（接口名称、耗时、状态码等），这就好比记录了游客自驾游时经过的所有收费站，以及沿途的路况与行驶时间等信息。单请求轨迹回溯是诊断特定请求异常/超时原因的有效手段，可以快速定位异常节点（拥堵的收费站）。</p>
+<p>比较成熟的 Tracing 产品（比如阿里云的 <a href="https://help.aliyun.com/document_detail/64995.html" target="_blank" rel="noopener">ARMS</a>）除了基础的链路数据外，还会记录请求出入参、本地方法栈、关联 SQL 与异常堆栈等信息。这些细节信息就好比车辆的型号大小、驾驶员驾龄、是否醉酒、沿途每一路段的详细路况等，当调用不符合预期（行程异常）时，就可以精准的定位根因，如下图所示:</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/9.jpg" alt></p>
+<h4 id="4-2-服务监控"><a href="#4-2-服务监控" class="headerlink" title="4.2 服务监控"></a>4.2 服务监控</h4><p>假如你是收费站的站长，你会关注哪些信息？收费站的车辆吞吐量？平均的过闸时间？车辆的来源与去向？同理，每一个服务节点，将途经的所有调用信息汇总后，就可以得到当前服务接口的吞吐量、耗时、来源与去向等统计指标。这些指标可以帮助我们快速识别当前服务的健康状态。在实际生产系统中，还可以与告警系统结合，实现风险的快速识别与处理，降低业务损失。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/10.jpg" alt></p>
+<h4 id="4-3-链路拓扑"><a href="#4-3-链路拓扑" class="headerlink" title="4.3 链路拓扑"></a>4.3 链路拓扑</h4><p>假如你是交通局的局长，你可能会关注全国高速公路网的整体运行状态，有哪些易拥堵或事故多发路段与站点，如何确保春运高峰期核心路段运行通畅，不会出现重大交通瘫痪事件等等。此时，你需要对所有的车辆行程轨迹进行汇总分析。</p>
+<p>同理，链路拓扑就是将全局或某一入口服务的所有调用链路进行汇总，聚合为链路拓扑大图，进而分析当前链路的性能瓶颈点、易故障点等，提前进行性能优化或风险防控，还可以根据历史流量来指导未来（比如双11大促）的容量评估。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/12.jpg" alt></p>
+<h3 id="5-分布式链路追踪的发展现状"><a href="#5-分布式链路追踪的发展现状" class="headerlink" title="5.分布式链路追踪的发展现状"></a>5.分布式链路追踪的发展现状</h3><p>截止到 2021年，分布式链路追踪（Tracing）已经成为主流软件架构不可或缺的基础技术之一，它与指标（Metrics）、日志（Logging）并称为可观测领域的“三驾马车”，它们三者之间的关系如下图所示：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/13.jpg" alt>随着 Kubenetes 容器技术与云计算的普及，未来的软件架构会更加趋向分布式云、微服务化的方向，软件开发、部署成本将大幅下降，但是系统维护和问题诊断的难度却急剧上升。因此，分布式链路追踪以及由它提供的“确定性关联”价值将愈加凸显，如下图所示：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/14.jpg" alt></p>
+<p>Tracing 在开源社区也颇受喜爱，拥有着旺盛的生命力，主流的开源标准包括 OpenTelemetry、OpenTracing、OpenCensus 和国内使用较多的 SkyWalking。其他影响力较强的实现还包括 Jaeger、Zipkin、Pinpoint等，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/15.jpg" alt></p>
+<p>在商业化领域，Tracing 与 APM（Application Performance Mornitoring） 密切绑定，绝大部分厂商会面向应用视角提供更加全面、易用的 APM 服务，而不仅仅是 Tracing 服务。参考 2021 年 Gartner 评测机构给出的 APM 魔力象限，可以大致评估各大厂商的 APM 与 Tracing 产品能力，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/16.jpg" alt>截止 2021年，阿里巴巴 98% 的 Java 应用（上万级别）均已接入内部自研的分布式链路追踪系统 EagleEye；阿里云上有近万家企业在持续使用 ARMS 提供的分布式链路追踪服务。而从整个业界来看，无论是谷歌、亚马逊这样的国际大厂，还是新兴的互联网公司，或是传统企业，都在大规模接入和应用分布式链路追踪技术，Tracing 生态正在蓬勃发展。</p>
+<h3 id="6-分布式链路追踪的挑战与限制"><a href="#6-分布式链路追踪的挑战与限制" class="headerlink" title="6.分布式链路追踪的挑战与限制"></a>6.分布式链路追踪的挑战与限制</h3><p>作为一门新兴技术，分布式链路追踪的技术演进史并不算长，仅有十数年。目前，它仍处于不断被探索、快速迭代的周期。为了更好的了解与应用分布式链路追踪技术，我们来看下它目前面临的几项关键挑战与限制。</p>
+<h4 id="6-1-关键挑战与应对"><a href="#6-1-关键挑战与应对" class="headerlink" title="6.1 关键挑战与应对"></a>6.1 关键挑战与应对</h4><p>分布式链路追踪技术从诞生到大规模应用，中间经历了一段较长的蛰伏期，直到近几年才逐渐被大家广泛接受和认可。影响其快速推广的关键挑战包括如下几点：</p>
+<ul>
+<li><strong>前期建设成本高：</strong> 无论是在不同组件接口上进行插桩埋点，还是保证链路上下文能够正确传播，亦或是搭建一套稳定可靠的链路数据后端处理系统，都不是一件易事，需要投入大量的研发人力。</li>
+<li><strong>数据处理成本高：</strong> 由于链路数据与请求流量成正比，每一次请求都会记录相应的链路日志，当系统流量爆炸式增长，相应的链路数据生成、采集、处理、存储、查询的成本也会急剧上升，带来巨大的 IT 资源开销。</li>
+<li><strong>价值没有得到普遍认可：</strong> 基础的链路数据仅仅表达了接口间的调用依赖，没有释放足够的业务价值，难以得到领导和同事们的全力支持。</li>
+<li><strong>链路标准不统一：</strong> 分布式链路追踪发展前期没有统一的业界标准，各家厂商百花齐放，虽然一定程度上促进 Tracing 技术的多元化探索，但也为链路融合、迁移和推广带来了巨大的挑战。</li>
+</ul>
+<p>当然，挑战同样也是机遇，为了应对上述问题，分布式链路追踪近几年实现了如下技术突破：</p>
+<ul>
+<li><strong>无侵入探针 + 一体化解决方案：</strong> 类似 JavaAgent 的探针插桩技术，实现了0代码入侵，0改造成本的链路自动埋点，而类似 SkyWalking 的开源实现还提供了端到端的一体化解决方案，从链路数据生成到最后的可视化，中小企业可以快速搭建并享受到分布式链路追踪技术的价值，大幅降低了 Tracing 的前期建设成本和接入门槛。</li>
+<li><strong>链路采样 + 边缘计算：</strong> 链路采样策略，例如固定比例采样、限流采样、错慢全采、自定义标签采样等，可以大幅降低链路数据的传输、处理、存储成本；结合用户网络内的指标聚合，长文本编码/压缩等边缘计算技术，可以合理控制分布式链路追踪的数据成本，保障链路系统持续健康运转。</li>
+<li><strong>关联分析 + 立体化可观测：</strong> 单条链路的价值难以凸显，但是基于成千上万条链路的聚合/关联分析却能快速定位，导致系统异常的关键因素，比如版本、地域、用户类型等。同时，结合业务、容器、基础设施等其他层面的可观测数据，建立一套端到端、立体化的可观测体系，能够更加有效地释放分布式链路追踪的技术价值。</li>
+<li><strong>开源标准趋向统一：</strong> 自从 2019 年 OpenTelemetry 开源立项，得到了两大主流开源实现 OpenTracing 和 OpenCensus 的大力支持，开启了可观测性的新时代。虽然，目前 OpenTelemetry 仅在 Tracing 领域拥有比较完善的技术标准，Metrics 和 Logging 仍在探索阶段，但是可观测性“三驾马车”融合一统的趋势已经势不可挡。未来基于统一完善的可观测数据标准，分布式链路追踪的“确定性关联”将得到更加广泛的应用。</li>
+</ul>
+<h4 id="6-2-现阶段能力限制"><a href="#6-2-现阶段能力限制" class="headerlink" title="6.2 现阶段能力限制"></a>6.2 现阶段能力限制</h4><p>分布式链路追踪现有的模型设计与实现，可以有效满足许多经典场景的分布式诊断诉求。但是，仍然有大量场景超出了现阶段分布式链路追踪的能力范畴，需要我们去探索更好的方案。</p>
+<h5 id="树形-YES！图形-NO！"><a href="#树形-YES！图形-NO！" class="headerlink" title="树形 YES！图形 NO！"></a>树形 YES！图形 NO！</h5><p>分布式链路追踪是通过 ParentSpanId 和 SpanId 来标识依赖关系，从而准确还原链路层级与顺序。但是，每个 Span 有且仅有一个 ParentSpanId，这就限制了所有链路形态只能是单个父节点的树形结构，而不能是多个父节点的图形结构。</p>
+<p>某些系统为了提供重复调用的效率，会将多次 RPC 调用打包成一次 RPC 调用合并发送，这种入度大于1的图形结构，就无法通过调用链真实还原调用状态，而是会被拆成多条调用链，如下图所示：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/17.jpg" alt></p>
+<h5 id="人工插桩-YES！智能插桩-NO！"><a href="#人工插桩-YES！智能插桩-NO！" class="headerlink" title="人工插桩 YES！智能插桩 NO！"></a>人工插桩 YES！智能插桩 NO！</h5><p>无论是 SDK 或是 Agent 模式，目前工业界的链路插桩主要是依赖人工发现插桩点并实现插桩过程，很难通过算法自适应的实现插桩点的智能发现。然而，学术界在这方面已经进行了一些有意思的探索，虽然在性能开销、安全等方面还不够成熟，但是值得关注。</p>
+<p>2019 年波士顿大学发表了一篇研究智能插桩的文章，他们实现的 Pythia 原型系统针对性能退化问题，可以自动发现更有价值的内部插桩点。例如，我们在请求一个存储系统时，可能会直接命中缓存快速返回结果，也可能未命中缓存导致加载磁盘花费了较多时间。我们仅在 RPC 层面进行插桩，只能看到请求耗时高低起伏，呈现一种双峰式的分布，但无法确认根因是什么。Pythia 通过比对分析不同的链路数据，会自动发现影响性能的潜在插桩点，比如慢请求可能会额外调用一次 fetchFromDisk 方法，从而更清晰的解释影响请求耗时的根因，如下图所示。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/18.jpg" alt></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/19.jpg" alt></p>
+<p>分布式链路追踪的能力限制远不止以上两种场景，在离线分析、机器学习等多个领域也等待我们去探索攻克。我们既要充分发挥现有的分布式链路追踪技术价值，解决当下的企业运维困难；同时也要把视野放宽，在未来更多的领域中去拓展分布式链路追踪的边界。</p>
+<h2 id="二、数据服务日志统一建设接入组件"><a href="#二、数据服务日志统一建设接入组件" class="headerlink" title="二、数据服务日志统一建设接入组件"></a>二、数据服务日志统一建设接入组件</h2><p><strong>日志采集流程：日志-&gt;Filebeat-&gt;Logstash→Elasticsearch→Kibana or Grafana</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/20.jpg" alt></p>
+<p><strong>ELK架构示意图</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/21.jpg" alt></p>
+<p><strong>ELK部署架构</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/22.jpg" alt></p>
+<h3 id="1-应用接入filebeat（需接入应用改造）"><a href="#1-应用接入filebeat（需接入应用改造）" class="headerlink" title="1.应用接入filebeat（需接入应用改造）"></a>1.应用接入filebeat（需接入应用改造）</h3><h4 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h4><p>应用接入filebeat，需要对JDOS工程做以下一次性的操作。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/23.jpg" alt></p>
+<h4 id="1-2-带filebeat的镜像"><a href="#1-2-带filebeat的镜像" class="headerlink" title="1.2 带filebeat的镜像"></a>1.2 带filebeat的镜像</h4><p>接入filebeat的前提是部署用的镜像中有filebeat。</p>
+<p><strong>可选镜像</strong></p>
+<p>在进行容器镜像的编译时，可选以下两种类型基础镜像。</p>
+<table>
+<thead>
+<tr>
+<th>镜像名称</th>
+<th>作用</th>
+<th>其他</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>datamill9n_java_filebeat</td>
+<td>java application模式使用</td>
+<td></td>
+</tr>
+<tr>
+<td>datamill9n_tom_filebeat</td>
+<td>tomcat模式使用</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>镜像关联步骤</strong></p>
+<p>步骤一：路径：镜像管理 - 镜像市场 </p>
+<p>步骤二：搜索 <strong>“datamill9n”</strong> </p>
+<p>步骤三：关联需要使用的景象</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/24.jpg" alt></p>
+<p><strong>基础镜像使用</strong></p>
+<p>在构建镜像时-在运行镜像时需要选择上述关联的基础镜像</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/25.jpg" alt></p>
+<h4 id="1-3-日志采集配置"><a href="#1-3-日志采集配置" class="headerlink" title="1.3 日志采集配置"></a>1.3 日志采集配置</h4><p><strong>容器变量</strong></p>
+<p>变量名称 ：  LOG_PROFILE</p>
+<p>变量值格式：应用英文标识_应用环境信息，如”dataasset_prod”</p>
+<p><strong>配置文件</strong></p>
+<p>文件路径：/etc/filebeat/filebeat.yml</p>
+<p>文件内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">filebeat.prospectors:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">log</span></span><br><span class="line">    <span class="attr">paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/export/Logs/data-asset-service*.log</span></span><br><span class="line">    <span class="comment">#handle with Exception</span></span><br><span class="line">    <span class="attr">multiline.pattern:</span> <span class="string">'^20\d&#123;2&#125;.*$'</span></span><br><span class="line">    <span class="attr">multiline.negate:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">multiline.match:</span> <span class="string">after</span></span><br><span class="line">    <span class="comment">#handle profile</span></span><br><span class="line">    <span class="attr">fields:</span></span><br><span class="line">      <span class="attr">profile:</span> <span class="string">LOG_PROFILE</span></span><br><span class="line">      <span class="comment">#profile:</span></span><br><span class="line">    <span class="attr">fields_under_root:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">filebeat.registry_file:</span> <span class="string">/export/Data/filebeat/configs/registry</span></span><br><span class="line"><span class="attr">output.logstash:</span></span><br><span class="line">  <span class="attr">hosts:</span> <span class="string">["11.104.70.56:5044"]</span></span><br><span class="line">  <span class="attr">loadbalance:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/26.jpg" alt></p>
+<h4 id="1-4-filebeat的启停"><a href="#1-4-filebeat的启停" class="headerlink" title="1.4 filebeat的启停"></a>1.4 filebeat的启停</h4><p><strong>start.sh 启动脚本</strong></p>
+<p>在对应的java进程启动之后，额外新增启动filebeat的步骤</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#################################### filebeat start</span></span><br><span class="line"><span class="comment">#export container args to env args</span></span><br><span class="line">count=`ps -ef |grep filebeat |grep -v <span class="string">"grep"</span> |wc -l`</span><br><span class="line"><span class="keyword">if</span> [ 0 == <span class="variable">$count</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> START filebeat</span><br><span class="line">    <span class="built_in">export</span> $(cat /proc/<span class="variable">$&#123;cpid&#125;</span>/environ |tr <span class="string">'\0'</span> <span class="string">'\n'</span> | grep LOG_PROFILE | xargs)</span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$LOG_PROFILE</span></span><br><span class="line">    mkdir -p /<span class="built_in">export</span>/filebeat</span><br><span class="line">    cp /etc/filebeat/filebeat.yml /<span class="built_in">export</span>/filebeat/filebeat.yml</span><br><span class="line">    sed -i <span class="string">"s/LOG_PROFILE/<span class="variable">$&#123;LOG_PROFILE&#125;</span>/g"</span> /<span class="built_in">export</span>/filebeat/filebeat.yml</span><br><span class="line">    <span class="comment">#run filebeat</span></span><br><span class="line">    nohup /usr/share/filebeat/bin/filebeat -e -c /<span class="built_in">export</span>/filebeat/filebeat.yml &gt; /dev/null 2&gt;&amp;1 &amp;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"filebeat start success."</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="comment">#################################### filebeat end</span></span><br></pre></td></tr></table></figure>
+
+<p>全部脚本举例</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="comment">#userdir</span></span><br><span class="line">SHDIR=$(<span class="built_in">cd</span> <span class="string">"<span class="variable">$(dirname "$0")</span>"</span>; <span class="built_in">pwd</span>)</span><br><span class="line"><span class="built_in">echo</span> current path:<span class="variable">$SHDIR</span></span><br><span class="line"> </span><br><span class="line"><span class="comment">#</span></span><br><span class="line">PIDFILE=<span class="string">"./start.pid"</span></span><br><span class="line"><span class="keyword">if</span> [ -f <span class="variable">$PIDFILE</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">kill</span> -0 `cat <span class="variable">$PIDFILE</span>` &gt; /dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> server already running as process `cat <span class="variable">$PIDFILE</span>`.</span><br><span class="line">        <span class="built_in">exit</span> 0</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"> </span><br><span class="line"><span class="comment"># exec</span></span><br><span class="line">BASEDIR=`dirname <span class="variable">$0</span>`/..</span><br><span class="line">LOGFILE=/<span class="built_in">export</span>/Logs/xxx.log</span><br><span class="line"> </span><br><span class="line">curl -s <span class="string">"http://pfinder-master.jd.com/access/script"</span> -o /tmp/pfinder.sh ; <span class="built_in">source</span> /tmp/pfinder.sh || :</span><br><span class="line">java -version</span><br><span class="line">nohup java <span class="variable">$&#123;PFINDER_AGENT:-&#125;</span> -XX:MaxRAMFraction=1 -XX:MaxRAM=2g -XX:+HeapDumpOnOutOfMemoryError -XX:ErrorFile=/<span class="built_in">export</span>/Logs/hs_err.log -XX:HeapDumpPath=/<span class="built_in">export</span>/Logs/heap_dump.hprof <span class="variable">$JAVA_OPTS</span> -jar <span class="variable">$BASEDIR</span>/xxx.jar --spring.config.location=file:/home/<span class="built_in">export</span>/App/bin/application.yml  &gt; /dev/null 2&gt;&amp;1 &amp;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="comment"># wirte pid to file</span></span><br><span class="line"><span class="keyword">if</span> [ $? -eq 0 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">    cpid=$!</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"pid is <span class="variable">$&#123;cpid&#125;</span>"</span></span><br><span class="line">    <span class="comment">#################################### filebeat start</span></span><br><span class="line">    <span class="comment">#export container args to env args</span></span><br><span class="line">    count=`ps -ef |grep filebeat |grep -v <span class="string">"grep"</span> |wc -l`</span><br><span class="line">    <span class="keyword">if</span> [ 0 == <span class="variable">$count</span> ];<span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> START filebeat</span><br><span class="line">        <span class="built_in">export</span> $(cat /proc/<span class="variable">$&#123;cpid&#125;</span>/environ |tr <span class="string">'\0'</span> <span class="string">'\n'</span> | grep LOG_PROFILE | xargs)</span><br><span class="line">        <span class="built_in">echo</span> <span class="variable">$LOG_PROFILE</span></span><br><span class="line">        mkdir -p /<span class="built_in">export</span>/filebeat</span><br><span class="line">        cp /etc/filebeat/filebeat.yml /<span class="built_in">export</span>/filebeat/filebeat.yml</span><br><span class="line">        sed -i <span class="string">"s/LOG_PROFILE/<span class="variable">$&#123;LOG_PROFILE&#125;</span>/g"</span> /<span class="built_in">export</span>/filebeat/filebeat.yml</span><br><span class="line">        <span class="comment">#run filebeat</span></span><br><span class="line">        nohup /usr/share/filebeat/bin/filebeat -e -c /<span class="built_in">export</span>/filebeat/filebeat.yml &gt; /dev/null 2&gt;&amp;1 &amp;</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"filebeat start success."</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    <span class="comment">#################################### filebeat end</span></span><br><span class="line">    <span class="keyword">if</span> /bin/<span class="built_in">echo</span> -n <span class="variable">$&#123;cpid&#125;</span> &gt; <span class="string">"<span class="variable">$PIDFILE</span>"</span></span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        sleep 5</span><br><span class="line">        <span class="built_in">echo</span> STARTED SUCCESS</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">echo</span> FAILED TO WRITE PID</span><br><span class="line">        <span class="built_in">exit</span> 1</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    (timeout 60 tail -f -n0 <span class="variable">$LOGFILE</span> &amp;) | grep -q <span class="string">"Started Application"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> SERVER DID NOT START</span><br><span class="line">    <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+<p><strong>stop.sh 停止脚本</strong></p>
+<p>停止脚本额外新增</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">############################################# filebeat stop</span></span><br><span class="line"><span class="comment"># kill filebeat</span></span><br><span class="line">pkill -9 filebeat</span><br><span class="line"><span class="built_in">echo</span> STOP FILEBEAT</span><br><span class="line"><span class="comment">############################################# filebeat stop</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-5-日志格式-统一日志格式与打印形式"><a href="#1-5-日志格式-统一日志格式与打印形式" class="headerlink" title="1.5 日志格式-统一日志格式与打印形式"></a>1.5 日志格式-统一日志格式与打印形式</h4><p><strong>日志格式配置</strong></p>
+<p>application.yml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 日志配置相关</span></span><br><span class="line"><span class="attr">logging:</span></span><br><span class="line">  <span class="attr">pattern:</span></span><br><span class="line">    <span class="attr">level:</span> <span class="string">' %X&#123;uuid:-uuid&#125; %X&#123;erp:-erp&#125; %X&#123;PFTID:-PFTID&#125; %5p'</span></span><br><span class="line">  <span class="attr">file:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">/export/Logs/data-asset-service.log</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>日志打印encoder配置</strong></p>
+<p>需要定义日志组件内部的encoder</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">encoder</span> <span class="attr">class</span>=<span class="string">"com.jd.datamill9n.common.logger.PatternLayoutEncoder"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>$&#123;FILE_LOG_PATTERN&#125;<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">charset</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="name">charset</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>完整配置举例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">resource</span>=<span class="string">"org/springframework/boot/logging/logback/defaults.xml"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">resource</span>=<span class="string">"org/springframework/boot/logging/logback/console-appender.xml"</span>/&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="tag">&lt;<span class="name">springProperty</span> <span class="attr">scope</span>=<span class="string">"context"</span> <span class="attr">name</span>=<span class="string">"LOG_FILE_NAME"</span> <span class="attr">source</span>=<span class="string">"logging.file.name"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"LOG_FILE_PATH"</span> <span class="attr">value</span>=<span class="string">"$&#123;LOG_FILE_NAME&#125;"</span>/&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">&lt;!--    文件输出日志--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">"ROLLING-FILE"</span> <span class="attr">class</span>=<span class="string">"ch.qos.logback.core.rolling.RollingFileAppender"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">file</span>&gt;</span>$&#123;LOG_FILE_PATH&#125;<span class="tag">&lt;/<span class="name">file</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">rollingPolicy</span> <span class="attr">class</span>=<span class="string">"ch.qos.logback.core.rolling.TimeBasedRollingPolicy"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">fileNamePattern</span>&gt;</span>$&#123;LOG_FILE_PATH&#125;.%d&#123;yyyy-MM-dd&#125;.%i.log<span class="tag">&lt;/<span class="name">fileNamePattern</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">timeBasedFileNamingAndTriggeringPolicy</span> <span class="attr">class</span>=<span class="string">"ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">maxFileSize</span>&gt;</span>200MB<span class="tag">&lt;/<span class="name">maxFileSize</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">timeBasedFileNamingAndTriggeringPolicy</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">rollingPolicy</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">append</span>&gt;</span>true<span class="tag">&lt;/<span class="name">append</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoder</span> <span class="attr">class</span>=<span class="string">"com.jd.datamill9n.common.logger.PatternLayoutEncoder"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>$&#123;FILE_LOG_PATTERN&#125;<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">charset</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="name">charset</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">&lt;!-- console输出日志 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">appender</span> <span class="attr">name</span>=<span class="string">"CONSOLE"</span> <span class="attr">class</span>=<span class="string">"ch.qos.logback.core.ConsoleAppender"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">encoder</span> <span class="attr">class</span>=<span class="string">"com.jd.datamill9n.common.logger.PatternLayoutEncoder"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">pattern</span>&gt;</span>$&#123;CONSOLE_LOG_PATTERN&#125;<span class="tag">&lt;/<span class="name">pattern</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">charset</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="name">charset</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">encoder</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">appender</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">level</span>=<span class="string">"INFO"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">"CONSOLE"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">appender-ref</span> <span class="attr">ref</span>=<span class="string">"ROLLING-FILE"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">root</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>日志打印新方式</strong></p>
+<p>经过上述“日志打印encoder配置”之后，我们打印日志在原有的基础上，可以解析下面这种日志的打印方式。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LOGGER.info(<span class="string">"消息内容，不包括参数值。 keys=&#123;k1, k2,k3&#125;"</span>, v1, v2, v3)；</span><br><span class="line">LOGGER.error(<span class="string">"出错消息内容，不包括参数值。 keys=&#123;k1, k2,k3&#125;"</span>, v1, v2, v3, e)；</span><br></pre></td></tr></table></figure>
+
+<p>其中keys={k1, k2,k3}为固定pattern。k1,k2,k3为参数的名称，v1,v2,v3为k1,k2,k3对应的值 。注意顺序一一对应。</p>
+<p>举例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logger.info(<span class="string">"Test with param. keys=&#123;k1,k2, k3&#125;"</span>, <span class="string">"v1"</span>, <span class="number">2</span>, <span class="number">3L</span>);</span><br></pre></td></tr></table></figure>
+
+<p>输出的结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2019-09-17 09:51:01.728 INFO 52531 --- [ main] c.j.datamill9n.common.logger.TestLogger : Test with param. param&#x3D;&#123;&quot;k1&quot;:&quot;v1&quot;,&quot;k2&quot;:2,&quot;k3&quot;:3&#125;</span><br></pre></td></tr></table></figure>
+
+<p>日志为什么会输出这个样子，具体原因稍后再表。</p>
+<h3 id="2-logstash集群部署及解析规则配置（接入应用无需关注）"><a href="#2-logstash集群部署及解析规则配置（接入应用无需关注）" class="headerlink" title="2.logstash集群部署及解析规则配置（接入应用无需关注）"></a>2.logstash集群部署及解析规则配置（接入应用无需关注）</h3><h4 id="2-1-集群部署"><a href="#2-1-集群部署" class="headerlink" title="2.1 集群部署"></a>2.1 集群部署</h4><p>Docker镜像部署集群。 推荐书籍 ： 《深入浅出Docker》→ 《Kubernetes快速入门》 作者：Nigel，Poulton（奈吉尔·波尔顿） </p>
+<p>Dockfile内容</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">FROM centos</span><br><span class="line">RUN yum install -y wget &amp;&amp; yum clean all</span><br><span class="line">RUN mkdir /home/logstash</span><br><span class="line">copy . /home/logstash</span><br><span class="line">RUN ls /home/logstash</span><br><span class="line"><span class="comment">#RUN wget 'https://artifacts.elastic.co/downloads/logstash/logstash-6.8.0.tar.gz'</span></span><br><span class="line">RUN wget -O logstash-6.8.0.tar.gz <span class="string">'http://storage.jd.local/mirror/logstash-6.8.0.tar.gz?Expires=3772414887&amp;AccessKey=CYVc16EdCiyJnawA&amp;Signature=L3hs%2B5dvaDSYpGuZ3HJT3STfEco%3D'</span></span><br><span class="line">RUN tar -xvf  logstash-6.8.0.tar.gz -C /home/logstash</span><br><span class="line">RUN rm -rf logstash-6.8.0.tar.gz</span><br><span class="line">RUN ls /home/logstash</span><br><span class="line">RUN mv /home/logstash/logstash-6.8.0/config/logstash.yml /home/logstash/logstash-6.8.0/config/logstash-copy.yml</span><br><span class="line">RUN mv /home/logstash/logstash/logstash.yml /home/logstash/logstash-6.8.0/config</span><br><span class="line">RUN ls /home/logstash/logstash-6.8.0/config</span><br><span class="line">WORKDIR /home/logstash</span><br><span class="line">RUN chmod 777 logstash-6.8.0/bin</span><br><span class="line">RUN ls /home/logstash</span><br><span class="line">RUN <span class="built_in">echo</span> <span class="variable">$PATH</span></span><br><span class="line">ENTRYPOINT ./logstash-6.8.0/bin/logstash -f ./logstash/logstash.conf</span><br><span class="line"><span class="comment">#ENTRYPOINT ./logstash-6.8.0/bin/logstash -f ./logstash/logstash.conf &gt;&gt; /export/Logs/logstash.log</span></span><br></pre></td></tr></table></figure>
+
+<p>GIT地址：<a href="https://coding.jd.com/datamill9n/jdos-images/" target="_blank" rel="noopener">https://coding.jd.com/datamill9n/jdos-images/</a></p>
+<p>其他12种可用镜像：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/27.jpg" alt></p>
+<h4 id="2-2-logstash配置"><a href="#2-2-logstash配置" class="headerlink" title="2.2 logstash配置"></a>2.2 logstash配置</h4><p>logstash配置解析内容</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/28.jpg" alt></p>
+<p>以下为logstash配置内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">    beats &#123;</span><br><span class="line">        port &#x3D;&gt; &quot;5044&quot;</span><br><span class="line">        client_inactivity_timeout &#x3D;&gt; 3600</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    #stdin&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">filter &#123;</span><br><span class="line"> </span><br><span class="line">    dissect &#123;</span><br><span class="line">        mapping &#x3D;&gt; &#123;&quot;profile&quot; &#x3D;&gt; &quot;%&#123;doc_type&#125;_%&#123;profileName&#125;&quot;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    grok &#123;</span><br><span class="line">            match &#x3D;&gt; &#123;</span><br><span class="line">                &quot;message&quot; &#x3D;&gt; &quot;%&#123;TS:ts&#125;\s+%&#123;UUID:uuid&#125;\s+%&#123;ERP:erp&#125;\s+%&#123;PFTID:traceId&#125;\s+%&#123;LOGLEVEL:loglevel&#125;\s+%&#123;PID:pid&#125;\s+---\s+\[%&#123;PNAME:thread&#125;\]\s+%&#123;CLASSNAME:classname&#125;\s+\:\s+%&#123;CONTEXT:context&#125;&quot;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;TS&quot; &#x3D;&gt; &quot;\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125; \d&#123;2&#125;\:\d&#123;2&#125;\:[0-9\.]+&quot;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;UUID&quot; &#x3D;&gt; &quot;[a-zA-Z0-9\-_]+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;PFTID&quot; &#x3D;&gt; &quot;[a-zA-Z0-9\.]+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;ERP&quot; &#x3D;&gt; &quot;[a-zA-Z0-9]+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;LOGLEVEL&quot; &#x3D;&gt; &quot;(INFO|DEBUG|ERROR|WARN)&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;PID&quot; &#x3D;&gt; &quot;\d+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;PNAME&quot; &#x3D;&gt; &quot;[_a-zA-Z\-\d&amp;\.\s\&#x2F;]+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;CLASSNAME&quot; &#x3D;&gt; &quot;[a-zA-Z\d_$\.\&#x2F;\[\]]+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">            pattern_definitions &#x3D;&gt; &#123;</span><br><span class="line">                &quot;CONTEXT&quot; &#x3D;&gt; &quot;.+&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        if &quot;_grokparsefailure&quot; in [tags] &#123;</span><br><span class="line">            mutate &#123;</span><br><span class="line">                replace &#x3D;&gt; &#123;</span><br><span class="line">                    &quot;doc_type&quot; &#x3D;&gt; &quot;logs_grok_failure&quot;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            mutate &#123;remove_field &#x3D;&gt; [&quot;message&quot;]&#125;</span><br><span class="line"> </span><br><span class="line">            grok &#123;</span><br><span class="line">                #(.*?)param&#x3D;(.*)[\n]*([\s\S]*)</span><br><span class="line">                match &#x3D;&gt; &#123;&quot;context&quot; &#x3D;&gt; &quot;%&#123;DATA:prefix&#125;param&#x3D;%&#123;JSON_DETAIL_PATTERN:details&#125;[\n]*%&#123;ANY_STRING_INCLUDE_WARP:ex&#125;&quot;&#125;</span><br><span class="line">                pattern_definitions &#x3D;&gt; &#123;&quot;ANY_STRING_INCLUDE_WARP&quot; &#x3D;&gt; &quot;[\s\S]*&quot;&#125;</span><br><span class="line">                pattern_definitions &#x3D;&gt; &#123;&quot;JSON_DETAIL_PATTERN&quot; &#x3D;&gt; &quot;&#123;.*&#125;&quot;&#125;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            if [prefix] or [details] &#123;</span><br><span class="line">             </span><br><span class="line">                mutate &#123;</span><br><span class="line">                    replace &#x3D;&gt; &#123; &quot;json_details&quot; &#x3D;&gt; &#39;&#123;&quot;%&#123;doc_type&#125;&quot;: %&#123;details&#125;&#125;&#39; &#125;</span><br><span class="line">                &#125;</span><br><span class="line">              </span><br><span class="line">                json &#123;</span><br><span class="line">                    source &#x3D;&gt; &quot;json_details&quot;</span><br><span class="line">                    target &#x3D;&gt; &quot;params&quot;</span><br><span class="line">                &#125;</span><br><span class="line">              </span><br><span class="line">                mutate &#123;rename &#x3D;&gt; [&quot;prefix&quot;, &quot;message&quot;]&#125;</span><br><span class="line">                mutate &#123;remove_field &#x3D;&gt; [&quot;details&quot;, &quot;json_details&quot;, &quot;context&quot;]&#125;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                mutate &#123;rename &#x3D;&gt; [&quot;context&quot;, &quot;message&quot;]&#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">         </span><br><span class="line">        if &quot;beats_input_codec_plain_applied&quot; in [tags] &#123;</span><br><span class="line">            mutate &#123;</span><br><span class="line">                remove_tag &#x3D;&gt; [&quot;beats_input_codec_plain_applied&quot;]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        mutate &#123;</span><br><span class="line">            add_field &#x3D;&gt; &#123;</span><br><span class="line">                &quot;ip_address&quot; &#x3D;&gt; &quot;%&#123;[@metadata][ip_address]&#125;&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        # 2019-05-31 10:21:23.873</span><br><span class="line">        date &#123;</span><br><span class="line">            match &#x3D;&gt; [&quot;ts&quot;, &quot;yyyy-MM-dd HH:mm:ss.SSS&quot;]</span><br><span class="line">            target &#x3D;&gt; &quot;timestamp&quot;</span><br><span class="line">            timezone &#x3D;&gt; &quot;Asia&#x2F;Shanghai&quot;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        mutate &#123;remove_field &#x3D;&gt; [&quot;ts&quot;, &quot;offset&quot;, &quot;@metadata&quot;, &quot;debug&quot;, &quot;version&quot;, &quot;type&quot;, &quot;beat&quot;, &quot;prospector&quot;, &quot;host&quot;, &quot;profile&quot;,&quot;input&quot;,&quot;log&quot;]&#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">output &#123;</span><br><span class="line">    if [doc_type] and [profileName] &#123;</span><br><span class="line">        stdout &#123;codec &#x3D;&gt; dots&#125;</span><br><span class="line">        #stdout&#123;codec &#x3D;&gt; rubydebug&#123;metadata &#x3D;&gt; true&#125;&#125;</span><br><span class="line">        #ouput to es</span><br><span class="line">        if [profileName] &#x3D;~ &#x2F;.*?prod.*?&#x2F; &#123;</span><br><span class="line">            elasticsearch &#123;</span><br><span class="line">                action &#x3D;&gt; &quot;index&quot;</span><br><span class="line">                hosts &#x3D;&gt; [&quot;es-nlb-es-87wgaecdzm.jvessel-open-hb.jdcloud.com:9200&quot;]</span><br><span class="line">                user &#x3D;&gt; &quot;elastic&quot;</span><br><span class="line">                password &#x3D;&gt; &quot;Es-logstash&quot;</span><br><span class="line">                index &#x3D;&gt; &quot;bdaa_service_log_prod_v1_%&#123;+YYYY.MM&#125;&quot;</span><br><span class="line">                document_type &#x3D;&gt; &quot;log&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            elasticsearch &#123;</span><br><span class="line">                action &#x3D;&gt; &quot;index&quot;</span><br><span class="line">                hosts &#x3D;&gt; [&quot;es-nlb-es-87wgaecdzm.jvessel-open-hb.jdcloud.com:9200&quot;]</span><br><span class="line">                user &#x3D;&gt; &quot;elastic&quot;</span><br><span class="line">                password &#x3D;&gt; &quot;Es-logstash&quot;</span><br><span class="line">                index &#x3D;&gt; &quot;bdaa_service_log_pre_v1_%&#123;+YYYY.MM&#125;&quot;</span><br><span class="line">                document_type &#x3D;&gt; &quot;log&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        stdout &#123;codec &#x3D;&gt; rubydebug &#123;metadata &#x3D;&gt; true&#125;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-3-实际举例"><a href="#2-3-实际举例" class="headerlink" title="2.3 实际举例"></a>2.3 实际举例</h4><p><strong>数据来源</strong></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/29.jpg" alt></p>
+<p><strong>日志举例</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2021-04-23 14:36:24.321  5be059e26ce558058a32-178fd7195ed njr21397101 erp 45242.36153.16191597842474811 datamill  INFO 159 --- [JSF-BZ-22000-82-T-11] c.j.d.c.s.i.JsfLogMessageInterceptor     : JSF invoked.  param&#x3D;&#123;&quot;receiveTime&quot;:1619159784319,&quot;args&quot;:[&quot;njr21397101&quot;],&quot;headers&quot;:&#123;&quot;1&quot;:60000,&quot;7&quot;:1660&#125;,&quot;costTime&quot;:1,&quot;response&quot;:&#123;&quot;status&quot;:0,&quot;result&quot;:&#123;&quot;id&quot;:747748,&quot;lastUpdateTime&quot;:1614248349424,&quot;status&quot;:&quot;STARTED&quot;,&quot;pin&quot;:&quot;njr21397101&quot;,&quot;name&quot;:&quot;njr21397101&quot;,&quot;role&quot;:&#123;&quot;id&quot;:622070,&quot;name&quot;:&quot;基础角色&quot;,&quot;desc&quot;:&quot;支持基础功能&quot;,&quot;order&quot;:-1,&quot;startTime&quot;:&quot;2000-02-01 00:00:00&quot;,&quot;expirationTime&quot;:&quot;2100-02-01 00:00:00&quot;,&quot;available&quot;:true&#125;,&quot;company&quot;:&quot;柏丽德珠宝（广州）有限公司&quot;,&quot;mainSubRoleType&quot;:&quot;MAIN&quot;,&quot;roleType&quot;:&quot;EXTERNAL_BASIC&quot;,&quot;channels&quot;:[],&quot;channelNames&quot;:[],&quot;isvAccount&quot;:false,&quot;virtualAccount&quot;:false,&quot;healthAccount&quot;:false,&quot;brandCount&quot;:1,&quot;basicAccount&quot;:true,&quot;advancedAccount&quot;:false,&quot;thirdPartyAccount&quot;:false,&quot;brandMember&quot;:[],&quot;available&quot;:true,&quot;startDate&quot;:&quot;2021-02-25&quot;,&quot;endDate&quot;:&quot;2022-01-01&quot;,&quot;createdTime&quot;:&quot;2021-02-25&quot;&#125;&#125;,&quot;methodName&quot;:&quot;findPin&quot;,&quot;alias&quot;:&quot;AccountAuthorizeService-4.prod&quot;,&quot;className&quot;:&quot;com.jd.datamill.auth.service.open.AccountAuthorizeService&quot;,&quot;receiveTimeStr&quot;:&quot;2021-04-23 14:36:24.320&quot;,&quot;invokedTime&quot;:&quot;2021-04-23 14:36:24.321&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>es中的存储</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"_index"</span> : <span class="string">"ads_polaris_datamill9n_log_prod_v3_2021.04"</span>,</span><br><span class="line">  <span class="attr">"_type"</span> : <span class="string">"log"</span>,</span><br><span class="line">  <span class="attr">"_id"</span> : <span class="string">"T4xx_XgBIDfoGaLsobt-"</span>,</span><br><span class="line">  <span class="attr">"_score"</span> : <span class="number">0.0</span>,</span><br><span class="line">  <span class="attr">"_source"</span> : &#123;</span><br><span class="line">    <span class="attr">"message"</span> : <span class="string">"JSF invoked.  "</span>,</span><br><span class="line">    <span class="attr">"appId"</span> : <span class="string">"datamill"</span>,</span><br><span class="line">    <span class="attr">"@version"</span> : <span class="string">"1"</span>,</span><br><span class="line">    <span class="attr">"profileName"</span> : <span class="string">"prod3"</span>,</span><br><span class="line">    <span class="attr">"thread"</span> : <span class="string">"JSF-BZ-22000-82-T-11"</span>,</span><br><span class="line">    <span class="attr">"ip_address"</span> : <span class="string">"10.175.121.217"</span>,</span><br><span class="line">    <span class="attr">"doc_type"</span> : <span class="string">"auth"</span>,</span><br><span class="line">    <span class="attr">"loglevel"</span> : <span class="string">"INFO"</span>,</span><br><span class="line">    <span class="attr">"uuid"</span> : <span class="string">"5be059e26ce558058a32-178fd7195ed"</span>,</span><br><span class="line">    <span class="attr">"@timestamp"</span> : <span class="string">"2021-04-23T06:36:24.604Z"</span>,</span><br><span class="line">    <span class="attr">"source"</span> : <span class="string">"/export/Logs/datamill.log"</span>,</span><br><span class="line">    <span class="attr">"erp"</span> : <span class="string">"erp"</span>,</span><br><span class="line">    <span class="attr">"timestamp"</span> : <span class="string">"2021-04-23T06:36:24.321Z"</span>,</span><br><span class="line">    <span class="attr">"pid"</span> : <span class="string">"159"</span>,</span><br><span class="line">    <span class="attr">"traceId"</span> : <span class="string">"45242.36153.16191597842474811"</span>,</span><br><span class="line">    <span class="attr">"params"</span> : &#123;</span><br><span class="line">      <span class="attr">"auth"</span> : &#123;</span><br><span class="line">        <span class="attr">"className"</span> : <span class="string">"com.jd.datamill.auth.service.open.AccountAuthorizeService"</span>,</span><br><span class="line">        <span class="attr">"receiveTime"</span> : <span class="number">1619159784319</span>,</span><br><span class="line">        <span class="attr">"args"</span> : [</span><br><span class="line">          <span class="string">"njr21397101"</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="attr">"headers"</span> : &#123;</span><br><span class="line">          <span class="attr">"7"</span> : <span class="number">1660</span>,</span><br><span class="line">          <span class="attr">"1"</span> : <span class="number">60000</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"costTime"</span> : <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"receiveTimeStr"</span> : <span class="string">"2021-04-23 14:36:24.320"</span>,</span><br><span class="line">        <span class="attr">"invokedTime"</span> : <span class="string">"2021-04-23 14:36:24.321"</span>,</span><br><span class="line">        <span class="attr">"response"</span> : &#123;</span><br><span class="line">          <span class="attr">"result"</span> : &#123;</span><br><span class="line">            <span class="attr">"channelNames"</span> : [ ],</span><br><span class="line">            <span class="attr">"startDate"</span> : <span class="string">"2021-02-25"</span>,</span><br><span class="line">            <span class="attr">"name"</span> : <span class="string">"njr21397101"</span>,</span><br><span class="line">            <span class="attr">"healthAccount"</span> : <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"createdTime"</span> : <span class="string">"2021-02-25"</span>,</span><br><span class="line">            <span class="attr">"available"</span> : <span class="literal">true</span>,</span><br><span class="line">            <span class="attr">"company"</span> : <span class="string">"柏丽德珠宝（广州）有限公司"</span>,</span><br><span class="line">            <span class="attr">"roleType"</span> : <span class="string">"EXTERNAL_BASIC"</span>,</span><br><span class="line">            <span class="attr">"advancedAccount"</span> : <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"status"</span> : <span class="string">"STARTED"</span>,</span><br><span class="line">            <span class="attr">"mainSubRoleType"</span> : <span class="string">"MAIN"</span>,</span><br><span class="line">            <span class="attr">"thirdPartyAccount"</span> : <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"lastUpdateTime"</span> : <span class="number">1614248349424</span>,</span><br><span class="line">            <span class="attr">"role"</span> : &#123;</span><br><span class="line">              <span class="attr">"startTime"</span> : <span class="string">"2000-02-01 00:00:00"</span>,</span><br><span class="line">              <span class="attr">"order"</span> : <span class="number">-1</span>,</span><br><span class="line">              <span class="attr">"expirationTime"</span> : <span class="string">"2100-02-01 00:00:00"</span>,</span><br><span class="line">              <span class="attr">"id"</span> : <span class="number">622070</span>,</span><br><span class="line">              <span class="attr">"name"</span> : <span class="string">"基础角色"</span>,</span><br><span class="line">              <span class="attr">"available"</span> : <span class="literal">true</span>,</span><br><span class="line">              <span class="attr">"desc"</span> : <span class="string">"支持基础功能"</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">"brandMember"</span> : [ ],</span><br><span class="line">            <span class="attr">"virtualAccount"</span> : <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"endDate"</span> : <span class="string">"2022-01-01"</span>,</span><br><span class="line">            <span class="attr">"channels"</span> : [ ],</span><br><span class="line">            <span class="attr">"id"</span> : <span class="number">747748</span>,</span><br><span class="line">            <span class="attr">"pin"</span> : <span class="string">"njr21397101"</span>,</span><br><span class="line">            <span class="attr">"isvAccount"</span> : <span class="literal">false</span>,</span><br><span class="line">            <span class="attr">"brandCount"</span> : <span class="number">1</span>,</span><br><span class="line">            <span class="attr">"basicAccount"</span> : <span class="literal">true</span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="attr">"status"</span> : <span class="number">0</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"alias"</span> : <span class="string">"AccountAuthorizeService-4.prod"</span>,</span><br><span class="line">        <span class="attr">"methodName"</span> : <span class="string">"findPin"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"pin"</span> : <span class="string">"njr21397101"</span>,</span><br><span class="line">    <span class="attr">"classname"</span> : <span class="string">"c.j.d.c.s.i.JsfLogMessageInterceptor"</span>,</span><br><span class="line">    <span class="attr">"tags"</span> : [ ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-grafana看板的配置"><a href="#3-grafana看板的配置" class="headerlink" title="3.grafana看板的配置"></a>3.grafana看板的配置</h3><h4 id="3-1-设计自己想看的面板以及打印对应日志"><a href="#3-1-设计自己想看的面板以及打印对应日志" class="headerlink" title="3.1 设计自己想看的面板以及打印对应日志"></a>3.1 设计自己想看的面板以及打印对应日志</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LOGGER.info(<span class="string">"auth validate invoke process success. keys=&#123;authValidateCostTime,invokeCostTime&#125;"</span>,</span><br><span class="line">           authValidateEndTime - authValidateStartTime, authInvokeEndTime - authValidateEndTime);</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-配置grafana看板"><a href="#3-2-配置grafana看板" class="headerlink" title="3.2 配置grafana看板"></a>3.2 配置grafana看板</h4><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/30.jpg" alt></p>
+<h4 id="3-3-ES中的日志存储"><a href="#3-3-ES中的日志存储" class="headerlink" title="3.3 ES中的日志存储"></a>3.3 ES中的日志存储</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line">POST _sql</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"sql"</span> : <span class="string">"select * from bdaa_uds_log_prod_v1_202207* where doc_type = 'uds' and message = 'auth validate invoke process success.' limit 3"</span></span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">ES返回结构</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"took"</span> : <span class="number">167</span>,</span><br><span class="line">  <span class="attr">"timed_out"</span> : <span class="literal">false</span>,</span><br><span class="line">  <span class="attr">"_shards"</span> : &#123;</span><br><span class="line">    <span class="attr">"total"</span> : <span class="number">145</span>,</span><br><span class="line">    <span class="attr">"successful"</span> : <span class="number">145</span>,</span><br><span class="line">    <span class="attr">"skipped"</span> : <span class="number">0</span>,</span><br><span class="line">    <span class="attr">"failed"</span> : <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"hits"</span> : &#123;</span><br><span class="line">    <span class="attr">"total"</span> : <span class="number">1676</span>,</span><br><span class="line">    <span class="attr">"max_score"</span> : <span class="number">0.0</span>,</span><br><span class="line">    <span class="attr">"hits"</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"_index"</span> : <span class="string">"bdaa_uds_log_prod_v1_20220705"</span>,</span><br><span class="line">        <span class="attr">"_type"</span> : <span class="string">"log"</span>,</span><br><span class="line">        <span class="attr">"_id"</span> : <span class="string">"N531zYEBklnJeavdQh5M"</span>,</span><br><span class="line">        <span class="attr">"_score"</span> : <span class="number">0.0</span>,</span><br><span class="line">        <span class="attr">"_source"</span> : &#123;</span><br><span class="line">          <span class="attr">"profileName"</span> : <span class="string">"prodbi"</span>,</span><br><span class="line">          <span class="attr">"ip_address"</span> : <span class="string">"10.184.12.54"</span>,</span><br><span class="line">          <span class="attr">"message"</span> : <span class="string">"auth validate invoke process success.  "</span>,</span><br><span class="line">          <span class="attr">"@timestamp"</span> : <span class="string">"2022-07-05T10:43:25.428Z"</span>,</span><br><span class="line">          <span class="attr">"method"</span> : <span class="string">"c.j.g.core.aop.UnionAuthValidateAspect.around"</span>,</span><br><span class="line">          <span class="attr">"doc_type"</span> : <span class="string">"uds"</span>,</span><br><span class="line">          <span class="attr">"erp"</span> : <span class="string">"erp"</span>,</span><br><span class="line">          <span class="attr">"lineNum"</span> : <span class="string">"258"</span>,</span><br><span class="line">          <span class="attr">"timestamp"</span> : <span class="string">"2022-07-05T10:43:22.000Z"</span>,</span><br><span class="line">          <span class="attr">"loglevel"</span> : <span class="string">"INFO"</span>,</span><br><span class="line">          <span class="attr">"thread"</span> : <span class="string">"JSF-BZ-22000-404-T-17"</span>,</span><br><span class="line">          <span class="attr">"loginErp"</span> : <span class="string">"loginErp"</span>,</span><br><span class="line">          <span class="attr">"params"</span> : &#123;</span><br><span class="line">            <span class="attr">"uds"</span> : &#123;</span><br><span class="line">              <span class="attr">"authValidateCostTime"</span> : <span class="number">255</span>,</span><br><span class="line">              <span class="attr">"invokeCostTime"</span> : <span class="number">1008</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="attr">"@version"</span> : <span class="string">"1"</span>,</span><br><span class="line">          <span class="attr">"traceId"</span> : <span class="string">"1341457.36523.16570178010864966"</span>,</span><br><span class="line">          <span class="attr">"source"</span> : <span class="string">"/export/Logs/uds/uds.log"</span>,</span><br><span class="line">          <span class="attr">"tags"</span> : [ ]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"_index"</span> : <span class="string">"bdaa_uds_log_prod_v1_20220705"</span>,</span><br><span class="line">        <span class="attr">"_type"</span> : <span class="string">"log"</span>,</span><br><span class="line">        <span class="attr">"_id"</span> : <span class="string">"ApvPzYEBklnJeavd3H6y"</span>,</span><br><span class="line">        <span class="attr">"_score"</span> : <span class="number">0.0</span>,</span><br><span class="line">        <span class="attr">"_source"</span> : &#123;</span><br><span class="line">          <span class="attr">"erp"</span> : <span class="string">"erp"</span>,</span><br><span class="line">          <span class="attr">"tags"</span> : [ ],</span><br><span class="line">          <span class="attr">"@version"</span> : <span class="string">"1"</span>,</span><br><span class="line">          <span class="attr">"doc_type"</span> : <span class="string">"uds"</span>,</span><br><span class="line">          <span class="attr">"params"</span> : &#123;</span><br><span class="line">            <span class="attr">"uds"</span> : &#123;</span><br><span class="line">              <span class="attr">"invokeCostTime"</span> : <span class="number">1021</span>,</span><br><span class="line">              <span class="attr">"authValidateCostTime"</span> : <span class="number">239</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="attr">"loginErp"</span> : <span class="string">"loginErp"</span>,</span><br><span class="line">          <span class="attr">"message"</span> : <span class="string">"auth validate invoke process success.  "</span>,</span><br><span class="line">          <span class="attr">"@timestamp"</span> : <span class="string">"2022-07-05T10:02:34.586Z"</span>,</span><br><span class="line">          <span class="attr">"timestamp"</span> : <span class="string">"2022-07-05T10:02:31.000Z"</span>,</span><br><span class="line">          <span class="attr">"profileName"</span> : <span class="string">"prodbi"</span>,</span><br><span class="line">          <span class="attr">"source"</span> : <span class="string">"/export/Logs/uds/uds.log"</span>,</span><br><span class="line">          <span class="attr">"method"</span> : <span class="string">"c.j.g.core.aop.UnionAuthValidateAspect.around"</span>,</span><br><span class="line">          <span class="attr">"thread"</span> : <span class="string">"JSF-BZ-22000-404-T-16"</span>,</span><br><span class="line">          <span class="attr">"ip_address"</span> : <span class="string">"11.16.99.144"</span>,</span><br><span class="line">          <span class="attr">"lineNum"</span> : <span class="string">"258"</span>,</span><br><span class="line">          <span class="attr">"loglevel"</span> : <span class="string">"INFO"</span>,</span><br><span class="line">          <span class="attr">"traceId"</span> : <span class="string">"724602.36523.16570153504936099"</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"_index"</span> : <span class="string">"bdaa_uds_log_prod_v1_20220705"</span>,</span><br><span class="line">        <span class="attr">"_type"</span> : <span class="string">"log"</span>,</span><br><span class="line">        <span class="attr">"_id"</span> : <span class="string">"P5vPzYEBklnJeavdyX1K"</span>,</span><br><span class="line">        <span class="attr">"_score"</span> : <span class="number">0.0</span>,</span><br><span class="line">        <span class="attr">"_source"</span> : &#123;</span><br><span class="line">          <span class="attr">"profileName"</span> : <span class="string">"prodbi"</span>,</span><br><span class="line">          <span class="attr">"ip_address"</span> : <span class="string">"10.188.19.225"</span>,</span><br><span class="line">          <span class="attr">"message"</span> : <span class="string">"auth validate invoke process success.  "</span>,</span><br><span class="line">          <span class="attr">"@timestamp"</span> : <span class="string">"2022-07-05T10:02:34.616Z"</span>,</span><br><span class="line">          <span class="attr">"method"</span> : <span class="string">"c.j.g.core.aop.UnionAuthValidateAspect.around"</span>,</span><br><span class="line">          <span class="attr">"doc_type"</span> : <span class="string">"uds"</span>,</span><br><span class="line">          <span class="attr">"erp"</span> : <span class="string">"erp"</span>,</span><br><span class="line">          <span class="attr">"lineNum"</span> : <span class="string">"258"</span>,</span><br><span class="line">          <span class="attr">"timestamp"</span> : <span class="string">"2022-07-05T10:02:31.000Z"</span>,</span><br><span class="line">          <span class="attr">"loglevel"</span> : <span class="string">"INFO"</span>,</span><br><span class="line">          <span class="attr">"thread"</span> : <span class="string">"JSF-BZ-22000-404-T-18"</span>,</span><br><span class="line">          <span class="attr">"loginErp"</span> : <span class="string">"loginErp"</span>,</span><br><span class="line">          <span class="attr">"params"</span> : &#123;</span><br><span class="line">            <span class="attr">"uds"</span> : &#123;</span><br><span class="line">              <span class="attr">"authValidateCostTime"</span> : <span class="number">259</span>,</span><br><span class="line">              <span class="attr">"invokeCostTime"</span> : <span class="number">1005</span></span><br><span class="line">            &#125;</span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="attr">"@version"</span> : <span class="string">"1"</span>,</span><br><span class="line">          <span class="attr">"traceId"</span> : <span class="string">"724611.36523.16570153504917852"</span>,</span><br><span class="line">          <span class="attr">"source"</span> : <span class="string">"/export/Logs/uds/uds.log"</span>,</span><br><span class="line">          <span class="attr">"tags"</span> : [ ]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-调用链路追踪实现"><a href="#4-调用链路追踪实现" class="headerlink" title="4.调用链路追踪实现"></a>4.调用链路追踪实现</h3><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/31.jpg" alt></p>
+<h4 id="4-1-现阶段组件化"><a href="#4-1-现阶段组件化" class="headerlink" title="4.1 现阶段组件化"></a>4.1 现阶段组件化</h4><p><strong>http与java服务的传输</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> ZuulException </span>&#123;</span><br><span class="line">    <span class="comment">// 因为下面会调用MDC.clear()整体清理MDC中的内容,会导致pfinder在这个filter之前往MDC中设置的PFTID也会被清理,所以在这里暂时性的将PFTID取出之后再set进MDC,后续有更好的办法会更新这部分逻辑</span></span><br><span class="line">    String traceId = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (MDC.getCopyOfContextMap() != <span class="keyword">null</span> &amp;&amp; MDC.getCopyOfContextMap().containsKey(<span class="string">"PFTID"</span>)) &#123;</span><br><span class="line">        traceId = MDC.get(<span class="string">"PFTID"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//1.清空MDC等threadLocal信息</span></span><br><span class="line">    MDC.clear();</span><br><span class="line">    RpcContext.getContext().clearAttachments();</span><br><span class="line">    LoginContext.remove();</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//2.往mdc中set uuid/PFTID</span></span><br><span class="line">    MDC.put(<span class="string">"PFTID"</span>, traceId);</span><br><span class="line">    RequestContext ctx = RequestContext.getCurrentContext();</span><br><span class="line">    String uuid = ctx.getRequest().getHeader(<span class="string">"uuid"</span>);</span><br><span class="line">    MDC.put(<span class="string">"uuid"</span>, uuid);</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//3.记录请求的startTime以及复位记录标志位</span></span><br><span class="line">    <span class="keyword">long</span> startTime = System.currentTimeMillis();</span><br><span class="line">    ctx.set(<span class="string">"startTime"</span>, String.valueOf(startTime));</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>java服务之间的传输</strong></p>
+<p>JsfMdcInterceptor依赖与使用</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--JSF配置 jsfFilter--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--    MDC相关，用来获取来自于client的uuid、pin、erp等信息--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"jsfMdcInterceptor"</span> <span class="attr">class</span>=<span class="string">"com.jd.datamill9n.common.spring.interceptor.JsfMdcInterceptor"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"jsfLogMessageInterceptor"</span> <span class="attr">class</span>=<span class="string">"com.jd.datamill9n.common.spring.interceptor.JsfLogMessageInterceptor"</span> <span class="attr">scope</span>=<span class="string">"prototype"</span>/&gt;</span></span><br><span class="line"> </span><br><span class="line"><span class="tag">&lt;<span class="name">jsf:server</span> <span class="attr">id</span>=<span class="string">"date-asset-service-jsf-server"</span> <span class="attr">protocol</span>=<span class="string">"jsf"</span>/&gt;</span></span><br><span class="line"> </span><br><span class="line"><span class="tag">&lt;<span class="name">jsf:provider</span> <span class="attr">id</span>=<span class="string">"dataAssetMetricService"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">interface</span>=<span class="string">"com.jd.bdaa.arch.provider.service.DataAssetMetricService"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">alias</span>=<span class="string">"dataAssetMetricService-#&#123;environment.VERSION == null ? '$&#123;jsf.alias.version:&#125;' : environment.VERSION&#125;#&#123;environment.PROFILE == null ? '.$&#123;jsf.alias.profile:&#125;' : '.'+environment.PROFILE&#125;"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">ref</span>=<span class="string">"dataAssetMetricServiceImpl"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">serialization</span>=<span class="string">"hessian"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">timeout</span>=<span class="string">"20000"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">server</span>=<span class="string">"date-asset-service-jsf-server"</span></span></span><br><span class="line"><span class="tag">  <span class="attr">filter</span>=<span class="string">"jsfMdcInterceptor,jsfLogMessageInterceptor"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">jsf:provider</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>maven引入</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">common.spring.version</span>&gt;</span>1.3.1<span class="tag">&lt;/<span class="name">common.spring.version</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- jsf-filter组件：jsf filter通过配置jsf provider filter在日志中输出jsf服务被调用时的信息 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.jd.datamill9n<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>common.spring<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;common.spring.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>代码分析</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JsfMdcInterceptor</span> <span class="keyword">extends</span> <span class="title">AbstractFilter</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(JsfMdcInterceptor<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;String&gt; TRANS_ARGS_LIST = Arrays.asList(<span class="string">"uuid"</span>, <span class="string">"pin"</span>, <span class="string">"erp"</span>, <span class="string">"PFTID"</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ResponseMessage <span class="title">invoke</span><span class="params">(RequestMessage request)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> isProvider = RpcContext.getContext().isProviderSide();</span><br><span class="line">        <span class="keyword">boolean</span> isConsumer = RpcContext.getContext().isConsumerSide();</span><br><span class="line">        Invocation invocationBody = request.getInvocationBody();</span><br><span class="line">        <span class="keyword">if</span> (LOGGER.isDebugEnabled()) &#123;</span><br><span class="line">            LOGGER.debug(<span class="string">"start transform uuid from RequestMessage. keys=&#123;isProvider,isConsumer,mdcMap,rpcMap&#125;"</span>,</span><br><span class="line">                         isProvider, isConsumer, MDC.getCopyOfContextMap(), invocationBody.getAttachments());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 当作为服务提供者的角色时。RpcContext --&gt; MDC</span></span><br><span class="line">        <span class="keyword">if</span> (isProvider) &#123;</span><br><span class="line">            Map&lt;String, Object&gt; mdcMapObj = invocationBody.getAttachments();</span><br><span class="line">            <span class="keyword">if</span> (mdcMapObj != <span class="keyword">null</span> &amp;&amp; mdcMapObj.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                mdcMapObj.forEach((k, v) -&gt; &#123;</span><br><span class="line">                    MDC.put(k, String.valueOf(v));</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 当作为服务消费者的角色时。MDC --&gt; RpcContext</span></span><br><span class="line">        <span class="keyword">if</span> (isConsumer) &#123;</span><br><span class="line">            Map&lt;String, String&gt; mdcMap = MDC.getCopyOfContextMap();</span><br><span class="line">            <span class="keyword">if</span> (mdcMap != <span class="keyword">null</span> &amp;&amp; mdcMap.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                mdcMap.forEach((k, v) -&gt; &#123;</span><br><span class="line">                    <span class="keyword">if</span> (TRANS_ARGS_LIST.contains(k)) &#123;</span><br><span class="line">                        invocationBody.addAttachment(k, v);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (LOGGER.isDebugEnabled()) &#123;</span><br><span class="line">            LOGGER.debug(<span class="string">"after transform uuid. keys=&#123;isProvider,isConsumer,mdcMap,rpcMap&#125;"</span>,</span><br><span class="line">                         isProvider, isConsumer, MDC.getCopyOfContextMap(), invocationBody.getAttachments());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> getNext().invoke(request);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (LOGGER.isDebugEnabled()) &#123;</span><br><span class="line">                LOGGER.debug(<span class="string">"after invoke service. keys=&#123;isProvider,isConsumer,mdcMap,rpcMap&#125;"</span>,</span><br><span class="line">                             isProvider, isConsumer, MDC.getCopyOfContextMap(), invocationBody.getAttachments());</span><br><span class="line">            &#125;</span><br><span class="line">            MDC.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>线程池之间的传输</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 引入方法同上</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MdcTaskDecorator</span> <span class="keyword">implements</span> <span class="title">TaskDecorator</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Runnable <span class="title">decorate</span><span class="params">(Runnable runnable)</span> </span>&#123;</span><br><span class="line">        Map&lt;String, String&gt; map = MDC.getCopyOfContextMap();</span><br><span class="line">        <span class="keyword">return</span> () -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                MDC.setContextMap(map);</span><br><span class="line">                runnable.run();</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                MDC.clear();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>服务与存储引擎</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="number">1</span> <span class="keyword">settings</span> log_comment = <span class="string">'b2b56851715795ff92d1-181d32973a1'</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参考链接： <a href="https://github.com/ClickHouse/ClickHouse/issues/18494" target="_blank" rel="noopener">https://github.com/ClickHouse/ClickHouse/issues/18494</a></p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/32.jpg" alt></p>
+<h4 id="4-2-未来JavaAgent化"><a href="#4-2-未来JavaAgent化" class="headerlink" title="4.2 未来JavaAgent化"></a>4.2 未来JavaAgent化</h4><p><strong>JavaAgent特性</strong></p>
+<ul>
+<li>完全非侵入式的进行代码埋点，进行系统监控</li>
+<li>修改JAVA底层源码，进行JVM自定义</li>
+<li>实现AOP动态代理</li>
+</ul>
+<p>参考文档： <a href="https://www.jrebel.com/blog/how-write-javaagent" target="_blank" rel="noopener">https://www.jrebel.com/blog/how-write-javaagent</a></p>
+<h2 id="三、查询决策整体方案介绍"><a href="#三、查询决策整体方案介绍" class="headerlink" title="三、查询决策整体方案介绍"></a>三、查询决策整体方案介绍</h2><h3 id="1-行业解决方案对比分析详情"><a href="#1-行业解决方案对比分析详情" class="headerlink" title="1.行业解决方案对比分析详情"></a>1.行业解决方案对比分析详情</h3><p>在技术上这个属于“业务链路追踪”范畴的事情。在分布式场景下，链路追踪主流实现方式包括两类，一类是基于日志的ELK方案，一类是基于单次请求调用的会话跟踪方案，但是这两种方案均不适用于我们这种复杂的业务场景。</p>
+<h4 id="1-1-传统的ELK方案"><a href="#1-1-传统的ELK方案" class="headerlink" title="1.1 传统的ELK方案"></a>1.1 传统的ELK方案</h4><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/33.jpg" alt></p>
+<p>方案流程：</p>
+<ol>
+<li>开发者编写程序时尽可能的打印日志；</li>
+<li>应用程序打印的日志被filebeat收集发送给logstash集群；</li>
+<li>logstash解析日志存入ES集群。</li>
+</ol>
+<p>排查问题：</p>
+<p>根据uuid从ES集群搜索相关日志并分析。如果用户使用该种方式排查问题的话，该方式有如下痛点，无法实施；</p>
+<ol>
+<li><strong>搜索慢</strong>：日志一般都是非结构化的文本，ES虽然能查，但涉及到分词并且频繁查询会很慢；</li>
+<li><strong>噪音多</strong>：搜出来的日志可能会很多，也没有重点；对用户无疑大海捞针；</li>
+<li><strong>分析难</strong>：搜索到的数据都是一条条离散的数据，必须充分懂业务逻辑，才能由人工对日志进行串联分析，尽可能地还原出请求的现场，对用户要求太高。</li>
+</ol>
+<h4 id="1-2-分布式链路追踪方案"><a href="#1-2-分布式链路追踪方案" class="headerlink" title="1.2 分布式链路追踪方案"></a>1.2 分布式链路追踪方案</h4><p>在分布式系统，尤其是微服务系统中，业务场景的某次请求往往需要经过多个服务、多个中间件、多台机器的复杂链路处理才能完成。分布式链路追踪方案就是解决这种问题的，分布式链路追踪诞生的标志性事件就是 Google Dapper 论文的发表。市面上的同类型框架几乎都是以Google Dapper论文为基础进行实现，整体大同小异，集团内部的Pfinder也是。<strong>实现原理都是通过一个分布式全局唯一的id（即traceId），将分布在各个服务节点上的同一次请求串联起来，还原调用关系、追踪系统问题、分析调用数据、统计系统指标。</strong></p>
+<blockquote>
+<p>Dapper 首先明确了分布式链路追踪的两个目标：任意部署和持续监测。进而给出了三个具体的设计准则：<br>低开销： 确保核心系统不会因为额外的性能开销拒绝使用。<br>应用级透明： 对应用开发透明，无需开发人员的协助，降低接入门槛，提高迭代效率。<br>可扩展： 在未来相当长一段时间内，随着业务的高速发展，仍然可以有效运转。</p>
+</blockquote>
+<p>分布式链路追踪是一种会话级别的追踪能力，主要作用是分析分布式系统的调用行为，并不能很好地应用于业务逻辑的追踪。举例：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/34.jpg" alt></p>
+<blockquote>
+<p>一个审核业务场景的追踪案例，业务系统对外提供审核能力，待审对象的审核需要经过“初审”和“复审”两个环节（两个环节关联相同的taskId），因此整个审核环节的执行调用了两次审核接口。如图左侧所示，完整的审核场景涉及众多“业务逻辑”的执行，而分布式会话跟踪只是根据两次RPC调用生成了右侧的两条调用链路，并没有办法准确地描述审核场景业务逻辑的执行</p>
+</blockquote>
+<p>指标服务平台的指标生产-消费链路同理，早晨6点生产的指标数据，和下午3点查询指标的请求不仅跨会话，对比上面例子更加复杂。所以这套方案有以下弊端：</p>
+<p><strong>1、无法同时追踪多条链路</strong></p>
+<p>会话级别的追踪。使用traceId串联，不同链路之间相互独立，给完整的业务追踪增加了难度。</p>
+<ol>
+<li>生产和消费链路独立；</li>
+<li>前端看板页面一次刷新，多次请求；</li>
+</ol>
+<p><strong>2、无法聚焦于当前业务系统的逻辑执行</strong></p>
+<p>分布式会话跟踪覆盖了单个请求流经的所有服务、组件、机器等等，不仅包含当前业务系统，还涉及了众多的下游服务。这些大部分都是噪音：</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/35.jpg" alt></p>
+<p><strong>分布式链路追踪主要作用是分析分布式系统间的调用行为，解决的是服务和服务间、服务和中间件间的情况，但是对于我们来说服务内部各种优化决策逻辑和执行逻辑对用户才是最重要的。</strong>举个例子是分布式链路追踪只能看清人和人之间的情况，但是我们的业务场景是想看到每个人下面的毛细血管的情况。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p><strong>传统的ELK方案：</strong></p>
+<p>需要事后从大量离散的日志中搜集和筛选出需要的日志，并人工进行日志的串联分析，其过程必然耗时耗力。</p>
+<p><strong>分布式链路追踪：</strong></p>
+<p>在调用执行的同时，完成了链路的动态串联，但由于是会话级别且仅关注于调服务间用关系等问题，导致其无法很好地应用于业务追踪。</p>
+<h3 id="2-整体流程"><a href="#2-整体流程" class="headerlink" title="2.整体流程"></a>2.整体流程</h3><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/36.jpg" alt></p>
+<h3 id="3-挑战点"><a href="#3-挑战点" class="headerlink" title="3. 挑战点"></a>3. 挑战点</h3><h4 id="3-1-SDK稳定性"><a href="#3-1-SDK稳定性" class="headerlink" title="3.1 SDK稳定性"></a>3.1 SDK稳定性</h4><p>目的：</p>
+<ul>
+<li>不能影响主链路的正常使用，影响主要体现在自身错误发生时不影响、性能上不影响；</li>
+<li>开箱即用，自动埋点和无侵入；</li>
+</ul>
+<p>措施：</p>
+<ol>
+<li>大量的错误隔离机制：</li>
+<li>链路数据的批量异步传输：</li>
+</ol>
+<p>结果：</p>
+<ol>
+<li>性能基准测试：接入SDK耗时在ns内；</li>
+<li>实际工程压测：影响可忽略不计；</li>
+</ol>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/37.jpg" alt></p>
+<h4 id="3-2-跨会话的分布式链路串联"><a href="#3-2-跨会话的分布式链路串联" class="headerlink" title="3.2 跨会话的分布式链路串联"></a>3.2 跨会话的分布式链路串联</h4><p>目的：让整体业务链路(生产、消费、页面)跨会话跨集群跨时间联系起来。</p>
+<p>措施：<strong>单个会话复用分布式链路追踪技术做链路染色，完整的业务链路采用业务标识串联。</strong></p>
+<p>主要体现在以下几个场景上：</p>
+<h5 id="3-2-1-页面一次刷新发起多个查询"><a href="#3-2-1-页面一次刷新发起多个查询" class="headerlink" title="3.2.1 页面一次刷新发起多个查询"></a>3.2.1 页面一次刷新发起多个查询</h5><p>实现方式：调用方在调用时可传入batchId这一业务标识，batchId代表一次页面刷新事件标识，该次页面刷新请求的查询batchId都一样。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/38.jpg" alt></p>
+<h5 id="3-2-2-一次查询对应的SQL在CK集群扫描了多少行数据、用了多少内存、命中那些索引"><a href="#3-2-2-一次查询对应的SQL在CK集群扫描了多少行数据、用了多少内存、命中那些索引" class="headerlink" title="3.2.2 一次查询对应的SQL在CK集群扫描了多少行数据、用了多少内存、命中那些索引"></a>3.2.2 一次查询对应的SQL在CK集群扫描了多少行数据、用了多少内存、命中那些索引</h5><p>实现方式：使用ClickHouse的log_comment能力可以将确定uuid的查询与CK执行的某次SQL关联起来，并结合CK的system.query_log、system.query_thread_log等表获取对应SQL执行用到的索引、扫描的数据行数、使用到的内存。</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/39.jpg" alt></p>
+<h5 id="3-2-3-一次查询使用的数据是那个生产任务生产的，该生产任务表现怎么样？"><a href="#3-2-3-一次查询使用的数据是那个生产任务生产的，该生产任务表现怎么样？" class="headerlink" title="3.2.3 一次查询使用的数据是那个生产任务生产的，该生产任务表现怎么样？"></a>3.2.3 一次查询使用的数据是那个生产任务生产的，该生产任务表现怎么样？</h5><p>实现方式：请求对应的集群 + 其他因素（时间、分区等）–&gt;  对应生产任务及实例</p>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/40.jpg" alt></p>
+<h4 id="3-3-高效的链路数据传输和查询"><a href="#3-3-高效的链路数据传输和查询" class="headerlink" title="3.3 高效的链路数据传输和查询"></a>3.3 高效的链路数据传输和查询</h4><p>目的：链路数据低成本传输 + 高性能查询</p>
+<p>措施：<strong>优化改造传统的ELK链路，解决日志非结构化、避免ES分词查询等弊端，采用ES嵌套结构+copy to进行关键词精准查询。</strong></p>
+<h5 id="3-3-1-SDK结构化的日志打印"><a href="#3-3-1-SDK结构化的日志打印" class="headerlink" title="3.3.1 SDK结构化的日志打印"></a>3.3.1 SDK结构化的日志打印</h5><p>用户只需要引用SDK在日志打印中引入业务信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2023-11-08 00:00:04.994  uuid erp PFTID  INFO 281 --- [BatchSpanProcessor_WorkerThread-1] b.a.o.p.o.e.DataAssetLoggingSpanExporter : DataAssetLoggingSpanExporter invoke. param&#x3D;&#123;&quot;spanPointKey&quot;:&quot;drive_execute_sql&quot;,&quot;routeContext_traceId&quot;:&quot;c853cc931fd1644157332cecdcfee8d2&quot;,&quot;routeContext_spanId&quot;:&quot;1d99cefda2cef59f&quot;,&quot;routeContext_parentSpanId&quot;:&quot;46bcc37f30e1b010&quot;,&quot;其他链路信息&quot;:&quot;······&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-3-2-将上述日志中param后的结构化数据放入ES嵌套结构并进行精准查询，提升查询性能"><a href="#3-3-2-将上述日志中param后的结构化数据放入ES嵌套结构并进行精准查询，提升查询性能" class="headerlink" title="3.3.2 将上述日志中param后的结构化数据放入ES嵌套结构并进行精准查询，提升查询性能"></a>3.3.2 将上述日志中param后的结构化数据放入ES嵌套结构并进行精准查询，提升查询性能</h5><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/41.jpg" alt></p>
+<h5 id="3-3-3-ES关键词精准查询，避免分词查询，大幅提升查询效率"><a href="#3-3-3-ES关键词精准查询，避免分词查询，大幅提升查询效率" class="headerlink" title="3.3.3 ES关键词精准查询，避免分词查询，大幅提升查询效率"></a>3.3.3 ES关键词精准查询，避免分词查询，大幅提升查询效率</h5><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/42.jpg" alt></p>
+<h4 id="3-4-业务关键点的灵活采集与展示"><a href="#3-4-业务关键点的灵活采集与展示" class="headerlink" title="3.4 业务关键点的灵活采集与展示"></a>3.4 业务关键点的灵活采集与展示</h4><p>目的：新服务接入SDK添加新节点后，可观测展示端无需开发即可实时展示。</p>
+<p>措施：<strong>通过设计SDK链路数据内容并结构化流程化的采集到ES中，可观测服务端拿到数据后，根据链路信息实时组织DAG与表格信息展示</strong></p>
+<h5 id="3-4-1-链路数据内容"><a href="#3-4-1-链路数据内容" class="headerlink" title="3.4.1 链路数据内容"></a>3.4.1 链路数据内容</h5><p>SDK自动传输的内容如下。以某个请求SQL执行步骤为例：</p>
+<ul>
+<li>服务信息：SDK自动生成。包含正在处理该请求的服务信息，JDOS应用名 + JSF别名；</li>
+<li>链路串联信息：SDK自动生成。用来动态生成链路的流程图结构；</li>
+<li>步骤基础信息：SDK自动生成。包含请求的基础信息（如resAppKey、请求人等）和该步骤的基本信息（如是否成功、耗时多久等）</li>
+<li>业务信息：用户指定传输。作为步骤额外补充的链路信息；</li>
+</ul>
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/43.jpg" alt></p>
+<h5 id="3-4-2-可观测服务根据“链路串联信息”动态构建流程图的规则文本，并通过组件展示"><a href="#3-4-2-可观测服务根据“链路串联信息”动态构建流程图的规则文本，并通过组件展示" class="headerlink" title="3.4.2 可观测服务根据“链路串联信息”动态构建流程图的规则文本，并通过组件展示"></a>3.4.2 可观测服务根据“链路串联信息”动态构建流程图的规则文本，并通过组件展示</h5><p>链路串联信息组合而成的流程图文本举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">drive_receive_request_fc9: 定义驱动接收请求_编号4</span><br><span class="line">index_service_request_atomic_service_f57: 指标服务请求原子服务_编号3</span><br><span class="line">drive_execute_sql_7f9: 定义驱动执行SQL_编号5</span><br><span class="line">drive_receive_request_0e3: 定义驱动接收请求_编号7</span><br><span class="line">index_service_receive_request_f68: 指标服务接收请求_编号1</span><br><span class="line">index_service_dissemble_8e2: 指标服务拆分:主从_编号2</span><br><span class="line">index_service_request_atomic_service_32d: 指标服务请求原子服务_编号6</span><br><span class="line">drive_execute_sql_7cd: 定义驱动执行SQL_编号8</span><br><span class="line">ck_pub_183: CK183集群</span><br><span class="line">ck_pub_183.shape: stored_data</span><br><span class="line">ck_pub_106: CK106集群</span><br><span class="line">ck_pub_106.shape: stored_data</span><br><span class="line">index_service_request_atomic_service_f57 -&gt; drive_receive_request_fc9</span><br><span class="line">index_service_dissemble_8e2 -&gt; index_service_request_atomic_service_f57: 主查询</span><br><span class="line">drive_receive_request_fc9 -&gt; drive_execute_sql_7f9</span><br><span class="line">index_service_request_atomic_service_32d -&gt; drive_receive_request_0e3</span><br><span class="line">index_service_receive_request_f68 -&gt; index_service_dissemble_8e2</span><br><span class="line">index_service_dissemble_8e2 -&gt; index_service_request_atomic_service_32d: 子查询 &#123;style.stroke-dash: 3&#125;</span><br><span class="line">drive_receive_request_0e3 -&gt; drive_execute_sql_7cd</span><br><span class="line">drive_execute_sql_7f9 -&gt; ck_pub_183</span><br><span class="line">drive_execute_sql_7cd -&gt; ck_pub_106</span><br></pre></td></tr></table></figure>
+
+<p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/44.jpg" alt></p>
+<h5 id="3-4-3-可观测根据步骤信息依次组织其他信息输出为详情表格"><a href="#3-4-3-可观测根据步骤信息依次组织其他信息输出为详情表格" class="headerlink" title="3.4.3 可观测根据步骤信息依次组织其他信息输出为详情表格"></a>3.4.3 可观测根据步骤信息依次组织其他信息输出为详情表格</h5><p><img src="//littleforestjia.github.io/2024/01/11/Java%E6%9C%8D%E5%8A%A1_ELK%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E9%93%BE%E8%B7%AF%E5%BB%BA%E8%AE%BE%E5%AE%9E%E6%88%98%E7%BB%8F%E9%AA%8C/45.jpg" alt></p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>Author：mazongguang(京东)</p>
+<p><a href="https://zhuanlan.zhihu.com/p/141439013?utm_id=0" target="_blank" rel="noopener">Filebeat介绍</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/379656230" target="_blank" rel="noopener">Logstash-介绍</a></p>
+<p><a href="https://blog.51cto.com/u_12970189/2391070" target="_blank" rel="noopener">自建elk+filebeat+grafana日志收集平台</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i> Java</a>
+          
+            <a href="/tags/Filebeat/" rel="tag"><i class="fa fa-tag"></i> Filebeat</a>
+          
+            <a href="/tags/Logstash/" rel="tag"><i class="fa fa-tag"></i> Logstash</a>
+          
+            <a href="/tags/Elasticsearch/" rel="tag"><i class="fa fa-tag"></i> Elasticsearch</a>
+          
+            <a href="/tags/Grafana/" rel="tag"><i class="fa fa-tag"></i> Grafana</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/10/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_DataFabric%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E6%9E%B6%E6%9E%84%E4%B8%8E%E6%8C%87%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%BB%BA%E8%AE%BE&%E9%9B%B6%E5%94%AE%E6%8C%87%E6%A0%87%E4%B8%AD%E5%8F%B0%E5%8C%96%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%8C%96%E5%AE%9E%E8%B7%B5/" rel="next" title="京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践">
+                <i class="fa fa-chevron-left"></i> 京东商智_DataFabric数据管理架构与指标服务建设&零售指标中台化与服务化实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/13/Java%E6%9C%8D%E5%8A%A1_git%E5%91%BD%E4%BB%A4%E5%90%88%E5%B9%B6%E6%88%96%E5%88%A0%E9%99%A4%E6%8F%90%E4%BA%A4%E8%AE%B0%E5%BD%95/" rel="prev" title="Java服务_git命令合并或删除提交记录">
+                Java服务_git命令合并或删除提交记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-ELK日志采集与可视化链路建设实战经验"><span class="nav-number">1.</span> <span class="nav-text">Java服务_ELK日志采集与可视化链路建设实战经验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、分布式链路追踪的前世今生"><span class="nav-number">1.1.</span> <span class="nav-text">一、分布式链路追踪的前世今生</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-起源"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.起源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-服务化框架-–-gt-微服务架构的演进"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">1.1 服务化框架 –&gt; 微服务架构的演进</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-微服务架构与传统单体框架的对比示意"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">1.2 微服务架构与传统单体框架的对比示意</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-分布式系统与微服务的优势"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">1.3 分布式系统与微服务的优势</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-分布式系统与微服务引入的问题"><span class="nav-number">1.1.1.4.</span> <span class="nav-text">1.4 分布式系统与微服务引入的问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-诞生"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.诞生</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-里程碑事件：Google-Dapper"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">2.1 里程碑事件：Google Dapper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-基本原理"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">2.2 基本原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-基础术语"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.基础术语</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-Trace"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">3.1 Trace</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-Span"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">3.2 Span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-Tags"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">3.3 Tags</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-Logs"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">3.4 Logs</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-分布式链路追踪的应用"><span class="nav-number">1.1.4.</span> <span class="nav-text">4.分布式链路追踪的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-单请求轨迹回溯"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">4.1 单请求轨迹回溯</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-服务监控"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">4.2 服务监控</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-链路拓扑"><span class="nav-number">1.1.4.3.</span> <span class="nav-text">4.3 链路拓扑</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-分布式链路追踪的发展现状"><span class="nav-number">1.1.5.</span> <span class="nav-text">5.分布式链路追踪的发展现状</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-分布式链路追踪的挑战与限制"><span class="nav-number">1.1.6.</span> <span class="nav-text">6.分布式链路追踪的挑战与限制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-关键挑战与应对"><span class="nav-number">1.1.6.1.</span> <span class="nav-text">6.1 关键挑战与应对</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-现阶段能力限制"><span class="nav-number">1.1.6.2.</span> <span class="nav-text">6.2 现阶段能力限制</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#树形-YES！图形-NO！"><span class="nav-number">1.1.6.2.1.</span> <span class="nav-text">树形 YES！图形 NO！</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#人工插桩-YES！智能插桩-NO！"><span class="nav-number">1.1.6.2.2.</span> <span class="nav-text">人工插桩 YES！智能插桩 NO！</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、数据服务日志统一建设接入组件"><span class="nav-number">1.2.</span> <span class="nav-text">二、数据服务日志统一建设接入组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-应用接入filebeat（需接入应用改造）"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.应用接入filebeat（需接入应用改造）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-概述"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.1 概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-带filebeat的镜像"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">1.2 带filebeat的镜像</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-日志采集配置"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">1.3 日志采集配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-filebeat的启停"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">1.4 filebeat的启停</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-日志格式-统一日志格式与打印形式"><span class="nav-number">1.2.1.5.</span> <span class="nav-text">1.5 日志格式-统一日志格式与打印形式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-logstash集群部署及解析规则配置（接入应用无需关注）"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.logstash集群部署及解析规则配置（接入应用无需关注）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-集群部署"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.1 集群部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-logstash配置"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2 logstash配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-实际举例"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.3 实际举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-grafana看板的配置"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.grafana看板的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-设计自己想看的面板以及打印对应日志"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">3.1 设计自己想看的面板以及打印对应日志</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-配置grafana看板"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">3.2 配置grafana看板</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-ES中的日志存储"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">3.3 ES中的日志存储</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-调用链路追踪实现"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.调用链路追踪实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-现阶段组件化"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">4.1 现阶段组件化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-未来JavaAgent化"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">4.2 未来JavaAgent化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、查询决策整体方案介绍"><span class="nav-number">1.3.</span> <span class="nav-text">三、查询决策整体方案介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-行业解决方案对比分析详情"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.行业解决方案对比分析详情</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-传统的ELK方案"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">1.1 传统的ELK方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-分布式链路追踪方案"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">1.2 分布式链路追踪方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-整体流程"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.整体流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-挑战点"><span class="nav-number">1.3.3.</span> <span class="nav-text">3. 挑战点</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-SDK稳定性"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">3.1 SDK稳定性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-跨会话的分布式链路串联"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">3.2 跨会话的分布式链路串联</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-1-页面一次刷新发起多个查询"><span class="nav-number">1.3.3.2.1.</span> <span class="nav-text">3.2.1 页面一次刷新发起多个查询</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-2-一次查询对应的SQL在CK集群扫描了多少行数据、用了多少内存、命中那些索引"><span class="nav-number">1.3.3.2.2.</span> <span class="nav-text">3.2.2 一次查询对应的SQL在CK集群扫描了多少行数据、用了多少内存、命中那些索引</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-3-一次查询使用的数据是那个生产任务生产的，该生产任务表现怎么样？"><span class="nav-number">1.3.3.2.3.</span> <span class="nav-text">3.2.3 一次查询使用的数据是那个生产任务生产的，该生产任务表现怎么样？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-高效的链路数据传输和查询"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">3.3 高效的链路数据传输和查询</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-1-SDK结构化的日志打印"><span class="nav-number">1.3.3.3.1.</span> <span class="nav-text">3.3.1 SDK结构化的日志打印</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-2-将上述日志中param后的结构化数据放入ES嵌套结构并进行精准查询，提升查询性能"><span class="nav-number">1.3.3.3.2.</span> <span class="nav-text">3.3.2 将上述日志中param后的结构化数据放入ES嵌套结构并进行精准查询，提升查询性能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-3-ES关键词精准查询，避免分词查询，大幅提升查询效率"><span class="nav-number">1.3.3.3.3.</span> <span class="nav-text">3.3.3 ES关键词精准查询，避免分词查询，大幅提升查询效率</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-业务关键点的灵活采集与展示"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">3.4 业务关键点的灵活采集与展示</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4-1-链路数据内容"><span class="nav-number">1.3.3.4.1.</span> <span class="nav-text">3.4.1 链路数据内容</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4-2-可观测服务根据“链路串联信息”动态构建流程图的规则文本，并通过组件展示"><span class="nav-number">1.3.3.4.2.</span> <span class="nav-text">3.4.2 可观测服务根据“链路串联信息”动态构建流程图的规则文本，并通过组件展示</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4-3-可观测根据步骤信息依次组织其他信息输出为详情表格"><span class="nav-number">1.3.3.4.3.</span> <span class="nav-text">3.4.3 可观测根据步骤信息依次组织其他信息输出为详情表格</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">1.4.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

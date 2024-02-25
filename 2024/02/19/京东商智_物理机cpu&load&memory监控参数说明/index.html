@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="京东商智_物理机cpu&amp;load&amp;memory监控参数说明Linux常用查看系统状态T命令netstat 查看各种网络相关信息，如网络连接、路由表、接口状态、pid、程序名等。 123456789101112131415jiazhengyang3@ZBMac-G44J4T0DY ~ % netstatActive Internet connectionsProto Recv-Q S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="京东商智_物理机cpu&amp;load&amp;memory监控参数说明">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="京东商智_物理机cpu&amp;load&amp;memory监控参数说明Linux常用查看系统状态T命令netstat 查看各种网络相关信息，如网络连接、路由表、接口状态、pid、程序名等。 123456789101112131415jiazhengyang3@ZBMac-G44J4T0DY ~ % netstatActive Internet connectionsProto Recv-Q S">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/1.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/2.jpg">
+<meta property="og:image" content="http://littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/3.jpg">
+<meta property="article:published_time" content="2024-02-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:33:52.940Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/19/京东商智_物理机cpu&load&memory监控参数说明/"/>
+
+
+
+
+
+  <title>京东商智_物理机cpu&load&memory监控参数说明 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">京东商智_物理机cpu&load&memory监控参数说明</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-19T00:00:00+08:00">
+                2024-02-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">京东商智</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="京东商智-物理机cpu-amp-load-amp-memory监控参数说明"><a href="#京东商智-物理机cpu-amp-load-amp-memory监控参数说明" class="headerlink" title="京东商智_物理机cpu&amp;load&amp;memory监控参数说明"></a>京东商智_物理机cpu&amp;load&amp;memory监控参数说明</h1><h2 id="Linux常用查看系统状态T命令"><a href="#Linux常用查看系统状态T命令" class="headerlink" title="Linux常用查看系统状态T命令"></a>Linux常用查看系统状态T命令</h2><p><strong>netstat</strong></p>
+<p>查看各种网络相关信息，如网络连接、路由表、接口状态、pid、程序名等。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">jiazhengyang3@ZBMac-G44J4T0DY ~ % netstat</span><br><span class="line">Active Internet connections</span><br><span class="line">Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)    </span><br><span class="line">tcp4       0      0  localhost.58046        localhost.58047        ESTABLISHED</span><br><span class="line">tcp4       0      0  localhost.58047        localhost.58046        ESTABLISHED</span><br><span class="line">tcp4       0      0  bogon.58038            tsa01s11-in-f10..https SYN_SENT   </span><br><span class="line">tcp4       0      0  bogon.58022            tsa03s08-in-f10..https SYN_SENT   </span><br><span class="line">tcp4       0      0  localhost.56641        localhost.58015        ESTABLISHED</span><br><span class="line">tcp4       0      0  localhost.58015        localhost.56641        ESTABLISHED</span><br><span class="line">tcp4       0      0  localhost.56641        localhost.58014        ESTABLISHED</span><br><span class="line">tcp4       0      0  localhost.58014        localhost.56641        ESTABLISHED</span><br><span class="line">tcp4       0      0  localhost.56641        localhost.58013        ESTABLISHED</span><br><span class="line">tcp4       0      0  localhost.58013        localhost.56641        ESTABLISHED</span><br><span class="line">tcp4       0    517  bogon.57993            tsa01s09-in-f10..https ESTABLISHED</span><br><span class="line">tcp4       0    517  bogon.57548            tsa01s09-in-f10..https FIN_WAIT_1</span><br></pre></td></tr></table></figure>
+
+<p><strong>top</strong></p>
+<p>查看CPU和内存使用情况，输出第一行为负载均衡，第二行为进程统计，第三行为cpu占用情况，第四行为<br>内存使用情况，第五行为交换分区使用情况，剩下的就是各个进程的详细监控数据。</p>
+<p>以下case为macOS，略有不同：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Processes: 410 total, 5 running, 405 sleeping, 3222 threads                                           23:45:26</span><br><span class="line">Load Avg: 5.92, 6.51, 7.26  CPU usage: 17.82% user, 12.28% sys, 69.89% idle</span><br><span class="line">SharedLibs: 299M resident, 69M data, 14M linkedit.</span><br><span class="line">MemRegions: 448904 total, 2578M resident, 371M private, 1500M shared.</span><br><span class="line">PhysMem: 15G used (2660M wired), 79M unused.</span><br><span class="line">VM: 137T vsize, 3823M framework vsize, 462953460(31) swapins, 468214307(0) swapouts.</span><br><span class="line">Networks: packets: 69720517/27G in, 65290912/15G out. Disks: 295518772/15T read, 56002541/7782G written.</span><br><span class="line"></span><br><span class="line">PID    COMMAND      %CPU  TIME     #TH    #WQ  #PORTS MEM    PURG   CMPRS  PGRP  PPID  STATE</span><br><span class="line">62859  CGEScheduler 99.9  192 hrs  80/1   1    978    27M    0B     22M    62859 174   running</span><br><span class="line">27436  ReportCrash  99.7  179 hrs  10/1   1    108    6563K  0B     5088K  27436 1     running</span><br></pre></td></tr></table></figure>
+
+<p><strong>df/du</strong></p>
+<p>df用于查看整个磁盘情况，du用于查看指定文件夹占用磁盘情况。</p>
+<p><strong>free</strong></p>
+<p>用于查看内存使用情况，比top命令多了一个buffers/cache标识内核使用的内存缓冲区情况。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# free</span><br><span class="line">total used free shared buffers cached</span><br><span class="line">Mem: 515740 455452 60288 0 61456 311040</span><br><span class="line">-/+ buffers/cache: 82956 432784</span><br><span class="line">Swap: 1020116 0 1020116</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="CPU监控"><a href="#CPU监控" class="headerlink" title="CPU监控"></a>CPU监控</h2><p><img src="//littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/1.jpg" alt></p>
+<p><strong>User</strong></p>
+<p>User表示CPU一共花了多少比例的时间运行在用户态空间或者说是用户进程(running user space processes)，这不包括运行操作系统内核代码的时间，典型的用户态空间程序有：Shells、数据库、web服务器等。</p>
+<p><strong>Nice</strong></p>
+<p>与User类似，Nice表示CPU执行优先级较低的用户级应用程序代码的时间。nice命令可以改变进程的优先级，nice值越高，优先级越低，范围为[-20,19]。</p>
+<p><strong>System</strong></p>
+<p>System表示CPU花了多少比例的时间在内核空间运行。分配内存、IO操作、创建子进程等都是内核操作，这也表明，当IO操作频繁时，System参数会很高。</p>
+<p><strong>Wait</strong></p>
+<p>在计算机中，读写磁盘的操作远比CPU运行的速度要慢，CPU负载处理数据，而数据一般在磁盘上需要读到内存中才能处理。当CPU发起读写操作后，需要等着磁盘驱动器将数据读入内存，从而导致CPU 在等待的这一段时间内无事可做，CPU处于这种等待状态的时间由Wait或IOWait参数来衡量。</p>
+<p><strong>Idle</strong></p>
+<p>Idel表示CPU处于空闲状态时间比例。一般而言，idel + user + nice 约等于100%，认真来说user + system + nice + idle + iowait + irq + softirq + … = 100%才是正确的。</p>
+<h2 id="Load监控"><a href="#Load监控" class="headerlink" title="Load监控"></a>Load监控</h2><p><img src="//littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/2.jpg" alt></p>
+<p>load average负载均衡，表示一段时间内的活跃进程数。上图中分别是1分钟、5分钟、15分钟的负载值，该值是每隔5秒钟检查一次活跃的进程数，然后按特定算法计算出的数值。</p>
+<h2 id="Memory监控"><a href="#Memory监控" class="headerlink" title="Memory监控"></a>Memory监控</h2><p><img src="//littleforestjia.github.io/2024/02/19/%E4%BA%AC%E4%B8%9C%E5%95%86%E6%99%BA_%E7%89%A9%E7%90%86%E6%9C%BAcpu&load&memory%E7%9B%91%E6%8E%A7%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E/3.jpg" alt></p>
+<p>free命令可以直观的展示内存使用情况：</p>
+<p><strong>total</strong></p>
+<p>total表示内存总数。</p>
+<p><strong>used</strong></p>
+<p>used表示已经使用内存数。</p>
+<p><strong>free</strong></p>
+<p>free表示剩余内存数。注意used + free = total。</p>
+<p><strong>shared</strong></p>
+<p>shared表示不同进程间共享内存，共享内存是一种特殊类型的内存，可以被系统上的多个进程访问，使得进程间通信能够更快捷、高效。</p>
+<p><strong>buffers</strong></p>
+<p>buffers指的是缓冲(Buffer)内存的使用量。缓冲内存是由内核管理的内存区域，用于缓存（即临时存储）文件系统的元数据和跟踪在实际数据读写操作中使用的块设备（比如硬盘）的信息。当文件系统需要读写块设备数据时，它通常会首先检查缓冲区中是否已经存在该数据。如果数据已经在缓冲区中，那么可以直接从内存读取，而无需访问较慢的磁盘，从而提高了性能。</p>
+<p><strong>cached</strong></p>
+<p>cached指的是缓存(cached)内存的使用量。缓存是把读取过的数据保存在内存中，重新读取时若命中（找到需要的数据）就不要去读硬盘了，若没有命中就读硬盘。其中的数据会根据读取频率进行组织，把最频繁读取的内容放在最容易找到的位置，把不再读的内容不断往后排，直至从中删除。 <strong>简单来说，buffer是已经被读过的数据所在块的所有数据，是很可能即将要被读写的数据；而cache是已经被读取过的数据。</strong></p>
+<p><strong>-buffers/cache</strong></p>
+<p>等于used - buffers - cached，表示被系统被实际使用掉的内存。</p>
+<p><strong>+buffers/cache</strong></p>
+<p>等于free + buffers + cached，表示可以挪用的内存总数。</p>
+<p><strong>Swap</strong></p>
+<p>Swap交换空间是一块磁盘上的空间，当系统的物理内存(RAM)不足时，操作系统可以使用这个交换空间作为一个临时的内存使用，是物理内存的一个扩展，可以视为硬盘上的虚拟内存。当系统内存不足时，操作系统会将不常用的内存页移到Swap空间中，以便释放物理内存给当前需要的进程使用。然而，因为交换空间位于硬盘上或者是固态驱动器上，所以其访问速度比直接访问物理内存慢得多，过度依赖交换空间会导致系统性能降低，这种情况被称为“交换爆炸”。通常，当系统使用了大量的Swap并且系统响应变慢时，可能是物理内存不足的迹象，需要考虑增加物理内存或优化当前运行的应用程序。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/18/Java%E6%9C%8D%E5%8A%A1_%E6%95%B0%E6%8D%AE%E6%9C%8D%E5%8A%A1%E9%80%9A%E8%BF%87%E5%8F%8D%E5%B0%84%E5%BF%AB%E9%80%9F%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E7%B1%BB%E5%B9%B6%E8%BF%9B%E8%A1%8CAOP%E5%A2%9E%E5%BC%BA/" rel="next" title="Java服务_数据服务通过反射快速路由实现类并进行AOP增强">
+                <i class="fa fa-chevron-left"></i> Java服务_数据服务通过反射快速路由实现类并进行AOP增强
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/20/ClickHouse_%E8%A1%8C%E4%B8%9A%E6%A8%A1%E5%9D%97ClickHouse%E6%9C%8D%E5%8A%A1%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" rel="prev" title="ClickHouse_行业模块ClickHouse服务优化实战">
+                ClickHouse_行业模块ClickHouse服务优化实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#京东商智-物理机cpu-amp-load-amp-memory监控参数说明"><span class="nav-number">1.</span> <span class="nav-text">京东商智_物理机cpu&amp;load&amp;memory监控参数说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux常用查看系统状态T命令"><span class="nav-number">1.1.</span> <span class="nav-text">Linux常用查看系统状态T命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU监控"><span class="nav-number">1.2.</span> <span class="nav-text">CPU监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Load监控"><span class="nav-number">1.3.</span> <span class="nav-text">Load监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Memory监控"><span class="nav-number">1.4.</span> <span class="nav-text">Memory监控</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

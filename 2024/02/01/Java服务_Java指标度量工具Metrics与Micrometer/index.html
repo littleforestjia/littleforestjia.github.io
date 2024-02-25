@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Metrics,Micrometer," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_Java指标度量工具Metrics与Micrometer一、Metrics工具包1.简介Metrics是一个给JAVA服务的各项指标提供度量工具的包，在JAVA代码中嵌入Metrics代码，可以方便的对业务代码的各个指标进行监控，同时，Metrics能够很好的跟Ganlia、Graphite结合，方便的提供图形化接口。基本使用方式直接将core包导入pom文件即可，配置如下： 123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_Java指标度量工具Metrics与Micrometer">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/01/Java%E6%9C%8D%E5%8A%A1_Java%E6%8C%87%E6%A0%87%E5%BA%A6%E9%87%8F%E5%B7%A5%E5%85%B7Metrics%E4%B8%8EMicrometer/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_Java指标度量工具Metrics与Micrometer一、Metrics工具包1.简介Metrics是一个给JAVA服务的各项指标提供度量工具的包，在JAVA代码中嵌入Metrics代码，可以方便的对业务代码的各个指标进行监控，同时，Metrics能够很好的跟Ganlia、Graphite结合，方便的提供图形化接口。基本使用方式直接将core包导入pom文件即可，配置如下： 123">
+<meta property="article:published_time" content="2024-01-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:44:03.981Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Metrics">
+<meta property="article:tag" content="Micrometer">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/01/Java服务_Java指标度量工具Metrics与Micrometer/"/>
+
+
+
+
+
+  <title>Java服务_Java指标度量工具Metrics与Micrometer | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/01/Java%E6%9C%8D%E5%8A%A1_Java%E6%8C%87%E6%A0%87%E5%BA%A6%E9%87%8F%E5%B7%A5%E5%85%B7Metrics%E4%B8%8EMicrometer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_Java指标度量工具Metrics与Micrometer</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-01T00:00:00+08:00">
+                2024-02-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-Java指标度量工具Metrics与Micrometer"><a href="#Java服务-Java指标度量工具Metrics与Micrometer" class="headerlink" title="Java服务_Java指标度量工具Metrics与Micrometer"></a>Java服务_Java指标度量工具Metrics与Micrometer</h1><h2 id="一、Metrics工具包"><a href="#一、Metrics工具包" class="headerlink" title="一、Metrics工具包"></a>一、Metrics工具包</h2><h3 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h3><p>Metrics是一个给JAVA服务的各项指标提供度量工具的包，在JAVA代码中嵌入Metrics代码，可以方便的对业务代码的各个指标进行监控，同时，Metrics能够很好的跟Ganlia、Graphite结合，方便的提供图形化接口。基本使用方式直接将core包导入pom文件即可，配置如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.codahale.metrics<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>metrics-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>core包主要提供如下核心功能：</p>
+<ul>
+<li>核心类Metrics Registries类似一个metrics容器，维护一个Map，可以是一个服务一个实例。</li>
+<li>支持五种metric类型：Gauges、Counters、Meters、Histograms和Timers。</li>
+<li>可以将metrics值通过JMX、Console，CSV文件和SLF4J loggers发布出来。</li>
+</ul>
+<p>Metrics也提供了对Ehcache、Apache HttpClient、JDBI、Jersey、Jetty、Log4J、Logback、JVM等的集成，可以方便地将Metrics输出到Ganglia、Graphite中，供用户图形化展示，具体用法遇到具体需求再自行探索即可。</p>
+<h3 id="2-度量类型"><a href="#2-度量类型" class="headerlink" title="2.度量类型"></a>2.度量类型</h3><h4 id="2-1-Gauges"><a href="#2-1-Gauges" class="headerlink" title="2.1 Gauges"></a>2.1 Gauges</h4><p>Gauges是一个最简单的度量类，一般用来统计瞬时状态的数据信息，<strong>本质是一个可以随时调用的方法</strong>。如下案例中使用Gauges统计系统中队列中元素个数，通过以下步骤将会向MetricsRegistry容器中注册一个名字为<em>com.netease.test.metrics .TestGauges.pending-job.size</em>的metrics，实时获取队列长度的指标：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 测试Gauges，实时统计pending状态的job个数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestGauges</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个registry，最核心的一个模块，相当于一个应用程序的metrics系统的容器，维护一个Map</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MetricRegistry metrics = <span class="keyword">new</span> MetricRegistry();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Queue&lt;String&gt; queue = <span class="keyword">new</span> LinkedBlockingDeque&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在控制台上打印输出</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics).build();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        reporter.start(<span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//实例化一个Gauge</span></span><br><span class="line">        Gauge&lt;Integer&gt; gauge = <span class="keyword">new</span> Gauge&lt;Integer&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Integer <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> queue.size();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//注册到容器中</span></span><br><span class="line">        metrics.register(MetricRegistry.name(TestGauges.class, "pending-job", "size"), gauge);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//测试JMX</span></span><br><span class="line">        JmxReporter jmxReporter = JmxReporter.forRegistry(metrics).build();</span><br><span class="line">        jmxReporter.start();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//模拟数据</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">20</span>; i++)&#123;</span><br><span class="line">            queue.add(<span class="string">"a"</span>);</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">console output:</span></span><br><span class="line"><span class="comment">14-2-17 15:29:35 ===============================================================</span></span><br><span class="line"><span class="comment">-- Gauges ----------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestGauges.pending-job.size</span></span><br><span class="line"><span class="comment">             value = 4</span></span><br><span class="line"><span class="comment">14-2-17 15:29:38 ===============================================================</span></span><br><span class="line"><span class="comment">-- Gauges ----------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestGauges.pending-job.size</span></span><br><span class="line"><span class="comment">             value = 6</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-Counter"><a href="#2-2-Counter" class="headerlink" title="2.2 Counter"></a>2.2 Counter</h4><p>Counter是Gauge的一个特例，维护一个计数器，可以通过inc()和dec()方法对计数器进行修改，<strong>本质就是一个计数器</strong>。使用步骤与Gauge基本类似，在MetricRegistry中提供了静态方法可以直接实例化一个Counter。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 测试Counter</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestCounter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个registry，最核心的一个模块，相当于一个应用程序的metrics系统的容器，维护一个Map</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MetricRegistry metrics = <span class="keyword">new</span> MetricRegistry();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在控制台上打印输出</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics).build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个counter,同样可以通过如下方式进行实例化再注册进去</span></span><br><span class="line"><span class="comment">     * pendingJobs = new Counter();</span></span><br><span class="line"><span class="comment">     * metrics.register(MetricRegistry.name(TestCounter.class, "pending-jobs"), pendingJobs);</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    private static Counter pendingJobs = metrics.counter(name(TestCounter.class, "pedding-jobs"));</span><br><span class="line"><span class="comment">//    private static Counter pendingJobs = metrics.counter(MetricRegistry.name(TestCounter.class, "pedding-jobs"));</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Queue&lt;String&gt; queue = <span class="keyword">new</span> LinkedList&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        pendingJobs.inc();</span><br><span class="line">        queue.offer(str);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">take</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        pendingJobs.dec();</span><br><span class="line">        <span class="keyword">return</span> queue.poll();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[]args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        reporter.start(<span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            add(<span class="string">"1"</span>);</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">console output：</span></span><br><span class="line"><span class="comment">14-2-17 17:52:34 ===============================================================</span></span><br><span class="line"><span class="comment">-- Counters --------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestCounter.pedding-jobs</span></span><br><span class="line"><span class="comment">             count = 4</span></span><br><span class="line"><span class="comment">14-2-17 17:52:37 ===============================================================</span></span><br><span class="line"><span class="comment">-- Counters --------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestCounter.pedding-jobs</span></span><br><span class="line"><span class="comment">             count = 6</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-Meters"><a href="#2-3-Meters" class="headerlink" title="2.3 Meters"></a>2.3 Meters</h4><p>Meters用来度量某个时间段的平均处理次数（request per second），如每1、5、15分钟的TPS，<strong>本质是使用一个map存储下事件和对应发生时间，然后基于该map中的数据进行预设的统计计算</strong>。比如一个service的请求数，通过metrics.meter()实例化一个Meter之后，然后通过meter.mark()方法就能将本次请求记录下来，统计结果有总的请求数，平均每秒的请求数，以及最近的1、5、15分钟的平均TPS。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 测试Meters</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestMeters</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个registry，最核心的一个模块，相当于一个应用程序的metrics系统的容器，维护一个Map</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MetricRegistry metrics = <span class="keyword">new</span> MetricRegistry();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在控制台上打印输出</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics).build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个Meter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    private static final Meter requests = metrics.meter(name(TestMeters.class, "request"));</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        requests.mark();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        reporter.start(<span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            handleRequest();</span><br><span class="line">            Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">14-2-17 18:43:08 ===============================================================</span></span><br><span class="line"><span class="comment">-- Meters ----------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestMeters.request</span></span><br><span class="line"><span class="comment">             count = 30</span></span><br><span class="line"><span class="comment">         mean rate = 9.95 events/second</span></span><br><span class="line"><span class="comment">     1-minute rate = 0.00 events/second</span></span><br><span class="line"><span class="comment">     5-minute rate = 0.00 events/second</span></span><br><span class="line"><span class="comment">    15-minute rate = 0.00 events/second</span></span><br><span class="line"><span class="comment">14-2-17 18:43:11 ===============================================================</span></span><br><span class="line"><span class="comment">-- Meters ----------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestMeters.request</span></span><br><span class="line"><span class="comment">             count = 60</span></span><br><span class="line"><span class="comment">         mean rate = 9.99 events/second</span></span><br><span class="line"><span class="comment">     1-minute rate = 10.00 events/second</span></span><br><span class="line"><span class="comment">     5-minute rate = 10.00 events/second</span></span><br><span class="line"><span class="comment">    15-minute rate = 10.00 events/second</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-Histograms"><a href="#2-4-Histograms" class="headerlink" title="2.4 Histograms"></a>2.4 Histograms</h4><p>Histograms主要使用来统计数据的分布情况，最大值、最小值、平均值、中位数，百分比（75%、90%、95%、98%、99%和99.9%），<strong>本质是使用一个list存储一组数值数据，然后基于该list中的数据进行预设的统计计算</strong>。我自己写的HBase压测工具PerformanceEvaluation中使用到了该metrics类来进行请求响应时间分布情况统计。Histograms简单使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 测试Histograms</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestHistograms</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个registry，最核心的一个模块，相当于一个应用程序的metrics系统的容器，维护一个Map</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MetricRegistry metrics = <span class="keyword">new</span> MetricRegistry();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在控制台上打印输出</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics).build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个Histograms</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    private static final Histogram randomNums = metrics.histogram(name(TestHistograms.class, "random"));</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(<span class="keyword">double</span> random)</span> </span>&#123;</span><br><span class="line">        randomNums.update((<span class="keyword">int</span>) (random*<span class="number">100</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        reporter.start(<span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line">        Random rand = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            handleRequest(rand.nextDouble());</span><br><span class="line">            Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">14-2-17 19:39:11 ===============================================================</span></span><br><span class="line"><span class="comment">-- Histograms ------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestHistograms.random</span></span><br><span class="line"><span class="comment">             count = 30</span></span><br><span class="line"><span class="comment">               min = 1</span></span><br><span class="line"><span class="comment">               max = 97</span></span><br><span class="line"><span class="comment">              mean = 45.93</span></span><br><span class="line"><span class="comment">            stddev = 29.12</span></span><br><span class="line"><span class="comment">            median = 39.50</span></span><br><span class="line"><span class="comment">              75% &lt;= 71.00</span></span><br><span class="line"><span class="comment">              95% &lt;= 95.90</span></span><br><span class="line"><span class="comment">              98% &lt;= 97.00</span></span><br><span class="line"><span class="comment">              99% &lt;= 97.00</span></span><br><span class="line"><span class="comment">            99.9% &lt;= 97.00</span></span><br><span class="line"><span class="comment">14-2-17 19:39:14 ===============================================================</span></span><br><span class="line"><span class="comment">-- Histograms ------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestHistograms.random</span></span><br><span class="line"><span class="comment">             count = 60</span></span><br><span class="line"><span class="comment">               min = 0</span></span><br><span class="line"><span class="comment">               max = 97</span></span><br><span class="line"><span class="comment">              mean = 41.17</span></span><br><span class="line"><span class="comment">            stddev = 28.60</span></span><br><span class="line"><span class="comment">            median = 34.50</span></span><br><span class="line"><span class="comment">              75% &lt;= 69.75</span></span><br><span class="line"><span class="comment">              95% &lt;= 92.90</span></span><br><span class="line"><span class="comment">              98% &lt;= 96.56</span></span><br><span class="line"><span class="comment">              99% &lt;= 97.00</span></span><br><span class="line"><span class="comment">            99.9% &lt;= 97.00</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-5-Timers"><a href="#2-5-Timers" class="headerlink" title="2.5 Timers"></a>2.5 Timers</h4><p>Timers主要是用来统计某一块代码段的执行时间以及其请求分布情况，具体是基于Histograms和Meters来实现的，<strong>本质就是同时使用一个map存储下事件和对应发生时间，使用一个list存储一组数值数据，然后基于map和list中的数据进行预设的统计计算</strong>。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 测试Timers</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestTimers</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个registry，最核心的一个模块，相当于一个应用程序的metrics系统的容器，维护一个Map</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MetricRegistry metrics = <span class="keyword">new</span> MetricRegistry();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在控制台上打印输出</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics).build();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 实例化一个Meter</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"><span class="comment">//    private static final Timer requests = metrics.timer(name(TestTimers.class, "request"));</span></span><br><span class="line">    private static final Timer requests = metrics.timer(name(TestTimers.class, "request"));</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(<span class="keyword">int</span> sleep)</span> </span>&#123;</span><br><span class="line">        Timer.Context context = requests.time();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//some operator</span></span><br><span class="line">            Thread.sleep(sleep);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            context.stop();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        reporter.start(<span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line">        Random random = <span class="keyword">new</span> Random();</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            handleRequest(random.nextInt(<span class="number">1000</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">14-2-18 9:31:54 ================================================================</span></span><br><span class="line"><span class="comment">-- Timers ----------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestTimers.request</span></span><br><span class="line"><span class="comment">             count = 4</span></span><br><span class="line"><span class="comment">         mean rate = 1.33 calls/second</span></span><br><span class="line"><span class="comment">     1-minute rate = 0.00 calls/second</span></span><br><span class="line"><span class="comment">     5-minute rate = 0.00 calls/second</span></span><br><span class="line"><span class="comment">    15-minute rate = 0.00 calls/second</span></span><br><span class="line"><span class="comment">               min = 483.07 milliseconds</span></span><br><span class="line"><span class="comment">               max = 901.92 milliseconds</span></span><br><span class="line"><span class="comment">              mean = 612.64 milliseconds</span></span><br><span class="line"><span class="comment">            stddev = 196.32 milliseconds</span></span><br><span class="line"><span class="comment">            median = 532.79 milliseconds</span></span><br><span class="line"><span class="comment">              75% &lt;= 818.31 milliseconds</span></span><br><span class="line"><span class="comment">              95% &lt;= 901.92 milliseconds</span></span><br><span class="line"><span class="comment">              98% &lt;= 901.92 milliseconds</span></span><br><span class="line"><span class="comment">              99% &lt;= 901.92 milliseconds</span></span><br><span class="line"><span class="comment">            99.9% &lt;= 901.92 milliseconds</span></span><br><span class="line"><span class="comment">14-2-18 9:31:57 ================================================================</span></span><br><span class="line"><span class="comment">-- Timers ----------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">com.netease.test.metrics.TestTimers.request</span></span><br><span class="line"><span class="comment">             count = 8</span></span><br><span class="line"><span class="comment">         mean rate = 1.33 calls/second</span></span><br><span class="line"><span class="comment">     1-minute rate = 1.40 calls/second</span></span><br><span class="line"><span class="comment">     5-minute rate = 1.40 calls/second</span></span><br><span class="line"><span class="comment">    15-minute rate = 1.40 calls/second</span></span><br><span class="line"><span class="comment">               min = 41.07 milliseconds</span></span><br><span class="line"><span class="comment">               max = 968.19 milliseconds</span></span><br><span class="line"><span class="comment">              mean = 639.50 milliseconds</span></span><br><span class="line"><span class="comment">            stddev = 306.12 milliseconds</span></span><br><span class="line"><span class="comment">            median = 692.77 milliseconds</span></span><br><span class="line"><span class="comment">              75% &lt;= 885.96 milliseconds</span></span><br><span class="line"><span class="comment">              95% &lt;= 968.19 milliseconds</span></span><br><span class="line"><span class="comment">              98% &lt;= 968.19 milliseconds</span></span><br><span class="line"><span class="comment">              99% &lt;= 968.19 milliseconds</span></span><br><span class="line"><span class="comment">            99.9% &lt;= 968.19 milliseconds</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-Reporters导出度量数据"><a href="#3-Reporters导出度量数据" class="headerlink" title="3.Reporters导出度量数据"></a>3.Reporters导出度量数据</h3><h4 id="3-1-ConsoleReporters"><a href="#3-1-ConsoleReporters" class="headerlink" title="3.1 ConsoleReporters"></a>3.1 ConsoleReporters</h4><p>ConsoleReporters常用于定时向控制台发送服务的各项指标数据。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ConsoleReporter reporter = ConsoleReporter.forRegistry(registry)</span><br><span class="line">                                                .convertRatesTo(TimeUnit.SECONDS)</span><br><span class="line">                                                .convertDurationsTo(TimeUnit.MILLISECONDS)</span><br><span class="line">                                                .build();</span><br><span class="line">reporter.start(<span class="number">1</span>, TimeUnit.MINUTES);</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-CsvReporter"><a href="#3-2-CsvReporter" class="headerlink" title="3.2 CsvReporter"></a>3.2 CsvReporter</h4><p>CsvReporter常用于定时向给定目录下的<code>.csv</code>文件追加服务各项指标数据，对于每一项指标都会在指定目录下创建一个<code>.csv</code>文件，然后定时向每个文件中追加指标最新数据。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> CsvReporter reporter = CsvReporter.forRegistry(registry)</span><br><span class="line">                                        .formatFor(Locale.US)</span><br><span class="line">                                        .convertRatesTo(TimeUnit.SECONDS)</span><br><span class="line">                                        .convertDurationsTo(TimeUnit.MILLISECONDS)</span><br><span class="line">                                        .build(<span class="keyword">new</span> File(<span class="string">"~/projects/data/"</span>));</span><br><span class="line">reporter.start(<span class="number">1</span>, TimeUnit.SECONDS);</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-JmxReporter"><a href="#3-3-JmxReporter" class="headerlink" title="3.3 JmxReporter"></a>3.3 JmxReporter</h4><p>JmxReporter将服务的各项度量指标通过JMX MBeans暴露出来，之后可以使用VisualVM查看指标数据，不建议在生产环境中使用。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> JmxReporter reporter = JmxReporter.forRegistry(registry).build();</span><br><span class="line">reporter.start();</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-Slf4jReporter"><a href="#3-4-Slf4jReporter" class="headerlink" title="3.4 Slf4jReporter"></a>3.4 Slf4jReporter</h4><p>Slf4jReporter允许我们定时将服务的指标数据作为日志记录到日志文件中。使用案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Slf4jReporter reporter = Slf4jReporter.forRegistry(registry).outputTo(LoggerFactory.getLogger(<span class="string">"com.example.metrics"</span>))</span><br><span class="line">                                            .convertRatesTo(TimeUnit.SECONDS)</span><br><span class="line">                                            .convertDurationsTo(TimeUnit.MILLISECONDS)</span><br><span class="line">                                            .build();</span><br><span class="line">reporter.start(<span class="number">1</span>, TimeUnit.MINUTES);</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="二、Micrometer"><a href="#二、Micrometer" class="headerlink" title="二、Micrometer"></a>二、Micrometer</h2><h3 id="1-简介-1"><a href="#1-简介-1" class="headerlink" title="1.简介"></a>1.简介</h3><h4 id="1-1-Micrometer与Metrics异同"><a href="#1-1-Micrometer与Metrics异同" class="headerlink" title="1.1 Micrometer与Metrics异同"></a>1.1 Micrometer与Metrics异同</h4><p>Micrometer与Metrics一样也是java生态中用于对业务和应用性能度量进行记录和监控的工具，提供了一些列工具用于手机、存储和报告各种运行时度量，如请求次数、处理时间、系统资源使用等。</p>
+<p>Micrometer与Metrics在功能上相似，都在内部维护了一组度量指标的集合，如使用map、list等在应用运行过程中收集相应数据，且都会启动一个后台进程或任务，负责周期性地将收集到的度量数据上报到配置的存储或后端监控系统中，开发者可以基于这些信息构建报警系统来响应特定的度量阈值。</p>
+<p>但是Micrometer与Metrics作为两个不同的度量工具库，也有一些差异，Micrometer在设计之初就更强调作为不同度量的适配和规范中间层，支持用户方便的自定义实现，支持多维度标签，适合集群监控；而Metrics更偏重独立的监控系统解决方案，主要面向固定维度监控，也不适合现代化云集群部署监控。且Micrometer在设计上更强调通过通用api支持更多的监控后端，如Prometheus等现代化监控系统；虽然Metrics也可以通过实现Reporter接口来扩展新的后端支持，但是自定义工作较复杂。总而言之，当涉及到集群部署应用监控，且需要集成灵活美观的监控系统，使用Micrometer更好，且Micrometer天然与Spring Boot框架集成；当只需要单机使用且偏工具性质时，如压测工具等场景，使用Metrics更好。</p>
+<h4 id="1-2-Micrometer核心组件"><a href="#1-2-Micrometer核心组件" class="headerlink" title="1.2 Micrometer核心组件"></a>1.2 Micrometer核心组件</h4><p>Micrometer中核心两个内容便是meter监控组件和registry注册器，meter就是各种监控数据存储和计算工具，比如计数器，计量器，计时器等；registry是一个监控组件管理类，用于创建、管理各种meter，并决定将meter数据输出到哪里。不同的监控系统就会有不同的registry注册器实现，它们的共同父类都是MeterRegistry，如对应Prometheus的注册器是PrometheusMeterRegistry。</p>
+<p>Meter的类型包括：Timer，Counter，Gauge，DistributionSummary，LongTaskTimer，FunctionCounter，FunctionTimer和TimeGauge。而一个Meter的具体实现类型需要通过名字和Tag(这里指的是Micrometer提供的Tag接口)作为它的唯一标识，这样做的好处是可以使用名字进行标记，通过不同的Tag去区分多种维度进行数据统计。</p>
+<h3 id="2-Registry"><a href="#2-Registry" class="headerlink" title="2.Registry"></a>2.Registry</h3><p>MeterRegistry是Micrometer的一个抽象类，对其几个比较特殊的实现类进行一下介绍：</p>
+<h4 id="2-1-SimpleMeterRegistry"><a href="#2-1-SimpleMeterRegistry" class="headerlink" title="2.1 SimpleMeterRegistry"></a>2.1 SimpleMeterRegistry</h4><p>SimpleMeterRegistry是最简单的Register，在Spring-based的应用程序中自动装配，它会在内存中保存每个meter的最新值，但是不会将这个值发布到任何地方：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MeterRegistry registry = <span class="keyword">new</span> SimpleMeterRegistry();</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-CompositeMeterRegistry"><a href="#2-2-CompositeMeterRegistry" class="headerlink" title="2.2 CompositeMeterRegistry"></a>2.2 CompositeMeterRegistry</h4><p>Micrometer提供了一个CompositeMeterRegistry，允许开发者通过添加多个registry的方式将指标数据同时发布到多个监控系统中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">CompositeMeterRegistry composite = <span class="keyword">new</span> CompositeMeterRegistry();</span><br><span class="line"></span><br><span class="line">Counter compositeCounter = composite.counter(<span class="string">"counter"</span>);</span><br><span class="line"><span class="comment">// 此处increment语句处于等待状态，直到CompositeMeterRegistry注册了一个registry。</span></span><br><span class="line"><span class="comment">// 此时counter计数器值为0</span></span><br><span class="line">compositeCounter.increment(); (<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">SimpleMeterRegistry simple = <span class="keyword">new</span> SimpleMeterRegistry();</span><br><span class="line"><span class="comment">// counter计数器注册到simple registry</span></span><br><span class="line">composite.add(simple); (<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// simple registry counter 与CompositeMeterRegistry中的其他registries的counter一起递增</span></span><br><span class="line">compositeCounter.increment(); (<span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-全局的MeterRegistry"><a href="#2-3-全局的MeterRegistry" class="headerlink" title="2.3 全局的MeterRegistry"></a>2.3 全局的MeterRegistry</h4><p>工厂类<code>io.micrometer.core.instrument.Metrics</code>中持有一个final静态的全局实现类globalRegistry，它也是一个CompositeMeterRegistry实例，其内部提供了一系列用于构建meters的方法。</p>
+<h4 id="2-4-自定义Registry"><a href="#2-4-自定义Registry" class="headerlink" title="2.4 自定义Registry"></a>2.4 自定义Registry</h4><p>Micrometer为我们提供了很多开箱即用的Registry，基本上可以满足大多数的业务场景，同时也支持用户根据实际场景需求，自定义registry。通常我们可以通过继承MeterRegistry、PushMeterRegistry或者StepMeterRegistry来创建定制化的输出到不同监控系统的Registry。</p>
+<h3 id="3-Micrometer基于SpirngBoot、Prometheus、Grafana集成"><a href="#3-Micrometer基于SpirngBoot、Prometheus、Grafana集成" class="headerlink" title="3. Micrometer基于SpirngBoot、Prometheus、Grafana集成"></a>3. Micrometer基于SpirngBoot、Prometheus、Grafana集成</h3><p>集成了Micrometer框架的JVM应用使用到Micrometer的API收集的度量数据位于内存之中，因此，需要额外的存储系统去存储这些度量数据，需要有监控系统负责统一收集和处理这些数据，还需要有一些UI工具去展示数据。常见的存储系统就是时序数据库，主流的有Influx、Datadog等。比较主流的用于数据收集和处理的监控系统就是Prometheus(普罗米修斯)。展示的UI目前相对用得比较多的就是Grafana。另外Prometheus已经内置了一个时序数据库的实现，因此在做一套相对完善的度量数据监控的系统只需要依赖目标JVM应用、Prometheus组件和Grafana组件即可。</p>
+<p><strong>一般通过Micrometer提供的开箱即用的Registry，就可以覆盖docker、服务器、SpringBoot应用程序等基本的系统指标监控，也可以通过实现自定义指标监控给到prometheus进行采集和可视化。但是我们一般通过prometheus进行系统指标的监控，业务指标通常使用ELK来监控，毕竟ELK面向的是日志数据，只要我们记录下了日志就可以把日志数据清洗出来做业务指标面板监控。</strong></p>
+<p><strong>线上问题的引入原因主要有变更、过载和强依赖故障，强依赖故障又可递归分为强依赖变更和强依赖过载。那么这两个不同的监控系统可分别用来应对不用的系统线上问题排查，其中ELK业务监控可用于监控变更带来的业务逻辑问题，如查询sql生成链路查看等；Prometheus系统监控可用于监控变更带来的程序错误，如接口可用率下降，也可用于监控过载带来的系统负载问题，如内存打满等。</strong></p>
+<p>更多搭建和实现细节自行查看参考文献。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p>Metrics：</p>
+<p><a href="https://www.cnblogs.com/nexiyi/p/metrics_sample_1.html" target="_blank" rel="noopener">Metrics-Java版的指标度量工具之一 </a></p>
+<p><a href="https://www.cnblogs.com/nexiyi/p/metrics_sample_2.html" target="_blank" rel="noopener">Metrics-Java版的指标度量工具之二 </a></p>
+<p><a href="https://segmentfault.com/a/1190000041211098" target="_blank" rel="noopener">微服务性能监控系列-基于Metrics的实时监控系统</a></p>
+<p>Micrometer：</p>
+<p><a href="https://segmentfault.com/a/1190000041250566" target="_blank" rel="noopener">服务性能监控之Micrometer详解</a></p>
+<p><a href="https://www.cnblogs.com/yunlongn/p/11343848.html" target="_blank" rel="noopener">给你的SpringBoot做埋点监控–JVM应用度量框架Micrometer </a></p>
+<p><a href="https://www.zhihu.com/question/27075747" target="_blank" rel="noopener">Java类应用监控应该监控哪些？</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Metrics/" rel="tag"><i class="fa fa-tag"></i> Metrics</a>
+          
+            <a href="/tags/Micrometer/" rel="tag"><i class="fa fa-tag"></i> Micrometer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/31/HBase_Java%E7%A6%BB%E7%BA%BF%E8%84%9A%E6%9C%AC%E6%88%96%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1%E4%B8%AD%E4%BD%BF%E7%94%A8Queue%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0%E9%99%90%E6%B5%81%E5%92%8C%E5%89%8A%E5%B3%B0%E5%AE%9E%E6%88%98/" rel="next" title="HBase_Java离线脚本或单机部署服务中使用Queue队列实现限流和削峰实战">
+                <i class="fa fa-chevron-left"></i> HBase_Java离线脚本或单机部署服务中使用Queue队列实现限流和削峰实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/02/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91%E4%B9%8B%E7%A6%BB%E7%BA%BF%E8%AE%A1%E7%AE%97_join%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8Espark&ck%E4%B8%AD%E7%9A%84join%E4%BC%98%E5%8C%96/" rel="prev" title="数据开发之离线计算_join的原理与spark&ck中的join优化">
+                数据开发之离线计算_join的原理与spark&ck中的join优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-Java指标度量工具Metrics与Micrometer"><span class="nav-number">1.</span> <span class="nav-text">Java服务_Java指标度量工具Metrics与Micrometer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、Metrics工具包"><span class="nav-number">1.1.</span> <span class="nav-text">一、Metrics工具包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-简介"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-度量类型"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.度量类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Gauges"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">2.1 Gauges</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Counter"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">2.2 Counter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-Meters"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">2.3 Meters</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-Histograms"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">2.4 Histograms</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-Timers"><span class="nav-number">1.1.2.5.</span> <span class="nav-text">2.5 Timers</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Reporters导出度量数据"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.Reporters导出度量数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-ConsoleReporters"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">3.1 ConsoleReporters</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-CsvReporter"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">3.2 CsvReporter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-JmxReporter"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">3.3 JmxReporter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-Slf4jReporter"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">3.4 Slf4jReporter</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Micrometer"><span class="nav-number">1.2.</span> <span class="nav-text">二、Micrometer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-简介-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.简介</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-Micrometer与Metrics异同"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.1 Micrometer与Metrics异同</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-Micrometer核心组件"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">1.2 Micrometer核心组件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Registry"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.Registry</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-SimpleMeterRegistry"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.1 SimpleMeterRegistry</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-CompositeMeterRegistry"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2 CompositeMeterRegistry</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-全局的MeterRegistry"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.3 全局的MeterRegistry</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-自定义Registry"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">2.4 自定义Registry</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Micrometer基于SpirngBoot、Prometheus、Grafana集成"><span class="nav-number">1.2.3.</span> <span class="nav-text">3. Micrometer基于SpirngBoot、Prometheus、Grafana集成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">1.3.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

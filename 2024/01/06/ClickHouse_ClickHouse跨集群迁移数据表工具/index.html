@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ClickHouse," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ClickHouse_ClickHouse跨集群迁移数据表工具关键命令1insert into sz.app_jdr_traffic_sz_all_chan_mvp_i_d_d_d select * from remote(&#39;11.102.245.98:9600&#39;,sz,app_jdr_traffic_sz_all_chan_mvp_i_d_d,&#39;rw_sz_merchant_flow_slave">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ClickHouse_ClickHouse跨集群迁移数据表工具">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/01/06/ClickHouse_ClickHouse%E8%B7%A8%E9%9B%86%E7%BE%A4%E8%BF%81%E7%A7%BB%E6%95%B0%E6%8D%AE%E8%A1%A8%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="ClickHouse_ClickHouse跨集群迁移数据表工具关键命令1insert into sz.app_jdr_traffic_sz_all_chan_mvp_i_d_d_d select * from remote(&#39;11.102.245.98:9600&#39;,sz,app_jdr_traffic_sz_all_chan_mvp_i_d_d,&#39;rw_sz_merchant_flow_slave">
+<meta property="article:published_time" content="2024-01-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:38:45.806Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="ClickHouse">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/01/06/ClickHouse_ClickHouse跨集群迁移数据表工具/"/>
+
+
+
+
+
+  <title>ClickHouse_ClickHouse跨集群迁移数据表工具 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/01/06/ClickHouse_ClickHouse%E8%B7%A8%E9%9B%86%E7%BE%A4%E8%BF%81%E7%A7%BB%E6%95%B0%E6%8D%AE%E8%A1%A8%E5%B7%A5%E5%85%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ClickHouse_ClickHouse跨集群迁移数据表工具</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-01-06T00:00:00+08:00">
+                2024-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ClickHouse/" itemprop="url" rel="index">
+                    <span itemprop="name">ClickHouse</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ClickHouse-ClickHouse跨集群迁移数据表工具"><a href="#ClickHouse-ClickHouse跨集群迁移数据表工具" class="headerlink" title="ClickHouse_ClickHouse跨集群迁移数据表工具"></a>ClickHouse_ClickHouse跨集群迁移数据表工具</h1><h2 id="关键命令"><a href="#关键命令" class="headerlink" title="关键命令"></a>关键命令</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> sz.app_jdr_traffic_sz_all_chan_mvp_i_d_d_d <span class="keyword">select</span> * <span class="keyword">from</span> remote(<span class="string">'11.102.245.98:9600'</span>,sz,app_jdr_traffic_sz_all_chan_mvp_i_d_d,<span class="string">'rw_sz_merchant_flow_slave_v1'</span>,<span class="string">'RkDtzFEgMbxKmCH2MbkO'</span>) <span class="keyword">where</span> <span class="keyword">partition</span> &gt;= <span class="string">'2023-12-11'</span> <span class="keyword">and</span> <span class="keyword">partition</span> &lt;= <span class="string">'2023-12-11'</span> <span class="keyword">settings</span> receive_timeout = <span class="number">6000</span>, send_timeout = <span class="number">6000</span>, insert_deduplicate = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>主要使用上述语句可以实现跨集群数据迁移，需要注意：</p>
+<ol>
+<li>一般是读本地表写分布式表，因为跨集群的分片数和副本数不一定一致，需要指定新表的分片键，然后写分布式表，让分布式表帮助分片；</li>
+<li>需要轮询源表的不同节点，分别读数，因为需要尽量分散读数操作，避免超出时间、内存等配额限制；</li>
+<li>需要轮询源表的不同分区，分别读数，因为需要尽量分散读数操作，避免超出时间、内存等配额限制。</li>
+</ol>
+<h2 id="完整工具代码"><a href="#完整工具代码" class="headerlink" title="完整工具代码"></a>完整工具代码</h2><p><strong>启动命令</strong></p>
+<p>/usr/bin/python3 copyData.py –src_db eco_data_bp –src_table adm_eco_s10_afs_sku_sum_test_local –dest_db eco_data_bp –dest_table adm_eco_s10_afs_sku_sum_test_local</p>
+<p><strong>conf.json</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"srcCluster"</span>:&#123;</span><br><span class="line">        <span class="attr">"host"</span>: <span class="string">"ckpub76.olap.jd.com"</span>,</span><br><span class="line">        <span class="attr">"port"</span>: <span class="number">2000</span>,</span><br><span class="line">        <span class="attr">"user"</span>: <span class="string">"default"</span>,</span><br><span class="line">        <span class="attr">"password"</span>: <span class="string">"***"</span>,</span><br><span class="line">        <span class="attr">"cluster_name"</span>: <span class="string">"LF10_CK_Pub_76"</span>,</span><br><span class="line">        <span class="attr">"tcp_http_mappings"</span>:</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"9000"</span>: <span class="string">"8123"</span>,</span><br><span class="line">            <span class="attr">"9600"</span>: <span class="string">"8623"</span>,</span><br><span class="line">            <span class="attr">"9700"</span>: <span class="string">"8723"</span>,</span><br><span class="line">            <span class="attr">"9800"</span>: <span class="string">"8823"</span>,</span><br><span class="line">            <span class="attr">"9900"</span>: <span class="string">"8923"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"destCluster"</span>:&#123;</span><br><span class="line">        <span class="attr">"host"</span>: <span class="string">"ckpub163.olap.jd.com"</span>,</span><br><span class="line">        <span class="attr">"port"</span>: <span class="number">2000</span>,</span><br><span class="line">        <span class="attr">"user"</span>: <span class="string">"default"</span>,</span><br><span class="line">        <span class="attr">"password"</span>: <span class="string">"***"</span>,</span><br><span class="line">        <span class="attr">"cluster_name"</span>: <span class="string">"LFRH_CK_Pub_163"</span>,</span><br><span class="line">        <span class="attr">"tcp_http_mappings"</span>:</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"9000"</span>: <span class="string">"8123"</span>,</span><br><span class="line">            <span class="attr">"9600"</span>: <span class="string">"8623"</span>,</span><br><span class="line">            <span class="attr">"9700"</span>: <span class="string">"8723"</span>,</span><br><span class="line">            <span class="attr">"9800"</span>: <span class="string">"8823"</span>,</span><br><span class="line">            <span class="attr">"9900"</span>: <span class="string">"8923"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"taskSettings"</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"sleep_second"</span>: <span class="number">5</span>,</span><br><span class="line">        <span class="attr">"parallelism"</span>: <span class="number">15</span>,</span><br><span class="line">        <span class="attr">"allow_to_drop_dest_partition"</span>: <span class="literal">false</span>,</span><br><span class="line">        <span class="attr">"check_count"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>cluster.py</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> functools</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CantRetry</span><span class="params">(RuntimeError)</span>:</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickHouseException</span><span class="params">(RuntimeError)</span>:</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">retry</span><span class="params">(times, sec)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(func)</span>:</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">inner_wrapper</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">            i = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    <span class="keyword">return</span> func(*args, **kwargs)</span><br><span class="line">                <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                    i += <span class="number">1</span></span><br><span class="line">                    <span class="keyword">if</span> i &gt; times:</span><br><span class="line">                        <span class="keyword">raise</span> (e)</span><br><span class="line">                    time.sleep(sec)</span><br><span class="line">        <span class="keyword">return</span> inner_wrapper</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@retry(2, 3)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">query_http</span><span class="params">(host, port, user, password, sql)</span>:</span></span><br><span class="line">    ckurl = <span class="string">f'http://<span class="subst">&#123;user&#125;</span>:<span class="subst">&#123;password&#125;</span>@<span class="subst">&#123;host&#125;</span>:<span class="subst">&#123;port&#125;</span>/'</span></span><br><span class="line">    response_result = requests.post(ckurl, data=sql.encode(<span class="string">'utf-8'</span>))</span><br><span class="line">    <span class="keyword">if</span> response_result.status_code != <span class="number">200</span>:</span><br><span class="line">        <span class="keyword">raise</span> ClickHouseException(</span><br><span class="line">            <span class="string">f"Query executed failed:<span class="subst">&#123;response_result.text&#125;</span>"</span>)</span><br><span class="line">    <span class="keyword">return</span> response_result.text</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickHouseInstance</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, host_address, tcp_port, http_port, cluster, shard, replica_num)</span>:</span></span><br><span class="line">        self.host_address = host_address</span><br><span class="line">        self.tcp_port = tcp_port</span><br><span class="line">        self.http_port = http_port</span><br><span class="line">        self.replica_num = replica_num</span><br><span class="line">        self.shard = shard</span><br><span class="line">        self.cluster = cluster</span><br><span class="line">        self.user = cluster.user</span><br><span class="line">        self.password = cluster.password</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">query_http</span><span class="params">(self, sql)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> query_http(self.host_address, self.http_port, self.user, self.password, sql)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Shard</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, cluster, shard_num)</span>:</span></span><br><span class="line">        self.shard_num = shard_num</span><br><span class="line">        self.replicas = list()</span><br><span class="line">        self.query_idx = <span class="number">0</span></span><br><span class="line">        self.cluster = cluster</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">append_replica</span><span class="params">(self, replica_num, host_address, tcp_port, http_port)</span>:</span></span><br><span class="line">        self.replicas.append(ClickHouseInstance(</span><br><span class="line">            host_address, tcp_port, http_port, self.cluster, self, replica_num))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">query_all_replicas</span><span class="params">(self, sql)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> replica <span class="keyword">in</span> self.replicas:</span><br><span class="line">            replica.query_http(sql)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">query</span><span class="params">(self, sql)</span>:</span>              </span><br><span class="line">        idx = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> idx &lt; len(self.replicas): </span><br><span class="line">            <span class="keyword">try</span>:    </span><br><span class="line">                idx += <span class="number">1</span></span><br><span class="line">                self.replicas[idx].query_http(sql)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                time.sleep(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 一个ck实例，包含所有分片，以及defualt账户密码</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cluster</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, cluster_name, host, port, user, password, tcp_http_mappings)</span>:</span></span><br><span class="line">        self.cluster_name = cluster_name</span><br><span class="line">        self.domain_name = host</span><br><span class="line">        self.port = port</span><br><span class="line">        self.user = user</span><br><span class="line">        self.password = password</span><br><span class="line">        self.tcp_http_mappings = tcp_http_mappings</span><br><span class="line">        self.shards = self.get_shards()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">query</span><span class="params">(self, sql)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> query_http(self.domain_name, self.port, self.user, self.password, sql)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">query_one_replica</span><span class="params">(self, sql)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> query_http(self.domain_name, self.port, self.user, self.password, sql)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">query_all</span><span class="params">(self, sql)</span>:</span></span><br><span class="line">        <span class="keyword">with</span> Pool(len(self.shards)) <span class="keyword">as</span> p:</span><br><span class="line">            clusters = p.map(functools.partial(</span><br><span class="line">                Shard.query_all_replicas, sql=sql), self.shards.values())</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_shards</span><span class="params">(self)</span>:</span></span><br><span class="line">        shards = dict()</span><br><span class="line">        get_shard_sql = <span class="string">f'''select shard_num, replica_num, host_address, port from system.clusters</span></span><br><span class="line"><span class="string">        where cluster='<span class="subst">&#123;self.cluster_name&#125;</span>' order by shard_num, replica_num;'''</span></span><br><span class="line">        result = self.query(get_shard_sql)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> result.splitlines():</span><br><span class="line">            shard_num, replica_num, host_address, tcp_port = line.split()</span><br><span class="line">            shard = shards.get(shard_num, Shard(self, shard_num))</span><br><span class="line">            shard.append_replica(replica_num, host_address,</span><br><span class="line">                                 tcp_port, self.tcp_http_mappings[tcp_port])</span><br><span class="line">            shards[shard_num] = shard</span><br><span class="line">        <span class="keyword">return</span> shards</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>copyData.py</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> codecs</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</span><br><span class="line"><span class="keyword">from</span> urllib <span class="keyword">import</span> response</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> logging</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> cluster <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> concurrent.futures</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">FORMAT = <span class="string">'%(asctime)-15s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s'</span></span><br><span class="line">logging.basicConfig(format=FORMAT)</span><br><span class="line">logging.getLogger().setLevel(logging.INFO)</span><br><span class="line"></span><br><span class="line"><span class="comment"># =============================</span></span><br><span class="line"><span class="comment"># 数据拷贝task类的定义以及初始化</span></span><br><span class="line"><span class="comment"># =============================</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Conf</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, config_path: str)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">with</span> open(config_path, <span class="string">'r'</span>) <span class="keyword">as</span> load_f:</span><br><span class="line">                self.loaded_json = json.load(load_f)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">raise</span> Exception(</span><br><span class="line">                <span class="string">f"can't get conf fron file '<span class="subst">&#123;config_path&#125;</span>': <span class="subst">&#123;e&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cluster_by_config</span><span class="params">(config)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> Cluster(config[<span class="string">'cluster_name'</span>], config[<span class="string">'host'</span>], config[<span class="string">'port'</span>],</span><br><span class="line">                   config[<span class="string">'user'</span>], config[<span class="string">'password'</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_partitions</span><span class="params">(cluster, database, table, range)</span>:</span></span><br><span class="line">    get_paritions_count_sql = <span class="string">f'''select countDistinct(partition) from cluster(system_cluster, system.parts) where database='<span class="subst">&#123;database&#125;</span>' and table='<span class="subst">&#123;table&#125;</span>' ; '''</span></span><br><span class="line">    logging.info(<span class="string">'test2'</span>)</span><br><span class="line">    paritions_count = cluster.query(get_paritions_count_sql).splitlines()[<span class="number">0</span>]</span><br><span class="line">    conditions = <span class="string">''</span></span><br><span class="line">    <span class="keyword">if</span> range[<span class="number">0</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        conditions += <span class="string">f"and partition &gt;= '<span class="subst">&#123;range[<span class="number">0</span>]&#125;</span>'"</span></span><br><span class="line">    <span class="keyword">if</span> range[<span class="number">1</span>] <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        conditions += <span class="string">f"and partition &lt;= '<span class="subst">&#123;range[<span class="number">1</span>]&#125;</span>'"</span></span><br><span class="line">        </span><br><span class="line">    get_partitions_sql = <span class="string">f"select distinct(partition) from cluster(system_cluster, system.parts) where database='<span class="subst">&#123;database&#125;</span>' and table='<span class="subst">&#123;table&#125;</span>' <span class="subst">&#123;conditions&#125;</span> order by partition; "</span></span><br><span class="line">    paritions = cluster.query(get_partitions_sql).splitlines()</span><br><span class="line">    </span><br><span class="line">    logging.info(<span class="string">f"get table <span class="subst">&#123;database&#125;</span>.<span class="subst">&#123;table&#125;</span> <span class="subst">&#123;len(paritions)&#125;</span>/<span class="subst">&#123;paritions_count&#125;</span> partitions by range <span class="subst">&#123;range&#125;</span> from cluster <span class="subst">&#123;cluster.cluster_name&#125;</span> "</span>)</span><br><span class="line">    <span class="keyword">return</span> paritions</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_condition</span><span class="params">(partition_key, partition)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> partition == <span class="string">'tuple()'</span> <span class="keyword">or</span> partition_key == <span class="string">''</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line">    partition_split = partition.encode(<span class="string">'utf-8'</span>).decode(</span><br><span class="line">    <span class="string">'unicode_escape'</span>).replace(<span class="string">'('</span>, <span class="string">''</span>).replace(<span class="string">')'</span>, <span class="string">''</span>).split(<span class="string">','</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> partition_key[<span class="number">0</span>] == <span class="string">'('</span>:</span><br><span class="line">        partition_key = partition_key.replace(<span class="string">'('</span>, <span class="string">''</span>).replace(<span class="string">')'</span>, <span class="string">''</span>)</span><br><span class="line">    partition_keys = partition_key.split(<span class="string">', '</span>)</span><br><span class="line">    <span class="keyword">if</span> len(partition_keys) == <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'where '</span> + <span class="string">f"toString(<span class="subst">&#123;partition_keys[<span class="number">0</span>]&#125;</span>) = '<span class="subst">&#123;partition_split[<span class="number">0</span>]&#125;</span>'"</span></span><br><span class="line">    conditions = [</span><br><span class="line">        <span class="string">f"<span class="subst">&#123;a&#125;</span> = <span class="subst">&#123;b&#125;</span>"</span> <span class="keyword">for</span> a, b <span class="keyword">in</span> zip(partition_keys, partition_split)</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'where '</span> + <span class="string">' and '</span>.join(conditions) </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Task</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, configs)</span>:</span></span><br><span class="line">        self.src_cluster = Cluster(**configs[<span class="string">"srcCluster"</span>])</span><br><span class="line">        self.dest_cluster = Cluster(**configs[<span class="string">"destCluster"</span>])</span><br><span class="line"></span><br><span class="line">        self.sleep_second = configs[<span class="string">'taskSettings'</span>].get(<span class="string">'sleep_second'</span>, <span class="number">1</span>)</span><br><span class="line">        self.parallelism = configs[<span class="string">'taskSettings'</span>].get(<span class="string">'parallelism'</span>, len(self.dest_cluster.shards))</span><br><span class="line">        self.allow_to_drop_dest_partition = configs[<span class="string">'taskSettings'</span>].get(<span class="string">'allow_to_drop_dest_partition'</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">        self.src_db = <span class="literal">None</span></span><br><span class="line">        self.src_table = <span class="literal">None</span></span><br><span class="line">        self.dest_db = <span class="literal">None</span></span><br><span class="line">        self.dest_table = <span class="literal">None</span></span><br><span class="line">        self.dest_dis_table = <span class="literal">None</span></span><br><span class="line">        </span><br><span class="line">        self.engine = <span class="literal">None</span>       </span><br><span class="line">        self.is_dimension_table = <span class="literal">False</span></span><br><span class="line">        self.partition_key = <span class="literal">None</span></span><br><span class="line">        self.partitions = <span class="literal">None</span></span><br><span class="line">        self.shard_key = <span class="literal">None</span></span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">initialize_src</span><span class="params">(self, src_db, src_table, range)</span>:</span></span><br><span class="line">        self.src_db = src_db</span><br><span class="line">        self.src_table = src_table</span><br><span class="line">        </span><br><span class="line">        sql = <span class="string">f"select partition_key from system.tables where name = '<span class="subst">&#123;src_table&#125;</span>' and database = '<span class="subst">&#123;src_db&#125;</span>'"</span></span><br><span class="line"></span><br><span class="line">        self.partition_key = self.src_cluster.query(sql).splitlines()[<span class="number">0</span>]</span><br><span class="line">        logging.info(<span class="string">"get partition_key: %s"</span>, self.partition_key)</span><br><span class="line">        </span><br><span class="line">        self.partitions = get_partitions(self.src_cluster, src_db,</span><br><span class="line">                                         src_table, range)</span><br><span class="line">        </span><br><span class="line">        sql = <span class="string">f"select count() from system.tables where name = '<span class="subst">&#123;src_table&#125;</span>' and database = '<span class="subst">&#123;src_db&#125;</span>' and create_table_query like '%replica_dict%'"</span></span><br><span class="line">        </span><br><span class="line">        self.is_dimension_table = (int(self.src_cluster.query(sql).splitlines()[<span class="number">0</span>]) == <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">check_table_exists</span><span class="params">(self)</span>:</span></span><br><span class="line">        sql = <span class="string">f"select count() from system.tables where name = '<span class="subst">&#123;self.dest_table&#125;</span>' and database = '<span class="subst">&#123;self.dest_db&#125;</span>'"</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            result = self.dest_cluster.query(sql)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            logging.error(<span class="string">"check table %s.%s exists on dest cluster %s failed: %s"</span>, self.dest_db, self.dest_table, self.dest_cluster.cluster_name, e)</span><br><span class="line">            sys.exit(<span class="number">-1</span>)</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">return</span> int(result.splitlines()[<span class="number">0</span>]) == <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_create_table_sql</span><span class="params">(self)</span>:</span></span><br><span class="line">        sql = <span class="string">f"show create <span class="subst">&#123;self.src_db&#125;</span>.<span class="subst">&#123;self.src_table&#125;</span>"</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            result = self.src_cluster.query(sql)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            logging.error(<span class="string">"get create table %s.%s sql %s failed: %s"</span>, self.src_db, self.src_table, sql, e)</span><br><span class="line">            sys.exit(<span class="number">-1</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> codecs.escape_decode(bytes(result,<span class="string">"utf-8"</span>))[<span class="number">0</span>].decode(<span class="string">"utf-8"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create_dest_table</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">if</span>(self.check_table_exists()):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            logging.info(<span class="string">'try to create table %s.%s on dest cluster'</span>, self.dest_db, self.dest_table) </span><br><span class="line">        </span><br><span class="line">        create_table_sql = self.get_create_table_sql()</span><br><span class="line">        </span><br><span class="line">        create_table_sql = create_table_sql.replace(self.src_cluster.cluster_name, self.dest_cluster.cluster_name).replace(<span class="string">f"<span class="subst">&#123;self.src_db&#125;</span>.<span class="subst">&#123;self.src_table&#125;</span>"</span>, <span class="string">f"<span class="subst">&#123;self.dest_db&#125;</span>.<span class="subst">&#123;self.dest_table&#125;</span>"</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.dest_cluster.query_all(create_table_sql)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            logging.error(<span class="string">"create table %s.%s sql %s failed: %s"</span>, self.dest_db, self.dest_table, create_table_sql, e)</span><br><span class="line">            sys.exit(<span class="number">-1</span>)</span><br><span class="line">    </span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create_dest_dis_table</span><span class="params">(self)</span>:</span></span><br><span class="line">        create_table_sql = <span class="string">f'''create table <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_dis_table&#125;</span>` </span></span><br><span class="line"><span class="string">        as  <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>`</span></span><br><span class="line"><span class="string">        ENGINE = Distributed('<span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span>', '<span class="subst">&#123;self.dest_db&#125;</span>', '<span class="subst">&#123;self.dest_table&#125;</span>', <span class="subst">&#123;self.shard_key&#125;</span>) '''</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.dest_cluster.query_all(create_table_sql)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            logging.error(<span class="string">"create table %s.%s sql %s failed: %s"</span>, self.dest_db, self.dest_table, create_table_sql, e)</span><br><span class="line">            sys.exit(<span class="number">-1</span>)</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">initialize_dest</span><span class="params">(self, dest_db, dest_table, shard_key)</span>:</span></span><br><span class="line">        self.shard_key = shard_key</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> dest_db <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            self.dest_db = self.src_table</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.dest_db = dest_db</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> dest_table <span class="keyword">is</span> <span class="literal">None</span>:           </span><br><span class="line">            self.dest_table = self.src_table</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.dest_table = dest_table</span><br><span class="line">        </span><br><span class="line">        self.dest_dis_table = <span class="string">f'<span class="subst">&#123;self.dest_table&#125;</span>_<span class="subst">&#123;int(time.time())&#125;</span>_dis'</span></span><br><span class="line">            </span><br><span class="line">        self.create_dest_table()   </span><br><span class="line">        self.create_dest_dis_table() </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">check_partition</span><span class="params">(self, condition, partition)</span>:</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            source_func = <span class="string">f'''cluster( <span class="subst">&#123;self.src_cluster.cluster_name&#125;</span>, <span class="subst">&#123;self.src_db&#125;</span>.`<span class="subst">&#123;self.src_table&#125;</span>`)'''</span>   </span><br><span class="line">            desc_func = <span class="string">f'''cluster( <span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span>, <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>`)'''</span></span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> self.engine == <span class="string">'ReplicatedReplacingMergeTree'</span>:</span><br><span class="line">                source_func += <span class="string">''' final '''</span></span><br><span class="line">                desc_func += <span class="string">''' final '''</span></span><br><span class="line">            </span><br><span class="line">                  </span><br><span class="line">            src_sql = <span class="string">f"select count() from <span class="subst">&#123;source_func&#125;</span>  <span class="subst">&#123;condition&#125;</span> settings do_not_merge_across_partitions_select_final = 1"</span></span><br><span class="line">            dest_sql = <span class="string">f"select count() from <span class="subst">&#123;desc_func&#125;</span>  <span class="subst">&#123;condition&#125;</span> settings do_not_merge_across_partitions_select_final = 1"</span></span><br><span class="line">            </span><br><span class="line">            src_cnt = int(self.src_cluster.query(src_sql).splitlines()[<span class="number">0</span>])</span><br><span class="line">            dest_cnt = int(self.dest_cluster.query(dest_sql).splitlines()[<span class="number">0</span>])        </span><br><span class="line">            </span><br><span class="line">                 </span><br><span class="line">            <span class="keyword">if</span> src_cnt != dest_cnt:</span><br><span class="line">                logging.info(</span><br><span class="line">                    <span class="string">f'<span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span>中表 <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>` 分区 <span class="subst">&#123;partition&#125;</span> 数据不一致, 源集群: <span class="subst">&#123;src_cnt&#125;</span>, 目标集群: <span class="subst">&#123;dest_cnt&#125;</span>, 尝试重新写入'</span></span><br><span class="line">                )</span><br><span class="line">                <span class="keyword">if</span> dest_cnt != <span class="number">0</span>:</span><br><span class="line">                    <span class="keyword">if</span> self.allow_to_drop_dest_partition == <span class="literal">False</span>:</span><br><span class="line">                        logging.error( <span class="string">f'<span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span> 中表 <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>` 目标集群分区 <span class="subst">&#123;partition&#125;</span> 数据不为空，不允许删除，跳过分区 <span class="subst">&#123;partition&#125;</span>'</span>)</span><br><span class="line">                        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">                    </span><br><span class="line">                    logging.info(</span><br><span class="line">                        <span class="string">f'<span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span> 中表 <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>` 目标集群分区 <span class="subst">&#123;partition&#125;</span> 数据不为空: <span class="subst">&#123;dest_cnt&#125;</span>, 尝试删除'</span></span><br><span class="line">                    )</span><br><span class="line">                    </span><br><span class="line">                    drop_partition_sql = <span class="string">f"alter table <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>`  on cluster <span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span> drop partition '<span class="subst">&#123;partition&#125;</span>'"</span></span><br><span class="line">                    <span class="keyword">if</span> partition[<span class="number">0</span>] == <span class="string">'('</span>:</span><br><span class="line">                        new_partition_str = partition.replace(<span class="string">'\\'</span>, <span class="string">''</span>)                     </span><br><span class="line">                        drop_partition_sql = <span class="string">f"alter table <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>`  on cluster <span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span> drop partition <span class="subst">&#123;new_partition_str&#125;</span>"</span>                </span><br><span class="line">                    self.dest_cluster.query(drop_partition_sql)</span><br><span class="line">                    time.sleep(<span class="number">1</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                logging.info(<span class="string">f'<span class="subst">&#123;self.dest_cluster.cluster_name&#125;</span>中表 <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_table&#125;</span>` 分区 <span class="subst">&#123;partition&#125;</span> 数据一致, 源集群: <span class="subst">&#123;src_cnt&#125;</span>, 目标集群: <span class="subst">&#123;dest_cnt&#125;</span>'</span>)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            logging.error(e)</span><br><span class="line">            logging.error(<span class="string">f"验证分区 <span class="subst">&#123;partition&#125;</span> 出错，请重试"</span>)</span><br><span class="line">            <span class="keyword">raise</span>(Exception)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">insert_data</span><span class="params">(self, src_shard, condition)</span>:</span></span><br><span class="line">        idx = random.randint(<span class="number">0</span>, len(src_shard.replicas)<span class="number">-1</span>)</span><br><span class="line">        replica = src_shard.replicas[idx]</span><br><span class="line">                </span><br><span class="line">        source_func = <span class="string">f'''remote('<span class="subst">&#123;replica.host_address&#125;</span>:<span class="subst">&#123;replica.tcp_port&#125;</span>',<span class="subst">&#123;self.src_db&#125;</span>,<span class="subst">&#123;self.src_table&#125;</span>,'<span class="subst">&#123;self.src_cluster.user&#125;</span>','<span class="subst">&#123;self.src_cluster.password&#125;</span>')'''</span></span><br><span class="line">            </span><br><span class="line">        settings = <span class="string">'''settings receive_timeout = 6000, send_timeout = 6000, insert_deduplicate = 0'''</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> self.engine == <span class="string">'ReplicatedReplacingMergeTree'</span>:</span><br><span class="line">            settings += <span class="string">''', do_not_merge_across_partitions_select_final = 1'''</span></span><br><span class="line">            source_func += <span class="string">''' final '''</span></span><br><span class="line">    </span><br><span class="line">        sql = <span class="string">f'''insert into <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_dis_table&#125;</span>`</span></span><br><span class="line"><span class="string">        select * from <span class="subst">&#123;source_func&#125;</span> <span class="subst">&#123;condition&#125;</span> </span></span><br><span class="line"><span class="string">        <span class="subst">&#123;settings&#125;</span>;'''</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># logging.info(sql)</span></span><br><span class="line">        self.dest_cluster.query(sql)</span><br><span class="line"></span><br><span class="line"><span class="meta">    @retry(2, 3)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">copy_parition</span><span class="params">(self, partition, condition)</span>:</span></span><br><span class="line">        <span class="comment"># 验证，如果有问题删除</span></span><br><span class="line">        <span class="keyword">if</span> self.check_partition(condition, partition):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        logging.info(<span class="string">f"准备拷贝分区 <span class="subst">&#123;partition&#125;</span>"</span>)</span><br><span class="line">        <span class="keyword">with</span> concurrent.futures.ThreadPoolExecutor(max_workers=self.parallelism) <span class="keyword">as</span> executor:</span><br><span class="line">            futures = list()               </span><br><span class="line">            <span class="keyword">for</span> shard_num, shard <span class="keyword">in</span> self.src_cluster.shards.items():</span><br><span class="line">                logging.info(<span class="string">f"准备拷贝分片 <span class="subst">&#123;shard_num&#125;</span>"</span>)</span><br><span class="line">                futures.append(executor.submit(Task.insert_data, self, shard, condition))</span><br><span class="line">            concurrent.futures.wait(futures)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(len(futures)):                   </span><br><span class="line">                exception = futures[i].exception()</span><br><span class="line">                <span class="comment"># handle exceptional case</span></span><br><span class="line">                <span class="keyword">if</span> exception:</span><br><span class="line">                    logging.error(<span class="string">f"源集群 <span class="subst">&#123;self.src_cluster.cluster_name&#125;</span> 分片 <span class="subst">&#123;i+<span class="number">1</span>&#125;</span> 分区 <span class="subst">&#123;partition&#125;</span> 拷贝失败: <span class="subst">&#123;exception&#125;</span>"</span>)</span><br><span class="line">                    <span class="keyword">raise</span>(exception)</span><br><span class="line">          </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> partition <span class="keyword">in</span> self.partitions:</span><br><span class="line">            condition = get_condition(self.partition_key, partition)           </span><br><span class="line">            self.copy_parition(partition, condition)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">drop_dest_dis_table</span><span class="params">(self)</span>:</span></span><br><span class="line">        drop_table_sql = <span class="string">f"drop table <span class="subst">&#123;self.dest_db&#125;</span>.`<span class="subst">&#123;self.dest_dis_table&#125;</span>`"</span></span><br><span class="line">        self.dest_cluster.query_all(drop_table_sql)</span><br><span class="line">         </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">copy_data</span><span class="params">(args)</span>:</span></span><br><span class="line">    logging.info(args)</span><br><span class="line"></span><br><span class="line">    logging.info(<span class="string">f"解析配置文件"</span>)</span><br><span class="line">    config = Conf(args.config)</span><br><span class="line">    </span><br><span class="line">    logging.info(<span class="string">f"初始化任务"</span>)</span><br><span class="line">    copy_task = Task(config.loaded_json) </span><br><span class="line">    </span><br><span class="line">    logging.info(<span class="string">f"从源表<span class="subst">&#123;args.src_db&#125;</span>中获取迁移数据信息"</span>)</span><br><span class="line">    copy_task.initialize_src(args.src_db, args.src_table, (args.min_partition, args.max_partition))</span><br><span class="line">    </span><br><span class="line">    copy_task.initialize_dest(args.dest_db, args.dest_table, args.shard_key)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        copy_task.run()</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        logging.info(<span class="string">f"迁移数据失败中止: <span class="subst">&#123;e&#125;</span>"</span>)</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">         copy_task.drop_dest_dis_table()</span><br><span class="line">    </span><br><span class="line">   </span><br><span class="line"></span><br><span class="line"><span class="comment"># =============================</span></span><br><span class="line"><span class="comment"># 主函数</span></span><br><span class="line"><span class="comment"># =============================</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    </span><br><span class="line">    parser = argparse.ArgumentParser(description=<span class="string">'ClickHouse集群数据迁移脚本'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--src_db'</span>, type=str, required=<span class="literal">True</span>, help=<span class="string">'源数据库'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--src_table'</span>, type=str, required=<span class="literal">True</span>, help=<span class="string">'源本地表'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--dest_db'</span>, type=str, help=<span class="string">'目标数据库'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--dest_table'</span>, type=str, help=<span class="string">'目标本地表'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--min_partition'</span>, type=str, help=<span class="string">'最小分区'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--max_partition'</span>, type=str, help=<span class="string">'最大分区'</span>)</span><br><span class="line"></span><br><span class="line">    parser.add_argument(<span class="string">'--config'</span>,</span><br><span class="line">                        type=str,</span><br><span class="line">                        default=<span class="string">f'conf.json'</span>,</span><br><span class="line">                        help=<span class="string">'配置文件'</span>)</span><br><span class="line">    parser.add_argument(<span class="string">'--shard_key'</span>,</span><br><span class="line">                        type=str,</span><br><span class="line">                        default=<span class="string">'rand()'</span>,</span><br><span class="line">                        help=<span class="string">'分片之间分发的规则'</span>)</span><br><span class="line">    args = parser.parse_args()</span><br><span class="line">    copy_data(args)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ClickHouse/" rel="tag"><i class="fa fa-tag"></i> ClickHouse</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/01/05/ClickHouse_ClickHouse%E6%9C%8D%E5%8A%A1%E4%B8%AD%E9%97%B4%E6%80%81&%E6%9C%AC%E5%9C%B0%E5%8E%BB%E9%87%8D%E4%BC%98%E5%8C%96%E5%AE%9E%E6%88%98/" rel="next" title="ClickHouse_ClickHouse服务中间态&本地去重优化实战">
+                <i class="fa fa-chevron-left"></i> ClickHouse_ClickHouse服务中间态&本地去重优化实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/01/07/ClickHouse_clickhouse%E6%B5%81%E9%87%8F%E5%95%86%E8%AF%A6%E6%98%8E%E7%BB%86%E5%88%B7%E5%B2%97%E5%AE%9E%E6%88%98/" rel="prev" title="ClickHouse_clickhouse流量商详明细刷岗实战">
+                ClickHouse_clickhouse流量商详明细刷岗实战 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ClickHouse-ClickHouse跨集群迁移数据表工具"><span class="nav-number">1.</span> <span class="nav-text">ClickHouse_ClickHouse跨集群迁移数据表工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关键命令"><span class="nav-number">1.1.</span> <span class="nav-text">关键命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#完整工具代码"><span class="nav-number">1.2.</span> <span class="nav-text">完整工具代码</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+  
+
+<link href="https://cdn.bootcss.com/font-awesome/4.6.2/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/32x32.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/16x16.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java服务_Spring事物与分布式事务一、Spring事务1.事务的属性事务具有ACID四个属性，这四种属性也可以看作是一种因果关系，A、I、D是手段，C是目的： 原子性（Atomicity）:事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。 一致性（Consistency）：事务必须使数据库从一个一致性状态变换到另外一个一致性状态。 隔离性（Isolation）：指一个事">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java服务_Spring事物与分布式事务">
+<meta property="og:url" content="http://https//littleforestjia.github.io/2024/02/07/Java%E6%9C%8D%E5%8A%A1_Spring%E4%BA%8B%E7%89%A9%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/index.html">
+<meta property="og:site_name" content="岩手县小森的博客">
+<meta property="og:description" content="Java服务_Spring事物与分布式事务一、Spring事务1.事务的属性事务具有ACID四个属性，这四种属性也可以看作是一种因果关系，A、I、D是手段，C是目的： 原子性（Atomicity）:事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。 一致性（Consistency）：事务必须使数据库从一个一致性状态变换到另外一个一致性状态。 隔离性（Isolation）：指一个事">
+<meta property="article:published_time" content="2024-02-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-02-25T09:17:25.335Z">
+<meta property="article:author" content="zju岩手县小森">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://https://littleforestjia.github.io/2024/02/07/Java服务_Spring事物与分布式事务/"/>
+
+
+
+
+
+  <title>Java服务_Spring事物与分布式事务 | 岩手县小森的博客</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">岩手县小森的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">努力将眼前的每一天过得精彩</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://https://littleforestjia.github.io/2024/02/07/Java%E6%9C%8D%E5%8A%A1_Spring%E4%BA%8B%E7%89%A9%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zju岩手县小森">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩手县小森的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java服务_Spring事物与分布式事务</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2024-02-07T00:00:00+08:00">
+                2024-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">Java服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java服务-Spring事物与分布式事务"><a href="#Java服务-Spring事物与分布式事务" class="headerlink" title="Java服务_Spring事物与分布式事务"></a>Java服务_Spring事物与分布式事务</h1><h2 id="一、Spring事务"><a href="#一、Spring事务" class="headerlink" title="一、Spring事务"></a>一、Spring事务</h2><h3 id="1-事务的属性"><a href="#1-事务的属性" class="headerlink" title="1.事务的属性"></a>1.事务的属性</h3><p>事务具有ACID四个属性，这四种属性也可以看作是一种因果关系，A、I、D是手段，C是目的：</p>
+<p>原子性（Atomicity）:事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。</p>
+<p>一致性（Consistency）：事务必须使数据库从一个一致性状态变换到另外一个一致性状态。</p>
+<p>隔离性（Isolation）：指一个事务的执行不能被其他事务干扰，即一个事务内部的操作及使用的数据对并发的其他事务是隔离的，并发执行的各个事务之间不能互相干扰。</p>
+<p>持久性（Durability）：一个事务一旦被提交，它对数据库中数据的改变就是永久性的，接下来的其他操作和数据库故障不应该对其有任何影响。</p>
+<h3 id="2-Transactional注解"><a href="#2-Transactional注解" class="headerlink" title="2.@Transactional注解"></a>2.@Transactional注解</h3><p>@Transactional注解是Spring提供的数据库事务快捷实现组件，本质是通过AOP实现的，可以与任何遵循了Java数据库连接(JDBC)规范且本身支持事务的数据库协同工作。@Transactional注解的常用参数如下：</p>
+<p><strong>rollbackFor</strong></p>
+<p>该属性用于设置需要进行回滚的异常类数组，当方法中抛出指定异常数组中的异常时，则进行事务回滚。例如： 1. 指定单一异常类：@Transactional(rollbackFor=RuntimeException.class) 2. 指定多个异常类：@Transactional(rollbackFor={RuntimeException.class, BusnessException.class})</p>
+<p><strong>isolation</strong></p>
+<p>该属性用于设置底层数据库的事务隔离级别，事务隔离级别介绍如下:</p>
+<p>1）@Transactional(isolation = Isolation.READ_UNCOMMITTED)读取未提交数据(会出现脏读, 不可重复读) 基本不使用；</p>
+<p>2）@Transactional(isolation = Isolation.READ_COMMITTED)读取已提交数据(会出现不可重复读和幻读)；</p>
+<p>3）@Transactional(isolation = Isolation.REPEATABLE_READ)可重复读(会出现幻读)；</p>
+<p>4）@Transactional(isolation = Isolation.SERIALIZABLE)串行化。</p>
+<p>其中的脏读、幻读、不可重复读分别表示：</p>
+<p>1）脏读 : 一个事务读取到另一事务未提交的更新数据；</p>
+<p>2）不可重复读 : 在同一事务中, 多次读取同一数据返回的结果有所不同, 换句话说, 后续读取可以读到另一事务已提交的更新数据.。相反, “可重复读”在同一事务中多次读取数据时, 能够保证所读数据一样, 也就是后续读取不能读到另一事务已提交的更新数据；</p>
+<p>3）幻读 : 一个事务读到另一个事务已提交的insert数据。</p>
+<h3 id="3-Transactional注解失效的8种场景"><a href="#3-Transactional注解失效的8种场景" class="headerlink" title="3.@Transactional注解失效的8种场景"></a>3.@Transactional注解失效的8种场景</h3><p><strong>1.访问权限问题 (只有public方法会生效)</strong></p>
+<p>如果方法的访问权限被定义成了private，这样会导致事务失效，spring要求被代理方法必须得是public的。</p>
+<p><strong>2.方法用final或static修饰，不会生效</strong></p>
+<p>如果方法被定义成了final或者static的，这样会导致事务失效。查看spring事务的源码，可以知道spring事务底层使用了aop，也就是通过jdk动态代理或者cglib，帮我们生成了代理类，在代理类中实现的事务功能。但如果某个方法用final或static修饰了，那么在它的代理类中，就无法重写该方法，也就无法添加事务功能。</p>
+<p><strong>3.同一个类中的方法直接内部调用，会导致事务失效</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(UserModel userModel)</span> </span>&#123;</span><br><span class="line">        userMapper.insertUser(userModel);</span><br><span class="line">        updateStatus(userModel);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateStatus</span><span class="params">(UserModel userModel)</span> </span>&#123;</span><br><span class="line">        doSameThing();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看到在事务方法add中，直接调用事务方法updateStatus。从前面介绍的内容可以知道，updateStatus方法拥有事务的能力是因为spring aop生成代理了对象，但是这种方法直接调用了this对象的方法，所以updateStatus方法不会生成事务。由此可见，在同一个类中的方法直接内部调用事务方法，会导致事务失效。</p>
+<p>如果有些场景，确实想在同一个类的某个方法中，调用它自己的另外一个方法，那么有一些解决办法如下：</p>
+<p>1）新建一个类，将事务方法与调用方法放在不同类中；</p>
+<p>2）在该类中注入自己，spring ioc内部的三级缓存确保了不会出现循环依赖问题，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Servcie</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceA</span> </span>&#123;</span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   prvate ServiceA serviceA;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">         queryData1();</span><br><span class="line">         queryData2();</span><br><span class="line">         serviceA.doSave(user);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Transactional</span>(rollbackFor=Exception<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">   <span class="title">public</span> <span class="title">void</span> <span class="title">doSave</span>(<span class="title">User</span> <span class="title">user</span>) </span>&#123;</span><br><span class="line">       addData1();</span><br><span class="line">       updateData2();</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>4.事务方法所在类未被spring管理</strong></p>
+<p>用spring事务的前提是：对象要被spring管理，需要创建bean实例，如使用@Controller、@Service、@Component、@Repository等注解都可以。</p>
+<p><strong>5.多线程调用</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserMapper userMapper;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RoleService roleService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(UserModel userModel)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        userMapper.insertUser(userModel);</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            roleService.doOtherThing();</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RoleService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doOtherThing</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"保存role表数据"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>事务方法add中，调用了事务方法doOtherThing，但是事务方法doOtherThing是在另外一个线程中调用的。这样会导致两个方法不在同一个线程中，获取到的数据库连接不一样，从而是两个不同的事务。如果doOtherThing方法中抛了异常，并不会被add方法捕捉到。</p>
+<p>我们所说的同一个事务，其实是指同一个数据库连接，只有拥有同一个数据库连接才能同时提交和回滚。</p>
+<p><strong>6.数据库表不支持事务</strong></p>
+<p>比如mysql数据库的myisam引擎就不支持事务，所以就算配置了@Transactional也不会生效。</p>
+<p><strong>7.未开启事务</strong></p>
+<p>如果不是SpringBoot项目，则需要在applicationContext.xml文件中，手动配置Spring事务相关参数。</p>
+<p><strong>8.抛出错误异常</strong></p>
+<p>Spring事务在默认情况下只会回滚RuntimeException（运行时异常）和Error（错误），对于普通的Exception(非运行时异常)，它不会回滚，比如常见的IOExeption和SQLException。对于非运行时异常则需要通过rollbackFor参数手动配置才可以使回滚生效。</p>
+<h2 id="二、分布式事务"><a href="#二、分布式事务" class="headerlink" title="二、分布式事务"></a>二、分布式事务</h2><p>随着微服务架构的流行，很多大型的业务流程被拆分成为了多个功能单一的基础服务，大家会根据业务的诉求在这些基础服务之上编写一些组合调用服务来满足业务诉求。但是随之就带来了分布式事务的问题，事务只能在一个微服务的一个方法中生效，无法对RPC调用的下游也生效。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RemoteService remoteService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateStatus</span><span class="params">(UserModel userModel)</span> </span>&#123;</span><br><span class="line">        remoteService.updateStatus(userModel)</span><br><span class="line">        doSameThing();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>如上述示例中，调用RPC服务的remoteService.updateStatus()方法没有问题，但是调用自身的doSameThing()方法出现报错抛出异常时，就会导致数据不一致的问题。这种问题往往比较致命，下游的remoteService.updateStatus()方法不一定支持幂等，那么失败重试可能会一直无法成功甚至引发更大的数据不一致问题。</strong></p>
+<p>业界也早就意识到了分布式事务的必要性，设计出了完美的补偿(TCC)和非完美补偿(Saga)等各种分布式事务协调协议，可以在一定程度上保障不同服务之间的数据一致性，但这些协议往往伴随着性能损失和复杂性提升。<strong>因此，我也思考了两个替代的编程思路，在尽量减少代码开发量的前提下避免分布式事务或降低它们对系统的影响：</strong></p>
+<p><strong>1.在一个事务方法中将本服务的数据更新操作放在前面，RPC服务方法的调用放在后面，这样做可以避免上述问题本服务代码报错而RPC服务数据已更新的数据不一致问题，同样如果本服务不报错而RPC服务报错返回异常那么本服务事务也可以正常生效确保数据一致性。</strong></p>
+<p><strong>2.将一个事务中的本服务数据更新部分实现幂等，我们不能相信其他人的系统，不能依赖下游实现了幂等，那我们自己就需要幂等，确保在本服务成功但是RPC服务失败的场景下，可以不断重试知道下游RPC服务成功，实现数据一致性。</strong></p>
+<p>定义驱动服务中的添加数据源接口就采用了类似思想，先更新本服务中的数据源、数据源策略相关信息，再调用下游的原子服务更新接口的EZD更新接口，也对本服务的数据更新方法checkAndInitDataSource()实现了幂等：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    RedisUtil.lock(lockKey, <span class="number">1000</span>, <span class="number">60</span>);</span><br><span class="line">    <span class="keyword">boolean</span> addRoute = routeDataSourceBO.getId() == <span class="keyword">null</span>;</span><br><span class="line">    driveDataSourceRouteManageService.checkAndInitDataSource(erp, addRoute, routeDataSourceBO);</span><br><span class="line">    Map&lt;Long, List&lt;Long&gt;&gt; resultMap = driveDataSourceRouteManageService.routeAddOrUpdate(erp, addRoute, routeDataSourceBO);</span><br><span class="line">    driveDataSourceRouteManageService.synAtomicServiceAndEzd(routeDataSourceBO);</span><br><span class="line">    Long routeId = resultMap.keySet().stream().findFirst().get();</span><br><span class="line">    <span class="keyword">return</span> success(routeId);</span><br><span class="line">&#125; <span class="keyword">catch</span> (TimeoutException e) &#123;</span><br><span class="line">    UmpUtil.makeAlarm(umpInfo, EXTERNAL_SERVICE_EXCEPTION_UMP_KEY, <span class="string">"数据源-集群同步外部系统超时"</span>);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> CommonException(<span class="string">"数据源编辑接口调用超时"</span>);</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    RedisUtil.unLock(lockKey);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://zhuanlan.zhihu.com/p/82071384" target="_blank" rel="noopener">基于服务的分布式事务(上)</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"><i class="fa fa-tag"></i> Spring</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2024/02/06/Java%E6%9C%8D%E5%8A%A1_SpringAOP&Filter&Interceptor%E6%AF%94%E8%BE%83%E4%B8%8E%E5%AE%9E%E6%88%98/" rel="next" title="Java服务_SpringAOP&Filter&Interceptor比较与实战">
+                <i class="fa fa-chevron-left"></i> Java服务_SpringAOP&Filter&Interceptor比较与实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/08/Java%E6%9C%8D%E5%8A%A1_SV%E6%9C%8D%E5%8A%A1%E7%BC%93%E5%AD%98%E5%85%A8%E9%87%8F%E6%9B%B4%E6%96%B0%E5%92%8C%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88/" rel="prev" title="Java服务_SV服务缓存全量更新和增量更新方案">
+                Java服务_SV服务缓存全量更新和增量更新方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/head.jpg"
+                alt="zju岩手县小森" />
+            
+              <p class="site-author-name" itemprop="name">zju岩手县小森</p>
+              <p class="site-description motion-element" itemprop="description">看的远固然重要 但是走好眼前的路才是关键</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">157</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">139</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.instagram.com/littleforestjia" target="_blank" title="Instagram">
+                      Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://space.bilibili.com/29623500" target="_blank" title="Bilibili">
+                      Bilibili</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java服务-Spring事物与分布式事务"><span class="nav-number">1.</span> <span class="nav-text">Java服务_Spring事物与分布式事务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、Spring事务"><span class="nav-number">1.1.</span> <span class="nav-text">一、Spring事务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-事务的属性"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.事务的属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Transactional注解"><span class="nav-number">1.1.2.</span> <span class="nav-text">2.@Transactional注解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Transactional注解失效的8种场景"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.@Transactional注解失效的8种场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、分布式事务"><span class="nav-number">1.2.</span> <span class="nav-text">二、分布式事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">1.3.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zju岩手县小森</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/2.1.3/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/velocity/1.2.1/velocity.ui.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="https://cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
